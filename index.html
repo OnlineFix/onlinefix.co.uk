@@ -240,8 +240,13 @@
         }
 
         @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
             .logo {
                 font-size: 2.5rem;
+                padding: 15px 25px;
             }
             
             .tagline {
@@ -249,16 +254,28 @@
             }
             
             .section-title {
-                font-size: 2rem;
+                font-size: 1.8rem;
             }
             
             .services-section, .contact-section {
-                padding: 30px 20px;
+                padding: 25px 15px;
             }
             
             .services-grid {
                 grid-template-columns: repeat(2, 1fr);
-                gap: 20px;
+                gap: 15px;
+            }
+            
+            .service-card {
+                padding: 20px 15px;
+            }
+            
+            .service-icon {
+                font-size: 2.5rem;
+            }
+            
+            .service-name {
+                font-size: 1.1rem;
             }
             
             .features {
@@ -266,15 +283,62 @@
                 gap: 15px;
             }
             
+            .feature {
+                padding: 20px;
+            }
+            
             .contact-grid {
                 grid-template-columns: 1fr;
-                gap: 20px;
+                gap: 15px;
+            }
+            
+            .contact-card {
+                padding: 20px;
+            }
+            
+            .cta-button {
+                padding: 12px 30px;
+                font-size: 1rem;
             }
         }
         
         @media (max-width: 480px) {
+            .container {
+                padding: 5px;
+            }
+            
+            .logo {
+                font-size: 2rem;
+                padding: 10px 20px;
+            }
+            
+            .services-section, .contact-section {
+                padding: 20px 10px;
+            }
+            
             .services-grid {
                 grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            
+            .service-card {
+                padding: 15px 10px;
+            }
+            
+            .service-icon {
+                font-size: 2rem;
+            }
+            
+            .service-name {
+                font-size: 1rem;
+            }
+            
+            .feature {
+                padding: 15px;
+            }
+            
+            .contact-card {
+                padding: 15px;
             }
         }
     </style>
@@ -334,7 +398,7 @@
                         <p>No hidden fees, clear upfront costs</p>
                     </div>
                     <div class="feature">
-                        <span class="feature-icon">⭐</span>
+                        <span class="feature-icon">⭐⭐⭐⭐⭐</span>
                         <h3 class="feature-title">5-Star Service</h3>
                         <p>Consistently rated excellent by customers</p>
                     </div>
