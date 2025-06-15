@@ -94,7 +94,7 @@
 
         .services-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(3, 1fr);
             gap: 30px;
             margin-bottom: 50px;
         }
@@ -127,7 +127,7 @@
 
         .features {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(2, 1fr);
             gap: 20px;
             margin: 40px 0;
         }
@@ -258,6 +258,27 @@
             .services-section, .contact-section {
                 padding: 30px 20px;
             }
+            
+            .services-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+            
+            .features {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .contact-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -298,6 +319,10 @@
                         <span class="service-icon">🖥️</span>
                         <h3 class="service-name">Desktop PCs</h3>
                     </div>
+                    <div class="service-card">
+                        <span class="service-icon">💾</span>
+                        <h3 class="service-name">Data Recovery</h3>
+                    </div>
                 </div>
 
                 <div class="features">
@@ -316,7 +341,13 @@
                         <h3 class="feature-title">5-Star Service</h3>
                         <p>Consistently rated excellent by customers</p>
                     </div>
+                    <div class="feature">
+                        <span class="feature-icon">👨‍🔧</span>
+                        <h3 class="feature-title">Expert Technicians</h3>
+                        <p>Skilled professionals led by Tomas with proven expertise</p>
+                    </div>
                 </div>
+
             </div>
 
             <div class="contact-section">
