@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OnlineFix - Fast & Reliable Tech Repairs in Guildford</title>
+    <title>OnlineFix - Expert Electronics Repair | Guildford, Surrey</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -11,454 +12,683 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --primary-blue: #0066FF;
+            --trust-teal: #00B4D8;
+            --deep-blue: #023E8A;
+            --accent-cyan: #90E0EF;
+            --dark-bg: #0A0E27;
+            --light-bg: #F8FAFC;
+            --white: #FFFFFF;
+            --gray-100: #F1F5F9;
+            --gray-600: #64748B;
+            --gray-800: #1E293B;
+            --success: #10B981;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             line-height: 1.6;
-            color: #333;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: var(--gray-800);
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .hero {
+            background: linear-gradient(135deg, var(--deep-blue) 0%, var(--primary-blue) 50%, var(--trust-teal) 100%);
             min-height: 100vh;
+            position: relative;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            animation: float 20s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(2deg); }
         }
 
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 0 20px;
+            position: relative;
+            z-index: 2;
         }
 
-        .hero {
+        /* Header */
+        .header {
             text-align: center;
-            color: white;
-            padding: 60px 0;
-            animation: fadeInUp 1s ease-out;
+            color: var(--white);
+            margin-bottom: 3rem;
         }
 
         .logo {
-            font-size: 3.5rem;
-            font-weight: 700;
-            margin-bottom: 20px;
-            color: white;
-            font-family: Helvetica, Arial, sans-serif;
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
 
         .tagline {
-            font-size: 1.4rem;
-            margin-bottom: 30px;
-            opacity: 0.95;
-            font-weight: 300;
+            font-size: 1.25rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
         }
 
-        .location-badge {
-            display: inline-block;
-            background: rgba(255,255,255,0.2);
-            padding: 10px 20px;
-            border-radius: 25px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.3);
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--white);
+            color: var(--primary-blue);
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
             font-size: 1.1rem;
-            margin-bottom: 40px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
         }
 
-        .main-content {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
-            overflow: hidden;
-            margin-top: -40px;
-            position: relative;
-            z-index: 10;
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.2);
+            background: var(--accent-cyan);
         }
 
-        .services-section {
-            padding: 50px 40px;
-            text-align: center;
+        /* Services Grid */
+        .services {
+            padding: 4rem 0;
+            background: var(--light-bg);
         }
 
         .section-title {
+            text-align: center;
             font-size: 2.5rem;
-            margin-bottom: 20px;
-            color: #4a5568;
-            font-weight: 600;
-        }
-
-        .services-description {
-            font-size: 1.2rem;
-            color: #718096;
-            margin-bottom: 40px;
-            max-width: 800px;
-            margin-left: auto;
-            margin-right: auto;
+            font-weight: 700;
+            margin-bottom: 3rem;
+            color: var(--deep-blue);
         }
 
         .services-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 30px;
-            margin-bottom: 50px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
         }
 
         .service-card {
-            background: linear-gradient(135deg, #f7fafc, #edf2f7);
-            padding: 30px 20px;
-            border-radius: 15px;
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
             transition: all 0.3s ease;
-            border: 2px solid transparent;
+            border: 1px solid rgba(0, 102, 255, 0.1);
         }
 
         .service-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.2);
-            border-color: #667eea;
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px -5px rgba(0, 102, 255, 0.2);
+            border-color: var(--trust-teal);
+        }
+
+        .service-card:hover .service-icon {
+            transform: scale(1.05);
+            color: var(--trust-teal);
         }
 
         .service-icon {
             font-size: 3rem;
-            margin-bottom: 15px;
-            display: block;
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
         }
 
-        .service-name {
+        .service-title {
             font-size: 1.3rem;
             font-weight: 600;
-            color: #4a5568;
+            margin-bottom: 0.5rem;
+            color: var(--deep-blue);
         }
 
+        /* Why Choose Us */
         .features {
+            padding: 4rem 0;
+            background: var(--white);
+        }
+
+        .features-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-            margin: 40px 0;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
         }
 
-        .feature {
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
-            padding: 25px;
-            border-radius: 15px;
+        .feature-item {
             text-align: center;
-            transition: transform 0.3s ease;
-        }
-
-        .feature:hover {
-            transform: scale(1.05);
+            padding: 1.5rem;
         }
 
         .feature-icon {
-            font-size: 2.5rem;
-            margin-bottom: 15px;
-            display: block;
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--trust-teal));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 2rem;
+            color: var(--white);
         }
 
         .feature-title {
             font-size: 1.2rem;
             font-weight: 600;
-            margin-bottom: 10px;
+            margin-bottom: 0.5rem;
+            color: var(--deep-blue);
         }
 
-        .contact-section {
-            background: linear-gradient(135deg, #2d3748, #4a5568);
-            color: white;
-            padding: 50px 40px;
-            text-align: center;
+        /* Reviews */
+        .reviews {
+            padding: 4rem 0;
+            background: var(--gray-100);
+        }
+
+        .reviews-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .review-card {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            position: relative;
+            transition: all 0.4s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .review-card:hover {
+            transform: translateY(-8px) rotateX(5deg);
+            box-shadow: 0 20px 40px rgba(0, 102, 255, 0.15);
+            border-color: var(--accent-cyan);
+        }
+
+        .review-card:hover .review-stars {
+            animation: starPulse 0.6s ease;
+        }
+
+        @keyframes starPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .review-stars {
+            color: #FFB400;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .review-text {
+            font-style: italic;
+            margin-bottom: 1rem;
+            color: var(--gray-600);
+        }
+
+        .review-author {
+            font-weight: 600;
+            color: var(--deep-blue);
+        }
+
+        /* Contact */
+        .contact {
+            padding: 4rem 0;
+            background: linear-gradient(135deg, var(--deep-blue), var(--primary-blue));
+            color: var(--white);
         }
 
         .contact-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 30px;
-            margin-top: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            text-align: center;
         }
 
-        .contact-card {
-            background: rgba(255,255,255,0.1);
-            padding: 30px;
-            border-radius: 15px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.2);
+        .contact-item {
+            padding: 1.5rem;
             transition: all 0.3s ease;
+            cursor: pointer;
         }
 
-        .contact-card:hover {
-            background: rgba(255,255,255,0.2);
+        .contact-item:hover {
             transform: translateY(-5px);
+        }
+
+        .contact-item:hover .contact-icon {
+            transform: scale(1.2) rotate(15deg);
+            color: var(--white);
+            text-shadow: 0 0 20px var(--accent-cyan);
         }
 
         .contact-icon {
             font-size: 2.5rem;
-            margin-bottom: 15px;
-            display: block;
+            margin-bottom: 1rem;
+            color: var(--accent-cyan);
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
 
-        .contact-label {
-            font-size: 1.1rem;
-            margin-bottom: 10px;
-            opacity: 0.9;
+        .contact-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
         }
 
         .contact-info {
-            font-size: 1.2rem;
-            font-weight: 600;
+            font-size: 1.1rem;
+            opacity: 0.9;
         }
 
         .contact-info a {
-            color: white;
+            color: var(--white);
             text-decoration: none;
-            transition: opacity 0.3s ease;
         }
 
         .contact-info a:hover {
-            opacity: 0.8;
+            color: var(--accent-cyan);
         }
 
-        .cta-button {
-            display: inline-block;
-            background: linear-gradient(45deg, #48bb78, #38a169);
-            color: white;
-            padding: 15px 40px;
-            border-radius: 50px;
+        /* Social Links */
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .social-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            color: var(--white);
             text-decoration: none;
-            font-weight: 600;
-            font-size: 1.1rem;
-            margin-top: 30px;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
         }
 
-        .cta-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(72, 187, 120, 0.4);
+        .social-link:hover {
+            background: var(--accent-cyan);
+            color: var(--deep-blue);
+            transform: translateY(-3px);
+        }
+
+        /* Mobile Optimizations */
+        @media (max-width: 768px) {
+            .logo {
+                font-size: 2rem;
+            }
+
+            .tagline {
+                font-size: 1.1rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .service-card {
+                padding: 1.5rem;
+            }
+
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                padding: 0 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero {
+                min-height: 90vh;
+            }
+
+            .logo {
+                font-size: 1.8rem;
+            }
+
+            .cta-button {
+                padding: 0.8rem 1.5rem;
+                font-size: 1rem;
+            }
+
+            .service-icon {
+                font-size: 2.5rem;
+            }
+
+            .feature-icon {
+                width: 60px;
+                height: 60px;
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Loading animation */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 0.8s ease forwards;
         }
 
         @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
             to {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
 
-        @media (max-width: 768px) {
-            .container {
-                padding: 10px;
-            }
-            
-            .logo {
-                font-size: 2.5rem;
-                padding: 15px 25px;
-            }
-            
-            .tagline {
-                font-size: 1.1rem;
-            }
-            
-            .section-title {
-                font-size: 1.8rem;
-            }
-            
-            .services-section, .contact-section {
-                padding: 25px 15px;
-            }
-            
-            .services-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 15px;
-            }
-            
-            .service-card {
-                padding: 20px 15px;
-            }
-            
-            .service-icon {
-                font-size: 2.5rem;
-            }
-            
-            .service-name {
-                font-size: 1.1rem;
-            }
-            
-            .features {
-                grid-template-columns: 1fr;
-                gap: 15px;
-            }
-            
-            .feature {
-                padding: 20px;
-            }
-            
-            .contact-grid {
-                grid-template-columns: 1fr;
-                gap: 15px;
-            }
-            
-            .contact-card {
-                padding: 20px;
-            }
-            
-            .cta-button {
-                padding: 12px 30px;
-                font-size: 1rem;
-            }
+        /* Floating animation for hero elements */
+        .logo:hover {
+            animation: logoFloat 1s ease-in-out;
         }
-        
-        @media (max-width: 480px) {
-            .container {
-                padding: 5px;
-            }
-            
-            .logo {
-                font-size: 2rem;
-                padding: 10px 20px;
-            }
-            
-            .services-section, .contact-section {
-                padding: 20px 10px;
-            }
-            
-            .services-grid {
-                grid-template-columns: 1fr;
-                gap: 12px;
-            }
-            
-            .service-card {
-                padding: 15px 10px;
-            }
-            
-            .service-icon {
-                font-size: 2rem;
-            }
-            
-            .service-name {
-                font-size: 1rem;
-            }
-            
-            .feature {
-                padding: 15px;
-            }
-            
-            .contact-card {
-                padding: 15px;
-            }
+
+        @keyframes logoFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Pulse animation for important elements */
+        .section-title {
+            transition: all 0.3s ease;
+        }
+
+        .section-title:hover {
+            transform: scale(1.05);
+            color: var(--trust-teal);
+            text-shadow: 0 4px 8px rgba(0, 180, 216, 0.3);
+        }
+
+        /* Glowing effect on hover */
+        .service-title:hover, .feature-title:hover, .contact-title:hover {
+            color: var(--trust-teal);
+            text-shadow: 0 0 10px rgba(0, 180, 216, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        /* Micro-interactions for text */
+        p:hover {
+            color: var(--primary-blue);
+            transition: color 0.3s ease;
+        }
+
+        /* Animated border on hover */
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 20px;
+            padding: 1px;
+            background: linear-gradient(45deg, var(--primary-blue), var(--trust-teal));
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .service-card:hover::before {
+            opacity: 0.3;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="hero">
-            <h1 class="logo">OnlineFix</h1>
-            <p class="tagline">Fast, Affordable & Professional Tech Repairs</p>
-            <div class="location-badge">📍 Heart of Guildford, Surrey</div>
-        </div>
-
-        <div class="main-content">
-            <div class="services-section">
-                <h2 class="section-title">Trusted Expert Repairs, Done Right</h2>
-                <p class="services-description">
-                    Led by Tomas, our experienced technicians deliver fast, reliable solutions tailored just for you. With transparent pricing and a commitment to 5-star service, we make sure your repair experience is smooth and hassle-free.
-                </p>
-
-                <div class="services-grid">
-                    <div class="service-card">
-                        <span class="service-icon">📱</span>
-                        <h3 class="service-name">Smartphones</h3>
-                    </div>
-                    <div class="service-card">
-                        <span class="service-icon">💻</span>
-                        <h3 class="service-name">Laptops</h3>
-                    </div>
-                    <div class="service-card">
-                        <span class="service-icon">📟</span>
-                        <h3 class="service-name">Tablets</h3>
-                    </div>
-                    <div class="service-card">
-                        <span class="service-icon">🎮</span>
-                        <h3 class="service-name">Gaming Consoles</h3>
-                    </div>
-                    <div class="service-card">
-                        <span class="service-icon">🖥️</span>
-                        <h3 class="service-name">Desktop PCs</h3>
-                    </div>
-                    <div class="service-card">
-                        <span class="service-icon">💾</span>
-                        <h3 class="service-name">Data Recovery</h3>
-                    </div>
-                </div>
-
-                <div class="features">
-                    <div class="feature">
-                        <span class="feature-icon">⚡</span>
-                        <h3 class="feature-title">Quick Turnaround</h3>
-                        <p>Fast repairs without compromising quality</p>
-                    </div>
-                    <div class="feature">
-                        <span class="feature-icon">💎</span>
-                        <h3 class="feature-title">Transparent Pricing</h3>
-                        <p>No hidden fees, clear upfront costs</p>
-                    </div>
-                    <div class="feature">
-                        <span class="feature-icon">⭐⭐⭐⭐⭐</span>
-                        <h3 class="feature-title">5-Star Service</h3>
-                        <p>Consistently rated excellent by customers</p>
-                    </div>
-                    <div class="feature">
-                        <span class="feature-icon">👨‍🔧</span>
-                        <h3 class="feature-title">Expert Technicians</h3>
-                        <p>Skilled professionals led by Tomas with proven expertise</p>
-                    </div>
-                </div>
-
-            </div>
-
-            <div class="contact-section">
-                <h2 class="section-title" style="color: white;">Get Your Device Fixed Today</h2>
-                
-                <div class="contact-grid">
-                    <div class="contact-card">
-                        <span class="contact-icon">📍</span>
-                        <div class="contact-label">Visit Us</div>
-                        <div class="contact-info">
-                            Guildford, Surrey<br>
-                            GU1 4PD<br>
-                            <em style="color: #48bb78;">Appointment Only</em>
-                        </div>
-                    </div>
-                    
-                    <div class="contact-card">
-                        <span class="contact-icon">📞</span>
-                        <div class="contact-label">Contact Us</div>
-                        <div class="contact-info">
-                            <a href="tel:+447940730537">07940 730537</a><br>
-                            <a href="mailto:onlinerepairbooking@gmail.com">onlinerepairbooking@gmail.com</a>
-                        </div>
-                    </div>
-                    
-                    <div class="contact-card">
-                        <span class="contact-icon">📱</span>
-                        <div class="contact-label">Follow Us</div>
-                        <div class="contact-info">
-                            Instagram: @onlinefixrepairs<br>
-                            TikTok: @onlinefix
-                        </div>
-                    </div>
-                    
-                    <div class="contact-card">
-                        <span class="contact-icon">🕐</span>
-                        <div class="contact-label">Open Hours</div>
-                        <div class="contact-info">
-                            10 AM – 10 PM<br>
-                            Every Day
-                        </div>
-                    </div>
-                </div>
-
-                <a href="tel:+447940730537" class="cta-button">📞 Call Now for Quick Repair</a>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="header fade-in">
+                <h1 class="logo">OnlineFix</h1>
+                <p class="tagline">Expert Electronics Repair with Tomas - Your Trusted Tech Specialist</p>
+                <a href="tel:+447940730537" class="cta-button">
+                    <i class="fas fa-phone"></i>
+                    Call Now: 07940 730537
+                </a>
             </div>
         </div>
-    </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="services">
+        <div class="container">
+            <h2 class="section-title fade-in">Expert Repair Services</h2>
+            <div class="services-grid">
+                <div class="service-card fade-in">
+                    <div class="service-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3 class="service-title">Smartphones</h3>
+                    <p>Screen repairs, battery replacement, water damage recovery, and all smartphone issues</p>
+                </div>
+                <div class="service-card fade-in">
+                    <div class="service-icon">
+                        <i class="fas fa-laptop"></i>
+                    </div>
+                    <h3 class="service-title">Laptops</h3>
+                    <p>Hardware repairs, screen replacement, keyboard fixes, and performance optimization</p>
+                </div>
+                <div class="service-card fade-in">
+                    <div class="service-icon">
+                        <i class="fas fa-tablet-alt"></i>
+                    </div>
+                    <h3 class="service-title">Tablets</h3>
+                    <p>Touch screen repairs, charging port fixes, and tablet restoration services</p>
+                </div>
+                <div class="service-card fade-in">
+                    <div class="service-icon">
+                        <i class="fas fa-gamepad"></i>
+                    </div>
+                    <h3 class="service-title">Gaming Consoles</h3>
+                    <p>PlayStation, Xbox, Nintendo repairs and performance enhancements</p>
+                </div>
+                <div class="service-card fade-in">
+                    <div class="service-icon">
+                        <i class="fas fa-desktop"></i>
+                    </div>
+                    <h3 class="service-title">Desktop PCs</h3>
+                    <p>Component upgrades, virus removal, system optimization, and custom builds</p>
+                </div>
+                <div class="service-card fade-in">
+                    <div class="service-icon">
+                        <i class="fas fa-hdd"></i>
+                    </div>
+                    <h3 class="service-title">Data Recovery</h3>
+                    <p>Professional data recovery from damaged drives and corrupted storage devices</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="container">
+            <h2 class="section-title fade-in">Why Choose OnlineFix?</h2>
+            <div class="features-grid">
+                <div class="feature-item fade-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h3 class="feature-title">Quick Turnaround</h3>
+                    <p>Fast repairs without compromising quality - most repairs completed same day</p>
+                </div>
+                <div class="feature-item fade-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-pound-sign"></i>
+                    </div>
+                    <h3 class="feature-title">Transparent Pricing</h3>
+                    <p>No hidden fees, clear upfront costs. Fair pricing for quality service</p>
+                </div>
+                <div class="feature-item fade-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <h3 class="feature-title">5-Star Service</h3>
+                    <p>Consistently rated excellent by customers with proven track record</p>
+                </div>
+                <div class="feature-item fade-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-user-cog"></i>
+                    </div>
+                    <h3 class="feature-title">Expert Technician</h3>
+                    <p>Skilled professional Tomas with years of proven expertise in electronics repair</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Reviews Section -->
+    <section class="reviews">
+        <div class="container">
+            <h2 class="section-title fade-in">Customer Reviews</h2>
+            <div class="reviews-container">
+                <div class="review-card fade-in">
+                    <div class="review-stars">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="review-text">"Excellent service! Tomas fixed my laptop screen in just 2 hours. Professional, affordable, and reliable. Highly recommended!"</p>
+                    <p class="review-author">- Sarah M.</p>
+                </div>
+                <div class="review-card fade-in">
+                    <div class="review-stars">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="review-text">"Amazing work on my phone water damage repair. Thought it was completely dead but Tomas brought it back to life. Top quality service!"</p>
+                    <p class="review-author">- James L.</p>
+                </div>
+                <div class="review-card fade-in">
+                    <div class="review-stars">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="review-text">"Fair pricing and honest service. Explained everything clearly and fixed my gaming console quickly. Will definitely return for future repairs."</p>
+                    <p class="review-author">- Michael R.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact">
+        <div class="container">
+            <h2 class="section-title fade-in" style="color: white;">Get Your Device Fixed Today</h2>
+            <div class="contact-grid">
+                <div class="contact-item fade-in">
+                    <div class="contact-icon">
+                        <i class="fas fa-phone"></i>
+                    </div>
+                    <h3 class="contact-title">Call Us</h3>
+                    <p class="contact-info">
+                        <a href="tel:+447940730537">07940 730537</a>
+                    </p>
+                </div>
+                <div class="contact-item fade-in">
+                    <div class="contact-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <h3 class="contact-title">Visit Us</h3>
+                    <p class="contact-info">
+                        Guildford, Surrey<br>
+                        GU1 4PD<br>
+                        <small>Appointment Only</small>
+                    </p>
+                </div>
+                <div class="contact-item fade-in">
+                    <div class="contact-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h3 class="contact-title">Open Hours</h3>
+                    <p class="contact-info">
+                        10 AM – 10 PM<br>
+                        Every Day
+                    </p>
+                </div>
+            </div>
+            
+            <div class="social-links fade-in">
+                <a href="https://instagram.com/onlinefixrepairs" class="social-link" target="_blank">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="https://tiktok.com/@onlinefix" class="social-link" target="_blank">
+                    <i class="fab fa-tiktok"></i>
+                </a>
+            </div>
+        </div>
+    </section>
 
     <script>
-        // Add smooth scroll effect for internal links
+        // Intersection Observer for fade-in animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animationDelay = Math.random() * 0.3 + 's';
+                    entry.target.classList.add('fade-in');
+                }
+            });
+        }, observerOptions);
+
+        // Observe all elements with fade-in class
+        document.addEventListener('DOMContentLoaded', () => {
+            const fadeElements = document.querySelectorAll('.fade-in');
+            fadeElements.forEach(el => observer.observe(el));
+        });
+
+        // Smooth scrolling for anchor links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
@@ -468,23 +698,104 @@
             });
         });
 
-        // Add animation on scroll
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.animation = 'fadeInUp 1s ease-out forwards';
-                }
-            });
-        }, observerOptions);
-
-        document.querySelectorAll('.service-card, .feature, .contact-card').forEach(el => {
-            observer.observe(el);
+        // Add click tracking for phone number
+        document.querySelector('a[href^="tel:"]').addEventListener('click', () => {
+            console.log('Phone number clicked');
         });
+
+        // Add particle effect on service card hover
+        document.querySelectorAll('.service-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.boxShadow = '0 15px 30px -5px rgba(0, 102, 255, 0.2)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.boxShadow = '0 10px 25px -5px rgba(0, 0, 0, 0.1)';
+            });
+        });
+
+        // Add wobble effect to feature icons on click
+        document.querySelectorAll('.feature-icon').forEach(icon => {
+            icon.addEventListener('click', function() {
+                this.style.animation = 'wobble 0.8s ease-in-out';
+                setTimeout(() => {
+                    this.style.animation = '';
+                }, 800);
+            });
+        });
+
+        // Add CSS for wobble animation
+        const wobbleStyle = document.createElement('style');
+        wobbleStyle.textContent = `
+            @keyframes wobble {
+                0% { transform: translateX(0%); }
+                15% { transform: translateX(-25%) rotate(-5deg); }
+                30% { transform: translateX(20%) rotate(3deg); }
+                45% { transform: translateX(-15%) rotate(-3deg); }
+                60% { transform: translateX(10%) rotate(2deg); }
+                75% { transform: translateX(-5%) rotate(-1deg); }
+                100% { transform: translateX(0%); }
+            }
+        `;
+        document.head.appendChild(wobbleStyle);
+
+        // Add typing effect to tagline
+        const tagline = document.querySelector('.tagline');
+        const originalText = tagline.textContent;
+        tagline.textContent = '';
+        
+        let i = 0;
+        function typeWriter() {
+            if (i < originalText.length) {
+                tagline.textContent += originalText.charAt(i);
+                i++;
+                setTimeout(typeWriter, 50);
+            }
+        }
+        
+        setTimeout(typeWriter, 1000);
+
+        // Add random floating animation to background
+        function createFloatingElement() {
+            const element = document.createElement('div');
+            element.style.cssText = `
+                position: absolute;
+                width: 4px;
+                height: 4px;
+                background: rgba(144, 224, 239, 0.6);
+                border-radius: 50%;
+                pointer-events: none;
+                animation: float-up 4s linear infinite;
+                left: ${Math.random() * 100}%;
+                top: 100%;
+                z-index: 1;
+            `;
+            
+            document.querySelector('.hero').appendChild(element);
+            
+            setTimeout(() => {
+                element.remove();
+            }, 4000);
+        }
+
+        // Add floating elements periodically
+        setInterval(createFloatingElement, 200);
+
+        // Add CSS for floating animation
+        const floatingStyle = document.createElement('style');
+        floatingStyle.textContent = `
+            @keyframes float-up {
+                0% {
+                    transform: translateY(0px) rotate(0deg);
+                    opacity: 1;
+                }
+                100% {
+                    transform: translateY(-100vh) rotate(360deg);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(floatingStyle);
     </script>
 </body>
 </html>
