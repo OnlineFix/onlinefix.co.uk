@@ -619,7 +619,7 @@
         <div class="container">
             <div class="stats-grid">
                 <div class="stat-item fade-in">
-                    <span class="stat-number" data-target="500">0</span>
+                    <span class="stat-number" data-target="1400">0</span>
                     <div class="stat-label">Devices Repaired</div>
                 </div>
                 <div class="stat-item fade-in">
@@ -631,7 +631,7 @@
                     <div class="stat-label">% Success Rate</div>
                 </div>
                 <div class="stat-item fade-in">
-                    <span class="stat-number" data-target="47">0</span>
+                    <span class="stat-number" data-target="113">0</span>
                     <div class="stat-label">Google Reviews</div>
                 </div>
             </div>
@@ -952,6 +952,48 @@
             const fadeElements = document.querySelectorAll('.fade-in');
             fadeElements.forEach(el => observer.observe(el));
         });
+
+        // Add random floating animation to background
+        function createFloatingElement() {
+            const element = document.createElement('div');
+            element.style.cssText = `
+                position: absolute;
+                width: 4px;
+                height: 4px;
+                background: rgba(144, 224, 239, 0.6);
+                border-radius: 50%;
+                pointer-events: none;
+                animation: float-up 4s linear infinite;
+                left: ${Math.random() * 100}%;
+                top: 100%;
+                z-index: 1;
+            `;
+            
+            document.querySelector('.page-header').appendChild(element);
+            
+            setTimeout(() => {
+                element.remove();
+            }, 4000);
+        }
+
+        // Add floating elements periodically
+        setInterval(createFloatingElement, 200);
+
+        // Add CSS for floating animation
+        const floatingStyle = document.createElement('style');
+        floatingStyle.textContent = `
+            @keyframes float-up {
+                0% {
+                    transform: translateY(0px) rotate(0deg);
+                    opacity: 1;
+                }
+                100% {
+                    transform: translateY(-100vh) rotate(360deg);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(floatingStyle);
 
         // Close mobile menu when clicking outside
         document.addEventListener('click', (e) => {
