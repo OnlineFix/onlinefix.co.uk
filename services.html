@@ -253,6 +253,7 @@
             grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
             gap: 2rem;
             margin-bottom: 3rem;
+            align-items: stretch; /* Make all cards the same height */
         }
 
         .service-card {
@@ -263,6 +264,8 @@
             transition: all 0.3s ease;
             border: 1px solid rgba(0, 102, 255, 0.1);
             position: relative;
+            display: flex;
+            flex-direction: column; /* Stack content vertically */
         }
 
         .service-card:hover {
@@ -304,6 +307,7 @@
         .service-features {
             list-style: none;
             margin-bottom: 1.5rem;
+            flex-grow: 1; /* Take up available space */
         }
 
         .service-features li {
@@ -319,6 +323,10 @@
             color: var(--success);
             font-weight: bold;
             font-size: 1.1rem;
+        }
+
+        .service-bottom {
+            margin-top: auto; /* Push to bottom of card */
         }
 
         .service-pricing {
@@ -344,21 +352,38 @@
         .service-cta {
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 0.5rem;
             background: var(--primary-blue);
             color: var(--white);
-            padding: 0.8rem 1.5rem;
+            padding: 1rem 1.5rem;
             border-radius: 25px;
             text-decoration: none;
             font-weight: 600;
             transition: all 0.3s ease;
             width: 100%;
-            justify-content: center;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-family: inherit;
+            min-height: 48px; /* Better touch target for mobile */
+            position: relative;
+            overflow: hidden;
         }
 
         .service-cta:hover {
             background: var(--trust-teal);
             transform: translateY(-2px);
+        }
+
+        .service-cta:active {
+            transform: translateY(0);
+        }
+
+        /* Ensure buttons work on mobile */
+        .service-cta:focus {
+            outline: 2px solid var(--accent-cyan);
+            outline-offset: 2px;
         }
 
         /* Emergency Service */
@@ -394,6 +419,7 @@
             font-size: 1.1rem;
             transition: all 0.3s ease;
             animation: pulse 2s infinite;
+            min-height: 48px;
         }
 
         @keyframes pulse {
@@ -478,6 +504,19 @@
             .process-steps {
                 grid-template-columns: 1fr;
             }
+
+            /* Enhanced mobile button styling */
+            .service-cta {
+                padding: 1.2rem 1.5rem;
+                font-size: 1.1rem;
+                min-height: 52px;
+            }
+
+            .emergency-button {
+                padding: 1.2rem 2rem;
+                font-size: 1rem;
+                min-height: 52px;
+            }
         }
 
         @media (max-width: 480px) {
@@ -495,6 +534,11 @@
 
             .service-title {
                 font-size: 1.3rem;
+            }
+
+            .services-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
             }
         }
 
@@ -591,14 +635,16 @@
                         <li>Camera and speaker fixes</li>
                         <li>Software troubleshooting</li>
                     </ul>
-                    <div class="service-pricing">
-                        <div class="price-text">Starting from</div>
-                        <div class="price-amount">£25</div>
+                    <div class="service-bottom">
+                        <div class="service-pricing">
+                            <div class="price-text">Starting from</div>
+                            <div class="price-amount">£25</div>
+                        </div>
+                        <a href="tel:+447940730537" class="service-cta">
+                            <i class="fas fa-phone"></i>
+                            Get Quote
+                        </a>
                     </div>
-                    <a href="tel:+447940730537" class="service-cta">
-                        <i class="fas fa-phone"></i>
-                        Get Quote
-                    </a>
                 </div>
 
                 <div class="service-card fade-in">
@@ -619,14 +665,16 @@
                         <li>Cooling system cleaning</li>
                         <li>Performance optimization</li>
                     </ul>
-                    <div class="service-pricing">
-                        <div class="price-text">Starting from</div>
-                        <div class="price-amount">£45</div>
+                    <div class="service-bottom">
+                        <div class="service-pricing">
+                            <div class="price-text">Starting from</div>
+                            <div class="price-amount">£45</div>
+                        </div>
+                        <a href="tel:+447940730537" class="service-cta">
+                            <i class="fas fa-phone"></i>
+                            Get Quote
+                        </a>
                     </div>
-                    <a href="tel:+447940730537" class="service-cta">
-                        <i class="fas fa-phone"></i>
-                        Get Quote
-                    </a>
                 </div>
 
                 <div class="service-card fade-in">
@@ -647,14 +695,16 @@
                         <li>Home button repair</li>
                         <li>Software restoration</li>
                     </ul>
-                    <div class="service-pricing">
-                        <div class="price-text">Starting from</div>
-                        <div class="price-amount">£35</div>
+                    <div class="service-bottom">
+                        <div class="service-pricing">
+                            <div class="price-text">Starting from</div>
+                            <div class="price-amount">£35</div>
+                        </div>
+                        <a href="tel:+447940730537" class="service-cta">
+                            <i class="fas fa-phone"></i>
+                            Get Quote
+                        </a>
                     </div>
-                    <a href="tel:+447940730537" class="service-cta">
-                        <i class="fas fa-phone"></i>
-                        Get Quote
-                    </a>
                 </div>
 
                 <div class="service-card fade-in">
@@ -675,14 +725,16 @@
                         <li>Software troubleshooting</li>
                         <li>Performance upgrades</li>
                     </ul>
-                    <div class="service-pricing">
-                        <div class="price-text">Starting from</div>
-                        <div class="price-amount">£40</div>
+                    <div class="service-bottom">
+                        <div class="service-pricing">
+                            <div class="price-text">Starting from</div>
+                            <div class="price-amount">£40</div>
+                        </div>
+                        <a href="tel:+447940730537" class="service-cta">
+                            <i class="fas fa-phone"></i>
+                            Get Quote
+                        </a>
                     </div>
-                    <a href="tel:+447940730537" class="service-cta">
-                        <i class="fas fa-phone"></i>
-                        Get Quote
-                    </a>
                 </div>
 
                 <div class="service-card fade-in">
@@ -703,14 +755,16 @@
                         <li>Hardware diagnostics</li>
                         <li>Operating system installation</li>
                     </ul>
-                    <div class="service-pricing">
-                        <div class="price-text">Starting from</div>
-                        <div class="price-amount">£30</div>
+                    <div class="service-bottom">
+                        <div class="service-pricing">
+                            <div class="price-text">Starting from</div>
+                            <div class="price-amount">£30</div>
+                        </div>
+                        <a href="tel:+447940730537" class="service-cta">
+                            <i class="fas fa-phone"></i>
+                            Get Quote
+                        </a>
                     </div>
-                    <a href="tel:+447940730537" class="service-cta">
-                        <i class="fas fa-phone"></i>
-                        Get Quote
-                    </a>
                 </div>
 
                 <div class="service-card fade-in">
@@ -731,14 +785,16 @@
                         <li>Deleted file recovery</li>
                         <li>Corrupted storage fixes</li>
                     </ul>
-                    <div class="service-pricing">
-                        <div class="price-text">Starting from</div>
-                        <div class="price-amount">£50</div>
+                    <div class="service-bottom">
+                        <div class="service-pricing">
+                            <div class="price-text">Starting from</div>
+                            <div class="price-amount">£50</div>
+                        </div>
+                        <a href="tel:+447940730537" class="service-cta">
+                            <i class="fas fa-phone"></i>
+                            Get Quote
+                        </a>
                     </div>
-                    <a href="tel:+447940730537" class="service-cta">
-                        <i class="fas fa-phone"></i>
-                        Get Quote
-                    </a>
                 </div>
             </div>
         </div>
@@ -811,6 +867,44 @@
                 navbar.classList.add('scrolled');
             } else {
                 navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Enhanced button functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add enhanced click functionality for service buttons
+            const serviceButtons = document.querySelectorAll('.service-cta');
+            
+            serviceButtons.forEach(button => {
+                // Add visual feedback
+                button.addEventListener('touchstart', function() {
+                    this.style.transform = 'translateY(0) scale(0.98)';
+                }, { passive: true });
+                
+                button.addEventListener('touchend', function() {
+                    this.style.transform = '';
+                }, { passive: true });
+
+                // Ensure the phone call works on mobile
+                button.addEventListener('click', function(e) {
+                    // Add a small delay to ensure visual feedback is seen
+                    setTimeout(() => {
+                        // The href="tel:" will handle the actual call
+                        console.log('Quote button clicked');
+                    }, 100);
+                });
+            });
+
+            // Same for emergency button
+            const emergencyButton = document.querySelector('.emergency-button');
+            if (emergencyButton) {
+                emergencyButton.addEventListener('touchstart', function() {
+                    this.style.transform = 'translateY(0) scale(0.98)';
+                }, { passive: true });
+                
+                emergencyButton.addEventListener('touchend', function() {
+                    this.style.transform = '';
+                }, { passive: true });
             }
         });
 
