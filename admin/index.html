@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - OnlineFix Repair Management</title>
+    
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-blue: #0066FF;
+            --trust-teal: #00B4D8;
+            --deep-blue: #023E8A;
+            --accent-cyan: #90E0EF;
+            --light-bg: #F8FAFC;
+            --white: #FFFFFF;
+            --gray-100: #F1F5F9;
+            --gray-200: #E2E8F0;
+            --gray-600: #64748B;
+            --gray-800: #1E293B;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            color: var(--gray-800);
+            background: var(--light-bg);
+        }
+
+        /* Layout */
+        .admin-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--white);
+            border-right: 1px solid var(--gray-200);
+            padding: 2rem 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 0 2rem 2rem;
+            border-bottom: 1px solid var(--gray-200);
+            margin-bottom: 2rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .user-info {
+            font-size: 0.9rem;
+            color: var(--gray-600);
+        }
+
+        .sidebar-nav {
+            padding: 0 1rem;
+        }
+
+        .nav-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: var(--gray-600);
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: var(--primary-blue);
+            color: var(--white);
+        }
+
+        .nav-link i {
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 2rem;
+        }
+
+        /* Header */
+        .header {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 1.5rem 2rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--deep-blue);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+        }
+
+        .btn-primary {
+            background: var(--primary-blue);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--deep-blue);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--gray-100);
+            color: var(--gray-800);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-200);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: var(--white);
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: var(--white);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: var(--white);
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin: 0 auto 1rem;
+            color: var(--white);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--gray-600);
+            font-weight: 500;
+        }
+
+        /* Content Sections */
+        .content-section {
+            background: var(--white);
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .section-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--deep-blue);
+        }
+
+        .section-content {
+            padding: 2rem;
+        }
+
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 1rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        th {
+            background: var(--gray-100);
+            font-weight: 600;
+            color: var(--gray-800);
+        }
+
+        tr:hover {
+            background: var(--gray-100);
+        }
+
+        /* Status Badges */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-received { background: #EEF2FF; color: #3730A3; }
+        .status-diagnosing { background: #FEF3C7; color: #92400E; }
+        .status-waiting-parts { background: #FEE2E2; color: #B91C1C; }
+        .status-in-repair { background: #DBEAFE; color: #1D4ED8; }
+        .status-testing { background: #E0E7FF; color: #5B21B6; }
+        .status-ready { background: #D1FAE5; color: #065F46; }
+        .status-completed { background: #F3F4F6; color: #374151; }
+
+        /* Forms */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--gray-800);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--gray-200);
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+        }
+
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-select {
+            background: var(--white);
+            cursor: pointer;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--deep-blue);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray-600);
+        }
+
+        /* Loading States */
+        .loading {
+            text-align: center;
+            padding: 3rem;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--gray-200);
+            border-top: 3px solid var(--primary-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .sidebar.show {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .main-content {
+                padding: 1rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Hide elements initially */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Success/Error messages */
+        .alert {
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: #D1FAE5;
+            color: #065F46;
+            border: 1px solid #A7F3D0;
+        }
+
+        .alert-error {
+            background: #FEE2E2;
+            color: #B91C1C;
+            border: 1px solid #FCA5A5;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="login-screen" class="hidden">
+        <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--deep-blue), var(--primary-blue));">
+            <div style="background: var(--white); padding: 3rem; border-radius: 20px; box-shadow: var(--shadow); max-width: 400px; width: 90%;">
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <div class="logo" style="font-size: 2rem; margin-bottom: 0.5rem;">OnlineFix</div>
+                    <p style="color: var(--gray-600);">Admin Dashboard Login</p>
+                </div>
+                <form id="login-form">
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-input" id="login-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-input" id="login-password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Login
+                    </button>
+                </form>
+                <div id="login-error" class="alert alert-error hidden" style="margin-top: 1rem;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div id="dashboard" class="admin-layout hidden">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">OnlineFix</div>
+                <div class="user-info">Admin Dashboard</div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-item">
+                    <a href="#" class="nav-link active" data-section="overview">
+                        <i class="fas fa-chart-line"></i>
+                        Overview
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link" data-section="repairs">
+                        <i class="fas fa-tools"></i>
+                        All Repairs
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link" data-section="active">
+                        <i class="fas fa-clock"></i>
+                        Active Repairs
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link" data-section="ready">
+                        <i class="fas fa-check-circle"></i>
+                        Ready for Collection
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link" data-section="customers">
+                        <i class="fas fa-users"></i>
+                        Customers
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Logout
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <h1 class="header-title" id="page-title">Dashboard Overview</h1>
+                <div class="header-actions">
+                    <button class="btn btn-primary" onclick="showNewRepairModal()">
+                        <i class="fas fa-plus"></i>
+                        New Repair
+                    </button>
+                </div>
+            </div>
+
+            <!-- Overview Section -->
+            <div id="overview-section" class="content-section">
+                <!-- Stats -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: var(--primary-blue);">
+                            <i class="fas fa-tools"></i>
+                        </div>
+                        <div class="stat-number" id="total-repairs">0</div>
+                        <div class="stat-label">Total Repairs</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: var(--warning);">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-number" id="active-repairs">0</div>
+                        <div class="stat-label">Active Repairs</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: var(--success);">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-number" id="ready-repairs">0</div>
+                        <div class="stat-label">Ready for Collection</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: var(--trust-teal);">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-number" id="total-customers">0</div>
+                        <div class="stat-label">Total Customers</div>
+                    </div>
+                </div>
+
+                <!-- Recent Repairs -->
+                <div class="content-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Recent Repairs</h2>
+                        <button class="btn btn-secondary" onclick="showSection('repairs')">View All</button>
+                    </div>
+                    <div class="section-content">
+                        <div class="table-container">
+                            <table id="recent-repairs-table">
+                                <thead>
+                                    <tr>
+                                        <th>Repair ID</th>
+                                        <th>Customer</th>
+                                        <th>Device</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- All Repairs Section -->
+            <div id="repairs-section" class="content-section hidden">
+                <div class="section-header">
+                    <h2 class="section-title">All Repairs</h2>
+                    <div>
+                        <select id="status-filter" class="form-input" style="display: inline-block; width: auto; margin-right: 1rem;">
+                            <option value="">All Statuses</option>
+                            <option value="received">Received</option>
+                            <option value="diagnosing">Diagnosing</option>
+                            <option value="waiting-parts">Waiting for Parts</option>
+                            <option value="in-repair">In Repair</option>
+                            <option value="testing">Testing</option>
+                            <option value="ready">Ready</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                        <button class="btn btn-primary" onclick="showNewRepairModal()">
+                            <i class="fas fa-plus"></i>
+                            New Repair
+                        </button>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <div class="table-container">
+                        <table id="all-repairs-table">
+                            <thead>
+                                <tr>
+                                    <th>Repair ID</th>
+                                    <th>Customer</th>
+                                    <th>Device</th>
+                                    <th>Issue</th>
+                                    <th>Status</th>
+                                    <th>Date Received</th>
+                                    <th>Est. Completion</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading -->
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+                <p>Loading dashboard data...</p>
+            </div>
+        </main>
+    </div>
+
+    <!-- New Repair Modal -->
+    <div id="new-repair-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Create New Repair</h2>
+                <button class="close-btn" onclick="closeModal('new-repair-modal')">&times;</button>
+            </div>
+            <form id="new-repair-form">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Customer Name</label>
+                        <input type="text" class="form-input" name="customerName" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Phone Number</label>
+                        <input type="tel" class="form-input" name="customerPhone" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-input" name="customerEmail">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Device Type</label>
+                        <select class="form-input form-select" name="deviceType" required>
+                            <option value="">Select Device Type</option>
+                            <option value="iPhone">iPhone</option>
+                            <option value="Samsung">Samsung Phone</option>
+                            <option value="Android">Android Phone</option>
+                            <option value="iPad">iPad</option>
+                            <option value="Tablet">Android Tablet</option>
+                            <option value="MacBook">MacBook</option>
+                            <option value="Laptop">Windows Laptop</option>
+                            <option value="Desktop">Desktop PC</option>
+                            <option value="Gaming Console">Gaming Console</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Brand</label>
+                        <input type="text" class="form-input" name="brand" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Model</label>
+                        <input type="text" class="form-input" name="model" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Issue Description</label>
+                    <textarea class="form-input form-textarea" name="issueDescription" required></textarea>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Estimated Completion Date</label>
+                        <input type="date" class="form-input" name="estimatedCompletion">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Estimated Cost (£)</label>
+                        <input type="number" class="form-input" name="estimatedCost" step="0.01">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Initial Notes</label>
+                    <textarea class="form-input" name="initialNotes" style="min-height: 80px;"></textarea>
+                </div>
+                <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('new-repair-modal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i>
+                        Create Repair
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "your-api-key-here",
+            authDomain: "onlinefix-repair.firebaseapp.com",
+            projectId: "onlinefix-repair",
+            storageBucket: "onlinefix-repair.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "your-app-id-here"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        // Global variables
+        let currentUser = null;
+        let allRepairs = [];
+        let allCustomers = [];
+
+        // Status configuration
+        const statusConfig = {
+            'received': { label: 'Received', class: 'status-received' },
+            'diagnosing': { label: 'Diagnosing', class: 'status-diagnosing' },
+            'waiting-parts': { label: 'Waiting for Parts', class: 'status-waiting-parts' },
+            'in-repair': { label: 'In Repair', class: 'status-in-repair' },
+            'testing': { label: 'Testing', class: 'status-testing' },
+            'ready': { label: 'Ready for Collection', class: 'status-ready' },
+            'completed': { label: 'Completed', class: 'status-completed' }
+        };
+
+        // Authentication
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                currentUser = user;
+                showDashboard();
+                loadDashboardData();
+            } else {
+                showLogin();
+            }
+        });
+
+        // Login form
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+            } catch (error) {
+                showLoginError(error.message);
+            }
+        });
+
+        // Show/hide screens
+        function showLogin() {
+            document.getElementById('login-screen').classList.remove('hidden');
+            document.getElementById('dashboard').classList.add('hidden');
+        }
+
+        function showDashboard() {
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
+        }
+
+        function showLoginError(message) {
+            const errorDiv = document.getElementById('login-error');
+            errorDiv.textContent = message;
+            errorDiv.classList.remove('hidden');
+        }
+
+        // Logout
+        function logout() {
+            auth.signOut();
+        }
+
+        // Navigation
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const section = e.target.closest('.nav-link').dataset.section;
+                if (section) {
+                    showSection(section);
+                }
+            });
+        });
+
+        function showSection(sectionName) {
+            // Update active nav link
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+                if (link.dataset.section === sectionName) {
+                    link.classList.add('active');
+                }
+            });
+
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.add('hidden');
+            });
+
+            // Show selected section
+            const section = document.getElementById(`${sectionName}-section`);
+            if (section) {
+                section.classList.remove('hidden');
+            }
+
+            // Update page title
+            const titles = {
+                'overview': 'Dashboard Overview',
+                'repairs': 'All Repairs',
+                'active': 'Active Repairs',
+                'ready': 'Ready for Collection',
+                'customers': 'Customer Management'
+            };
+            document.getElementById('page-title').textContent = titles[sectionName] || 'Dashboard';
+
+            // Load section-specific data
+            if (sectionName === 'repairs') {
+                loadAllRepairs();
+            } else if (sectionName === 'active') {
+                loadActiveRepairs();
+            } else if (sectionName === 'ready') {
+                loadReadyRepairs();
+            } else if (sectionName === 'customers') {
+                loadCustomers();
+            }
+        }
+
+        // Load dashboard data
+        async function loadDashboardData() {
+            document.getElementById('loading').style.display = 'block';
+            
+            try {
+                // Load repairs
+                const repairsSnapshot = await db.collection('repairs').get();
+                allRepairs = repairsSnapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+
+                // Update stats
+                updateStats();
+
+                // Load recent repairs
+                loadRecentRepairs();
+
+                document.getElementById('loading').style.display = 'none';
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+
+        // Update stats
+        function updateStats() {
+            const activeRepairs = allRepairs.filter(r => 
+                !['completed'].includes(r.currentStatus)
+            ).length;
+
+            const readyRepairs = allRepairs.filter(r => 
+                r.currentStatus === 'ready'
+            ).length;
+
+            const customers = new Set(allRepairs.map(r => r.customerEmail || r.customerPhone)).size;
+
+            document.getElementById('total-repairs').textContent = allRepairs.length;
+            document.getElementById('active-repairs').textContent = activeRepairs;
+            document.getElementById('ready-repairs').textContent = readyRepairs;
+            document.getElementById('total-customers').textContent = customers;
+        }
+
+        // Load recent repairs
+        function loadRecentRepairs() {
+            const recent = allRepairs
+                .sort((a, b) => b.dateReceived.seconds - a.dateReceived.seconds)
+                .slice(0, 10);
+
+            const tbody = document.querySelector('#recent-repairs-table tbody');
+            tbody.innerHTML = '';
+
+            recent.forEach(repair => {
+                const row = createRepairRow(repair);
+                tbody.appendChild(row);
+            });
+        }
+
+        // Create repair table row
+        function createRepairRow(repair) {
+            const row = document.createElement('tr');
+            const status = statusConfig[repair.currentStatus] || statusConfig['received'];
+            
+            row.innerHTML = `
+                <td><strong>${repair.repairId}</strong></td>
+                <td>${repair.customerName}</td>
+                <td>${repair.brand} ${repair.model}</td>
+                <td><span class="status-badge ${status.class}">${status.label}</span></td>
+                <td>${new Date(repair.dateReceived.seconds * 1000).toLocaleDateString('en-GB')}</td>
+                <td>
+                    <button class="btn btn-secondary" style="padding: 0.5rem;" onclick="viewRepair('${repair.id}')">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="btn btn-primary" style="padding: 0.5rem;" onclick="editRepair('${repair.id}')">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                </td>
+            `;
+            return row;
+        }
+
+        // Modal functions
+        function showNewRepairModal() {
+            document.getElementById('new-repair-modal').classList.add('show');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+
+        // New repair form
+        document.getElementById('new-repair-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+            
+            // Generate repair ID
+            const repairId = 'REPAIR_' + Date.now().toString().slice(-6);
+            
+            const repairData = {
+                repairId: repairId,
+                customerName: data.customerName,
+                customerPhone: data.customerPhone,
+                customerEmail: data.customerEmail || '',
+                deviceType: data.deviceType,
+                brand: data.brand,
+                model: data.model,
+                issueDescription: data.issueDescription,
+                currentStatus: 'received',
+                dateReceived: firebase.firestore.Timestamp.now(),
+                estimatedCompletion: data.estimatedCompletion ? firebase.firestore.Timestamp.fromDate(new Date(data.estimatedCompletion)) : null,
+                estimatedCost: data.estimatedCost ? parseFloat(data.estimatedCost) : null,
+                progress: [{
+                    status: 'received',
+                    timestamp: firebase.firestore.Timestamp.now(),
+                    notes: data.initialNotes || 'Device received and logged into system',
+                    technician: currentUser.email
+                }],
+                photos: [],
+                createdBy: currentUser.email,
+                createdAt: firebase.firestore.Timestamp.now()
+            };
+
+            try {
+                await db.collection('repairs').add(repairData);
+                closeModal('new-repair-modal');
+                document.getElementById('new-repair-form').reset();
+                
+                // Show success message
+                showAlert('Repair created successfully! Repair ID: ' + repairId, 'success');
+                
+                // Reload data
+                loadDashboardData();
+                
+            } catch (error) {
+                console.error('Error creating repair:', error);
+                showAlert('Error creating repair: ' + error.message, 'error');
+            }
+        });
+
+        // Show alert
+        function showAlert(message, type) {
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            
+            document.querySelector('.main-content').insertBefore(alert, document.querySelector('.header').nextSibling);
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+
+        // Placeholder functions for repair actions
+        function viewRepair(repairId) {
+            // TODO: Implement repair view modal
+            console.log('View repair:', repairId);
+        }
+
+        function editRepair(repairId) {
+            // TODO: Implement repair edit modal
+            console.log('Edit repair:', repairId);
+        }
+
+        // Status filter
+        document.getElementById('status-filter').addEventListener('change', (e) => {
+            loadAllRepairs(e.target.value);
+        });
+
+        // Load all repairs with optional filter
+        function loadAllRepairs(statusFilter = '') {
+            let filteredRepairs = allRepairs;
+            
+            if (statusFilter) {
+                filteredRepairs = allRepairs.filter(r => r.currentStatus === statusFilter);
+            }
+
+            const tbody = document.querySelector('#all-repairs-table tbody');
+            tbody.innerHTML = '';
+
+            filteredRepairs.forEach(repair => {
+                const row = createDetailedRepairRow(repair);
+                tbody.appendChild(row);
+            });
+        }
+
+        function createDetailedRepairRow(repair) {
+            const row = document.createElement('tr');
+            const status = statusConfig[repair.currentStatus] || statusConfig['received'];
+            
+            row.innerHTML = `
+                <td><strong>${repair.repairId}</strong></td>
+                <td>${repair.customerName}<br><small>${repair.customerPhone}</small></td>
+                <td>${repair.deviceType}<br><small>${repair.brand} ${repair.model}</small></td>
+                <td title="${repair.issueDescription}">${repair.issueDescription.substring(0, 50)}${repair.issueDescription.length > 50 ? '...' : ''}</td>
+                <td><span class="status-badge ${status.class}">${status.label}</span></td>
+                <td>${new Date(repair.dateReceived.seconds * 1000).toLocaleDateString('en-GB')}</td>
+                <td>${repair.estimatedCompletion ? new Date(repair.estimatedCompletion.seconds * 1000).toLocaleDateString('en-GB') : 'TBD'}</td>
+                <td>
+                    <button class="btn btn-secondary" style="padding: 0.5rem;" onclick="viewRepair('${repair.id}')">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="btn btn-primary" style="padding: 0.5rem;" onclick="editRepair('${repair.id}')">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                </td>
+            `;
+            return row;
+        }
+
+        // Placeholder functions for other sections
+        function loadActiveRepairs() {
+            console.log('Loading active repairs...');
+        }
+
+        function loadReadyRepairs() {
+            console.log('Loading ready repairs...');
+        }
+
+        function loadCustomers() {
+            console.log('Loading customers...');
+        }
+
+        // Close modals when clicking outside
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal')) {
+                e.target.classList.remove('show');
+            }
+        });
+    </script>
+</body>
+</html>
