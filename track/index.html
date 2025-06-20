@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Your Repair - OnlineFix</title>
+    <meta name="description" content="Track your device repair status with OnlineFix. Real-time updates on your smartphone, laptop, or tablet repair progress.">
+    
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-blue: #0066FF;
+            --trust-teal: #00B4D8;
+            --deep-blue: #023E8A;
+            --accent-cyan: #90E0EF;
+            --light-bg: #F8FAFC;
+            --white: #FFFFFF;
+            --gray-100: #F1F5F9;
+            --gray-600: #64748B;
+            --gray-800: #1E293B;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            color: var(--gray-800);
+            background: var(--light-bg);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--deep-blue), var(--primary-blue));
+            color: var(--white);
+            padding: 2rem 0;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 3rem;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--gray-100);
+            border-top: 4px solid var(--primary-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Error State */
+        .error {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: var(--shadow);
+            border-left: 4px solid var(--danger);
+        }
+
+        .error-icon {
+            font-size: 3rem;
+            color: var(--danger);
+            margin-bottom: 1rem;
+        }
+
+        /* Repair Card */
+        .repair-card {
+            background: var(--white);
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .device-header {
+            background: linear-gradient(135deg, var(--primary-blue), var(--trust-teal));
+            color: var(--white);
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .device-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .device-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .device-id {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        /* Status Section */
+        .status-section {
+            padding: 2rem;
+        }
+
+        .current-status {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        .status-received { background: #EEF2FF; color: #3730A3; }
+        .status-diagnosing { background: #FEF3C7; color: #92400E; }
+        .status-waiting-parts { background: #FEE2E2; color: #B91C1C; }
+        .status-in-repair { background: #DBEAFE; color: #1D4ED8; }
+        .status-testing { background: #E0E7FF; color: #5B21B6; }
+        .status-ready { background: #D1FAE5; color: #065F46; }
+        .status-completed { background: #F3F4F6; color: #374151; }
+
+        .estimated-completion {
+            font-size: 1rem;
+            color: var(--gray-600);
+        }
+
+        /* Progress Timeline */
+        .timeline {
+            margin: 2rem 0;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .timeline-item:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 35px;
+            width: 2px;
+            height: calc(100% + 10px);
+            background: var(--gray-100);
+        }
+
+        .timeline-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .timeline-icon.completed {
+            background: var(--success);
+            color: var(--white);
+        }
+
+        .timeline-icon.current {
+            background: var(--primary-blue);
+            color: var(--white);
+        }
+
+        .timeline-icon.pending {
+            background: var(--gray-100);
+            color: var(--gray-600);
+        }
+
+        .timeline-content {
+            flex: 1;
+        }
+
+        .timeline-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .timeline-time {
+            font-size: 0.9rem;
+            color: var(--gray-600);
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-notes {
+            font-size: 0.9rem;
+            color: var(--gray-700);
+            line-height: 1.4;
+        }
+
+        /* Device Details */
+        .device-details {
+            background: var(--gray-100);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(100, 116, 139, 0.1);
+        }
+
+        .detail-label {
+            font-weight: 500;
+            color: var(--gray-600);
+        }
+
+        .detail-value {
+            font-weight: 600;
+        }
+
+        /* Photos Section */
+        .photos-section {
+            margin: 2rem 0;
+        }
+
+        .photos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .photo-item {
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .photo-item:hover {
+            transform: scale(1.02);
+        }
+
+        .photo-item img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+        }
+
+        /* Contact Section */
+        .contact-section {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        .contact-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--deep-blue);
+        }
+
+        .contact-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .contact-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .contact-btn.primary {
+            background: var(--primary-blue);
+            color: var(--white);
+        }
+
+        .contact-btn.primary:hover {
+            background: var(--deep-blue);
+            transform: translateY(-2px);
+        }
+
+        .contact-btn.secondary {
+            background: var(--gray-100);
+            color: var(--gray-800);
+        }
+
+        .contact-btn.secondary:hover {
+            background: var(--gray-800);
+            color: var(--white);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .header {
+                margin-bottom: 1rem;
+            }
+
+            .device-header {
+                padding: 1.5rem;
+            }
+
+            .status-section {
+                padding: 1.5rem;
+            }
+
+            .contact-buttons {
+                flex-direction: column;
+            }
+
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Animations */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <div class="logo">OnlineFix</div>
+            <div class="subtitle">Device Repair Tracking</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Loading State -->
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>Loading repair details...</p>
+        </div>
+
+        <!-- Error State -->
+        <div id="error" class="error" style="display: none;">
+            <div class="error-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h2>Repair Not Found</h2>
+            <p>We couldn't find a repair with this ID. Please check your NFC card or contact us for assistance.</p>
+            <div style="margin-top: 1.5rem;">
+                <a href="tel:+447940730537" class="contact-btn primary">
+                    <i class="fas fa-phone"></i>
+                    Call Us
+                </a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div id="main-content" style="display: none;">
+            <!-- Repair Card -->
+            <div class="repair-card fade-in">
+                <div class="device-header">
+                    <div class="device-icon" id="deviceIcon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <div class="device-title" id="deviceTitle">Loading...</div>
+                    <div class="device-id" id="deviceId">Repair ID: ...</div>
+                </div>
+
+                <div class="status-section">
+                    <!-- Current Status -->
+                    <div class="current-status">
+                        <div class="status-badge" id="statusBadge">
+                            <i class="fas fa-clock"></i>
+                            Loading...
+                        </div>
+                        <div class="estimated-completion" id="estimatedCompletion"></div>
+                    </div>
+
+                    <!-- Progress Timeline -->
+                    <div class="timeline" id="timeline">
+                        <!-- Timeline items will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Device Details -->
+            <div class="repair-card fade-in">
+                <div class="device-details">
+                    <h3 style="margin-bottom: 1rem; color: var(--deep-blue);">
+                        <i class="fas fa-info-circle"></i>
+                        Device Information
+                    </h3>
+                    <div class="detail-grid" id="deviceDetails">
+                        <!-- Details will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Photos Section -->
+            <div class="repair-card fade-in" id="photosCard" style="display: none;">
+                <div class="photos-section">
+                    <h3 style="margin-bottom: 1rem; color: var(--deep-blue);">
+                        <i class="fas fa-camera"></i>
+                        Device Photos
+                    </h3>
+                    <div class="photos-grid" id="photosGrid">
+                        <!-- Photos will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Section -->
+            <div class="contact-section fade-in">
+                <div class="contact-title">Need to get in touch?</div>
+                <div class="contact-buttons">
+                    <a href="tel:+447940730537" class="contact-btn primary">
+                        <i class="fas fa-phone"></i>
+                        Call Now
+                    </a>
+                    <a href="https://wa.me/447940730537" class="contact-btn secondary" target="_blank">
+                        <i class="fab fa-whatsapp"></i>
+                        WhatsApp
+                    </a>
+                    <a href="mailto:info@onlinefix.co.uk" class="contact-btn secondary">
+                        <i class="fas fa-envelope"></i>
+                        Email
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "your-api-key-here",
+            authDomain: "onlinefix-repair.firebaseapp.com",
+            projectId: "onlinefix-repair",
+            storageBucket: "onlinefix-repair.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "your-app-id-here"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Status definitions
+        const statusConfig = {
+            'received': {
+                label: 'Received',
+                icon: 'fas fa-inbox',
+                class: 'status-received'
+            },
+            'diagnosing': {
+                label: 'Diagnosing',
+                icon: 'fas fa-search',
+                class: 'status-diagnosing'
+            },
+            'waiting-parts': {
+                label: 'Waiting for Parts',
+                icon: 'fas fa-clock',
+                class: 'status-waiting-parts'
+            },
+            'in-repair': {
+                label: 'In Repair',
+                icon: 'fas fa-tools',
+                class: 'status-in-repair'
+            },
+            'testing': {
+                label: 'Testing',
+                icon: 'fas fa-vial',
+                class: 'status-testing'
+            },
+            'ready': {
+                label: 'Ready for Collection',
+                icon: 'fas fa-check-circle',
+                class: 'status-ready'
+            },
+            'completed': {
+                label: 'Completed',
+                icon: 'fas fa-flag-checkered',
+                class: 'status-completed'
+            }
+        };
+
+        // Device type icons
+        const deviceIcons = {
+            'iPhone': 'fas fa-mobile-alt',
+            'Samsung': 'fas fa-mobile-alt',
+            'Android': 'fas fa-mobile-alt',
+            'Laptop': 'fas fa-laptop',
+            'MacBook': 'fas fa-laptop',
+            'iPad': 'fas fa-tablet-alt',
+            'Tablet': 'fas fa-tablet-alt',
+            'Desktop': 'fas fa-desktop',
+            'Gaming Console': 'fas fa-gamepad'
+        };
+
+        // Get repair ID from URL
+        function getRepairId() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('id');
+        }
+
+        // Load repair data
+        async function loadRepairData(repairId) {
+            try {
+                const doc = await db.collection('repairs').doc(repairId).get();
+                
+                if (!doc.exists) {
+                    showError();
+                    return;
+                }
+
+                const data = doc.data();
+                displayRepairData(data);
+                
+            } catch (error) {
+                console.error('Error loading repair data:', error);
+                showError();
+            }
+        }
+
+        // Display repair data
+        function displayRepairData(data) {
+            // Update device info
+            document.getElementById('deviceTitle').textContent = `${data.brand} ${data.model}`;
+            document.getElementById('deviceId').textContent = `Repair ID: ${data.repairId}`;
+            
+            // Update device icon
+            const iconClass = deviceIcons[data.deviceType] || 'fas fa-cog';
+            document.getElementById('deviceIcon').innerHTML = `<i class="${iconClass}"></i>`;
+
+            // Update status
+            const status = statusConfig[data.currentStatus] || statusConfig['received'];
+            const statusBadge = document.getElementById('statusBadge');
+            statusBadge.className = `status-badge ${status.class}`;
+            statusBadge.innerHTML = `<i class="${status.icon}"></i> ${status.label}`;
+
+            // Update estimated completion
+            if (data.estimatedCompletion) {
+                const date = new Date(data.estimatedCompletion.seconds * 1000);
+                document.getElementById('estimatedCompletion').textContent = 
+                    `Estimated completion: ${date.toLocaleDateString('en-GB')}`;
+            }
+
+            // Build timeline
+            buildTimeline(data.progress || [], data.currentStatus);
+
+            // Update device details
+            updateDeviceDetails(data);
+
+            // Show photos if available
+            if (data.photos && data.photos.length > 0) {
+                showPhotos(data.photos);
+            }
+
+            // Show main content
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+
+            // Trigger animations
+            setTimeout(() => {
+                document.querySelectorAll('.fade-in').forEach((el, index) => {
+                    el.style.animationDelay = `${index * 0.1}s`;
+                });
+            }, 100);
+        }
+
+        // Build progress timeline
+        function buildTimeline(progress, currentStatus) {
+            const timeline = document.getElementById('timeline');
+            const statusOrder = ['received', 'diagnosing', 'waiting-parts', 'in-repair', 'testing', 'ready', 'completed'];
+            
+            timeline.innerHTML = '';
+
+            statusOrder.forEach((statusKey, index) => {
+                const status = statusConfig[statusKey];
+                const progressItem = progress.find(p => p.status === statusKey);
+                
+                let iconClass = 'pending';
+                let timeText = '';
+                let notes = '';
+
+                if (progressItem) {
+                    iconClass = 'completed';
+                    const date = new Date(progressItem.timestamp.seconds * 1000);
+                    timeText = date.toLocaleString('en-GB');
+                    notes = progressItem.notes || '';
+                } else if (statusKey === currentStatus) {
+                    iconClass = 'current';
+                    timeText = 'In Progress';
+                }
+
+                const timelineItem = document.createElement('div');
+                timelineItem.className = 'timeline-item';
+                timelineItem.innerHTML = `
+                    <div class="timeline-icon ${iconClass}">
+                        <i class="${status.icon}"></i>
+                    </div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">${status.label}</div>
+                        ${timeText ? `<div class="timeline-time">${timeText}</div>` : ''}
+                        ${notes ? `<div class="timeline-notes">${notes}</div>` : ''}
+                    </div>
+                `;
+
+                timeline.appendChild(timelineItem);
+            });
+        }
+
+        // Update device details
+        function updateDeviceDetails(data) {
+            const details = [
+                { label: 'Device Type', value: data.deviceType },
+                { label: 'Brand', value: data.brand },
+                { label: 'Model', value: data.model },
+                { label: 'Issue', value: data.issueDescription },
+                { label: 'Received Date', value: new Date(data.dateReceived.seconds * 1000).toLocaleDateString('en-GB') },
+                { label: 'Customer', value: data.customerName }
+            ];
+
+            const detailsContainer = document.getElementById('deviceDetails');
+            detailsContainer.innerHTML = '';
+
+            details.forEach(detail => {
+                if (detail.value) {
+                    const detailItem = document.createElement('div');
+                    detailItem.className = 'detail-item';
+                    detailItem.innerHTML = `
+                        <span class="detail-label">${detail.label}:</span>
+                        <span class="detail-value">${detail.value}</span>
+                    `;
+                    detailsContainer.appendChild(detailItem);
+                }
+            });
+        }
+
+        // Show photos
+        function showPhotos(photos) {
+            const photosCard = document.getElementById('photosCard');
+            const photosGrid = document.getElementById('photosGrid');
+            
+            photosGrid.innerHTML = '';
+            
+            photos.forEach(photo => {
+                const photoItem = document.createElement('div');
+                photoItem.className = 'photo-item';
+                photoItem.innerHTML = `<img src="${photo}" alt="Device photo" onclick="window.open('${photo}', '_blank')">`;
+                photosGrid.appendChild(photoItem);
+            });
+
+            photosCard.style.display = 'block';
+        }
+
+        // Show error state
+        function showError() {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('error').style.display = 'block';
+        }
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', () => {
+            const repairId = getRepairId();
+            
+            if (!repairId) {
+                showError();
+                return;
+            }
+
+            loadRepairData(repairId);
+        });
+
+        // Auto-refresh every 30 seconds
+        setInterval(() => {
+            const repairId = getRepairId();
+            if (repairId && document.getElementById('main-content').style.display !== 'none') {
+                loadRepairData(repairId);
+            }
+        }, 30000);
+    </script>
+</body>
+</html>
