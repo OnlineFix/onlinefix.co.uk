@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO Meta Tags -->
+    <title>Customer Reviews - OnlineFix Electronics Repair Guildford | 5-Star Rated Service</title>
+    <meta name="description" content="Read genuine customer reviews for OnlineFix electronics repair in Guildford, Surrey. 5-star rated service for smartphone, laptop, tablet, and gaming console repairs. See what our customers say!">
+    <meta name="keywords" content="OnlineFix reviews, electronics repair reviews Guildford, smartphone repair testimonials, laptop repair reviews Surrey, customer feedback electronics repair">
+    <meta name="author" content="OnlineFix - Tomas">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://onlinefix.co.uk/reviews.html">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://onlinefix.co.uk/reviews.html">
+    <meta property="og:title" content="Customer Reviews - OnlineFix Electronics Repair Guildford">
+    <meta property="og:description" content="Read genuine 5-star customer reviews for professional electronics repair in Guildford, Surrey.">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-blue: #0066FF;
+            --trust-teal: #00B4D8;
+            --deep-blue: #023E8A;
+            --accent-cyan: #90E0EF;
+            --dark-bg: #0A0E27;
+            --light-bg: #F8FAFC;
+            --white: #FFFFFF;
+            --gray-100: #F1F5F9;
+            --gray-600: #64748B;
+            --gray-800: #1E293B;
+            --success: #10B981;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            color: var(--gray-800);
+            overflow-x: hidden;
+        }
+
+        /* Navigation - Same as other pages */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 1rem 0;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .navbar.scrolled {
+            background: rgba(255, 255, 255, 0.98);
+            padding: 0.5rem 0;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary-blue);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .nav-logo:hover {
+            transform: scale(1.05);
+            color: var(--trust-teal);
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--gray-800);
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-blue);
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary-blue);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .nav-link.active {
+            color: var(--primary-blue);
+        }
+
+        .nav-link.active::after {
+            width: 100%;
+        }
+
+        .nav-cta {
+            background: var(--primary-blue);
+            color: var(--white);
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-cta:hover {
+            background: var(--trust-teal);
+            transform: translateY(-2px);
+        }
+
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--primary-blue);
+            cursor: pointer;
+        }
+
+        /* Mobile Navigation */
+        @media (max-width: 768px) {
+            .nav-menu {
+                position: fixed;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: var(--white);
+                flex-direction: column;
+                padding: 2rem;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+                transform: translateY(-100vh);
+                transition: transform 0.3s ease;
+            }
+
+            .nav-menu.active {
+                transform: translateY(0);
+            }
+
+            .mobile-menu-toggle {
+                display: block;
+            }
+
+            .nav-cta {
+                margin-top: 1rem;
+            }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Page Header */
+        .page-header {
+            background: linear-gradient(135deg, var(--deep-blue) 0%, var(--primary-blue) 50%, var(--trust-teal) 100%);
+            padding: 120px 0 80px;
+            color: var(--white);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            animation: float 20s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(2deg); }
+        }
+
+        .page-header h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 2;
+        }
+
+        .page-header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Stats Section */
+        .stats {
+            padding: 4rem 0;
+            background: var(--white);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            text-align: center;
+        }
+
+        .stat-item {
+            padding: 2rem;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--primary-blue);
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            color: var(--gray-600);
+            font-weight: 500;
+        }
+
+        /* Google Business Link */
+        .google-business {
+            padding: 3rem 0;
+            background: var(--light-bg);
+            text-align: center;
+        }
+
+        .google-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            background: var(--white);
+            padding: 1.5rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            color: var(--gray-800);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            border: 2px solid transparent;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .google-link:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(66, 133, 244, 0.2);
+            border-color: #4285F4;
+        }
+
+        .google-logo {
+            background: var(--white);
+            border-radius: 50%;
+            padding: 0.5rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .google-link:hover .google-logo {
+            transform: rotate(360deg);
+            box-shadow: 0 4px 15px rgba(66, 133, 244, 0.3);
+        }
+
+        .google-text {
+            flex: 1;
+            text-align: left;
+        }
+
+        .google-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--deep-blue);
+            margin-bottom: 0.2rem;
+        }
+
+        .google-subtitle {
+            font-size: 0.9rem;
+            color: var(--gray-600);
+        }
+
+        .google-arrow {
+            font-size: 1.2rem;
+            color: #4285F4;
+            transition: all 0.3s ease;
+        }
+
+        .google-link:hover .google-arrow {
+            transform: translateX(5px);
+            color: var(--trust-teal);
+        }
+
+        /* Reviews Section */
+        .reviews {
+            padding: 4rem 0;
+            background: var(--gray-100);
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 3rem;
+            color: var(--deep-blue);
+        }
+
+        .reviews-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .review-card {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            position: relative;
+            transition: all 0.4s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .review-card:hover {
+            transform: translateY(-8px) rotateX(5deg);
+            box-shadow: 0 20px 40px rgba(0, 102, 255, 0.15);
+            border-color: var(--accent-cyan);
+        }
+
+        .review-card:hover .review-stars {
+            animation: starPulse 0.6s ease;
+        }
+
+        @keyframes starPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+        }
+
+        .review-stars {
+            color: #FFB400;
+            font-size: 1.2rem;
+        }
+
+        .review-date {
+            font-size: 0.9rem;
+            color: var(--gray-600);
+        }
+
+        .review-text {
+            font-style: italic;
+            margin-bottom: 1.5rem;
+            color: var(--gray-700);
+            line-height: 1.7;
+            font-size: 1.05rem;
+        }
+
+        .review-author {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .review-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--trust-teal));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .review-name {
+            font-weight: 600;
+            color: var(--deep-blue);
+        }
+
+        .review-service {
+            font-size: 0.9rem;
+            color: var(--gray-600);
+        }
+
+        /* Featured Review */
+        .featured-review {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, var(--deep-blue), var(--primary-blue));
+            color: var(--white);
+            padding: 3rem;
+            text-align: center;
+            border-radius: 20px;
+            margin-bottom: 2rem;
+        }
+
+        .featured-review .review-stars {
+            color: #FFD700;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .featured-review .review-text {
+            font-size: 1.3rem;
+            color: var(--white);
+            margin-bottom: 2rem;
+        }
+
+        .featured-review .review-author {
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .featured-review .review-avatar {
+            background: var(--white);
+            color: var(--primary-blue);
+        }
+
+        /* Trust Indicators */
+        .trust-indicators {
+            padding: 4rem 0;
+            background: var(--white);
+        }
+
+        .trust-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            text-align: center;
+        }
+
+        .trust-item {
+            padding: 2rem;
+        }
+
+        .trust-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--trust-teal));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 2rem;
+            color: var(--white);
+        }
+
+        .trust-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--deep-blue);
+        }
+
+        /* Mobile Optimizations */
+        @media (max-width: 768px) {
+            .page-header h1 {
+                font-size: 2.5rem;
+            }
+
+            .reviews-container {
+                grid-template-columns: 1fr;
+            }
+
+            .featured-review {
+                padding: 2rem;
+                grid-column: 1;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .trust-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .container {
+                padding: 0 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .page-header {
+                padding: 100px 0 60px;
+            }
+
+            .page-header h1 {
+                font-size: 2rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-number {
+                font-size: 2.5rem;
+            }
+
+            .review-card {
+                padding: 1.5rem;
+            }
+
+            .featured-review {
+                padding: 1.5rem;
+            }
+        }
+
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Loading animation */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 0.8s ease forwards;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">OnlineFix</a>
+            <ul class="nav-menu" id="nav-menu">
+                <li><a href="/" class="nav-link">Home</a></li>
+                <li><a href="/services.html" class="nav-link">Services</a></li>
+                <li><a href="/about.html" class="nav-link">About</a></li>
+                <li><a href="/reviews.html" class="nav-link active">Reviews</a></li>
+                <li><a href="/contact.html" class="nav-link">Contact</a></li>
+                <li><a href="tel:+447940730537" class="nav-cta">
+                    <i class="fas fa-phone"></i>
+                    Call Now
+                </a></li>
+            </ul>
+            <button class="mobile-menu-toggle" id="mobile-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="container">
+            <h1>Customer Reviews</h1>
+            <p>See what our satisfied customers say about OnlineFix repair services</p>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-item fade-in">
+                    <span class="stat-number" data-target="500">0</span>
+                    <div class="stat-label">Devices Repaired</div>
+                </div>
+                <div class="stat-item fade-in">
+                    <span class="stat-number" data-target="5">0</span>
+                    <div class="stat-label">Average Rating</div>
+                </div>
+                <div class="stat-item fade-in">
+                    <span class="stat-number" data-target="98">0</span>
+                    <div class="stat-label">% Success Rate</div>
+                </div>
+                <div class="stat-item fade-in">
+                    <span class="stat-number" data-target="47">0</span>
+                    <div class="stat-label">Google Reviews</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Google Business Link -->
+    <section class="google-business">
+        <div class="container">
+            <div class="fade-in">
+                <a href="https://maps.app.goo.gl/zqbFNuYM2z7u8xux8" class="google-link" target="_blank" rel="noopener">
+                    <div class="google-logo">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                        </svg>
+                    </div>
+                    <div class="google-text">
+                        <div class="google-title">View us on Google</div>
+                        <div class="google-subtitle">Read all our 5-star reviews</div>
+                    </div>
+                    <div class="google-arrow">
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Reviews Section -->
+    <section class="reviews">
+        <div class="container">
+            <h2 class="section-title fade-in">What Our Customers Say</h2>
+            <div class="reviews-container">
+                <div class="featured-review fade-in">
+                    <div class="review-stars">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="review-text">"Absolutely outstanding service! My MacBook Pro had water damage and I thought it was completely dead. Tomas not only fixed it but also recovered all my important work files. The repair was completed in just 3 hours and at a very reasonable price. I can't recommend OnlineFix enough - they truly saved my business!"</p>
+                    <div class="review-author">
+                        <div class="review-avatar">A</div>
+                        <div>
+                            <div class="review-name">Alex Thompson</div>
+                            <div class="review-service">MacBook Pro Water Damage Recovery</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="review-card fade-in">
+                    <div class="review-header">
+                        <div class="review-stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="review-date">2 weeks ago</div>
+                    </div>
+                    <p class="review-text">"Excellent service! Tomas fixed my laptop screen in just 2 hours. Professional, affordable, and reliable. Highly recommended!"</p>
+                    <div class="review-author">
+                        <div class="review-avatar">S</div>
+                        <div>
+                            <div class="review-name">Sarah Mitchell</div>
+                            <div class="review-service">Laptop Screen Replacement</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="review-card fade-in">
+                    <div class="review-header">
+                        <div class="review-stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="review-date">1 month ago</div>
+                    </div>
+                    <p class="review-text">"Amazing work on my phone water damage repair. Thought it was completely dead but Tomas brought it back to life. Top quality service!"</p>
+                    <div class="review-author">
+                        <div class="review-avatar">J</div>
+                        <div>
+                            <div class="review-name">James Lancaster</div>
+                            <div class="review-service">iPhone Water Damage Recovery</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="review-card fade-in">
+                    <div class="review-header">
+                        <div class="review-stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="review-date">3 weeks ago</div>
+                    </div>
+                    <p class="review-text">"Fair pricing and honest service. Explained everything clearly and fixed my gaming console quickly. Will definitely return for future repairs."</p>
+                    <div class="review-author">
+                        <div class="review-avatar">M</div>
+                        <div>
+                            <div class="review-name">Michael Roberts</div>
+                            <div class="review-service">PlayStation 5 Repair</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="review-card fade-in">
+                    <div class="review-header">
+                        <div class="review-stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="review-date">1 week ago</div>
+                    </div>
+                    <p class="review-text">"Fantastic service from start to finish. My tablet screen was completely shattered and Tomas had it looking brand new within the same day. Great communication and fair pricing."</p>
+                    <div class="review-author">
+                        <div class="review-avatar">E</div>
+                        <div>
+                            <div class="review-name">Emma Wilson</div>
+                            <div class="review-service">iPad Screen Replacement</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="review-card fade-in">
+                    <div class="review-header">
+                        <div class="review-stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="review-date">2 months ago</div>
+                    </div>
+                    <p class="review-text">"Had my desktop PC completely upgraded and optimized. Tomas knows his stuff and provided excellent advice on the best components for my budget. Couldn't be happier!"</p>
+                    <div class="review-author">
+                        <div class="review-avatar">D</div>
+                        <div>
+                            <div class="review-name">David Chen</div>
+                            <div class="review-service">Desktop PC Upgrade</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="review-card fade-in">
+                    <div class="review-header">
+                        <div class="review-stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="review-date">5 days ago</div>
+                    </div>
+                    <p class="review-text">"Emergency repair service was a lifesaver! My phone died completely on a Friday evening and I needed it for an important business trip. Tomas stayed late to fix it - absolute legend!"</p>
+                    <div class="review-author">
+                        <div class="review-avatar">L</div>
+                        <div>
+                            <div class="review-name">Lisa Parker</div>
+                            <div class="review-service">Emergency Phone Repair</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="review-card fade-in">
+                    <div class="review-header">
+                        <div class="review-stars">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="review-date">6 weeks ago</div>
+                    </div>
+                    <p class="review-text">"Professional data recovery service. Lost all my family photos when my hard drive crashed, but Tomas managed to recover everything. Worth every penny!"</p>
+                    <div class="review-author">
+                        <div class="review-avatar">R</div>
+                        <div>
+                            <div class="review-name">Rachel Green</div>
+                            <div class="review-service">Data Recovery Service</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Trust Indicators -->
+    <section class="trust-indicators">
+        <div class="container">
+            <h2 class="section-title fade-in">Why Customers Trust Us</h2>
+            <div class="trust-grid">
+                <div class="trust-item fade-in">
+                    <div class="trust-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3 class="trust-title">Warranty Guaranteed</h3>
+                    <p>All repairs come with warranty coverage for your peace of mind</p>
+                </div>
+                <div class="trust-item fade-in">
+                    <div class="trust-icon">
+                        <i class="fas fa-tools"></i>
+                    </div>
+                    <h3 class="trust-title">Quality Parts Only</h3>
+                    <p>We use only genuine and high-quality replacement parts</p>
+                </div>
+                <div class="trust-item fade-in">
+                    <div class="trust-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h3 class="trust-title">Fast Turnaround</h3>
+                    <p>Most repairs completed within the same day</p>
+                </div>
+                <div class="trust-item fade-in">
+                    <div class="trust-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <h3 class="trust-title">Data Security</h3>
+                    <p>Your personal data and privacy are always protected</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Mobile menu toggle
+        const mobileToggle = document.getElementById('mobile-toggle');
+        const navMenu = document.getElementById('nav-menu');
+
+        mobileToggle.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
+            const icon = mobileToggle.querySelector('i');
+            icon.classList.toggle('fa-bars');
+            icon.classList.toggle('fa-times');
+        });
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Animated counters
+        function animateCounters() {
+            const counters = document.querySelectorAll('.stat-number');
+            
+            counters.forEach(counter => {
+                const target = parseInt(counter.getAttribute('data-target'));
+                const increment = target / 100;
+                let current = 0;
+                
+                const updateCounter = () => {
+                    if (current < target) {
+                        current += increment;
+                        if (target === 5) {
+                            counter.textContent = current.toFixed(1);
+                        } else {
+                            counter.textContent = Math.ceil(current);
+                        }
+                        requestAnimationFrame(updateCounter);
+                    } else {
+                        if (target === 5) {
+                            counter.textContent = target.toFixed(1);
+                        } else {
+                            counter.textContent = target;
+                        }
+                    }
+                };
+                
+                updateCounter();
+            });
+        }
+
+        // Intersection Observer for fade-in animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animationDelay = Math.random() * 0.3 + 's';
+                    entry.target.classList.add('fade-in');
+                    
+                    // Trigger counter animation when stats section is visible
+                    if (entry.target.classList.contains('stat-item') && !entry.target.dataset.animated) {
+                        entry.target.dataset.animated = 'true';
+                        setTimeout(animateCounters, 500);
+                    }
+                }
+            });
+        }, observerOptions);
+
+        // Observe all elements with fade-in class
+        document.addEventListener('DOMContentLoaded', () => {
+            const fadeElements = document.querySelectorAll('.fade-in');
+            fadeElements.forEach(el => observer.observe(el));
+        });
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!navMenu.contains(e.target) && !mobileToggle.contains(e.target)) {
+                navMenu.classList.remove('active');
+                const icon = mobileToggle.querySelector('i');
+                icon.classList.add('fa-bars');
+                icon.classList.remove('fa-times');
+            }
+        });
+    </script>
+</body>
+</html>
