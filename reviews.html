@@ -619,7 +619,7 @@
         <div class="container">
             <div class="stats-grid">
                 <div class="stat-item fade-in">
-                    <span class="stat-number" data-target="1000+">0</span>
+                    <span class="stat-number" data-target="1000" data-suffix="+">0</span>
                     <div class="stat-label">Devices Repaired</div>
                 </div>
                 <div class="stat-item fade-in">
@@ -859,6 +859,7 @@
             
             counters.forEach(counter => {
                 const target = parseInt(counter.getAttribute('data-target'));
+                const suffix = counter.getAttribute('data-suffix') || '';
                 const increment = target / 100;
                 let current = 0;
                 
@@ -875,7 +876,7 @@
                         if (target === 5) {
                             counter.textContent = target.toFixed(1);
                         } else {
-                            counter.textContent = target;
+                            counter.textContent = target + suffix;
                         }
                     }
                 };
