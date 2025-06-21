@@ -580,13 +580,16 @@
         // Load repair data
         async function loadRepairData(repairId) {
             try {
-                const doc = await db.collection('repairs').doc(repairId).get();
+                // Query by repairId field instead of document ID
+                const querySnapshot = await db.collection('repairs').where('repairId', '==', repairId).get();
                 
-                if (!doc.exists) {
+                if (querySnapshot.empty) {
                     showError();
                     return;
                 }
 
+                // Get the first matching document
+                const doc = querySnapshot.docs[0];
                 const data = doc.data();
                 displayRepairData(data);
                 
