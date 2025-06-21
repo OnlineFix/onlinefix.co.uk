@@ -47,7 +47,7 @@
         }
 
         .container {
-            max-width: 800px;
+            max-width: 1000px;
             margin: 0 auto;
             padding: 2rem;
         }
@@ -100,6 +100,98 @@
 
         .form-content {
             padding: 2rem;
+        }
+
+        /* Progress Steps */
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .progress-steps::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background: var(--gray-200);
+            z-index: 1;
+        }
+
+        .progress-line {
+            position: absolute;
+            top: 20px;
+            left: 10%;
+            height: 2px;
+            background: var(--primary-blue);
+            z-index: 2;
+            transition: width 0.3s ease;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            z-index: 3;
+            position: relative;
+        }
+
+        .step-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .step.active .step-circle {
+            background: var(--primary-blue);
+            color: var(--white);
+        }
+
+        .step.completed .step-circle {
+            background: var(--success);
+            color: var(--white);
+        }
+
+        .step.pending .step-circle {
+            background: var(--gray-200);
+            color: var(--gray-600);
+        }
+
+        .step-label {
+            font-size: 0.9rem;
+            color: var(--gray-600);
+            font-weight: 500;
+        }
+
+        /* Form Steps */
+        .form-step {
+            display: none;
+        }
+
+        .form-step.active {
+            display: block;
+            animation: fadeInUp 0.4s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* Form Elements */
@@ -166,6 +258,11 @@
             background: rgba(0, 102, 255, 0.02);
         }
 
+        .photo-upload.dragover {
+            border-color: var(--primary-blue);
+            background: rgba(0, 102, 255, 0.1);
+        }
+
         .upload-icon {
             font-size: 3rem;
             color: var(--gray-400);
@@ -227,17 +324,19 @@
 
         /* Buttons */
         .form-actions {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
             margin-top: 2rem;
             padding-top: 2rem;
             border-top: 1px solid var(--gray-200);
-            text-align: center;
         }
 
         .btn {
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            padding: 0.75rem 2rem;
+            padding: 0.75rem 1.5rem;
             border: none;
             border-radius: 10px;
             text-decoration: none;
@@ -255,6 +354,24 @@
         .btn-primary:hover {
             background: var(--deep-blue);
             transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--gray-200);
+            color: var(--gray-800);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-300);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: var(--white);
+        }
+
+        .btn-success:hover {
+            background: #059669;
         }
 
         .btn:disabled {
@@ -283,7 +400,7 @@
             margin-bottom: 1rem;
         }
 
-        .request-id {
+        .repair-id {
             font-size: 1.5rem;
             font-weight: 600;
             color: var(--primary-blue);
@@ -400,6 +517,15 @@
                 grid-template-columns: 1fr;
             }
 
+            .progress-steps {
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
             .contact-grid {
                 grid-template-columns: 1fr;
             }
@@ -416,59 +542,88 @@
         <div class="form-container">
             <div class="form-header">
                 <h1 class="form-title">Request Device Repair</h1>
-                <p class="form-description">Fill in your device details and we'll contact you within 2 hours with a quote</p>
+                <p class="form-description">Fill in your device details and we'll get back to you with a quote and repair timeline</p>
             </div>
 
             <div class="form-content">
+                <!-- Progress Steps -->
+                <div class="progress-steps">
+                    <div class="progress-line" id="progress-line"></div>
+                    <div class="step active" data-step="1">
+                        <div class="step-circle">1</div>
+                        <div class="step-label">Contact Info</div>
+                    </div>
+                    <div class="step pending" data-step="2">
+                        <div class="step-circle">2</div>
+                        <div class="step-label">Device Details</div>
+                    </div>
+                    <div class="step pending" data-step="3">
+                        <div class="step-circle">3</div>
+                        <div class="step-label">Issue & Photos</div>
+                    </div>
+                    <div class="step pending" data-step="4">
+                        <div class="step-circle">4</div>
+                        <div class="step-label">Submit Request</div>
+                    </div>
+                </div>
+
                 <!-- Form -->
                 <form id="repair-form">
-                    <!-- Contact Information -->
-                    <h2 style="margin-bottom: 1.5rem; color: var(--deep-blue);">Contact Information</h2>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label class="form-label required">Your Name</label>
-                            <input type="text" class="form-input" name="customerName" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label required">Phone Number</label>
-                            <input type="tel" class="form-input" name="customerPhone" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label required">Email Address</label>
-                            <input type="email" class="form-input" name="customerEmail" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Address (Optional)</label>
-                            <input type="text" class="form-input" name="customerAddress">
+                    <!-- Step 1: Contact Information -->
+                    <div class="form-step active" data-step="1">
+                        <h2 style="margin-bottom: 1.5rem; color: var(--deep-blue);">Contact Information</h2>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label required">Your Name</label>
+                                <input type="text" class="form-input" name="customerName" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label required">Phone Number</label>
+                                <input type="tel" class="form-input" name="customerPhone" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label required">Email Address</label>
+                                <input type="email" class="form-input" name="customerEmail" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Address (Optional)</label>
+                                <input type="text" class="form-input" name="customerAddress">
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Device Information -->
-                    <h2 style="margin: 2rem 0 1.5rem; color: var(--deep-blue);">Device Information</h2>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label class="form-label required">Device Type</label>
-                            <select class="form-input form-select" name="deviceType" required>
-                                <option value="">Select Device Type</option>
-                                <option value="iPhone">iPhone</option>
-                                <option value="Samsung">Samsung Phone</option>
-                                <option value="Android">Android Phone</option>
-                                <option value="iPad">iPad</option>
-                                <option value="Tablet">Android Tablet</option>
-                                <option value="MacBook">MacBook</option>
-                                <option value="Laptop">Windows Laptop</option>
-                                <option value="Desktop">Desktop PC</option>
-                                <option value="Gaming Console">Gaming Console</option>
-                                <option value="Other">Other</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label required">Brand</label>
-                            <input type="text" class="form-input" name="brand" required placeholder="e.g., Apple, Samsung, HP">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label required">Model</label>
-                            <input type="text" class="form-input" name="model" required placeholder="e.g., iPhone 13 Pro, Galaxy S22">
+                    <!-- Step 2: Device Details -->
+                    <div class="form-step" data-step="2">
+                        <h2 style="margin-bottom: 1.5rem; color: var(--deep-blue);">Device Information</h2>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label required">Device Type</label>
+                                <select class="form-input form-select" name="deviceType" required>
+                                    <option value="">Select Device Type</option>
+                                    <option value="iPhone">iPhone</option>
+                                    <option value="Samsung">Samsung Phone</option>
+                                    <option value="Android">Android Phone</option>
+                                    <option value="iPad">iPad</option>
+                                    <option value="Tablet">Android Tablet</option>
+                                    <option value="MacBook">MacBook</option>
+                                    <option value="Laptop">Windows Laptop</option>
+                                    <option value="Desktop">Desktop PC</option>
+                                    <option value="Gaming Console">Gaming Console</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label required">Brand</label>
+                                <input type="text" class="form-input" name="brand" required placeholder="e.g., Apple, Samsung, HP">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label required">Model</label>
+                                <input type="text" class="form-input" name="model" required placeholder="e.g., iPhone 13 Pro, Galaxy S22">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Serial Number / IMEI (if available)</label>
+                                <input type="text" class="form-input" name="serialNumber" placeholder="Optional">
+                            </div>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Device Condition</label>
@@ -482,19 +637,30 @@
                         </div>
                     </div>
 
-                    <!-- Issue Description -->
-                    <h2 style="margin: 2rem 0 1.5rem; color: var(--deep-blue);">Issue Description</h2>
-                    <div class="form-group">
-                        <label class="form-label required">Describe the Problem</label>
-                        <textarea class="form-input form-textarea" name="issueDescription" required 
-                            placeholder="Please describe what's wrong with your device in detail. The more information you provide, the better we can help you."></textarea>
-                    </div>
-
-                    <div class="form-grid">
+                    <!-- Step 3: Issue & Photos -->
+                    <div class="form-step" data-step="3">
+                        <h2 style="margin-bottom: 1.5rem; color: var(--deep-blue);">Issue Description & Photos</h2>
                         <div class="form-group">
-                            <label class="form-label">When did this start?</label>
+                            <label class="form-label required">Describe the Problem</label>
+                            <textarea class="form-input form-textarea" name="issueDescription" required 
+                                placeholder="Please describe what's wrong with your device in detail. The more information you provide, the better we can help you."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">When did the problem start?</label>
                             <textarea class="form-input" name="problemHistory" style="min-height: 80px;"
                                 placeholder="When did you first notice the issue? What were you doing when it happened?"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Device Photos (Optional but Helpful)</label>
+                            <div class="photo-upload" onclick="document.getElementById('photo-input').click()">
+                                <div class="upload-icon">
+                                    <i class="fas fa-camera"></i>
+                                </div>
+                                <div class="upload-text">Click to upload photos or drag and drop</div>
+                                <button type="button" class="upload-button">Choose Photos</button>
+                                <input type="file" id="photo-input" multiple accept="image/*" style="display: none;">
+                            </div>
+                            <div class="photo-preview" id="photo-preview"></div>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Urgency Level</label>
@@ -506,26 +672,22 @@
                         </div>
                     </div>
 
-                    <!-- Photo Upload -->
-                    <div class="form-group">
-                        <label class="form-label">Device Photos (Optional but Helpful)</label>
-                        <div class="photo-upload" onclick="document.getElementById('photo-input').click()">
-                            <div class="upload-icon">
-                                <i class="fas fa-camera"></i>
-                            </div>
-                            <div class="upload-text">Click to upload photos or drag and drop</div>
-                            <button type="button" class="upload-button">Choose Photos</button>
-                            <input type="file" id="photo-input" multiple accept="image/*" style="display: none;">
+                    <!-- Step 4: Review & Submit -->
+                    <div class="form-step" data-step="4">
+                        <h2 style="margin-bottom: 1.5rem; color: var(--deep-blue);">Review & Submit Request</h2>
+                        <div id="review-content">
+                            <!-- Review content will be populated by JavaScript -->
                         </div>
-                        <div class="photo-preview" id="photo-preview"></div>
-                    </div>
-
-                    <!-- Submit Button -->
-                    <div class="form-actions">
-                        <button type="submit" class="btn btn-primary" id="submit-btn">
-                            <i class="fas fa-paper-plane"></i>
-                            Submit Repair Request
-                        </button>
+                        <div class="contact-info">
+                            <h3><i class="fas fa-info-circle"></i> What Happens Next?</h3>
+                            <ol style="margin-left: 1.5rem; margin-top: 1rem;">
+                                <li>We'll review your repair request</li>
+                                <li>Contact you within 2 hours with a quote</li>
+                                <li>If you approve, bring your device to our shop</li>
+                                <li>We'll give you an NFC tracking card</li>
+                                <li>Track your repair progress in real-time!</li>
+                            </ol>
+                        </div>
                     </div>
                 </form>
 
@@ -541,7 +703,7 @@
                         <i class="fas fa-check-circle"></i>
                     </div>
                     <h2 class="success-title">Request Submitted Successfully!</h2>
-                    <div class="request-id" id="generated-request-id">REQ_123456</div>
+                    <div class="repair-id" id="generated-repair-id">REQ_123456</div>
                     
                     <div class="next-steps">
                         <h3><i class="fas fa-clock"></i> What's Next?</h3>
@@ -577,256 +739,157 @@
                     </div>
 
                     <div style="margin-top: 2rem;">
-                        <button class="btn btn-primary" onclick="location.reload()">
+                        <button class="btn btn-primary" onclick="createNewRequest()">
                             <i class="fas fa-plus"></i>
                             Submit Another Request
                         </button>
+                        <a href="../" class="btn btn-secondary">
+                            <i class="fas fa-home"></i>
+                            Back to Homepage
+                        </a>
                     </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="form-actions" id="form-actions">
+                    <button type="button" class="btn btn-secondary" id="prev-btn" onclick="previousStep()" style="display: none;">
+                        <i class="fas fa-arrow-left"></i>
+                        Previous
+                    </button>
+                    <div></div>
+                    <button type="button" class="btn btn-primary" id="next-btn" onclick="nextStep()">
+                        Next
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Initialize EmailJS - Replace with your public key
-        emailjs.init("1S2WR85T5tT9fO6fp");
-
-        // Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyAuPjwwwkqau6Wzfx7rURAe9jYPpgNbil4",
-            authDomain: "onlinefix-repair.firebaseapp.com",
-            projectId: "onlinefix-repair",
-            storageBucket: "onlinefix-repair.firebasestorage.app",
-            messagingSenderId: "382934797751",
-            appId: "1:382934797751:web:5ac8a9c87d68a17b4cec32"
-        };
-
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        const storage = firebase.storage();
-
-        // Global variables
-        let uploadedPhotos = [];
-
-        // Photo upload handling
-        document.getElementById('photo-input').addEventListener('change', handlePhotoUpload);
-
-        function handlePhotoUpload(e) {
-            const files = Array.from(e.target.files);
-            files.forEach(file => {
-                if (file.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        addPhotoPreview(e.target.result, file);
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
-        }
-
-        function addPhotoPreview(src, file) {
-            const preview = document.getElementById('photo-preview');
-            const photoItem = document.createElement('div');
-            photoItem.className = 'photo-item';
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize EmailJS
+            emailjs.init("YOUR_EMAILJS_PUBLIC_KEY"); // You'll need to replace this
             
-            const photoId = 'photo_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-            photoItem.innerHTML = `
-                <img src="${src}" alt="Device photo">
-                <button type="button" class="photo-remove" onclick="removePhoto('${photoId}')">×</button>
-            `;
-            
-            photoItem.dataset.photoId = photoId;
-            preview.appendChild(photoItem);
-            
-            uploadedPhotos.push({ id: photoId, file, src });
-        }
+            // Firebase Configuration
+            const firebaseConfig = {
+                apiKey: "AIzaSyAuPjwwwkqau6Wzfx7rURAe9jYPpgNbil4",
+                authDomain: "onlinefix-repair.firebaseapp.com",
+                projectId: "onlinefix-repair",
+                storageBucket: "onlinefix-repair.firebasestorage.app",
+                messagingSenderId: "382934797751",
+                appId: "1:382934797751:web:5ac8a9c87d68a17b4cec32"
+            };
 
-        function removePhoto(photoId) {
-            const photoElement = document.querySelector(`[data-photo-id="${photoId}"]`);
-            if (photoElement) {
-                photoElement.remove();
-            }
-            uploadedPhotos = uploadedPhotos.filter(photo => photo.id !== photoId);
-        }
+            // Initialize Firebase
+            firebase.initializeApp(firebaseConfig);
+            const db = firebase.firestore();
+            const storage = firebase.storage();
 
-        // Form submission
-        document.getElementById('repair-form').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            // Show loading
-            document.getElementById('repair-form').style.display = 'none';
-            document.getElementById('loading').style.display = 'block';
+            // Global variables
+            let currentStep = 1;
+            let uploadedPhotos = [];
+            let formData = {};
 
-            try {
-                const formData = new FormData(e.target);
-                const data = Object.fromEntries(formData);
-
-                // Generate request ID
-                const requestId = 'REQ_' + Date.now().toString().slice(-6);
-
-                // Upload photos if any
-                const photoUrls = [];
-                for (const photo of uploadedPhotos) {
-                    try {
-                        const photoRef = storage.ref().child(`requests/${requestId}/${photo.id}`);
-                        const snapshot = await photoRef.put(photo.file);
-                        const downloadURL = await snapshot.ref.getDownloadURL();
-                        photoUrls.push(downloadURL);
-                    } catch (photoError) {
-                        console.warn('Photo upload failed:', photoError);
+            // Step navigation
+            window.nextStep = function() {
+                if (validateCurrentStep()) {
+                    if (currentStep < 4) {
+                        currentStep++;
+                        updateSteps();
+                    } else {
+                        submitRepairRequest();
                     }
                 }
-
-                // Create repair request document
-                const requestData = {
-                    requestId: requestId,
-                    status: 'pending-quote',
-                    customerName: data.customerName,
-                    customerPhone: data.customerPhone,
-                    customerEmail: data.customerEmail,
-                    customerAddress: data.customerAddress || '',
-                    deviceType: data.deviceType,
-                    brand: data.brand,
-                    model: data.model,
-                    deviceCondition: data.deviceCondition || 'working',
-                    issueDescription: data.issueDescription,
-                    problemHistory: data.problemHistory || '',
-                    urgencyLevel: data.urgencyLevel || 'standard',
-                    photos: photoUrls,
-                    requestDate: firebase.firestore.Timestamp.now(),
-                    source: 'customer-request'
-                };
-
-                // Save to Firestore
-                await db.collection('repair-requests').add(requestData);
-
-                // Send email notification
-                await sendEmailNotification(requestData);
-
-                // Show success screen
-                showSuccessScreen(requestId);
-
-            } catch (error) {
-                console.error('Error submitting request:', error);
-                showAlert('Error submitting request. Please try again.', 'error');
-                
-                // Show form again
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('repair-form').style.display = 'block';
             }
-        });
 
-        // Send email notification
-        async function sendEmailNotification(requestData) {
-            try {
-                const emailParams = {
-                    to_email: 'hello@onlinefix.co.uk',
-                    from_name: 'OnlineFix Website',
-                    subject: `New Repair Request - ${requestData.requestId}`,
-                    customer_name: requestData.customerName,
-                    customer_phone: requestData.customerPhone,
-                    customer_email: requestData.customerEmail,
-                    device_info: `${requestData.brand} ${requestData.model} (${requestData.deviceType})`,
-                    issue_description: requestData.issueDescription,
-                    urgency: requestData.urgencyLevel,
-                    request_id: requestData.requestId,
-                    message: `
-NEW REPAIR REQUEST RECEIVED
-
-Customer Details:
-Name: ${requestData.customerName}
-Phone: ${requestData.customerPhone}
-Email: ${requestData.customerEmail}
-${requestData.customerAddress ? `Address: ${requestData.customerAddress}` : ''}
-
-Device Information:
-Type: ${requestData.deviceType}
-Brand: ${requestData.brand}
-Model: ${requestData.model}
-Condition: ${requestData.deviceCondition}
-
-Issue Description:
-${requestData.issueDescription}
-
-${requestData.problemHistory ? `Problem History:\n${requestData.problemHistory}` : ''}
-
-Urgency: ${requestData.urgencyLevel}
-Photos: ${requestData.photos.length} attached
-
-Next Steps:
-1. Contact customer with quote: ${requestData.customerPhone}
-2. If approved, create repair in admin dashboard
-3. Program NFC card with: https://onlinefix.co.uk/track/?id=[REPAIR_ID]
-4. Give NFC card to customer
-
-Request ID: ${requestData.requestId}
-Admin Dashboard: https://onlinefix.co.uk/admin/
-                    `
-                };
-
-                // Replace with your EmailJS service and template IDs
-                await emailjs.send('service_jusdhkb', 'template_kfxgfkp', emailParams);
-                console.log('Email sent successfully');
-                
-            } catch (error) {
-                console.error('Email sending failed:', error);
-                // Continue anyway - don't fail the whole process
-            }
-        }
-
-        // Show success screen
-        function showSuccessScreen(requestId) {
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('generated-request-id').textContent = requestId;
-            document.getElementById('success-screen').style.display = 'block';
-        }
-
-        // Show alert
-        function showAlert(message, type) {
-            const alert = document.createElement('div');
-            alert.className = `alert alert-${type}`;
-            alert.textContent = message;
-            
-            document.querySelector('.form-content').insertBefore(alert, document.querySelector('form'));
-            
-            setTimeout(() => {
-                alert.remove();
-            }, 5000);
-        }
-
-        // Drag and drop for photos
-        const photoUpload = document.querySelector('.photo-upload');
-        
-        photoUpload.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            photoUpload.style.borderColor = 'var(--primary-blue)';
-            photoUpload.style.background = 'rgba(0, 102, 255, 0.1)';
-        });
-
-        photoUpload.addEventListener('dragleave', () => {
-            photoUpload.style.borderColor = 'var(--gray-200)';
-            photoUpload.style.background = 'transparent';
-        });
-
-        photoUpload.addEventListener('drop', (e) => {
-            e.preventDefault();
-            photoUpload.style.borderColor = 'var(--gray-200)';
-            photoUpload.style.background = 'transparent';
-            
-            const files = Array.from(e.dataTransfer.files);
-            files.forEach(file => {
-                if (file.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        addPhotoPreview(e.target.result, file);
-                    };
-                    reader.readAsDataURL(file);
+            window.previousStep = function() {
+                if (currentStep > 1) {
+                    currentStep--;
+                    updateSteps();
                 }
-            });
-        });
+            }
 
-        console.log('Customer repair request form loaded successfully');
-    </script>
-</body>
-</html>
+            function updateSteps() {
+                // Update step indicators
+                document.querySelectorAll('.step').forEach((step, index) => {
+                    const stepNumber = index + 1;
+                    step.classList.remove('active', 'completed', 'pending');
+                    
+                    if (stepNumber < currentStep) {
+                        step.classList.add('completed');
+                    } else if (stepNumber === currentStep) {
+                        step.classList.add('active');
+                    } else {
+                        step.classList.add('pending');
+                    }
+                });
+
+                // Update progress line
+                const progressLine = document.getElementById('progress-line');
+                const progressWidth = ((currentStep - 1) / 3) * 80;
+                progressLine.style.width = progressWidth + '%';
+
+                // Show/hide form steps
+                document.querySelectorAll('.form-step').forEach((step, index) => {
+                    step.classList.remove('active');
+                    if (index + 1 === currentStep) {
+                        step.classList.add('active');
+                    }
+                });
+
+                // Update buttons
+                const prevBtn = document.getElementById('prev-btn');
+                const nextBtn = document.getElementById('next-btn');
+
+                prevBtn.style.display = currentStep > 1 ? 'inline-flex' : 'none';
+                
+                if (currentStep === 4) {
+                    nextBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Request';
+                    populateReviewStep();
+                } else {
+                    nextBtn.innerHTML = 'Next <i class="fas fa-arrow-right"></i>';
+                }
+            }
+
+            // Form validation
+            function validateCurrentStep() {
+                const currentStepElement = document.querySelector(`.form-step[data-step="${currentStep}"]`);
+                const requiredFields = currentStepElement.querySelectorAll('[required]');
+                let isValid = true;
+
+                requiredFields.forEach(field => {
+                    if (!field.value.trim()) {
+                        field.style.borderColor = 'var(--danger)';
+                        isValid = false;
+                    } else {
+                        field.style.borderColor = 'var(--gray-200)';
+                    }
+                });
+
+                if (!isValid) {
+                    showAlert('Please fill in all required fields', 'error');
+                }
+
+                return isValid;
+            }
+
+            // Photo upload handling
+            document.getElementById('photo-input').addEventListener('change', handlePhotoUpload);
+
+            function handlePhotoUpload(e) {
+                const files = Array.from(e.target.files);
+                files.forEach(file => {
+                    if (file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            addPhotoPreview(e.target.result, file);
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+
+            function addPhotoPreview(src, file) {
+                const preview = document.getElementById('photo-
