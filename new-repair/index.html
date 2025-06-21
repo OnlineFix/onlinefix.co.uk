@@ -5,485 +5,490 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>New Repair Intake - OnlineFix</title>
     
+    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
     <style>
-        /* --- Universal Styles & Variables --- */
         * {
-            margin: 0; 
-            padding: 0; 
+            margin: 0;
+            padding: 0;
             box-sizing: border-box;
         }
 
         :root {
-            --primary-blue: #0066FF; 
-            --trust-teal: #00B4D8; 
-            --deep-blue: #023E8A; 
-            --accent-cyan: #90E0EF; 
-            --light-bg: #F8FAFC; 
-            --white: #FFFFFF; 
-            --gray-100: #F1F5F9; 
-            --gray-200: #E2E8F0; 
-            --gray-600: #64748B; 
-            --gray-800: #1E293B; 
-            --success: #10B981; 
-            --warning: #F59E0B; 
-            --danger: #EF4444; 
-            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); 
+            --primary-blue: #0066FF;
+            --trust-teal: #00B4D8;
+            --deep-blue: #023E8A;
+            --accent-cyan: #90E0EF;
+            --light-bg: #F8FAFC;
+            --white: #FFFFFF;
+            --gray-100: #F1F5F9;
+            --gray-200: #E2E8F0;
+            --gray-600: #64748B;
+            --gray-800: #1E293B;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; 
-            line-height: 1.6; 
-            color: var(--gray-800); 
-            background: var(--light-bg); 
-            min-height: 100vh; 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            color: var(--gray-800);
+            background: var(--light-bg);
+            min-height: 100vh;
         }
 
         .container {
-            max-width: 1000px; 
-            margin: 0 auto; 
-            padding: 2rem; 
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
         }
 
-        /* --- Header --- */
+        /* Header */
         .header {
-            background: linear-gradient(135deg, var(--deep-blue), var(--primary-blue)); 
-            color: var(--white); 
-            padding: 2rem 0; 
-            text-align: center; 
-            margin-bottom: 2rem; 
-            border-radius: 20px; 
+            background: linear-gradient(135deg, var(--deep-blue), var(--primary-blue));
+            color: var(--white);
+            padding: 2rem 0;
+            text-align: center;
+            margin-bottom: 2rem;
+            border-radius: 20px;
         }
 
         .logo {
-            font-size: 2rem; 
-            font-weight: 800; 
-            margin-bottom: 0.5rem; 
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
         }
 
         .subtitle {
-            opacity: 0.9; 
-            font-size: 1.1rem; 
+            opacity: 0.9;
+            font-size: 1.1rem;
         }
 
-        /* --- Form Styling --- */
+        /* Form Container */
         .form-container {
-            background: var(--white); 
-            border-radius: 20px; 
-            box-shadow: var(--shadow); 
-            overflow: hidden; 
+            background: var(--white);
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
         }
 
         .form-header {
-            background: var(--gray-100); 
-            padding: 2rem; 
-            border-bottom: 1px solid var(--gray-200); 
+            background: var(--gray-100);
+            padding: 2rem;
+            border-bottom: 1px solid var(--gray-200);
         }
 
         .form-title {
-            font-size: 1.5rem; 
-            font-weight: 600; 
-            color: var(--deep-blue); 
-            margin-bottom: 0.5rem; 
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--deep-blue);
+            margin-bottom: 0.5rem;
         }
 
         .form-description {
-            color: var(--gray-600); 
+            color: var(--gray-600);
         }
 
         .form-content {
-            padding: 2rem; 
+            padding: 2rem;
         }
 
-        /* --- Progress Steps --- */
+        /* Progress Steps */
         .progress-steps {
-            display: flex; 
-            justify-content: space-between; 
-            margin-bottom: 3rem; 
-            position: relative; 
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 3rem;
+            position: relative;
         }
 
         .progress-steps::before {
-            content: ''; 
-            position: absolute; 
-            top: 20px; 
-            left: 10%; 
-            right: 10%; 
-            height: 2px; 
-            background: var(--gray-200); 
-            z-index: 1; 
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background: var(--gray-200);
+            z-index: 1;
         }
 
         .progress-line {
-            position: absolute; 
-            top: 20px; 
-            left: 10%; 
-            height: 2px; 
-            background: var(--primary-blue); 
-            z-index: 2; 
-            transition: width 0.3s ease; 
+            position: absolute;
+            top: 20px;
+            left: 10%;
+            height: 2px;
+            background: var(--primary-blue);
+            z-index: 2;
+            transition: width 0.3s ease;
         }
 
         .step {
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            text-align: center; 
-            z-index: 3; 
-            position: relative; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            z-index: 3;
+            position: relative;
         }
 
         .step-circle {
-            width: 40px; 
-            height: 40px; 
-            border-radius: 50%; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            font-weight: 600; 
-            margin-bottom: 0.5rem; 
-            transition: all 0.3s ease; 
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s ease;
         }
 
         .step.active .step-circle {
-            background: var(--primary-blue); 
-            color: var(--white); 
+            background: var(--primary-blue);
+            color: var(--white);
         }
 
         .step.completed .step-circle {
-            background: var(--success); 
-            color: var(--white); 
+            background: var(--success);
+            color: var(--white);
         }
 
         .step.pending .step-circle {
-            background: var(--gray-200); 
-            color: var(--gray-600); 
+            background: var(--gray-200);
+            color: var(--gray-600);
         }
 
         .step-label {
-            font-size: 0.9rem; 
-            color: var(--gray-600); 
-            font-weight: 500; 
+            font-size: 0.9rem;
+            color: var(--gray-600);
+            font-weight: 500;
         }
 
-        /* --- Form Steps & Elements --- */
+        /* Form Steps */
         .form-step {
-            display: none; 
+            display: none;
         }
 
         .form-step.active {
-            display: block; 
-            animation: fadeInUp 0.4s ease; 
+            display: block;
+            animation: fadeInUp 0.4s ease;
         }
 
         @keyframes fadeInUp {
             from {
-                opacity: 0; 
-                transform: translateY(20px); 
+                opacity: 0;
+                transform: translateY(20px);
             }
             to {
-                opacity: 1; 
-                transform: translateY(0); 
+                opacity: 1;
+                transform: translateY(0);
             }
         }
 
+        /* Form Elements */
         .form-grid {
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
-            gap: 1.5rem; 
-            margin-bottom: 2rem; 
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
         }
 
         .form-group {
-            margin-bottom: 1.5rem; 
+            margin-bottom: 1.5rem;
         }
 
         .form-label {
-            display: block; 
-            margin-bottom: 0.5rem; 
-            font-weight: 600; 
-            color: var(--gray-800); 
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--gray-800);
         }
 
         .form-label.required::after {
-            content: ' *'; 
-            color: var(--danger); 
+            content: ' *';
+            color: var(--danger);
         }
 
         .form-input {
-            width: 100%; 
-            padding: 0.75rem; 
-            border: 2px solid var(--gray-200); 
-            border-radius: 10px; 
-            font-size: 1rem; 
-            transition: all 0.3s ease; 
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--gray-200);
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
         }
 
         .form-input:focus {
-            outline: none; 
-            border-color: var(--primary-blue); 
-            box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1); 
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
         }
-        
+
         .form-textarea {
-            min-height: 100px; 
-            resize: vertical; 
+            min-height: 100px;
+            resize: vertical;
         }
 
         .form-select {
-            background: var(--white); 
-            cursor: pointer; 
+            background: var(--white);
+            cursor: pointer;
         }
 
-        /* --- Photo Upload --- */
+        /* Photo Upload */
         .photo-upload {
-            border: 2px dashed var(--gray-200); 
-            border-radius: 10px; 
-            padding: 2rem; 
-            text-align: center; 
-            transition: all 0.3s ease; 
-            cursor: pointer; 
+            border: 2px dashed var(--gray-200);
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
         }
 
         .photo-upload:hover {
-            border-color: var(--primary-blue); 
-            background: rgba(0, 102, 255, 0.02); 
+            border-color: var(--primary-blue);
+            background: rgba(0, 102, 255, 0.02);
         }
 
         .photo-upload.dragover {
-            border-color: var(--primary-blue); 
-            background: rgba(0, 102, 255, 0.1); 
+            border-color: var(--primary-blue);
+            background: rgba(0, 102, 255, 0.1);
         }
 
         .upload-icon {
-            font-size: 3rem; 
-            color: var(--primary-blue);
-            margin-bottom: 1rem; 
+            font-size: 3rem;
+            color: var(--gray-400);
+            margin-bottom: 1rem;
         }
 
         .upload-text {
-            color: var(--gray-600); 
-            margin-bottom: 1rem; 
+            color: var(--gray-600);
+            margin-bottom: 1rem;
         }
 
-        .photo-preview {
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); 
-            gap: 1rem; 
-            margin-top: 1rem; 
-        }
-
-        .photo-item {
-            position: relative; 
-            border-radius: 10px; 
-            overflow: hidden; 
-        }
-
-        .photo-item img {
-            width: 100%; 
-            height: 120px; 
-            object-fit: cover; 
-        }
-
-        .photo-remove {
-            position: absolute; 
-            top: 5px; 
-            right: 5px; 
-            background: var(--danger); 
-            color: var(--white); 
-            border: none; 
-            border-radius: 50%; 
-            width: 25px; 
-            height: 25px; 
-            cursor: pointer; 
-            font-size: 0.8rem; 
-        }
-
-        /* --- Buttons & Actions --- */
-        .form-actions {
-            display: flex; 
-            justify-content: space-between; 
-            gap: 1rem; 
-            margin-top: 2rem; 
-            padding-top: 2rem; 
-            border-top: 1px solid var(--gray-200); 
-        }
-
-        .btn {
-            display: inline-flex; 
-            align-items: center; 
-            gap: 0.5rem; 
-            padding: 0.75rem 1.5rem; 
-            border: none; 
-            border-radius: 10px; 
-            text-decoration: none; 
-            font-weight: 600; 
-            cursor: pointer; 
-            transition: all 0.3s ease; 
-            font-size: 1rem; 
-        }
-
-        .btn-primary {
-            background: var(--primary-blue); 
-            color: var(--white); 
-        }
-
-        .btn-primary:hover {
-            background: var(--deep-blue); 
-            transform: translateY(-2px); 
-        }
-
-        .btn-secondary {
-            background: var(--gray-200); 
-            color: var(--gray-800); 
-        }
-
-        .btn-secondary:hover {
-            background: var(--gray-600);
-            color: var(--white);
-        }
-
-        .btn-success {
-            background: var(--success); 
-            color: var(--white); 
-        }
-
-        .btn-success:hover {
-            background: #059669; 
-        }
-        
         .upload-button {
-            background: var(--primary-blue); 
-            color: var(--white); 
-            border: none; 
-            padding: 0.75rem 1.5rem; 
-            border-radius: 10px; 
-            cursor: pointer; 
-            font-weight: 600; 
-            transition: all 0.3s ease; 
+            background: var(--primary-blue);
+            color: var(--white);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
         }
 
         .upload-button:hover {
-            background: var(--deep-blue); 
+            background: var(--deep-blue);
+        }
+
+        .photo-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .photo-item {
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .photo-item img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+        }
+
+        .photo-remove {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: var(--danger);
+            color: var(--white);
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        /* Buttons */
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: var(--primary-blue);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--deep-blue);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--gray-200);
+            color: var(--gray-800);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-300);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: var(--white);
+        }
+
+        .btn-success:hover {
+            background: #059669;
         }
 
         .btn:disabled {
-            opacity: 0.6; 
-            cursor: not-allowed; 
-            transform: none !important; 
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
         }
 
-        /* --- Success Screen --- */
+        /* Success Screen */
         .success-screen {
-            display: none; 
-            text-align: center; 
-            padding: 3rem; 
+            display: none;
+            text-align: center;
+            padding: 3rem;
         }
 
         .success-icon {
-            font-size: 4rem; 
-            color: var(--success); 
-            margin-bottom: 1rem; 
+            font-size: 4rem;
+            color: var(--success);
+            margin-bottom: 1rem;
         }
 
         .success-title {
-            font-size: 2rem; 
-            font-weight: 700; 
-            color: var(--deep-blue); 
-            margin-bottom: 1rem; 
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--deep-blue);
+            margin-bottom: 1rem;
         }
 
         .repair-id {
-            font-size: 1.5rem; 
-            font-weight: 600; 
-            color: var(--primary-blue); 
-            background: var(--gray-100); 
-            padding: 1rem 2rem; 
-            border-radius: 50px; 
-            display: inline-block; 
-            margin: 1rem 0; 
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary-blue);
+            background: var(--gray-100);
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            display: inline-block;
+            margin: 1rem 0;
         }
 
         .nfc-instructions {
-            background: var(--gray-100); 
-            border-radius: 15px; 
-            padding: 2rem; 
-            margin: 2rem 0; 
-        }
-        
-        .nfc-url {
-            background: var(--white); 
-            border: 2px solid var(--gray-200); 
-            border-radius: 10px; 
-            padding: 1rem; 
-            font-family: monospace; 
-            font-size: 0.9rem; 
-            word-break: break-all; 
-            margin: 1rem 0; 
+            background: var(--gray-100);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
         }
 
-        /* --- Loading & Alerts --- */
+        .nfc-url {
+            background: var(--white);
+            border: 2px solid var(--gray-200);
+            border-radius: 10px;
+            padding: 1rem;
+            font-family: monospace;
+            font-size: 0.9rem;
+            word-break: break-all;
+            margin: 1rem 0;
+        }
+
+        /* Loading States */
         .loading {
-            display: none; 
-            text-align: center; 
-            padding: 2rem; 
+            display: none;
+            text-align: center;
+            padding: 2rem;
         }
 
         .spinner {
-            width: 40px; 
-            height: 40px; 
-            border: 3px solid var(--gray-200); 
-            border-top: 3px solid var(--primary-blue); 
-            border-radius: 50%; 
-            animation: spin 1s linear infinite; 
-            margin: 0 auto 1rem; 
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--gray-200);
+            border-top: 3px solid var(--primary-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg);  }
-            100% { transform: rotate(360deg);  }
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
+        /* Alerts */
         .alert {
-            padding: 1rem; 
-            border-radius: 10px; 
-            margin-bottom: 1rem; 
-            font-weight: 500; 
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            font-weight: 500;
         }
 
         .alert-success {
-            background: #D1FAE5; 
-            color: #065F46; 
-            border: 1px solid #A7F3D0; 
+            background: #D1FAE5;
+            color: #065F46;
+            border: 1px solid #A7F3D0;
         }
 
         .alert-error {
-            background: #FEE2E2; 
-            color: #B91C1C; 
-            border: 1px solid #FCA5A5; 
+            background: #FEE2E2;
+            color: #B91C1C;
+            border: 1px solid #FCA5A5;
         }
 
-        /* --- Responsive Design --- */
+        /* Responsive */
         @media (max-width: 768px) {
             .container {
-                padding: 1rem; 
+                padding: 1rem;
             }
-            .form-content, .form-header {
-                padding: 1.5rem; 
+
+            .form-content {
+                padding: 1.5rem;
             }
+
             .form-grid {
-                grid-template-columns: 1fr; 
+                grid-template-columns: 1fr;
             }
+
             .progress-steps {
-                flex-wrap: wrap; 
-                gap: 1rem; 
+                flex-wrap: wrap;
+                gap: 1rem;
             }
+
             .form-actions {
-                flex-direction: column; 
+                flex-direction: column;
             }
         }
     </style>
@@ -497,233 +502,245 @@
 
         <div class="form-container">
             <div class="form-header">
-                <h1 class="form-title">Create New Repair</h1> 
-                <p class="form-description">Fill in the device and customer information to create a new repair ticket</p> 
+                <h1 class="form-title">Create New Repair</h1>
+                <p class="form-description">Fill in the device and customer information to create a new repair ticket</p>
             </div>
 
             <div class="form-content">
+                <!-- Progress Steps -->
                 <div class="progress-steps">
-                    <div class="progress-line" id="progress-line"></div> 
-                    <div class="step active" data-step="1"> 
+                    <div class="progress-line" id="progress-line"></div>
+                    <div class="step active" data-step="1">
                         <div class="step-circle">1</div>
                         <div class="step-label">Customer Info</div>
-                    </div> 
-                    <div class="step pending" data-step="2"> 
+                    </div>
+                    <div class="step pending" data-step="2">
                         <div class="step-circle">2</div>
                         <div class="step-label">Device Details</div>
-                    </div> 
-                    <div class="step pending" data-step="3"> 
+                    </div>
+                    <div class="step pending" data-step="3">
                         <div class="step-circle">3</div>
                         <div class="step-label">Issue & Photos</div>
-                    </div> 
-                    <div class="step pending" data-step="4"> 
+                    </div>
+                    <div class="step pending" data-step="4">
                         <div class="step-circle">4</div>
                         <div class="step-label">Review & Create</div>
-                    </div> 
-                </div> 
+                    </div>
+                </div>
 
+                <!-- Form -->
                 <form id="repair-form">
+                    <!-- Step 1: Customer Information -->
                     <div class="form-step active" data-step="1">
-                        <h2 style="margin-bottom: 1.5rem; color: var(--deep-blue);">Customer Information</h2> 
+                        <h2 style="margin-bottom: 1.5rem; color: var(--deep-blue);">Customer Information</h2>
                         <div class="form-grid">
                             <div class="form-group">
-                                <label class="form-label required">Customer Name</label> 
-                                <input type="text" class="form-input" name="customerName" required> 
+                                <label class="form-label required">Customer Name</label>
+                                <input type="text" class="form-input" name="customerName" required>
                             </div>
                             <div class="form-group">
-                                <label class="form-label required">Phone Number</label> 
-                                <input type="tel" class="form-input" name="customerPhone" required> 
+                                <label class="form-label required">Phone Number</label>
+                                <input type="tel" class="form-input" name="customerPhone" required>
                             </div>
-                            <div class="form-group"> 
-                                <label class="form-label">Email Address</label> 
-                                <input type="email" class="form-input" name="customerEmail"> 
-                            </div> 
                             <div class="form-group">
-                                <label class="form-label">Address</label> 
-                                <input type="text" class="form-input" name="customerAddress"> 
+                                <label class="form-label">Email Address</label>
+                                <input type="email" class="form-input" name="customerEmail">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Address</label>
+                                <input type="text" class="form-input" name="customerAddress">
                             </div>
                         </div>
                     </div>
 
+                    <!-- Step 2: Device Details -->
                     <div class="form-step" data-step="2">
-                        <h2 style="margin-bottom: 1.5rem; color: var(--deep-blue);">Device Information</h2> 
+                        <h2 style="margin-bottom: 1.5rem; color: var(--deep-blue);">Device Information</h2>
                         <div class="form-grid">
                             <div class="form-group">
-                                <label class="form-label required">Device Type</label> 
-                                <select class="form-input form-select" name="deviceType" required> 
+                                <label class="form-label required">Device Type</label>
+                                <select class="form-input form-select" name="deviceType" required>
                                     <option value="">Select Device Type</option>
-                                    <option value="iPhone">iPhone</option> 
+                                    <option value="iPhone">iPhone</option>
                                     <option value="Samsung">Samsung Phone</option>
                                     <option value="Android">Android Phone</option>
-                                    <option value="iPad">iPad</option> 
+                                    <option value="iPad">iPad</option>
                                     <option value="Tablet">Android Tablet</option>
                                     <option value="MacBook">MacBook</option>
-                                    <option value="Laptop">Windows Laptop</option> 
+                                    <option value="Laptop">Windows Laptop</option>
                                     <option value="Desktop">Desktop PC</option>
-                                    <option value="Gaming Console">Gaming Console</option> 
+                                    <option value="Gaming Console">Gaming Console</option>
                                     <option value="Other">Other</option>
                                 </select>
-                            </div> 
+                            </div>
                             <div class="form-group">
                                 <label class="form-label required">Brand</label>
-                                <input type="text" class="form-input" name="brand" required placeholder="e.g., Apple, Samsung, HP"> 
+                                <input type="text" class="form-input" name="brand" required placeholder="e.g., Apple, Samsung, HP">
                             </div>
                             <div class="form-group">
                                 <label class="form-label required">Model</label>
-                                <input type="text" class="form-input" name="model" required placeholder="e.g., iPhone 13 Pro, Galaxy S22"> 
+                                <input type="text" class="form-input" name="model" required placeholder="e.g., iPhone 13 Pro, Galaxy S22">
                             </div>
                             <div class="form-group">
-                                <label class="form-label">Serial Number / IMEI</label> 
-                                <input type="text" class="form-input" name="serialNumber" placeholder="If available"> 
+                                <label class="form-label">Serial Number / IMEI</label>
+                                <input type="text" class="form-input" name="serialNumber" placeholder="If available">
                             </div>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Device Condition</label>
-                            <select class="form-input form-select" name="deviceCondition"> 
+                            <select class="form-input form-select" name="deviceCondition">
                                 <option value="working">Working</option>
                                 <option value="partially-working">Partially Working</option>
-                                <option value="not-working">Not Working</option> 
+                                <option value="not-working">Not Working</option>
                                 <option value="physically-damaged">Physically Damaged</option>
                                 <option value="water-damaged">Water Damaged</option>
-                            </select> 
+                            </select>
                         </div>
                     </div>
 
+                    <!-- Step 3: Issue & Photos -->
                     <div class="form-step" data-step="3">
-                        <h2 style="margin-bottom: 1.5rem; color: var(--deep-blue);">Issue Description & Photos</h2> 
+                        <h2 style="margin-bottom: 1.5rem; color: var(--deep-blue);">Issue Description & Photos</h2>
                         <div class="form-group">
                             <label class="form-label required">Issue Description</label>
-                            <textarea class="form-input form-textarea" name="issueDescription" required placeholder="Describe the problem with the device in detail..."></textarea> 
+                            <textarea class="form-input form-textarea" name="issueDescription" required 
+                                placeholder="Describe the problem with the device in detail..."></textarea>
                         </div>
                         <div class="form-grid">
-                            <div class="form-group"> 
+                            <div class="form-group">
                                 <label class="form-label">Estimated Cost (£)</label>
                                 <input type="number" class="form-input" name="estimatedCost" step="0.01" placeholder="0.00">
-                            </div> 
+                            </div>
                             <div class="form-group">
                                 <label class="form-label">Estimated Completion Date</label>
-                                <input type="date" class="form-input" name="estimatedCompletion"> 
+                                <input type="date" class="form-input" name="estimatedCompletion">
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Device Photos</label> 
+                            <label class="form-label">Device Photos</label>
                             <div class="photo-upload" onclick="document.getElementById('photo-input').click()">
                                 <div class="upload-icon">
-                                    <i class="fas fa-camera"></i> 
+                                    <i class="fas fa-camera"></i>
                                 </div>
                                 <div class="upload-text">Click to upload photos or drag and drop</div>
-                                <button type="button" class="upload-button">Choose Photos</button> 
+                                <button type="button" class="upload-button">Choose Photos</button>
                                 <input type="file" id="photo-input" multiple accept="image/*" style="display: none;">
                             </div>
-                            <div class="photo-preview" id="photo-preview"></div> 
+                            <div class="photo-preview" id="photo-preview"></div>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Additional Notes</label>
-                            <textarea class="form-input" name="additionalNotes" placeholder="Any additional notes about the device or repair..."></textarea> 
+                            <textarea class="form-input" name="additionalNotes" 
+                                placeholder="Any additional notes about the device or repair..."></textarea>
                         </div>
                     </div>
 
+                    <!-- Step 4: Review & Create -->
                     <div class="form-step" data-step="4">
-                        <h2 style="margin-bottom: 1.5rem; color: var(--deep-blue);">Review & Create Repair</h2> 
+                        <h2 style="margin-bottom: 1.5rem; color: var(--deep-blue);">Review & Create Repair</h2>
                         <div id="review-content">
-                            </div>
-                    </div> 
+                            <!-- Review content will be populated by JavaScript -->
+                        </div>
+                    </div>
                 </form>
 
+                <!-- Loading -->
                 <div class="loading" id="loading">
                     <div class="spinner"></div>
-                    <p>Creating repair ticket...</p> 
+                    <p>Creating repair ticket...</p>
                 </div>
 
+                <!-- Success Screen -->
                 <div class="success-screen" id="success-screen">
                     <div class="success-icon">
-                        <i class="fas fa-check-circle"></i> 
+                        <i class="fas fa-check-circle"></i>
                     </div>
                     <h2 class="success-title">Repair Created Successfully!</h2>
                     <div class="repair-id" id="generated-repair-id">REPAIR_123456</div>
                     
-                    <div class="nfc-instructions"> 
-                        <h3 style="margin-bottom: 1rem; color: var(--deep-blue);"> 
+                    <div class="nfc-instructions">
+                        <h3 style="margin-bottom: 1rem; color: var(--deep-blue);">
                             <i class="fas fa-wifi"></i>
                             NFC Card Setup
                         </h3>
-                        <p style="margin-bottom: 1rem;">Program your NFC card with this URL:</p> 
+                        <p style="margin-bottom: 1rem;">Program your NFC card with this URL:</p>
                         <div class="nfc-url" id="nfc-url">
                             https://onlinefix.github.io/track/?id=REPAIR_123456
                         </div>
-                        <p style="font-size: 0.9rem; color: var(--gray-600);"> 
+                        <p style="font-size: 0.9rem; color: var(--gray-600);">
                             Give this NFC card to the customer so they can track their repair progress
                         </p>
                     </div>
 
-                    <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 2rem;"> 
+                    <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 2rem;">
                         <button class="btn btn-primary" onclick="printReceipt()">
                             <i class="fas fa-print"></i>
                             Print Receipt
-                        </button> 
+                        </button>
                         <button class="btn btn-secondary" onclick="createNewRepair()">
                             <i class="fas fa-plus"></i>
                             New Repair
-                        </button> 
+                        </button>
                         <a href="../admin/" class="btn btn-success">
                             <i class="fas fa-tachometer-alt"></i>
                             Go to Dashboard
-                        </a> 
+                        </a>
                     </div>
                 </div>
 
-                <div class="form-actions" id="form-actions"> 
+                <!-- Form Actions -->
+                <div class="form-actions" id="form-actions">
                     <button type="button" class="btn btn-secondary" id="prev-btn" onclick="previousStep()" style="display: none;">
                         <i class="fas fa-arrow-left"></i>
                         Previous
-                    </button> 
+                    </button>
                     <div></div>
                     <button type="button" class="btn btn-primary" id="next-btn" onclick="nextStep()">
                         Next
                         <i class="fas fa-arrow-right"></i>
-                    </button> 
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Firebase Configuration (Replace with your actual config)
+        // Firebase Configuration
         const firebaseConfig = {
             apiKey: "your-api-key-here",
-            authDomain: "onlinefix-repair.firebaseapp.com", [cite: 147]
+            authDomain: "onlinefix-repair.firebaseapp.com",
             projectId: "onlinefix-repair",
             storageBucket: "onlinefix-repair.appspot.com",
             messagingSenderId: "123456789",
             appId: "your-app-id-here"
         };
-        
+
         // Initialize Firebase
-        firebase.initializeApp(firebaseConfig); [cite: 148]
-        const db = firebase.firestore(); [cite: 148]
-        const storage = firebase.storage(); [cite: 148]
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const storage = firebase.storage();
 
         // Global variables
-        let currentStep = 1; [cite: 149]
-        let uploadedPhotos = []; [cite: 149]
-        let formData = {}; [cite: 150]
+        let currentStep = 1;
+        let uploadedPhotos = [];
+        let formData = {};
 
         // Step navigation
         function nextStep() {
             if (validateCurrentStep()) {
                 if (currentStep < 4) {
-                    currentStep++; [cite: 151]
-                    updateSteps(); [cite: 151]
+                    currentStep++;
+                    updateSteps();
                 } else {
-                    createRepair(); [cite: 152]
+                    createRepair();
                 }
             }
         }
 
         function previousStep() {
             if (currentStep > 1) {
-                currentStep--; [cite: 153]
-                updateSteps(); [cite: 153]
+                currentStep--;
+                updateSteps();
             }
         }
 
@@ -734,18 +751,18 @@
                 step.classList.remove('active', 'completed', 'pending');
                 
                 if (stepNumber < currentStep) {
-                    step.classList.add('completed'); [cite: 154]
+                    step.classList.add('completed');
                 } else if (stepNumber === currentStep) {
-                    step.classList.add('active'); [cite: 155]
+                    step.classList.add('active');
                 } else {
-                    step.classList.add('pending'); [cite: 155]
+                    step.classList.add('pending');
                 }
             });
 
             // Update progress line
-            const progressLine = document.getElementById('progress-line'); [cite: 156]
-            const progressWidth = ((currentStep - 1) / 3) * 80; [cite: 157] // 80% is the max width 
-            progressLine.style.width = progressWidth + '%'; [cite: 158]
+            const progressLine = document.getElementById('progress-line');
+            const progressWidth = ((currentStep - 1) / 3) * 80; // 80% is the max width
+            progressLine.style.width = progressWidth + '%';
 
             // Show/hide form steps
             document.querySelectorAll('.form-step').forEach((step, index) => {
@@ -753,25 +770,26 @@
                 if (index + 1 === currentStep) {
                     step.classList.add('active');
                 }
-            }); [cite: 160]
+            });
 
             // Update buttons
-            const prevBtn = document.getElementById('prev-btn'); [cite: 161]
-            const nextBtn = document.getElementById('next-btn'); [cite: 161]
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
 
-            prevBtn.style.display = currentStep > 1 ? 'inline-flex' : 'none'; [cite: 162]
+            prevBtn.style.display = currentStep > 1 ? 'inline-flex' : 'none';
+            
             if (currentStep === 4) {
-                nextBtn.innerHTML = '<i class="fas fa-save"></i> Create Repair'; [cite: 163]
-                populateReviewStep(); [cite: 163]
+                nextBtn.innerHTML = '<i class="fas fa-save"></i> Create Repair';
+                populateReviewStep();
             } else {
-                nextBtn.innerHTML = 'Next <i class="fas fa-arrow-right"></i>'; [cite: 164]
+                nextBtn.innerHTML = 'Next <i class="fas fa-arrow-right"></i>';
             }
         }
 
         // Form validation
         function validateCurrentStep() {
-            const currentStepElement = document.querySelector(`.form-step[data-step="${currentStep}"]`); [cite: 165]
-            const requiredFields = currentStepElement.querySelectorAll('[required]'); [cite: 165]
+            const currentStepElement = document.querySelector(`.form-step[data-step="${currentStep}"]`);
+            const requiredFields = currentStepElement.querySelectorAll('[required]');
             let isValid = true;
 
             requiredFields.forEach(field => {
@@ -779,66 +797,73 @@
                     field.style.borderColor = 'var(--danger)';
                     isValid = false;
                 } else {
-                    field.style.borderColor = 'var(--gray-200)'; [cite: 166]
+                    field.style.borderColor = 'var(--gray-200)';
                 }
             });
 
             if (!isValid) {
-                showAlert('Please fill in all required fields', 'error'); [cite: 167]
+                showAlert('Please fill in all required fields', 'error');
             }
 
-            return isValid; [cite: 169]
+            return isValid;
         }
 
         // Photo upload handling
-        document.getElementById('photo-input').addEventListener('change', handlePhotoUpload); [cite: 169]
-        
+        document.getElementById('photo-input').addEventListener('change', handlePhotoUpload);
+
         function handlePhotoUpload(e) {
-            const files = Array.from(e.target.files); [cite: 170]
-            files.forEach(file => { [cite: 171]
+            const files = Array.from(e.target.files);
+            files.forEach(file => {
                 if (file.type.startsWith('image/')) {
                     const reader = new FileReader();
                     reader.onload = (e) => {
-                        addPhotoPreview(e.target.result, file); [cite: 171]
+                        addPhotoPreview(e.target.result, file);
                     };
-                    reader.readAsDataURL(file); [cite: 172]
+                    reader.readAsDataURL(file);
                 }
             });
         }
 
         function addPhotoPreview(src, file) {
-            const preview = document.getElementById('photo-preview'); [cite: 173]
-            const photoItem = document.createElement('div'); [cite: 174]
+            const preview = document.getElementById('photo-preview');
+            const photoItem = document.createElement('div');
             photoItem.className = 'photo-item';
             
-            const photoId = 'photo_' + Date.now(); [cite: 175]
+            const photoId = 'photo_' + Date.now();
             photoItem.innerHTML = `
                 <img src="${src}" alt="Device photo">
                 <button type="button" class="photo-remove" onclick="removePhoto('${photoId}')">×</button>
-            `; [cite: 175]
-            photoItem.dataset.photoId = photoId; [cite: 176]
+            `;
+            
+            photoItem.dataset.photoId = photoId;
             preview.appendChild(photoItem);
             
-            uploadedPhotos.push({ id: photoId, file, src }); [cite: 177]
+            uploadedPhotos.push({ id: photoId, file, src });
         }
 
         function removePhoto(photoId) {
-            const photoElement = document.querySelector(`[data-photo-id="${photoId}"]`); [cite: 178]
+            // Remove from preview
+            const photoElement = document.querySelector(`[data-photo-id="${photoId}"]`);
             if (photoElement) {
-                photoElement.remove(); [cite: 179]
+                photoElement.remove();
             }
-            uploadedPhotos = uploadedPhotos.filter(photo => photo.id !== photoId); [cite: 180]
+            
+            // Remove from uploaded photos array
+            uploadedPhotos = uploadedPhotos.filter(photo => photo.id !== photoId);
         }
-        
+
         // Drag and drop for photos
-        const photoUpload = document.querySelector('.photo-upload'); [cite: 180]
+        const photoUpload = document.querySelector('.photo-upload');
+        
         photoUpload.addEventListener('dragover', (e) => {
             e.preventDefault();
             photoUpload.classList.add('dragover');
-        }); [cite: 181]
+        });
+
         photoUpload.addEventListener('dragleave', () => {
             photoUpload.classList.remove('dragover');
-        }); [cite: 182]
+        });
+
         photoUpload.addEventListener('drop', (e) => {
             e.preventDefault();
             photoUpload.classList.remove('dragover');
@@ -846,144 +871,153 @@
             const files = Array.from(e.dataTransfer.files);
             files.forEach(file => {
                 if (file.type.startsWith('image/')) {
-                    const reader = new FileReader(); [cite: 184]
+                    const reader = new FileReader();
                     reader.onload = (e) => {
                         addPhotoPreview(e.target.result, file);
                     };
                     reader.readAsDataURL(file);
-                } [cite: 185]
+                }
             });
         });
 
         // Populate review step
         function populateReviewStep() {
-            const form = document.getElementById('repair-form'); [cite: 186]
-            const formDataObj = new FormData(form); [cite: 187]
+            const form = document.getElementById('repair-form');
+            const formDataObj = new FormData(form);
             const data = Object.fromEntries(formDataObj);
             
-            const reviewContent = document.getElementById('review-content'); [cite: 187]
+            const reviewContent = document.getElementById('review-content');
             reviewContent.innerHTML = `
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
                     <div style="background: var(--gray-100); padding: 1.5rem; border-radius: 15px;">
                         <h3 style="color: var(--deep-blue); margin-bottom: 1rem;">Customer Information</h3>
-                        <p><strong>Name:</strong> ${data.customerName}</p> 
+                        <p><strong>Name:</strong> ${data.customerName}</p>
                         <p><strong>Phone:</strong> ${data.customerPhone}</p>
-                        ${data.customerEmail ? `<p><strong>Email:</strong> ${data.customerEmail}</p>` : ''} 
-                        ${data.customerAddress ? `<p><strong>Address:</strong> ${data.customerAddress}</p>` : ''} 
+                        ${data.customerEmail ? `<p><strong>Email:</strong> ${data.customerEmail}</p>` : ''}
+                        ${data.customerAddress ? `<p><strong>Address:</strong> ${data.customerAddress}</p>` : ''}
                     </div>
                     <div style="background: var(--gray-100); padding: 1.5rem; border-radius: 15px;">
                         <h3 style="color: var(--deep-blue); margin-bottom: 1rem;">Device Information</h3>
-                        <p><strong>Type:</strong> ${data.deviceType}</p> 
+                        <p><strong>Type:</strong> ${data.deviceType}</p>
                         <p><strong>Brand:</strong> ${data.brand}</p>
                         <p><strong>Model:</strong> ${data.model}</p>
-                        ${data.serialNumber ? `<p><strong>Serial:</strong> ${data.serialNumber}</p>` : ''} 
+                        ${data.serialNumber ? `<p><strong>Serial:</strong> ${data.serialNumber}</p>` : ''}
                         <p><strong>Condition:</strong> ${data.deviceCondition}</p>
                     </div>
                 </div>
                 <div style="background: var(--gray-100); padding: 1.5rem; border-radius: 15px; margin-top: 1.5rem;">
-                    <h3 style="color: var(--deep-blue); margin-bottom: 1rem;">Repair Details</h3> 
+                    <h3 style="color: var(--deep-blue); margin-bottom: 1rem;">Repair Details</h3>
                     <p><strong>Issue:</strong> ${data.issueDescription}</p>
-                    ${data.estimatedCost ? `<p><strong>Estimated Cost:</strong> £${data.estimatedCost}</p>` : ''} 
-                    ${data.estimatedCompletion ? `<p><strong>Est. Completion:</strong> ${new Date(data.estimatedCompletion).toLocaleDateString('en-GB')}</p>` : ''} 
-                    ${data.additionalNotes ? `<p><strong>Notes:</strong> ${data.additionalNotes}</p>` : ''} 
-                    ${uploadedPhotos.length > 0 ? `<p><strong>Photos:</strong> ${uploadedPhotos.length} photo(s) attached</p>` : ''} 
+                    ${data.estimatedCost ? `<p><strong>Estimated Cost:</strong> £${data.estimatedCost}</p>` : ''}
+                    ${data.estimatedCompletion ? `<p><strong>Est. Completion:</strong> ${new Date(data.estimatedCompletion).toLocaleDateString('en-GB')}</p>` : ''}
+                    ${data.additionalNotes ? `<p><strong>Notes:</strong> ${data.additionalNotes}</p>` : ''}
+                    ${uploadedPhotos.length > 0 ? `<p><strong>Photos:</strong> ${uploadedPhotos.length} photo(s) attached</p>` : ''}
                 </div>
             `;
         }
 
         // Create repair
         async function createRepair() {
-            document.getElementById('form-actions').style.display = 'none'; [cite: 199]
-            document.getElementById('loading').style.display = 'block'; [cite: 200]
+            document.getElementById('form-actions').style.display = 'none';
+            document.getElementById('loading').style.display = 'block';
 
             try {
-                const form = document.getElementById('repair-form'); [cite: 200]
-                const formDataObj = new FormData(form); [cite: 201]
+                const form = document.getElementById('repair-form');
+                const formDataObj = new FormData(form);
                 const data = Object.fromEntries(formDataObj);
 
-                const repairId = 'REPAIR_' + Date.now().toString().slice(-6); [cite: 201]
-                const photoUrls = []; [cite: 202]
-                for (const photo of uploadedPhotos) { [cite: 203]
-                    const photoRef = storage.ref().child(`repairs/${repairId}/${photo.id}`); [cite: 203]
-                    const snapshot = await photoRef.put(photo.file); [cite: 204]
+                // Generate repair ID
+                const repairId = 'REPAIR_' + Date.now().toString().slice(-6);
+
+                // Upload photos if any
+                const photoUrls = [];
+                for (const photo of uploadedPhotos) {
+                    const photoRef = storage.ref().child(`repairs/${repairId}/${photo.id}`);
+                    const snapshot = await photoRef.put(photo.file);
                     const downloadURL = await snapshot.ref.getDownloadURL();
-                    photoUrls.push(downloadURL); [cite: 204]
+                    photoUrls.push(downloadURL);
                 }
 
+                // Create repair document
                 const repairData = {
                     repairId: repairId,
                     customerName: data.customerName,
-                    customerPhone: data.customerPhone, [cite: 206]
-                    customerEmail: data.customerEmail || '', [cite: 206]
-                    customerAddress: data.customerAddress || '', [cite: 207]
-                    deviceType: data.deviceType, [cite: 208]
+                    customerPhone: data.customerPhone,
+                    customerEmail: data.customerEmail || '',
+                    customerAddress: data.customerAddress || '',
+                    deviceType: data.deviceType,
                     brand: data.brand,
                     model: data.model,
-                    serialNumber: data.serialNumber || '', [cite: 208]
-                    deviceCondition: data.deviceCondition || 'working', [cite: 209, 210]
+                    serialNumber: data.serialNumber || '',
+                    deviceCondition: data.deviceCondition || 'working',
                     issueDescription: data.issueDescription,
                     currentStatus: 'received',
                     dateReceived: firebase.firestore.Timestamp.now(),
-                    estimatedCompletion: data.estimatedCompletion ? firebase.firestore.Timestamp.fromDate(new Date(data.estimatedCompletion)) : null, [cite: 211]
-                    estimatedCost: data.estimatedCost ? parseFloat(data.estimatedCost) : null, [cite: 212]
-                    additionalNotes: data.additionalNotes || '', [cite: 212]
-                    photos: photoUrls, [cite: 213]
+                    estimatedCompletion: data.estimatedCompletion ? 
+                        firebase.firestore.Timestamp.fromDate(new Date(data.estimatedCompletion)) : null,
+                    estimatedCost: data.estimatedCost ? parseFloat(data.estimatedCost) : null,
+                    additionalNotes: data.additionalNotes || '',
+                    photos: photoUrls,
                     progress: [{
                         status: 'received',
                         timestamp: firebase.firestore.Timestamp.now(),
-                        notes: 'Device received and logged into system', [cite: 214]
+                        notes: 'Device received and logged into system',
                         technician: 'System'
                     }],
                     createdAt: firebase.firestore.Timestamp.now()
-                }; [cite: 215]
+                };
 
                 await db.collection('repairs').add(repairData);
-                showSuccessScreen(repairId); [cite: 216]
+
+                // Show success screen
+                showSuccessScreen(repairId);
+
             } catch (error) {
-                console.error('Error creating repair:', error); [cite: 217]
-                showAlert('Error creating repair: ' + error.message, 'error'); [cite: 217]
-                document.getElementById('loading').style.display = 'none'; [cite: 217]
-                document.getElementById('form-actions').style.display = 'flex'; [cite: 218]
+                console.error('Error creating repair:', error);
+                showAlert('Error creating repair: ' + error.message, 'error');
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('form-actions').style.display = 'flex';
             }
         }
-        
+
+        // Show success screen
         function showSuccessScreen(repairId) {
-            document.getElementById('loading').style.display = 'none'; [cite: 219]
-            document.querySelector('.form-content > form').style.display = 'none'; [cite: 219]
+            document.getElementById('loading').style.display = 'none';
+            document.querySelector('.form-content > form').style.display = 'none';
             
             document.getElementById('generated-repair-id').textContent = repairId;
             document.getElementById('nfc-url').textContent = `https://onlinefix.github.io/track/?id=${repairId}`;
-            document.getElementById('success-screen').style.display = 'block'; [cite: 220]
+            document.getElementById('success-screen').style.display = 'block';
         }
 
         // Utility functions
         function showAlert(message, type) {
-            const alert = document.createElement('div'); [cite: 220]
-            alert.className = `alert alert-${type}`; [cite: 221]
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
             alert.textContent = message;
             
             document.querySelector('.form-content').insertBefore(alert, document.querySelector('.progress-steps'));
             
             setTimeout(() => {
                 alert.remove();
-            }, 5000); [cite: 222]
+            }, 5000);
         }
 
         function createNewRepair() {
-            location.reload(); [cite: 223]
+            location.reload();
         }
 
         function printReceipt() {
-            window.print(); [cite: 224]
+            window.print();
         }
-        
-        // Auto-fill estimated completion date
+
+        // Auto-fill estimated completion date (3 days from now)
         document.addEventListener('DOMContentLoaded', () => {
             const completionInput = document.querySelector('input[name="estimatedCompletion"]');
             const threeDaysFromNow = new Date();
             threeDaysFromNow.setDate(threeDaysFromNow.getDate() + 3);
             completionInput.value = threeDaysFromNow.toISOString().split('T')[0];
-        }); [cite: 225]
+        });
     </script>
 </body>
 </html>
