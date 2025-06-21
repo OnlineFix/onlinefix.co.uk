@@ -756,13 +756,13 @@
 
     <script>
         // Firebase Configuration
-                const firebaseConfig = {
-            apiKey: "AIzaSyAuPjwwwkqau6Wzfx7rURAe9jYPpgNbil4",
+        const firebaseConfig = {
+            apiKey: "your-api-key-here",
             authDomain: "onlinefix-repair.firebaseapp.com",
             projectId: "onlinefix-repair",
-            storageBucket: "onlinefix-repair.firebasestorage.app",
-            messagingSenderId: "382934797751",
-            appId: "1:382934797751:web:5ac8a9c87d68a17b4cec32"
+            storageBucket: "onlinefix-repair.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "your-app-id-here"
         };
 
         // Initialize Firebase
@@ -1039,15 +1039,191 @@
             }, 5000);
         }
 
-        // Placeholder functions for repair actions
+        // View repair details
         function viewRepair(repairId) {
-            // TODO: Implement repair view modal
-            console.log('View repair:', repairId);
+            const repair = allRepairs.find(r => r.id === repairId);
+            if (!repair) return;
+
+            const modal = document.createElement('div');
+            modal.className = 'modal show';
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width: 800px;">
+                    <div class="modal-header">
+                        <h2 class="modal-title">Repair Details - ${repair.repairId}</h2>
+                        <button class="close-btn" onclick="this.closest('.modal').remove()">&times;</button>
+                    </div>
+                    <div style="max-height: 70vh; overflow-y: auto;">
+                        <div class="form-grid" style="margin-bottom: 2rem;">
+                            <div style="background: var(--gray-100); padding: 1.5rem; border-radius: 15px;">
+                                <h3 style="color: var(--deep-blue); margin-bottom: 1rem;">Customer Information</h3>
+                                <p><strong>Name:</strong> ${repair.customerName}</p>
+                                <p><strong>Phone:</strong> ${repair.customerPhone}</p>
+                                ${repair.customerEmail ? `<p><strong>Email:</strong> ${repair.customerEmail}</p>` : ''}
+                                ${repair.customerAddress ? `<p><strong>Address:</strong> ${repair.customerAddress}</p>` : ''}
+                            </div>
+                            <div style="background: var(--gray-100); padding: 1.5rem; border-radius: 15px;">
+                                <h3 style="color: var(--deep-blue); margin-bottom: 1rem;">Device Information</h3>
+                                <p><strong>Type:</strong> ${repair.deviceType}</p>
+                                <p><strong>Brand:</strong> ${repair.brand}</p>
+                                <p><strong>Model:</strong> ${repair.model}</p>
+                                ${repair.serialNumber ? `<p><strong>Serial:</strong> ${repair.serialNumber}</p>` : ''}
+                                <p><strong>Condition:</strong> ${repair.deviceCondition || 'Not specified'}</p>
+                            </div>
+                        </div>
+                        <div style="background: var(--gray-100); padding: 1.5rem; border-radius: 15px; margin-bottom: 2rem;">
+                            <h3 style="color: var(--deep-blue); margin-bottom: 1rem;">Repair Details</h3>
+                            <p><strong>Issue:</strong> ${repair.issueDescription}</p>
+                            <p><strong>Current Status:</strong> <span class="status-badge ${statusConfig[repair.currentStatus]?.class || 'status-received'}">${statusConfig[repair.currentStatus]?.label || 'Received'}</span></p>
+                            <p><strong>Date Received:</strong> ${new Date(repair.dateReceived.seconds * 1000).toLocaleString('en-GB')}</p>
+                            ${repair.estimatedCompletion ? `<p><strong>Est. Completion:</strong> ${new Date(repair.estimatedCompletion.seconds * 1000).toLocaleDateString('en-GB')}</p>` : ''}
+                            ${repair.estimatedCost ? `<p><strong>Est. Cost:</strong> £${repair.estimatedCost}</p>` : ''}
+                            ${repair.additionalNotes ? `<p><strong>Notes:</strong> ${repair.additionalNotes}</p>` : ''}
+                        </div>
+                        ${repair.progress && repair.progress.length > 0 ? `
+                            <div style="background: var(--gray-100); padding: 1.5rem; border-radius: 15px; margin-bottom: 2rem;">
+                                <h3 style="color: var(--deep-blue); margin-bottom: 1rem;">Progress History</h3>
+                                ${repair.progress.map(p => `
+                                    <div style="padding: 1rem; background: var(--white); border-radius: 10px; margin-bottom: 1rem;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                            <strong>${statusConfig[p.status]?.label || p.status}</strong>
+                                            <small>${new Date(p.timestamp.seconds * 1000).toLocaleString('en-GB')}</small>
+                                        </div>
+                                        ${p.notes ? `<p style="color: var(--gray-600); margin: 0;">${p.notes}</p>` : ''}
+                                        ${p.technician ? `<p style="color: var(--gray-500); font-size: 0.9rem; margin: 0.5rem 0 0 0;">By: ${p.technician}</p>` : ''}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                        ${repair.photos && repair.photos.length > 0 ? `
+                            <div style="background: var(--gray-100); padding: 1.5rem; border-radius: 15px;">
+                                <h3 style="color: var(--deep-blue); margin-bottom: 1rem;">Photos</h3>
+                                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1rem;">
+                                    ${repair.photos.map(photo => `
+                                        <img src="${photo}" alt="Device photo" style="width: 100%; height: 120px; object-fit: cover; border-radius: 10px; cursor: pointer;" onclick="window.open('${photo}', '_blank')">
+                                    `).join('')}
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                    <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--gray-200);">
+                        <button class="btn btn-primary" onclick="editRepair('${repairId}'); this.closest('.modal').remove();">
+                            <i class="fas fa-edit"></i>
+                            Edit Repair
+                        </button>
+                        <button class="btn btn-secondary" onclick="this.closest('.modal').remove()">Close</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
         }
 
+        // Edit repair - show status update modal
         function editRepair(repairId) {
-            // TODO: Implement repair edit modal
-            console.log('Edit repair:', repairId);
+            const repair = allRepairs.find(r => r.id === repairId);
+            if (!repair) return;
+
+            const modal = document.createElement('div');
+            modal.className = 'modal show';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 class="modal-title">Update Repair - ${repair.repairId}</h2>
+                        <button class="close-btn" onclick="this.closest('.modal').remove()">&times;</button>
+                    </div>
+                    <form id="update-repair-form">
+                        <div class="form-group">
+                            <label class="form-label">Customer: ${repair.customerName}</label>
+                            <label class="form-label">Device: ${repair.brand} ${repair.model}</label>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Update Status</label>
+                            <select class="form-input" name="newStatus" required>
+                                <option value="received" ${repair.currentStatus === 'received' ? 'selected' : ''}>Received</option>
+                                <option value="diagnosing" ${repair.currentStatus === 'diagnosing' ? 'selected' : ''}>Diagnosing</option>
+                                <option value="waiting-parts" ${repair.currentStatus === 'waiting-parts' ? 'selected' : ''}>Waiting for Parts</option>
+                                <option value="in-repair" ${repair.currentStatus === 'in-repair' ? 'selected' : ''}>In Repair</option>
+                                <option value="testing" ${repair.currentStatus === 'testing' ? 'selected' : ''}>Testing</option>
+                                <option value="ready" ${repair.currentStatus === 'ready' ? 'selected' : ''}>Ready for Collection</option>
+                                <option value="completed" ${repair.currentStatus === 'completed' ? 'selected' : ''}>Completed</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Progress Notes</label>
+                            <textarea class="form-input form-textarea" name="progressNotes" placeholder="Add notes about this status update..."></textarea>
+                        </div>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">Estimated Completion Date</label>
+                                <input type="date" class="form-input" name="estimatedCompletion" 
+                                    value="${repair.estimatedCompletion ? new Date(repair.estimatedCompletion.seconds * 1000).toISOString().split('T')[0] : ''}">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Estimated Cost (£)</label>
+                                <input type="number" class="form-input" name="estimatedCost" step="0.01" 
+                                    value="${repair.estimatedCost || ''}">
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem;">
+                            <button type="button" class="btn btn-secondary" onclick="this.closest('.modal').remove()">Cancel</button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i>
+                                Update Repair
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+
+            // Handle form submission
+            document.getElementById('update-repair-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await updateRepairStatus(repairId, e.target);
+                modal.remove();
+            });
+        }
+
+        // Update repair status
+        async function updateRepairStatus(repairId, form) {
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData);
+
+            try {
+                const updateData = {
+                    currentStatus: data.newStatus,
+                };
+
+                // Add optional fields if provided
+                if (data.estimatedCompletion) {
+                    updateData.estimatedCompletion = firebase.firestore.Timestamp.fromDate(new Date(data.estimatedCompletion));
+                }
+                if (data.estimatedCost) {
+                    updateData.estimatedCost = parseFloat(data.estimatedCost);
+                }
+
+                // Add progress entry
+                const progressEntry = {
+                    status: data.newStatus,
+                    timestamp: firebase.firestore.Timestamp.now(),
+                    notes: data.progressNotes || `Status updated to ${statusConfig[data.newStatus]?.label || data.newStatus}`,
+                    technician: currentUser.email
+                };
+
+                updateData.progress = firebase.firestore.FieldValue.arrayUnion(progressEntry);
+
+                // Update in Firestore
+                await db.collection('repairs').doc(repairId).update(updateData);
+
+                showAlert('Repair updated successfully!', 'success');
+                
+                // Reload data
+                loadDashboardData();
+
+            } catch (error) {
+                console.error('Error updating repair:', error);
+                showAlert('Error updating repair: ' + error.message, 'error');
+            }
         }
 
         // Status filter
