@@ -9,6 +9,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
     <style>
@@ -57,6 +58,13 @@
             text-align: center;
             margin-bottom: 2rem;
             border-radius: 20px;
+            position: relative;
+        }
+
+        .header-actions {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
         }
 
         .logo {
@@ -68,6 +76,23 @@
         .subtitle {
             opacity: 0.9;
             font-size: 1.1rem;
+        }
+
+        /* Unauthorized Screen */
+        .unauthorized {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 3rem;
+            text-align: center;
+            box-shadow: var(--shadow);
+            margin: 2rem auto;
+            max-width: 500px;
+        }
+
+        .unauthorized-icon {
+            font-size: 3rem;
+            color: var(--danger);
+            margin-bottom: 1rem;
         }
 
         /* Form Container */
@@ -126,6 +151,7 @@
             background: var(--primary-blue);
             z-index: 2;
             transition: width 0.3s ease;
+            width: 0%;
         }
 
         .step {
@@ -468,6 +494,18 @@
             border: 1px solid #FCA5A5;
         }
 
+        /* Auth Check Loading */
+        .auth-loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .container {
@@ -490,215 +528,254 @@
             .form-actions {
                 flex-direction: column;
             }
+
+            .header-actions {
+                position: static;
+                margin-top: 1rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <div class="logo">OnlineFix</div>
-            <div class="subtitle">New Repair Intake Form</div>
+    <!-- Auth Loading -->
+    <div id="auth-loading" class="auth-loading">
+        <div class="loading" style="display: block;">
+            <div class="spinner"></div>
+            <p>Checking authentication...</p>
         </div>
+    </div>
 
-        <div class="form-container">
-            <div class="form-header">
-                <h1 class="form-title">Create New Repair</h1>
-                <p class="form-description">Fill in the device and customer information to create a new repair ticket</p>
+    <!-- Main Content (hidden initially) -->
+    <div id="main-content" class="hidden">
+        <div class="container">
+            <div class="header">
+                <div class="header-actions">
+                    <a href="../admin/" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i>
+                        Back to Dashboard
+                    </a>
+                </div>
+                <div class="logo">OnlineFix</div>
+                <div class="subtitle">New Repair Intake Form</div>
+                <div style="margin-top: 0.5rem; font-size: 0.9rem; opacity: 0.8;" id="user-info">
+                    Logged in as: <span id="user-email"></span>
+                </div>
             </div>
 
-            <div class="form-content">
-                <!-- Progress Steps -->
-                <div class="progress-steps">
-                    <div class="progress-line" id="progress-line"></div>
-                    <div class="step active" data-step="1">
-                        <div class="step-circle">1</div>
-                        <div class="step-label">Customer Info</div>
-                    </div>
-                    <div class="step pending" data-step="2">
-                        <div class="step-circle">2</div>
-                        <div class="step-label">Device Details</div>
-                    </div>
-                    <div class="step pending" data-step="3">
-                        <div class="step-circle">3</div>
-                        <div class="step-label">Issue & Photos</div>
-                    </div>
-                    <div class="step pending" data-step="4">
-                        <div class="step-circle">4</div>
-                        <div class="step-label">Review & Create</div>
-                    </div>
+            <!-- Unauthorized Message (hidden by default) -->
+            <div id="unauthorized" class="unauthorized hidden">
+                <div class="unauthorized-icon">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <h2>Access Denied</h2>
+                <p>You must be logged in to create new repairs.</p>
+                <a href="../admin/" class="btn btn-primary" style="margin-top: 1rem;">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Go to Login
+                </a>
+            </div>
+
+            <!-- Form Container (hidden by default) -->
+            <div id="form-container" class="form-container hidden">
+                <div class="form-header">
+                    <h1 class="form-title">Create New Repair</h1>
+                    <p class="form-description">Fill in the device and customer information to create a new repair ticket</p>
                 </div>
 
-                <!-- Form -->
-                <form id="repair-form">
-                    <!-- Step 1: Customer Information -->
-                    <div class="form-step active" data-step="1">
-                        <h2 style="margin-bottom: 1.5rem; color: var(--deep-blue);">Customer Information</h2>
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label class="form-label required">Customer Name</label>
-                                <input type="text" class="form-input" name="customerName" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label required">Phone Number</label>
-                                <input type="tel" class="form-input" name="customerPhone" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Email Address</label>
-                                <input type="email" class="form-input" name="customerEmail">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Address</label>
-                                <input type="text" class="form-input" name="customerAddress">
-                            </div>
+                <div class="form-content">
+                    <!-- Progress Steps -->
+                    <div class="progress-steps">
+                        <div class="progress-line" id="progress-line"></div>
+                        <div class="step active" data-step="1">
+                            <div class="step-circle">1</div>
+                            <div class="step-label">Customer Info</div>
+                        </div>
+                        <div class="step pending" data-step="2">
+                            <div class="step-circle">2</div>
+                            <div class="step-label">Device Details</div>
+                        </div>
+                        <div class="step pending" data-step="3">
+                            <div class="step-circle">3</div>
+                            <div class="step-label">Issue & Photos</div>
+                        </div>
+                        <div class="step pending" data-step="4">
+                            <div class="step-circle">4</div>
+                            <div class="step-label">Review & Create</div>
                         </div>
                     </div>
 
-                    <!-- Step 2: Device Details -->
-                    <div class="form-step" data-step="2">
-                        <h2 style="margin-bottom: 1.5rem; color: var(--deep-blue);">Device Information</h2>
-                        <div class="form-grid">
+                    <!-- Form -->
+                    <form id="repair-form">
+                        <!-- Step 1: Customer Information -->
+                        <div class="form-step active" data-step="1">
+                            <h2 style="margin-bottom: 1.5rem; color: var(--deep-blue);">Customer Information</h2>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label required">Customer Name</label>
+                                    <input type="text" class="form-input" name="customerName" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label required">Phone Number</label>
+                                    <input type="tel" class="form-input" name="customerPhone" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Email Address</label>
+                                    <input type="email" class="form-input" name="customerEmail">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Address</label>
+                                    <input type="text" class="form-input" name="customerAddress">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 2: Device Details -->
+                        <div class="form-step" data-step="2">
+                            <h2 style="margin-bottom: 1.5rem; color: var(--deep-blue);">Device Information</h2>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label required">Device Type</label>
+                                    <select class="form-input form-select" name="deviceType" required>
+                                        <option value="">Select Device Type</option>
+                                        <option value="iPhone">iPhone</option>
+                                        <option value="Samsung">Samsung Phone</option>
+                                        <option value="Android">Android Phone</option>
+                                        <option value="iPad">iPad</option>
+                                        <option value="Tablet">Android Tablet</option>
+                                        <option value="MacBook">MacBook</option>
+                                        <option value="Laptop">Windows Laptop</option>
+                                        <option value="Desktop">Desktop PC</option>
+                                        <option value="Gaming Console">Gaming Console</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label required">Brand</label>
+                                    <input type="text" class="form-input" name="brand" required placeholder="e.g., Apple, Samsung, HP">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label required">Model</label>
+                                    <input type="text" class="form-input" name="model" required placeholder="e.g., iPhone 13 Pro, Galaxy S22">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Serial Number / IMEI</label>
+                                    <input type="text" class="form-input" name="serialNumber" placeholder="If available">
+                                </div>
+                            </div>
                             <div class="form-group">
-                                <label class="form-label required">Device Type</label>
-                                <select class="form-input form-select" name="deviceType" required>
-                                    <option value="">Select Device Type</option>
-                                    <option value="iPhone">iPhone</option>
-                                    <option value="Samsung">Samsung Phone</option>
-                                    <option value="Android">Android Phone</option>
-                                    <option value="iPad">iPad</option>
-                                    <option value="Tablet">Android Tablet</option>
-                                    <option value="MacBook">MacBook</option>
-                                    <option value="Laptop">Windows Laptop</option>
-                                    <option value="Desktop">Desktop PC</option>
-                                    <option value="Gaming Console">Gaming Console</option>
-                                    <option value="Other">Other</option>
+                                <label class="form-label">Device Condition</label>
+                                <select class="form-input form-select" name="deviceCondition">
+                                    <option value="working">Working</option>
+                                    <option value="partially-working">Partially Working</option>
+                                    <option value="not-working">Not Working</option>
+                                    <option value="physically-damaged">Physically Damaged</option>
+                                    <option value="water-damaged">Water Damaged</option>
                                 </select>
                             </div>
-                            <div class="form-group">
-                                <label class="form-label required">Brand</label>
-                                <input type="text" class="form-input" name="brand" required placeholder="e.g., Apple, Samsung, HP">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label required">Model</label>
-                                <input type="text" class="form-input" name="model" required placeholder="e.g., iPhone 13 Pro, Galaxy S22">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Serial Number / IMEI</label>
-                                <input type="text" class="form-input" name="serialNumber" placeholder="If available">
-                            </div>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">Device Condition</label>
-                            <select class="form-input form-select" name="deviceCondition">
-                                <option value="working">Working</option>
-                                <option value="partially-working">Partially Working</option>
-                                <option value="not-working">Not Working</option>
-                                <option value="physically-damaged">Physically Damaged</option>
-                                <option value="water-damaged">Water Damaged</option>
-                            </select>
-                        </div>
-                    </div>
 
-                    <!-- Step 3: Issue & Photos -->
-                    <div class="form-step" data-step="3">
-                        <h2 style="margin-bottom: 1.5rem; color: var(--deep-blue);">Issue Description & Photos</h2>
-                        <div class="form-group">
-                            <label class="form-label required">Issue Description</label>
-                            <textarea class="form-input form-textarea" name="issueDescription" required 
-                                placeholder="Describe the problem with the device in detail..."></textarea>
-                        </div>
-                        <div class="form-grid">
+                        <!-- Step 3: Issue & Photos -->
+                        <div class="form-step" data-step="3">
+                            <h2 style="margin-bottom: 1.5rem; color: var(--deep-blue);">Issue Description & Photos</h2>
                             <div class="form-group">
-                                <label class="form-label">Estimated Cost (£)</label>
-                                <input type="number" class="form-input" name="estimatedCost" step="0.01" placeholder="0.00">
+                                <label class="form-label required">Issue Description</label>
+                                <textarea class="form-input form-textarea" name="issueDescription" required 
+                                    placeholder="Describe the problem with the device in detail..."></textarea>
                             </div>
-                            <div class="form-group">
-                                <label class="form-label">Estimated Completion Date</label>
-                                <input type="date" class="form-input" name="estimatedCompletion">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Device Photos</label>
-                            <div class="photo-upload" onclick="document.getElementById('photo-input').click()">
-                                <div class="upload-icon">
-                                    <i class="fas fa-camera"></i>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label">Estimated Cost (£)</label>
+                                    <input type="number" class="form-input" name="estimatedCost" step="0.01" placeholder="0.00">
                                 </div>
-                                <div class="upload-text">Click to upload photos or drag and drop</div>
-                                <button type="button" class="upload-button">Choose Photos</button>
-                                <input type="file" id="photo-input" multiple accept="image/*" style="display: none;">
+                                <div class="form-group">
+                                    <label class="form-label">Estimated Completion Date</label>
+                                    <input type="date" class="form-input" name="estimatedCompletion">
+                                </div>
                             </div>
-                            <div class="photo-preview" id="photo-preview"></div>
+                            <div class="form-group">
+                                <label class="form-label">Device Photos</label>
+                                <div class="photo-upload" onclick="document.getElementById('photo-input').click()">
+                                    <div class="upload-icon">
+                                        <i class="fas fa-camera"></i>
+                                    </div>
+                                    <div class="upload-text">Click to upload photos or drag and drop</div>
+                                    <button type="button" class="upload-button">Choose Photos</button>
+                                    <input type="file" id="photo-input" multiple accept="image/*" style="display: none;">
+                                </div>
+                                <div class="photo-preview" id="photo-preview"></div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Additional Notes</label>
+                                <textarea class="form-input" name="additionalNotes" 
+                                    placeholder="Any additional notes about the device or repair..."></textarea>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">Additional Notes</label>
-                            <textarea class="form-input" name="additionalNotes" 
-                                placeholder="Any additional notes about the device or repair..."></textarea>
+
+                        <!-- Step 4: Review & Create -->
+                        <div class="form-step" data-step="4">
+                            <h2 style="margin-bottom: 1.5rem; color: var(--deep-blue);">Review & Create Repair</h2>
+                            <div id="review-content">
+                                <!-- Review content will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- Loading -->
+                    <div class="loading" id="loading">
+                        <div class="spinner"></div>
+                        <p>Creating repair ticket...</p>
+                    </div>
+
+                    <!-- Success Screen -->
+                    <div class="success-screen" id="success-screen">
+                        <div class="success-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <h2 class="success-title">Repair Created Successfully!</h2>
+                        <div class="repair-id" id="generated-repair-id">REPAIR_123456</div>
+                        
+                        <div class="nfc-instructions">
+                            <h3 style="margin-bottom: 1rem; color: var(--deep-blue);">
+                                <i class="fas fa-wifi"></i>
+                                NFC Card Setup
+                            </h3>
+                            <p style="margin-bottom: 1rem;">Program your NFC card with this URL:</p>
+                            <div class="nfc-url" id="nfc-url">
+                                https://onlinefix.github.io/track/?id=REPAIR_123456
+                            </div>
+                            <p style="font-size: 0.9rem; color: var(--gray-600);">
+                                Give this NFC card to the customer so they can track their repair progress
+                            </p>
+                        </div>
+
+                        <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 2rem;">
+                            <button class="btn btn-primary" onclick="printReceipt()">
+                                <i class="fas fa-print"></i>
+                                Print Receipt
+                            </button>
+                            <button class="btn btn-secondary" onclick="createNewRepair()">
+                                <i class="fas fa-plus"></i>
+                                New Repair
+                            </button>
+                            <a href="../admin/" class="btn btn-success">
+                                <i class="fas fa-tachometer-alt"></i>
+                                Go to Dashboard
+                            </a>
                         </div>
                     </div>
 
-                    <!-- Step 4: Review & Create -->
-                    <div class="form-step" data-step="4">
-                        <h2 style="margin-bottom: 1.5rem; color: var(--deep-blue);">Review & Create Repair</h2>
-                        <div id="review-content">
-                            <!-- Review content will be populated by JavaScript -->
-                        </div>
-                    </div>
-                </form>
-
-                <!-- Loading -->
-                <div class="loading" id="loading">
-                    <div class="spinner"></div>
-                    <p>Creating repair ticket...</p>
-                </div>
-
-                <!-- Success Screen -->
-                <div class="success-screen" id="success-screen">
-                    <div class="success-icon">
-                        <i class="fas fa-check-circle"></i>
-                    </div>
-                    <h2 class="success-title">Repair Created Successfully!</h2>
-                    <div class="repair-id" id="generated-repair-id">REPAIR_123456</div>
-                    
-                    <div class="nfc-instructions">
-                        <h3 style="margin-bottom: 1rem; color: var(--deep-blue);">
-                            <i class="fas fa-wifi"></i>
-                            NFC Card Setup
-                        </h3>
-                        <p style="margin-bottom: 1rem;">Program your NFC card with this URL:</p>
-                        <div class="nfc-url" id="nfc-url">
-                            https://onlinefix.github.io/track/?id=REPAIR_123456
-                        </div>
-                        <p style="font-size: 0.9rem; color: var(--gray-600);">
-                            Give this NFC card to the customer so they can track their repair progress
-                        </p>
-                    </div>
-
-                    <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 2rem;">
-                        <button class="btn btn-primary" onclick="printReceipt()">
-                            <i class="fas fa-print"></i>
-                            Print Receipt
+                    <!-- Form Actions -->
+                    <div class="form-actions" id="form-actions">
+                        <button type="button" class="btn btn-secondary" id="prev-btn" onclick="previousStep()" style="display: none;">
+                            <i class="fas fa-arrow-left"></i>
+                            Previous
                         </button>
-                        <button class="btn btn-secondary" onclick="createNewRepair()">
-                            <i class="fas fa-plus"></i>
-                            New Repair
+                        <div></div>
+                        <button type="button" class="btn btn-primary" id="next-btn" onclick="nextStep()">
+                            Next
+                            <i class="fas fa-arrow-right"></i>
                         </button>
-                        <a href="../admin/" class="btn btn-success">
-                            <i class="fas fa-tachometer-alt"></i>
-                            Go to Dashboard
-                        </a>
                     </div>
-                </div>
-
-                <!-- Form Actions -->
-                <div class="form-actions" id="form-actions">
-                    <button type="button" class="btn btn-secondary" id="prev-btn" onclick="previousStep()" style="display: none;">
-                        <i class="fas fa-arrow-left"></i>
-                        Previous
-                    </button>
-                    <div></div>
-                    <button type="button" class="btn btn-primary" id="next-btn" onclick="nextStep()">
-                        Next
-                        <i class="fas fa-arrow-right"></i>
-                    </button>
                 </div>
             </div>
         </div>
@@ -707,23 +784,41 @@
     <script>
         // Firebase Configuration
         const firebaseConfig = {
-            apiKey: "your-api-key-here",
+            apiKey: "AIzaSyAuPjwwwkqau6Wzfx7rURAe9jYPpgNbil4",
             authDomain: "onlinefix-repair.firebaseapp.com",
             projectId: "onlinefix-repair",
-            storageBucket: "onlinefix-repair.appspot.com",
-            messagingSenderId: "123456789",
-            appId: "your-app-id-here"
+            storageBucket: "onlinefix-repair.firebasestorage.app",
+            messagingSenderId: "382934797751",
+            appId: "1:382934797751:web:5ac8a9c87d68a17b4cec32"
         };
 
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const storage = firebase.storage();
+        const auth = firebase.auth();
 
         // Global variables
         let currentStep = 1;
         let uploadedPhotos = [];
         let formData = {};
+        let currentUser = null;
+
+        // Check authentication
+        auth.onAuthStateChanged((user) => {
+            document.getElementById('auth-loading').classList.add('hidden');
+            document.getElementById('main-content').classList.remove('hidden');
+            
+            if (user) {
+                currentUser = user;
+                document.getElementById('user-email').textContent = user.email;
+                document.getElementById('form-container').classList.remove('hidden');
+                document.getElementById('unauthorized').classList.add('hidden');
+            } else {
+                document.getElementById('form-container').classList.add('hidden');
+                document.getElementById('unauthorized').classList.remove('hidden');
+            }
+        });
 
         // Step navigation
         function nextStep() {
@@ -829,7 +924,7 @@
             const photoItem = document.createElement('div');
             photoItem.className = 'photo-item';
             
-            const photoId = 'photo_' + Date.now();
+            const photoId = 'photo_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
             photoItem.innerHTML = `
                 <img src="${src}" alt="Device photo">
                 <button type="button" class="photo-remove" onclick="removePhoto('${photoId}')">×</button>
@@ -918,6 +1013,11 @@
 
         // Create repair
         async function createRepair() {
+            if (!currentUser) {
+                showAlert('You must be logged in to create repairs', 'error');
+                return;
+            }
+
             document.getElementById('form-actions').style.display = 'none';
             document.getElementById('loading').style.display = 'block';
 
@@ -932,10 +1032,14 @@
                 // Upload photos if any
                 const photoUrls = [];
                 for (const photo of uploadedPhotos) {
-                    const photoRef = storage.ref().child(`repairs/${repairId}/${photo.id}`);
-                    const snapshot = await photoRef.put(photo.file);
-                    const downloadURL = await snapshot.ref.getDownloadURL();
-                    photoUrls.push(downloadURL);
+                    try {
+                        const photoRef = storage.ref().child(`repairs/${repairId}/${photo.id}`);
+                        const snapshot = await photoRef.put(photo.file);
+                        const downloadURL = await snapshot.ref.getDownloadURL();
+                        photoUrls.push(downloadURL);
+                    } catch (error) {
+                        console.error('Error uploading photo:', error);
+                    }
                 }
 
                 // Create repair document
@@ -962,8 +1066,9 @@
                         status: 'received',
                         timestamp: firebase.firestore.Timestamp.now(),
                         notes: 'Device received and logged into system',
-                        technician: 'System'
+                        technician: currentUser.email
                     }],
+                    createdBy: currentUser.email,
                     createdAt: firebase.firestore.Timestamp.now()
                 };
 
@@ -984,6 +1089,7 @@
         function showSuccessScreen(repairId) {
             document.getElementById('loading').style.display = 'none';
             document.querySelector('.form-content > form').style.display = 'none';
+            document.getElementById('form-actions').style.display = 'none';
             
             document.getElementById('generated-repair-id').textContent = repairId;
             document.getElementById('nfc-url').textContent = `https://onlinefix.github.io/track/?id=${repairId}`;
@@ -996,11 +1102,16 @@
             alert.className = `alert alert-${type}`;
             alert.textContent = message;
             
-            document.querySelector('.form-content').insertBefore(alert, document.querySelector('.progress-steps'));
+            const container = document.querySelector('.form-content');
+            const progressSteps = document.querySelector('.progress-steps');
             
-            setTimeout(() => {
-                alert.remove();
-            }, 5000);
+            if (container && progressSteps) {
+                container.insertBefore(alert, progressSteps);
+                
+                setTimeout(() => {
+                    alert.remove();
+                }, 5000);
+            }
         }
 
         function createNewRepair() {
@@ -1014,9 +1125,11 @@
         // Auto-fill estimated completion date (3 days from now)
         document.addEventListener('DOMContentLoaded', () => {
             const completionInput = document.querySelector('input[name="estimatedCompletion"]');
-            const threeDaysFromNow = new Date();
-            threeDaysFromNow.setDate(threeDaysFromNow.getDate() + 3);
-            completionInput.value = threeDaysFromNow.toISOString().split('T')[0];
+            if (completionInput) {
+                const threeDaysFromNow = new Date();
+                threeDaysFromNow.setDate(threeDaysFromNow.getDate() + 3);
+                completionInput.value = threeDaysFromNow.toISOString().split('T')[0];
+            }
         });
     </script>
 </body>
