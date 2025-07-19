@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - OnlineFix Repair Management</title>
     
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
     <style>
         * {
@@ -468,16 +473,8 @@
     </style>
 </head>
 <body>
-    <!-- Loading Screen -->
-    <div id="firebase-loading" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--light-bg); display: flex; align-items: center; justify-content: center; z-index: 9999;">
-        <div style="text-align: center;">
-            <div class="spinner"></div>
-            <p>Loading Firebase...</p>
-        </div>
-    </div>
-
     <!-- Login Screen -->
-    <div id="login-screen" class="hidden">
+    <div id="login-screen">
         <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--deep-blue), var(--primary-blue));">
             <div style="background: var(--white); padding: 3rem; border-radius: 20px; box-shadow: var(--shadow); max-width: 400px; width: 90%;">
                 <div style="text-align: center; margin-bottom: 2rem;">
@@ -509,7 +506,7 @@
         <aside class="sidebar">
             <div class="sidebar-header">
                 <div class="logo">OnlineFix</div>
-                <div class="user-info">Admin Dashboard</div>
+                <div class="user-info" id="user-email">Admin Dashboard</div>
             </div>
             <nav class="sidebar-nav">
                 <div class="nav-item">
@@ -660,120 +657,77 @@
         </main>
     </div>
 
-    <!-- Firebase Scripts -->
     <script>
-        // Load Firebase scripts dynamically with error handling
-        function loadFirebaseScript(src) {
-            return new Promise((resolve, reject) => {
-                const script = document.createElement('script');
-                script.src = src;
-                script.onload = resolve;
-                script.onerror = reject;
-                document.head.appendChild(script);
-            });
-        }
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAuPjwwwkqau6Wzfx7rURAe9jYPpgNbil4",
+            authDomain: "onlinefix-repair.firebaseapp.com",
+            projectId: "onlinefix-repair",
+            storageBucket: "onlinefix-repair.firebasestorage.app",
+            messagingSenderId: "382934797751",
+            appId: "1:382934797751:web:5ac8a9c87d68a17b4cec32"
+        };
 
-        async function initializeFirebase() {
-            try {
-                // Load Firebase scripts in order
-                await loadFirebaseScript('https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js');
-                await loadFirebaseScript('https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js');
-                await loadFirebaseScript('https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js');
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
 
-                // Firebase Configuration
-                const firebaseConfig = {
-                    apiKey: "AIzaSyAuPjwwwkqau6Wzfx7rURAe9jYPpgNbil4",
-                    authDomain: "onlinefix-repair.firebaseapp.com",
-                    projectId: "onlinefix-repair",
-                    storageBucket: "onlinefix-repair.firebasestorage.app",
-                    messagingSenderId: "382934797751",
-                    appId: "1:382934797751:web:5ac8a9c87d68a17b4cec32"
-                };
+        // Global variables
+        let currentUser = null;
+        let allRepairs = [];
 
-                // Initialize Firebase
-                firebase.initializeApp(firebaseConfig);
-                
-                // Initialize services
-                window.db = firebase.firestore();
-                window.auth = firebase.auth();
+        // Status configuration
+        const statusConfig = {
+            'received': { label: 'Received', class: 'status-received' },
+            'diagnosing': { label: 'Diagnosing', class: 'status-diagnosing' },
+            'waiting-parts': { label: 'Waiting for Parts', class: 'status-waiting-parts' },
+            'in-repair': { label: 'In Repair', class: 'status-in-repair' },
+            'testing': { label: 'Testing', class: 'status-testing' },
+            'ready': { label: 'Ready for Collection', class: 'status-ready' },
+            'completed': { label: 'Completed', class: 'status-completed' }
+        };
 
-                // Hide loading and start app
-                document.getElementById('firebase-loading').style.display = 'none';
-                startApp();
-
-            } catch (error) {
-                console.error('Error loading Firebase:', error);
-                document.getElementById('firebase-loading').innerHTML = `
-                    <div style="text-align: center;">
-                        <div style="color: var(--danger); font-size: 2rem; margin-bottom: 1rem;">
-                            <i class="fas fa-exclamation-triangle"></i>
-                        </div>
-                        <h2>Firebase Loading Error</h2>
-                        <p>Failed to load Firebase. Please refresh the page.</p>
-                        <button onclick="location.reload()" style="margin-top: 1rem; padding: 0.75rem 1.5rem; background: var(--primary-blue); color: white; border: none; border-radius: 10px; cursor: pointer;">
-                            Refresh Page
-                        </button>
-                    </div>
-                `;
+        // Authentication state observer
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                currentUser = user;
+                document.getElementById('user-email').textContent = user.email;
+                showDashboard();
+                loadDashboardData();
+            } else {
+                showLogin();
             }
-        }
+        });
 
-        function startApp() {
-            // Global variables
-            window.currentUser = null;
-            window.allRepairs = [];
+        // Login form submission
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
 
-            // Status configuration
-            window.statusConfig = {
-                'received': { label: 'Received', class: 'status-received' },
-                'diagnosing': { label: 'Diagnosing', class: 'status-diagnosing' },
-                'waiting-parts': { label: 'Waiting for Parts', class: 'status-waiting-parts' },
-                'in-repair': { label: 'In Repair', class: 'status-in-repair' },
-                'testing': { label: 'Testing', class: 'status-testing' },
-                'ready': { label: 'Ready for Collection', class: 'status-ready' },
-                'completed': { label: 'Completed', class: 'status-completed' }
-            };
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+            } catch (error) {
+                showLoginError(error.message);
+            }
+        });
 
-            // Authentication
-            auth.onAuthStateChanged((user) => {
-                if (user) {
-                    currentUser = user;
-                    showDashboard();
-                    loadDashboardData();
-                } else {
-                    showLogin();
-                }
-            });
-
-            // Login form
-            document.getElementById('login-form').addEventListener('submit', async (e) => {
+        // Navigation
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
                 e.preventDefault();
-                const email = document.getElementById('login-email').value;
-                const password = document.getElementById('login-password').value;
-
-                try {
-                    await auth.signInWithEmailAndPassword(email, password);
-                } catch (error) {
-                    showLoginError(error.message);
+                const section = e.target.closest('.nav-link').dataset.section;
+                if (section) {
+                    showSection(section);
                 }
             });
+        });
 
-            // Navigation
-            document.querySelectorAll('.nav-link').forEach(link => {
-                link.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    const section = e.target.closest('.nav-link').dataset.section;
-                    if (section) {
-                        showSection(section);
-                    }
-                });
-            });
-
-            // Status filter
-            document.getElementById('status-filter').addEventListener('change', (e) => {
-                loadAllRepairs(e.target.value);
-            });
-        }
+        // Status filter
+        document.getElementById('status-filter').addEventListener('change', (e) => {
+            loadAllRepairs(e.target.value);
+        });
 
         // Show/hide screens
         function showLogin() {
@@ -853,6 +807,7 @@
             } catch (error) {
                 console.error('Error loading dashboard data:', error);
                 document.getElementById('loading').style.display = 'none';
+                showAlert('Error loading data: ' + error.message, 'error');
             }
         }
 
@@ -877,7 +832,11 @@
         // Load recent repairs
         function loadRecentRepairs() {
             const recent = allRepairs
-                .sort((a, b) => b.dateReceived.seconds - a.dateReceived.seconds)
+                .sort((a, b) => {
+                    const aTime = a.dateReceived?.seconds || 0;
+                    const bTime = b.dateReceived?.seconds || 0;
+                    return bTime - aTime;
+                })
                 .slice(0, 10);
 
             const tbody = document.querySelector('#recent-repairs-table tbody');
@@ -893,13 +852,14 @@
         function createRepairRow(repair) {
             const row = document.createElement('tr');
             const status = statusConfig[repair.currentStatus] || statusConfig['received'];
+            const date = repair.dateReceived ? new Date(repair.dateReceived.seconds * 1000).toLocaleDateString('en-GB') : 'N/A';
             
             row.innerHTML = `
                 <td><strong>${repair.repairId}</strong></td>
                 <td>${repair.customerName}</td>
                 <td>${repair.brand} ${repair.model}</td>
                 <td><span class="status-badge ${status.class}">${status.label}</span></td>
-                <td>${new Date(repair.dateReceived.seconds * 1000).toLocaleDateString('en-GB')}</td>
+                <td>${date}</td>
                 <td>
                     <button class="btn btn-secondary" style="padding: 0.5rem;" onclick="viewRepair('${repair.id}')">
                         <i class="fas fa-eye"></i>
@@ -947,7 +907,7 @@
                             <h3 style="color: var(--deep-blue); margin-bottom: 1rem;">Repair Details</h3>
                             <p><strong>Issue:</strong> ${repair.issueDescription}</p>
                             <p><strong>Current Status:</strong> <span class="status-badge ${statusConfig[repair.currentStatus]?.class || 'status-received'}">${statusConfig[repair.currentStatus]?.label || 'Received'}</span></p>
-                            <p><strong>Date Received:</strong> ${new Date(repair.dateReceived.seconds * 1000).toLocaleString('en-GB')}</p>
+                            <p><strong>Date Received:</strong> ${repair.dateReceived ? new Date(repair.dateReceived.seconds * 1000).toLocaleString('en-GB') : 'N/A'}</p>
                             ${repair.estimatedCompletion ? `<p><strong>Est. Completion:</strong> ${new Date(repair.estimatedCompletion.seconds * 1000).toLocaleDateString('en-GB')}</p>` : ''}
                             ${repair.estimatedCost ? `<p><strong>Est. Cost:</strong> £${repair.estimatedCost}</p>` : ''}
                             ${repair.additionalNotes ? `<p><strong>Notes:</strong> ${repair.additionalNotes}</p>` : ''}
@@ -959,7 +919,7 @@
                                     <div style="padding: 1rem; background: var(--white); border-radius: 10px; margin-bottom: 1rem;">
                                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                                             <strong>${statusConfig[p.status]?.label || p.status}</strong>
-                                            <small>${new Date(p.timestamp.seconds * 1000).toLocaleString('en-GB')}</small>
+                                            <small>${p.timestamp ? new Date(p.timestamp.seconds * 1000).toLocaleString('en-GB') : 'N/A'}</small>
                                         </div>
                                         ${p.notes ? `<p style="color: var(--gray-600); margin: 0;">${p.notes}</p>` : ''}
                                         ${p.technician ? `<p style="color: var(--gray-500); font-size: 0.9rem; margin: 0.5rem 0 0 0;">By: ${p.technician}</p>` : ''}
@@ -993,7 +953,7 @@
                         <h2 class="modal-title">Update Repair - ${repair.repairId}</h2>
                         <button class="close-btn" onclick="this.closest('.modal').remove()">&times;</button>
                     </div>
-                    <form id="update-repair-form">
+                    <form id="update-repair-form" data-repair-id="${repairId}">
                         <div class="form-group">
                             <label class="form-label">Customer: ${repair.customerName}</label>
                             <label class="form-label">Device: ${repair.brand} ${repair.model}</label>
@@ -1042,6 +1002,7 @@
             // Handle form submission
             document.getElementById('update-repair-form').addEventListener('submit', async (e) => {
                 e.preventDefault();
+                const repairId = e.target.dataset.repairId;
                 await updateRepairStatus(repairId, e.target);
                 modal.remove();
             });
@@ -1109,6 +1070,8 @@
         function createDetailedRepairRow(repair) {
             const row = document.createElement('tr');
             const status = statusConfig[repair.currentStatus] || statusConfig['received'];
+            const dateReceived = repair.dateReceived ? new Date(repair.dateReceived.seconds * 1000).toLocaleDateString('en-GB') : 'N/A';
+            const estCompletion = repair.estimatedCompletion ? new Date(repair.estimatedCompletion.seconds * 1000).toLocaleDateString('en-GB') : 'TBD';
             
             row.innerHTML = `
                 <td><strong>${repair.repairId}</strong></td>
@@ -1116,8 +1079,8 @@
                 <td>${repair.deviceType}<br><small>${repair.brand} ${repair.model}</small></td>
                 <td title="${repair.issueDescription}">${repair.issueDescription.substring(0, 50)}${repair.issueDescription.length > 50 ? '...' : ''}</td>
                 <td><span class="status-badge ${status.class}">${status.label}</span></td>
-                <td>${new Date(repair.dateReceived.seconds * 1000).toLocaleDateString('en-GB')}</td>
-                <td>${repair.estimatedCompletion ? new Date(repair.estimatedCompletion.seconds * 1000).toLocaleDateString('en-GB') : 'TBD'}</td>
+                <td>${dateReceived}</td>
+                <td>${estCompletion}</td>
                 <td>
                     <button class="btn btn-secondary" style="padding: 0.5rem;" onclick="viewRepair('${repair.id}')">
                         <i class="fas fa-eye"></i>
@@ -1149,9 +1112,6 @@
                 e.target.classList.remove('show');
             }
         });
-
-        // Initialize the app when page loads
-        document.addEventListener('DOMContentLoaded', initializeFirebase);
     </script>
 </body>
 </html>
