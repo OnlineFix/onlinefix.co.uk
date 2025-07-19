@@ -25,7 +25,9 @@
             --accent-cyan: #90E0EF;
             --light-bg: #F8FAFC;
             --white: #FFFFFF;
+            --gray-50: #F9FAFB;
             --gray-100: #F1F5F9;
+            --gray-300: #CBD5E1;
             --gray-600: #64748B;
             --gray-800: #1E293B;
             --success: #10B981;
@@ -181,29 +183,50 @@
             gap: 1rem;
             margin-bottom: 1.5rem;
             position: relative;
+            opacity: 0;
+            animation: slideInLeft 0.4s ease forwards;
         }
 
-        .timeline-item:not(:last-child)::after {
-            content: '';
+        .timeline-item:nth-child(1) { animation-delay: 0.1s; }
+        .timeline-item:nth-child(2) { animation-delay: 0.2s; }
+        .timeline-item:nth-child(3) { animation-delay: 0.3s; }
+        .timeline-item:nth-child(4) { animation-delay: 0.4s; }
+        .timeline-item:nth-child(5) { animation-delay: 0.5s; }
+        .timeline-item:nth-child(6) { animation-delay: 0.6s; }
+        .timeline-item:nth-child(7) { animation-delay: 0.7s; }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .timeline-connector {
             position: absolute;
-            left: 15px;
-            top: 35px;
+            left: 17px;
+            top: 38px;
             width: 2px;
-            height: calc(100% + 10px);
-            background: var(--gray-100);
+            background: var(--gray-300);
+            z-index: 0;
         }
 
         .timeline-icon {
-            width: 30px;
-            height: 30px;
+            width: 35px;
+            height: 35px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             flex-shrink: 0;
             position: relative;
             z-index: 1;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .timeline-icon.completed {
@@ -217,17 +240,62 @@
         }
 
         .timeline-icon.pending {
-            background: var(--gray-100);
+            background: var(--gray-300);
             color: var(--gray-600);
+        }
+
+        /* Status-specific icon colors */
+        .timeline-icon.status-received {
+            background: #6366F1;
+            color: var(--white);
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+        }
+
+        .timeline-icon.status-diagnosing {
+            background: #F59E0B;
+            color: var(--white);
+            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+        }
+
+        .timeline-icon.status-waiting-parts {
+            background: #EF4444;
+            color: var(--white);
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+        }
+
+        .timeline-icon.status-in-repair {
+            background: #3B82F6;
+            color: var(--white);
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+        }
+
+        .timeline-icon.status-testing {
+            background: #8B5CF6;
+            color: var(--white);
+            box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
+        }
+
+        .timeline-icon.status-ready {
+            background: #10B981;
+            color: var(--white);
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+        }
+
+        .timeline-icon.status-completed {
+            background: #6B7280;
+            color: var(--white);
+            box-shadow: 0 2px 8px rgba(107, 114, 128, 0.3);
         }
 
         .timeline-content {
             flex: 1;
+            padding-left: 0.5rem;
         }
 
         .timeline-title {
             font-weight: 600;
             margin-bottom: 0.25rem;
+            color: var(--gray-800);
         }
 
         .timeline-time {
@@ -245,9 +313,11 @@
         /* Progress Photos */
         .timeline-photos {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
             gap: 0.5rem;
-            margin-top: 0.5rem;
+            margin-top: 0.75rem;
+            margin-bottom: 0.5rem;
+            max-width: 400px;
         }
 
         .timeline-photo {
@@ -255,16 +325,19 @@
             overflow: hidden;
             cursor: pointer;
             transition: transform 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .timeline-photo:hover {
             transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
         }
 
         .timeline-photo img {
             width: 100%;
-            height: 80px;
+            height: 70px;
             object-fit: cover;
+            display: block;
         }
 
         /* Device Details */
@@ -296,35 +369,6 @@
 
         .detail-value {
             font-weight: 600;
-        }
-
-        /* Photos Section */
-        .photos-section {
-            padding: 1.5rem;
-        }
-
-        .photos-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        .photo-item {
-            border-radius: 10px;
-            overflow: hidden;
-            cursor: pointer;
-            transition: transform 0.3s ease;
-        }
-
-        .photo-item:hover {
-            transform: scale(1.02);
-        }
-
-        .photo-item img {
-            width: 100%;
-            height: 120px;
-            object-fit: cover;
         }
 
         /* Contact Section */
@@ -402,6 +446,21 @@
             max-width: 90%;
             max-height: 90%;
             object-fit: contain;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 40px;
+            color: var(--white);
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .modal-close:hover {
+            color: var(--gray-300);
         }
 
         /* Responsive */
@@ -518,19 +577,6 @@
                 </div>
             </div>
 
-            <!-- Photos Section -->
-            <div class="repair-card fade-in" id="photosCard" style="display: none;">
-                <div class="photos-section">
-                    <h3 style="margin-bottom: 1rem; color: var(--deep-blue);">
-                        <i class="fas fa-camera"></i>
-                        Device Photos
-                    </h3>
-                    <div class="photos-grid" id="photosGrid">
-                        <!-- Photos will be populated by JavaScript -->
-                    </div>
-                </div>
-            </div>
-
             <!-- Contact Section -->
             <div class="contact-section fade-in">
                 <div class="contact-title">Need to get in touch?</div>
@@ -554,7 +600,8 @@
 
     <!-- Photo Modal -->
     <div class="photo-modal" id="photoModal" onclick="closePhotoModal()">
-        <img id="modalImage" src="" alt="Full size photo">
+        <span class="modal-close" onclick="closePhotoModal()">&times;</span>
+        <img id="modalImage" src="" alt="Full size photo" onclick="event.stopPropagation()">
     </div>
 
     <script>
@@ -655,13 +702,34 @@
 
         // Display repair data
         function displayRepairData(data) {
-            // Update device info
-            const deviceInfo = data.device || `${data.brand || ''} ${data.model || ''}`;
+            // Update device info - prioritize device field, then brand/model combination
+            let deviceInfo = '';
+            if (data.device) {
+                deviceInfo = data.device;
+            } else if (data.brand || data.model) {
+                deviceInfo = `${data.brand || ''} ${data.model || ''}`.trim();
+            } else {
+                deviceInfo = 'Device';
+            }
+            
             document.getElementById('deviceTitle').textContent = deviceInfo;
             document.getElementById('deviceId').textContent = `Repair ID: ${data.repairId}`;
             
-            // Update device icon
-            const iconClass = deviceIcons[data.deviceType] || deviceIcons['Device'];
+            // Update device icon - use device field to determine icon if possible
+            let deviceTypeForIcon = data.deviceType || 'Device';
+            if (data.device) {
+                const deviceLower = data.device.toLowerCase();
+                if (deviceLower.includes('iphone')) deviceTypeForIcon = 'iPhone';
+                else if (deviceLower.includes('samsung')) deviceTypeForIcon = 'Samsung';
+                else if (deviceLower.includes('android')) deviceTypeForIcon = 'Android';
+                else if (deviceLower.includes('ipad')) deviceTypeForIcon = 'iPad';
+                else if (deviceLower.includes('tablet')) deviceTypeForIcon = 'Tablet';
+                else if (deviceLower.includes('macbook')) deviceTypeForIcon = 'MacBook';
+                else if (deviceLower.includes('laptop')) deviceTypeForIcon = 'Laptop';
+                else if (deviceLower.includes('desktop')) deviceTypeForIcon = 'Desktop';
+                else if (deviceLower.includes('console')) deviceTypeForIcon = 'Gaming Console';
+            }
+            const iconClass = deviceIcons[deviceTypeForIcon] || deviceIcons['Device'];
             document.getElementById('deviceIcon').innerHTML = `<i class="${iconClass}"></i>`;
 
             // Update status
@@ -671,33 +739,59 @@
             statusBadge.innerHTML = `<i class="${status.icon}"></i> ${status.label}`;
 
             // Update estimated completion
+            let completionText = '';
             if (data.estimatedCompletion) {
                 const date = new Date(data.estimatedCompletion.seconds * 1000);
-                document.getElementById('estimatedCompletion').textContent = 
-                    `Estimated completion: ${date.toLocaleDateString('en-GB')}`;
+                completionText = `Estimated completion: ${date.toLocaleDateString('en-GB')}`;
             }
             
             // Show estimated cost if available
             if (data.estimatedCost || data.price) {
                 const cost = data.estimatedCost || data.price;
-                const completionEl = document.getElementById('estimatedCompletion');
-                completionEl.innerHTML += `<br>Estimated cost: £${cost}`;
+                if (completionText) {
+                    completionText += `<br>`;
+                }
+                completionText += `Estimated cost: £${cost}`;
             }
+            
+            document.getElementById('estimatedCompletion').innerHTML = completionText;
 
-            // Build timeline
-            buildTimeline(data.progress || [], data.currentStatus);
+            // Get initial photos (photos not in progress updates)
+            const progressPhotos = new Set();
+            if (data.progress) {
+                data.progress.forEach(p => {
+                    if (p.photos) {
+                        p.photos.forEach(photo => progressPhotos.add(photo));
+                    }
+                });
+            }
+            
+            const initialPhotos = (data.photos || []).filter(photo => !progressPhotos.has(photo));
+
+            // Build timeline with initial photos
+            buildTimeline(data.progress || [], data.currentStatus, initialPhotos, data.dateReceived);
 
             // Update device details
             updateDeviceDetails(data);
 
-            // Show photos if available
-            if (data.photos && data.photos.length > 0) {
-                showPhotos(data.photos);
-            }
-
             // Show main content
             document.getElementById('loading').style.display = 'none';
             document.getElementById('main-content').style.display = 'block';
+
+            // Add timeline connectors after DOM renders
+            setTimeout(() => {
+                const timeline = document.getElementById('timeline');
+                const timelineItems = timeline.querySelectorAll('.timeline-item');
+                timelineItems.forEach((item, index) => {
+                    if (index < timelineItems.length - 1) {
+                        const connector = document.createElement('div');
+                        connector.className = 'timeline-connector';
+                        const itemHeight = item.offsetHeight;
+                        connector.style.height = `${itemHeight - 5}px`;
+                        item.appendChild(connector);
+                    }
+                });
+            }, 100);
 
             // Trigger animations
             setTimeout(() => {
@@ -708,13 +802,24 @@
         }
 
         // Build progress timeline
-        function buildTimeline(progress, currentStatus) {
+        function buildTimeline(progress, currentStatus, initialPhotos, dateReceived) {
             const timeline = document.getElementById('timeline');
-            const statusOrder = ['received', 'diagnosing', 'waiting-parts', 'in-repair', 'testing', 'ready', 'completed'];
-            
             timeline.innerHTML = '';
 
-            statusOrder.forEach((statusKey, index) => {
+            // Create a set of statuses that have been used
+            const usedStatuses = new Set(['received']); // Always show received
+            progress.forEach(p => usedStatuses.add(p.status));
+            usedStatuses.add(currentStatus); // Add current status
+
+            // Build timeline only for used statuses
+            const statusOrder = ['received', 'diagnosing', 'waiting-parts', 'in-repair', 'testing', 'ready', 'completed'];
+            
+            statusOrder.forEach((statusKey) => {
+                // Skip if this status was never used
+                if (!usedStatuses.has(statusKey)) {
+                    return;
+                }
+
                 const status = statusConfig[statusKey];
                 const progressItem = progress.find(p => p.status === statusKey);
                 
@@ -723,15 +828,38 @@
                 let notes = '';
                 let photos = [];
 
+                // Check if this status is completed
+                const statusIndex = statusOrder.indexOf(statusKey);
+                const currentStatusIndex = statusOrder.indexOf(currentStatus);
+                const isCompleted = progressItem || statusIndex < currentStatusIndex;
+                const isCurrent = statusKey === currentStatus && !progressItem;
+
                 if (progressItem) {
-                    iconClass = 'completed';
+                    iconClass = `completed status-${statusKey}`;
                     const date = new Date(progressItem.timestamp.seconds * 1000);
                     timeText = date.toLocaleString('en-GB');
                     notes = progressItem.notes || '';
                     photos = progressItem.photos || [];
-                } else if (statusKey === currentStatus) {
-                    iconClass = 'current';
+                } else if (isCurrent) {
+                    iconClass = `current status-${statusKey}`;
                     timeText = 'In Progress';
+                } else if (statusKey === 'received' && !progressItem) {
+                    // Always show received status with date
+                    iconClass = `completed status-${statusKey}`;
+                    if (dateReceived) {
+                        const date = new Date(dateReceived.seconds * 1000);
+                        timeText = date.toLocaleString('en-GB');
+                    } else {
+                        timeText = 'Device received';
+                    }
+                    notes = 'Device received and logged into system';
+                } else if (isCompleted) {
+                    iconClass = `completed status-${statusKey}`;
+                }
+
+                // For received status, include initial photos
+                if (statusKey === 'received' && initialPhotos && initialPhotos.length > 0) {
+                    photos = [...photos, ...initialPhotos];
                 }
 
                 const timelineItem = document.createElement('div');
@@ -762,46 +890,38 @@
 
         // Update device details
         function updateDeviceDetails(data) {
-            const details = [
-                { label: 'Device Type', value: data.deviceType || data.device || 'Not specified' },
-                { label: 'Brand', value: data.brand || 'Not specified' },
-                { label: 'Model', value: data.model || 'Not specified' },
-                { label: 'Issue', value: data.issueDescription || 'Not specified' },
-                { label: 'Received Date', value: data.dateReceived ? new Date(data.dateReceived.seconds * 1000).toLocaleDateString('en-GB') : 'Not specified' },
-                { label: 'Customer', value: data.customerName || 'Not specified' }
-            ];
+            const details = [];
+            
+            // Show device if available, otherwise show type/brand/model
+            if (data.device) {
+                details.push({ label: 'Device', value: data.device });
+            } else {
+                if (data.deviceType) details.push({ label: 'Device Type', value: data.deviceType });
+                if (data.brand) details.push({ label: 'Brand', value: data.brand });
+                if (data.model) details.push({ label: 'Model', value: data.model });
+            }
+            
+            if (data.issueDescription) details.push({ label: 'Issue', value: data.issueDescription });
+            if (data.dateReceived) {
+                details.push({ 
+                    label: 'Received Date', 
+                    value: new Date(data.dateReceived.seconds * 1000).toLocaleDateString('en-GB') 
+                });
+            }
+            if (data.customerName) details.push({ label: 'Customer', value: data.customerName });
 
             const detailsContainer = document.getElementById('deviceDetails');
             detailsContainer.innerHTML = '';
 
             details.forEach(detail => {
-                if (detail.value && detail.value !== 'Not specified') {
-                    const detailItem = document.createElement('div');
-                    detailItem.className = 'detail-item';
-                    detailItem.innerHTML = `
-                        <span class="detail-label">${detail.label}:</span>
-                        <span class="detail-value">${detail.value}</span>
-                    `;
-                    detailsContainer.appendChild(detailItem);
-                }
+                const detailItem = document.createElement('div');
+                detailItem.className = 'detail-item';
+                detailItem.innerHTML = `
+                    <span class="detail-label">${detail.label}:</span>
+                    <span class="detail-value">${detail.value}</span>
+                `;
+                detailsContainer.appendChild(detailItem);
             });
-        }
-
-        // Show photos
-        function showPhotos(photos) {
-            const photosCard = document.getElementById('photosCard');
-            const photosGrid = document.getElementById('photosGrid');
-            
-            photosGrid.innerHTML = '';
-            
-            photos.forEach(photo => {
-                const photoItem = document.createElement('div');
-                photoItem.className = 'photo-item';
-                photoItem.innerHTML = `<img src="${photo}" alt="Device photo" onclick="showPhotoModal('${photo}')">`;
-                photosGrid.appendChild(photoItem);
-            });
-
-            photosCard.style.display = 'block';
         }
 
         // Photo modal functions
