@@ -9,6 +9,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
     <style>
@@ -297,6 +298,87 @@
         .status-testing { background: #E0E7FF; color: #5B21B6; }
         .status-ready { background: #D1FAE5; color: #065F46; }
         .status-completed { background: #F3F4F6; color: #374151; }
+
+        /* Delete button */
+        .btn-danger {
+            background: var(--danger);
+            color: var(--white);
+        }
+
+        .btn-danger:hover {
+            background: #DC2626;
+        }
+
+        /* Photo upload in modal */
+        .photo-upload-small {
+            border: 2px dashed var(--gray-200);
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+        }
+
+        .photo-upload-small:hover {
+            border-color: var(--primary-blue);
+            background: rgba(0, 102, 255, 0.02);
+        }
+
+        .photo-preview-small {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .photo-item-small {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .photo-item-small img {
+            width: 100%;
+            height: 80px;
+            object-fit: cover;
+        }
+
+        .photo-remove-small {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: var(--danger);
+            color: var(--white);
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            font-size: 0.7rem;
+        }
+
+        /* Template selector */
+        .template-selector {
+            margin-bottom: 1rem;
+        }
+
+        .template-btn {
+            font-size: 0.85rem;
+            padding: 0.5rem 1rem;
+            margin: 0.25rem;
+            background: var(--gray-100);
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .template-btn:hover {
+            background: var(--primary-blue);
+            color: var(--white);
+            border-color: var(--primary-blue);
+        }
 
         /* Forms */
         .form-grid {
@@ -672,10 +754,12 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const auth = firebase.auth();
+        const storage = firebase.storage();
 
         // Global variables
         let currentUser = null;
         let allRepairs = [];
+        let updatePhotos = [];
 
         // Status configuration
         const statusConfig = {
@@ -686,6 +770,40 @@
             'testing': { label: 'Testing', class: 'status-testing' },
             'ready': { label: 'Ready for Collection', class: 'status-ready' },
             'completed': { label: 'Completed', class: 'status-completed' }
+        };
+
+        // Status update templates
+        const statusTemplates = {
+            'diagnosing': [
+                'Initial diagnosis in progress. We are examining your device to identify all issues.',
+                'Running diagnostic tests to determine the exact cause of the problem.',
+                'Device diagnosis complete. We have identified the issues and will proceed with repairs.'
+            ],
+            'waiting-parts': [
+                'We need to order replacement parts for your device. Expected arrival within 2-3 business days.',
+                'Waiting for specific components to arrive. We\'ll update you once parts are received.',
+                'Additional parts required for complete repair. Order has been placed with our supplier.'
+            ],
+            'in-repair': [
+                'Repair work has begun on your device. Our technician is working on fixing the identified issues.',
+                'Your device is currently being repaired. We expect to complete the work within 24-48 hours.',
+                'Repair in progress. Additional issues were discovered that require attention.'
+            ],
+            'testing': [
+                'Repair completed. Now conducting thorough testing to ensure everything works perfectly.',
+                'Running quality checks and stress tests on your repaired device.',
+                'Final testing phase. Verifying all functions are working as expected.'
+            ],
+            'ready': [
+                'Great news! Your device is repaired and ready for collection. Please bring your receipt.',
+                'Repair completed successfully. Your device is ready to be picked up at your convenience.',
+                'Your device has been fully repaired and tested. Ready for collection during business hours.'
+            ],
+            'completed': [
+                'Repair completed and device collected. Thank you for choosing OnlineFix!',
+                'Service completed. We hope you\'re satisfied with our repair service.',
+                'Device successfully repaired and delivered to customer.'
+            ]
         };
 
         // Authentication state observer
@@ -867,6 +985,9 @@
                     <button class="btn btn-primary" style="padding: 0.5rem;" onclick="editRepair('${repair.id}')">
                         <i class="fas fa-edit"></i>
                     </button>
+                    <button class="btn btn-danger" style="padding: 0.5rem;" onclick="deleteRepair('${repair.id}', '${repair.repairId}')">
+                        <i class="fas fa-trash"></i>
+                    </button>
                 </td>
             `;
             return row;
@@ -923,6 +1044,13 @@
                                         </div>
                                         ${p.notes ? `<p style="color: var(--gray-600); margin: 0;">${p.notes}</p>` : ''}
                                         ${p.technician ? `<p style="color: var(--gray-500); font-size: 0.9rem; margin: 0.5rem 0 0 0;">By: ${p.technician}</p>` : ''}
+                                        ${p.photos && p.photos.length > 0 ? `
+                                            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 0.5rem; margin-top: 0.5rem;">
+                                                ${p.photos.map(photo => `
+                                                    <img src="${photo}" alt="Progress photo" style="width: 100%; height: 80px; object-fit: cover; border-radius: 8px; cursor: pointer;" onclick="window.open('${photo}', '_blank')">
+                                                `).join('')}
+                                            </div>
+                                        ` : ''}
                                     </div>
                                 `).join('')}
                             </div>
@@ -945,10 +1073,13 @@
             const repair = allRepairs.find(r => r.id === repairId);
             if (!repair) return;
 
+            // Reset update photos
+            updatePhotos = [];
+
             const modal = document.createElement('div');
             modal.className = 'modal show';
             modal.innerHTML = `
-                <div class="modal-content">
+                <div class="modal-content" style="max-width: 700px;">
                     <div class="modal-header">
                         <h2 class="modal-title">Update Repair - ${repair.repairId}</h2>
                         <button class="close-btn" onclick="this.closest('.modal').remove()">&times;</button>
@@ -960,7 +1091,7 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">Update Status</label>
-                            <select class="form-input" name="newStatus" required>
+                            <select class="form-input" name="newStatus" id="status-select" onchange="showTemplates(this.value)">
                                 <option value="received" ${repair.currentStatus === 'received' ? 'selected' : ''}>Received</option>
                                 <option value="diagnosing" ${repair.currentStatus === 'diagnosing' ? 'selected' : ''}>Diagnosing</option>
                                 <option value="waiting-parts" ${repair.currentStatus === 'waiting-parts' ? 'selected' : ''}>Waiting for Parts</option>
@@ -970,9 +1101,22 @@
                                 <option value="completed" ${repair.currentStatus === 'completed' ? 'selected' : ''}>Completed</option>
                             </select>
                         </div>
+                        <div class="template-selector" id="template-selector" style="display: none;">
+                            <label class="form-label">Quick Templates:</label>
+                            <div id="template-buttons"></div>
+                        </div>
                         <div class="form-group">
                             <label class="form-label">Progress Notes</label>
-                            <textarea class="form-input form-textarea" name="progressNotes" placeholder="Add notes about this status update..."></textarea>
+                            <textarea class="form-input form-textarea" name="progressNotes" id="progress-notes" placeholder="Add notes about this status update..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Add Photos (Optional)</label>
+                            <div class="photo-upload-small" onclick="document.getElementById('update-photo-input').click()">
+                                <i class="fas fa-camera" style="font-size: 1.5rem; color: var(--gray-400); margin-bottom: 0.5rem; display: block;"></i>
+                                <span style="color: var(--gray-600); font-size: 0.9rem;">Click to add photos</span>
+                                <input type="file" id="update-photo-input" multiple accept="image/*" style="display: none;" onchange="handleUpdatePhotos(event)">
+                            </div>
+                            <div class="photo-preview-small" id="update-photo-preview"></div>
                         </div>
                         <div class="form-grid">
                             <div class="form-group">
@@ -998,6 +1142,9 @@
             `;
             
             document.body.appendChild(modal);
+
+            // Show templates for current status
+            showTemplates(repair.currentStatus);
 
             // Handle form submission
             document.getElementById('update-repair-form').addEventListener('submit', async (e) => {
@@ -1026,12 +1173,32 @@
                     updateData.estimatedCost = parseFloat(data.estimatedCost);
                 }
 
+                // Upload photos if any
+                const photoUrls = [];
+                if (updatePhotos.length > 0) {
+                    const repair = allRepairs.find(r => r.id === repairId);
+                    for (const photo of updatePhotos) {
+                        try {
+                            const photoRef = storage.ref().child(`repairs/${repair.repairId}/updates/${Date.now()}_${photo.id}`);
+                            const snapshot = await photoRef.put(photo.file);
+                            const downloadURL = await snapshot.ref.getDownloadURL();
+                            photoUrls.push(downloadURL);
+                        } catch (error) {
+                            console.error('Error uploading photo:', error);
+                        }
+                    }
+                    
+                    // Add new photos to existing photos array
+                    updateData.photos = firebase.firestore.FieldValue.arrayUnion(...photoUrls);
+                }
+
                 // Add progress entry
                 const progressEntry = {
                     status: data.newStatus,
                     timestamp: firebase.firestore.Timestamp.now(),
                     notes: data.progressNotes || `Status updated to ${statusConfig[data.newStatus]?.label || data.newStatus}`,
-                    technician: currentUser.email
+                    technician: currentUser.email,
+                    photos: photoUrls
                 };
 
                 updateData.progress = firebase.firestore.FieldValue.arrayUnion(progressEntry);
@@ -1043,6 +1210,9 @@
                 
                 // Reload data
                 loadDashboardData();
+
+                // Reset update photos
+                updatePhotos = [];
 
             } catch (error) {
                 console.error('Error updating repair:', error);
@@ -1088,6 +1258,9 @@
                     <button class="btn btn-primary" style="padding: 0.5rem;" onclick="editRepair('${repair.id}')">
                         <i class="fas fa-edit"></i>
                     </button>
+                    <button class="btn btn-danger" style="padding: 0.5rem;" onclick="deleteRepair('${repair.id}', '${repair.repairId}')">
+                        <i class="fas fa-trash"></i>
+                    </button>
                 </td>
             `;
             return row;
@@ -1112,6 +1285,96 @@
                 e.target.classList.remove('show');
             }
         });
+
+        // Show templates for selected status
+        function showTemplates(status) {
+            const templates = statusTemplates[status];
+            const selector = document.getElementById('template-selector');
+            const buttonsContainer = document.getElementById('template-buttons');
+            
+            if (templates && templates.length > 0) {
+                selector.style.display = 'block';
+                buttonsContainer.innerHTML = '';
+                
+                templates.forEach((template, index) => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'template-btn';
+                    btn.textContent = `Template ${index + 1}`;
+                    btn.onclick = () => {
+                        document.getElementById('progress-notes').value = template;
+                    };
+                    buttonsContainer.appendChild(btn);
+                });
+            } else {
+                selector.style.display = 'none';
+            }
+        }
+
+        // Handle photo upload for updates
+        function handleUpdatePhotos(event) {
+            const files = Array.from(event.target.files);
+            files.forEach(file => {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        addUpdatePhotoPreview(e.target.result, file);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        function addUpdatePhotoPreview(src, file) {
+            const preview = document.getElementById('update-photo-preview');
+            const photoItem = document.createElement('div');
+            photoItem.className = 'photo-item-small';
+            
+            const photoId = 'photo_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            photoItem.innerHTML = `
+                <img src="${src}" alt="Update photo">
+                <button type="button" class="photo-remove-small" onclick="removeUpdatePhoto('${photoId}')">×</button>
+            `;
+            
+            photoItem.dataset.photoId = photoId;
+            preview.appendChild(photoItem);
+            
+            updatePhotos.push({ id: photoId, file, src });
+        }
+
+        function removeUpdatePhoto(photoId) {
+            const photoElement = document.querySelector(`[data-photo-id="${photoId}"]`);
+            if (photoElement) {
+                photoElement.remove();
+            }
+            updatePhotos = updatePhotos.filter(photo => photo.id !== photoId);
+        }
+
+        // Delete repair
+        async function deleteRepair(repairId, repairIdNumber) {
+            if (confirm(`Are you sure you want to delete repair ${repairIdNumber}? This action cannot be undone.`)) {
+                try {
+                    // Delete from Firestore
+                    await db.collection('repairs').doc(repairId).delete();
+                    
+                    // Delete photos from Storage if any
+                    const repair = allRepairs.find(r => r.id === repairId);
+                    if (repair && repair.photos && repair.photos.length > 0) {
+                        // Note: You might want to delete photos from storage here
+                        // This requires parsing the photo URLs to get the storage paths
+                    }
+                    
+                    showAlert(`Repair ${repairIdNumber} deleted successfully!`, 'success');
+                    
+                    // Reload data
+                    loadDashboardData();
+                    
+                } catch (error) {
+                    console.error('Error deleting repair:', error);
+                    showAlert('Error deleting repair: ' + error.message, 'error');
+                }
+            }
+        }
     </script>
 </body>
 </html>
