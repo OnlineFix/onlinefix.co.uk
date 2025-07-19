@@ -242,6 +242,31 @@
             line-height: 1.4;
         }
 
+        /* Progress Photos */
+        .timeline-photos {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .timeline-photo {
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .timeline-photo:hover {
+            transform: scale(1.05);
+        }
+
+        .timeline-photo img {
+            width: 100%;
+            height: 80px;
+            object-fit: cover;
+        }
+
         /* Device Details */
         .device-details {
             background: var(--gray-100);
@@ -275,7 +300,7 @@
 
         /* Photos Section */
         .photos-section {
-            margin: 2rem 0;
+            padding: 1.5rem;
         }
 
         .photos-grid {
@@ -354,6 +379,29 @@
         .contact-btn.secondary:hover {
             background: var(--gray-800);
             color: var(--white);
+        }
+
+        /* Photo Modal */
+        .photo-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            cursor: pointer;
+        }
+
+        .photo-modal img {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
         }
 
         /* Responsive */
@@ -504,6 +552,11 @@
         </div>
     </div>
 
+    <!-- Photo Modal -->
+    <div class="photo-modal" id="photoModal" onclick="closePhotoModal()">
+        <img id="modalImage" src="" alt="Full size photo">
+    </div>
+
     <script>
         // Firebase Configuration
         const firebaseConfig = {
@@ -568,7 +621,8 @@
             'iPad': 'fas fa-tablet-alt',
             'Tablet': 'fas fa-tablet-alt',
             'Desktop': 'fas fa-desktop',
-            'Gaming Console': 'fas fa-gamepad'
+            'Gaming Console': 'fas fa-gamepad',
+            'Device': 'fas fa-cog'
         };
 
         // Get repair ID from URL
@@ -602,11 +656,12 @@
         // Display repair data
         function displayRepairData(data) {
             // Update device info
-            document.getElementById('deviceTitle').textContent = `${data.brand} ${data.model}`;
+            const deviceInfo = data.device || `${data.brand || ''} ${data.model || ''}`;
+            document.getElementById('deviceTitle').textContent = deviceInfo;
             document.getElementById('deviceId').textContent = `Repair ID: ${data.repairId}`;
             
             // Update device icon
-            const iconClass = deviceIcons[data.deviceType] || 'fas fa-cog';
+            const iconClass = deviceIcons[data.deviceType] || deviceIcons['Device'];
             document.getElementById('deviceIcon').innerHTML = `<i class="${iconClass}"></i>`;
 
             // Update status
@@ -620,6 +675,13 @@
                 const date = new Date(data.estimatedCompletion.seconds * 1000);
                 document.getElementById('estimatedCompletion').textContent = 
                     `Estimated completion: ${date.toLocaleDateString('en-GB')}`;
+            }
+            
+            // Show estimated cost if available
+            if (data.estimatedCost || data.price) {
+                const cost = data.estimatedCost || data.price;
+                const completionEl = document.getElementById('estimatedCompletion');
+                completionEl.innerHTML += `<br>Estimated cost: £${cost}`;
             }
 
             // Build timeline
@@ -659,12 +721,14 @@
                 let iconClass = 'pending';
                 let timeText = '';
                 let notes = '';
+                let photos = [];
 
                 if (progressItem) {
                     iconClass = 'completed';
                     const date = new Date(progressItem.timestamp.seconds * 1000);
                     timeText = date.toLocaleString('en-GB');
                     notes = progressItem.notes || '';
+                    photos = progressItem.photos || [];
                 } else if (statusKey === currentStatus) {
                     iconClass = 'current';
                     timeText = 'In Progress';
@@ -680,6 +744,15 @@
                         <div class="timeline-title">${status.label}</div>
                         ${timeText ? `<div class="timeline-time">${timeText}</div>` : ''}
                         ${notes ? `<div class="timeline-notes">${notes}</div>` : ''}
+                        ${photos.length > 0 ? `
+                            <div class="timeline-photos">
+                                ${photos.map(photo => `
+                                    <div class="timeline-photo" onclick="showPhotoModal('${photo}')">
+                                        <img src="${photo}" alt="Progress photo">
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
                     </div>
                 `;
 
@@ -690,19 +763,19 @@
         // Update device details
         function updateDeviceDetails(data) {
             const details = [
-                { label: 'Device Type', value: data.deviceType },
-                { label: 'Brand', value: data.brand },
-                { label: 'Model', value: data.model },
-                { label: 'Issue', value: data.issueDescription },
-                { label: 'Received Date', value: new Date(data.dateReceived.seconds * 1000).toLocaleDateString('en-GB') },
-                { label: 'Customer', value: data.customerName }
+                { label: 'Device Type', value: data.deviceType || data.device || 'Not specified' },
+                { label: 'Brand', value: data.brand || 'Not specified' },
+                { label: 'Model', value: data.model || 'Not specified' },
+                { label: 'Issue', value: data.issueDescription || 'Not specified' },
+                { label: 'Received Date', value: data.dateReceived ? new Date(data.dateReceived.seconds * 1000).toLocaleDateString('en-GB') : 'Not specified' },
+                { label: 'Customer', value: data.customerName || 'Not specified' }
             ];
 
             const detailsContainer = document.getElementById('deviceDetails');
             detailsContainer.innerHTML = '';
 
             details.forEach(detail => {
-                if (detail.value) {
+                if (detail.value && detail.value !== 'Not specified') {
                     const detailItem = document.createElement('div');
                     detailItem.className = 'detail-item';
                     detailItem.innerHTML = `
@@ -724,11 +797,23 @@
             photos.forEach(photo => {
                 const photoItem = document.createElement('div');
                 photoItem.className = 'photo-item';
-                photoItem.innerHTML = `<img src="${photo}" alt="Device photo" onclick="window.open('${photo}', '_blank')">`;
+                photoItem.innerHTML = `<img src="${photo}" alt="Device photo" onclick="showPhotoModal('${photo}')">`;
                 photosGrid.appendChild(photoItem);
             });
 
             photosCard.style.display = 'block';
+        }
+
+        // Photo modal functions
+        function showPhotoModal(photoUrl) {
+            const modal = document.getElementById('photoModal');
+            const modalImg = document.getElementById('modalImage');
+            modalImg.src = photoUrl;
+            modal.style.display = 'block';
+        }
+
+        function closePhotoModal() {
+            document.getElementById('photoModal').style.display = 'none';
         }
 
         // Show error state
