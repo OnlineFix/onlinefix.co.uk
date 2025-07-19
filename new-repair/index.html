@@ -211,6 +211,7 @@
             gap: 1rem;
             justify-content: center;
             margin-top: 2rem;
+            flex-wrap: wrap;
         }
 
         .btn {
@@ -531,7 +532,7 @@
                 <p style="color: var(--gray-600); margin-bottom: 0.5rem;">NFC Card URL:</p>
                 <div class="copy-container">
                     <div class="nfc-url" id="nfc-url" style="padding-right: 4rem;">
-                        https://onlinefix.github.io/track/?id=REPAIR_123456
+                        [URL will be generated]
                     </div>
                     <button class="btn btn-secondary" onclick="copyNFCLink()" style="position: absolute; right: 0.5rem; top: 50%; transform: translateY(-50%); padding: 0.5rem 1rem; font-size: 0.85rem;">
                         <i class="fas fa-copy"></i>
@@ -541,12 +542,19 @@
                 <p style="font-size: 0.85rem; color: var(--gray-600); margin-top: 0.5rem;">
                     Email sent to onlinerepairbooking@gmail.com
                 </p>
+                <p style="font-size: 0.75rem; color: var(--gray-600); margin-top: 0.5rem;">
+                    Note: If tracking link doesn't work immediately, wait a few minutes for GitHub Pages to update.
+                </p>
             </div>
 
             <div class="button-group">
                 <button class="btn btn-primary" onclick="printLabel()">
                     <i class="fas fa-print"></i>
                     Print Label
+                </button>
+                <button class="btn btn-secondary" onclick="testTrackingLink()">
+                    <i class="fas fa-external-link-alt"></i>
+                    Test Tracking
                 </button>
                 <button class="btn btn-secondary" onclick="createAnother()">
                     <i class="fas fa-plus"></i>
@@ -574,7 +582,17 @@
     </div>
 
     <script>
+        // IMPORTANT: Update this to match your GitHub Pages URL structure
+        const GITHUB_PAGES_BASE_URL = 'https://onlinefix.co.uk';
+        
         // Initialize EmailJS (You need to sign up at emailjs.com and get your own keys)
+        // Instructions:
+        // 1. Sign up at https://www.emailjs.com/
+        // 2. Add your email service (Gmail, Outlook, etc.)
+        // 3. Create an email template
+        // 4. Get your Public Key, Service ID, and Template ID
+        // 5. Replace YOUR_EMAILJS_PUBLIC_KEY below with your actual public key
+        // 6. Update the emailjs.send() call with your Service ID and Template ID
         emailjs.init("YOUR_EMAILJS_PUBLIC_KEY"); // Replace with your EmailJS public key
 
         // Firebase Configuration
@@ -708,6 +726,33 @@
                     }
                 }
 
+                // Parse device info for better compatibility
+                let brand = 'Unknown';
+                let model = 'Unknown';
+                let deviceType = 'Device';
+                
+                if (data.device) {
+                    // Try to extract brand and model from device string
+                    const deviceParts = data.device.trim().split(' ');
+                    if (deviceParts.length > 0) {
+                        brand = deviceParts[0];
+                        model = data.device;
+                        
+                        // Determine device type
+                        const deviceLower = data.device.toLowerCase();
+                        if (deviceLower.includes('iphone') || deviceLower.includes('phone')) {
+                            deviceType = 'iPhone';
+                        } else if (deviceLower.includes('ipad') || deviceLower.includes('tablet')) {
+                            deviceType = 'iPad';
+                        } else if (deviceLower.includes('macbook') || deviceLower.includes('laptop')) {
+                            deviceType = 'MacBook';
+                        } else if (deviceLower.includes('samsung')) {
+                            deviceType = 'Samsung';
+                            brand = 'Samsung';
+                        }
+                    }
+                }
+
                 // Create repair document
                 const repairData = {
                     repairId: repairId,
@@ -717,11 +762,11 @@
                     customerEmail: data.email || '',
                     customerPhone: data.phone || '',
                     device: data.device || '',
-                    // Add fields expected by track page
-                    brand: data.device ? data.device.split(' ')[0] : 'Unknown',
-                    model: data.device || 'Unknown',
-                    deviceType: 'Device', // Generic type
-                    issueDescription: data.issue || '',
+                    // Fields expected by track page
+                    brand: brand,
+                    model: model,
+                    deviceType: deviceType,
+                    issueDescription: data.issue || 'No description provided',
                     estimatedCost: data.price ? parseFloat(data.price) : null,
                     currentStatus: 'received',
                     dateReceived: firebase.firestore.Timestamp.now(),
@@ -737,15 +782,23 @@
                 };
 
                 // Save to Firestore
-                await db.collection('repairs').add(repairData);
+                const docRef = await db.collection('repairs').add(repairData);
+                
+                console.log('Repair created successfully:', repairData);
+                console.log('Document ID:', docRef.id);
+                console.log('Tracking URL:', `${GITHUB_PAGES_BASE_URL}/track/?id=${repairId}`);
+                
+                // Verify the repair was saved by reading it back
+                const savedDoc = await docRef.get();
+                if (!savedDoc.exists) {
+                    throw new Error('Failed to verify repair was saved');
+                }
 
                 // Store current repair data for label printing
                 currentRepairData = repairData;
 
                 // Send email notification
                 await sendEmailNotification(repairData);
-                // Also open mailto as fallback
-                sendEmailViaMailto(repairData);
 
                 // Show success modal
                 showSuccessModal(repairId);
@@ -761,8 +814,7 @@
         // Send email notification
         async function sendEmailNotification(repairData) {
             try {
-                // Note: EmailJS requires you to create a template on their platform
-                // This is a placeholder - you need to set up EmailJS account and template
+                // EmailJS template parameters
                 const templateParams = {
                     to_email: 'onlinerepairbooking@gmail.com',
                     repair_id: repairData.repairId,
@@ -772,17 +824,29 @@
                     device: repairData.device,
                     issue: repairData.issueDescription,
                     price: repairData.estimatedCost ? `£${repairData.estimatedCost}` : 'Not specified',
-                    nfc_url: `https://onlinefix.github.io/track/?id=${repairData.repairId}`,
+                    nfc_url: `${GITHUB_PAGES_BASE_URL}/track/?id=${repairData.repairId}`,
                     date: new Date().toLocaleString('en-GB')
                 };
 
-                // Uncomment and configure when EmailJS is set up
+                // EMAILJS SETUP INSTRUCTIONS:
+                // 1. Sign up at https://www.emailjs.com/
+                // 2. Add email service (Gmail recommended)
+                // 3. Create email template with variables above
+                // 4. Get your IDs from EmailJS dashboard
+                // 5. Replace the IDs below:
+                
+                // Uncomment this line when EmailJS is configured:
                 // await emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', templateParams);
                 
-                console.log('Email would be sent with:', templateParams);
+                console.log('Email notification ready to send:', templateParams);
+                
+                // Always use mailto as fallback for now
+                sendEmailViaMailto(repairData);
+                
             } catch (error) {
-                console.error('Error sending email:', error);
-                // Don't stop the process if email fails
+                console.error('Error with email notification:', error);
+                // Try mailto as fallback
+                sendEmailViaMailto(repairData);
             }
         }
 
@@ -790,7 +854,7 @@
         function showSuccessModal(repairId) {
             document.getElementById('loading').style.display = 'none';
             document.getElementById('generated-repair-id').textContent = repairId;
-            document.getElementById('nfc-url').textContent = `https://onlinefix.github.io/track/?id=${repairId}`;
+            document.getElementById('nfc-url').textContent = `${GITHUB_PAGES_BASE_URL}/track/?id=${repairId}`;
             
             // Show label preview
             updateLabelPreview();
@@ -810,7 +874,8 @@
                 ${currentRepairData.device}<br>
                 ${currentRepairData.customerPhone}<br>
                 ${currentRepairData.estimatedCost ? `£${currentRepairData.estimatedCost}` : ''}<br>
-                ${new Date().toLocaleDateString('en-GB')}
+                ${new Date().toLocaleDateString('en-GB')}<br>
+                <small style="font-size: 0.7em;">onlinefix.co.uk/track</small>
             `;
             
             document.getElementById('label-content').innerHTML = labelContent;
@@ -831,6 +896,7 @@
                     <div style="font-size: 9pt;">${currentRepairData.customerPhone}</div>
                     ${currentRepairData.estimatedCost ? `<div style="font-size: 9pt;">£${currentRepairData.estimatedCost}</div>` : ''}
                     <div style="font-size: 8pt; margin-top: 2px;">${new Date().toLocaleDateString('en-GB')}</div>
+                    <div style="font-size: 7pt; margin-top: 2px;">Track: onlinefix.co.uk/track</div>
                 </div>
             `;
             
@@ -868,6 +934,12 @@
             }, 5000);
         }
 
+        // Test tracking link
+        function testTrackingLink() {
+            const nfcUrl = document.getElementById('nfc-url').textContent.trim();
+            window.open(nfcUrl, '_blank');
+        }
+
         // Alternative email sending using mailto (fallback if EmailJS not configured)
         function sendEmailViaMailto(repairData) {
             const subject = `New Repair: ${repairData.repairId}`;
@@ -882,7 +954,7 @@ Device: ${repairData.device}
 Issue: ${repairData.issueDescription}
 Price: ${repairData.estimatedCost ? `£${repairData.estimatedCost}` : 'Not specified'}
 
-NFC URL: https://onlinefix.github.io/track/?id=${repairData.repairId}
+NFC URL: ${GITHUB_PAGES_BASE_URL}/track/?id=${repairData.repairId}
 
 Date: ${new Date().toLocaleString('en-GB')}
             `;
