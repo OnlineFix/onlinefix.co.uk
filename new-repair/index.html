@@ -303,7 +303,12 @@
             font-family: monospace;
             font-size: 0.85rem;
             word-break: break-all;
-            margin: 1rem 0;
+            margin: 0;
+        }
+
+        .copy-container {
+            position: relative;
+            margin: 0.5rem 0;
         }
 
         /* Loading */
@@ -418,7 +423,7 @@
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <div class="logo">OnlineFix - New Repair</div>
+            <div class="logo">OnlineFix</div>
             <div style="display: flex; gap: 1rem; align-items: center;">
                 <div class="user-info" id="user-info">Not logged in</div>
                 <a href="../admin/" class="btn btn-secondary">
@@ -524,8 +529,14 @@
             
             <div style="margin: 2rem 0;">
                 <p style="color: var(--gray-600); margin-bottom: 0.5rem;">NFC Card URL:</p>
-                <div class="nfc-url" id="nfc-url">
-                    https://onlinefix.github.io/track/?id=REPAIR_123456
+                <div class="copy-container">
+                    <div class="nfc-url" id="nfc-url" style="padding-right: 4rem;">
+                        https://onlinefix.github.io/track/?id=REPAIR_123456
+                    </div>
+                    <button class="btn btn-secondary" onclick="copyNFCLink()" style="position: absolute; right: 0.5rem; top: 50%; transform: translateY(-50%); padding: 0.5rem 1rem; font-size: 0.85rem;">
+                        <i class="fas fa-copy"></i>
+                        Copy
+                    </button>
                 </div>
                 <p style="font-size: 0.85rem; color: var(--gray-600); margin-top: 0.5rem;">
                     Email sent to onlinerepairbooking@gmail.com
@@ -706,8 +717,12 @@
                     customerEmail: data.email || '',
                     customerPhone: data.phone || '',
                     device: data.device || '',
+                    // Add fields expected by track page
+                    brand: data.device ? data.device.split(' ')[0] : 'Unknown',
+                    model: data.device || 'Unknown',
+                    deviceType: 'Device', // Generic type
                     issueDescription: data.issue || '',
-                    price: data.price ? parseFloat(data.price) : null,
+                    estimatedCost: data.price ? parseFloat(data.price) : null,
                     currentStatus: 'received',
                     dateReceived: firebase.firestore.Timestamp.now(),
                     photos: photoUrls,
@@ -729,6 +744,8 @@
 
                 // Send email notification
                 await sendEmailNotification(repairData);
+                // Also open mailto as fallback
+                sendEmailViaMailto(repairData);
 
                 // Show success modal
                 showSuccessModal(repairId);
@@ -754,7 +771,7 @@
                     customer_phone: repairData.customerPhone,
                     device: repairData.device,
                     issue: repairData.issueDescription,
-                    price: repairData.price ? `£${repairData.price}` : 'Not specified',
+                    price: repairData.estimatedCost ? `£${repairData.estimatedCost}` : 'Not specified',
                     nfc_url: `https://onlinefix.github.io/track/?id=${repairData.repairId}`,
                     date: new Date().toLocaleString('en-GB')
                 };
@@ -792,6 +809,7 @@
                 ${currentRepairData.customerName}<br>
                 ${currentRepairData.device}<br>
                 ${currentRepairData.customerPhone}<br>
+                ${currentRepairData.estimatedCost ? `£${currentRepairData.estimatedCost}` : ''}<br>
                 ${new Date().toLocaleDateString('en-GB')}
             `;
             
@@ -811,6 +829,7 @@
                     <div>${currentRepairData.customerName}</div>
                     <div style="font-size: 9pt;">${currentRepairData.device}</div>
                     <div style="font-size: 9pt;">${currentRepairData.customerPhone}</div>
+                    ${currentRepairData.estimatedCost ? `<div style="font-size: 9pt;">£${currentRepairData.estimatedCost}</div>` : ''}
                     <div style="font-size: 8pt; margin-top: 2px;">${new Date().toLocaleDateString('en-GB')}</div>
                 </div>
             `;
@@ -861,7 +880,7 @@ Email: ${repairData.customerEmail}
 Phone: ${repairData.customerPhone}
 Device: ${repairData.device}
 Issue: ${repairData.issueDescription}
-Price: ${repairData.price ? `£${repairData.price}` : 'Not specified'}
+Price: ${repairData.estimatedCost ? `£${repairData.estimatedCost}` : 'Not specified'}
 
 NFC URL: https://onlinefix.github.io/track/?id=${repairData.repairId}
 
@@ -870,6 +889,41 @@ Date: ${new Date().toLocaleString('en-GB')}
             
             const mailtoLink = `mailto:onlinerepairbooking@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
             window.open(mailtoLink);
+        }
+
+        // Copy NFC link to clipboard
+        function copyNFCLink() {
+            const nfcUrl = document.getElementById('nfc-url').textContent.trim();
+            
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(nfcUrl).then(() => {
+                    showAlert('NFC link copied to clipboard!', 'success');
+                }).catch(err => {
+                    console.error('Failed to copy:', err);
+                    fallbackCopy(nfcUrl);
+                });
+            } else {
+                fallbackCopy(nfcUrl);
+            }
+        }
+
+        // Fallback copy method for older browsers
+        function fallbackCopy(text) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.opacity = '0';
+            document.body.appendChild(textArea);
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+                showAlert('NFC link copied to clipboard!', 'success');
+            } catch (err) {
+                showAlert('Failed to copy link', 'error');
+            }
+            
+            document.body.removeChild(textArea);
         }
     </script>
 </body>
