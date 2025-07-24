@@ -11,9 +11,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
     
-    <!-- EmailJS -->
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
     <style>
         * {
@@ -31,7 +28,6 @@
             --white: #FFFFFF;
             --gray-100: #F1F5F9;
             --gray-200: #E2E8F0;
-            --gray-300: #CBD5E1;
             --gray-600: #64748B;
             --gray-800: #1E293B;
             --success: #10B981;
@@ -53,22 +49,6 @@
             min-height: 100vh;
         }
 
-        /* Mobile Menu Toggle */
-        .mobile-menu-toggle {
-            display: none;
-            position: fixed;
-            top: 1rem;
-            left: 1rem;
-            z-index: 1001;
-            background: var(--primary-blue);
-            color: var(--white);
-            border: none;
-            border-radius: 10px;
-            padding: 0.75rem;
-            cursor: pointer;
-            box-shadow: var(--shadow);
-        }
-
         /* Sidebar */
         .sidebar {
             width: 280px;
@@ -79,7 +59,6 @@
             height: 100vh;
             overflow-y: auto;
             z-index: 1000;
-            transition: transform 0.3s ease;
         }
 
         .sidebar-header {
@@ -135,7 +114,6 @@
             flex: 1;
             margin-left: 280px;
             padding: 2rem;
-            transition: margin-left 0.3s ease;
         }
 
         /* Header */
@@ -148,8 +126,6 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
         }
 
         .header-title {
@@ -161,33 +137,6 @@
         .header-actions {
             display: flex;
             gap: 1rem;
-            flex-wrap: wrap;
-        }
-
-        /* Search Bar */
-        .search-container {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1.5rem;
-            background: var(--white);
-            padding: 1.5rem;
-            border-radius: 15px;
-            box-shadow: var(--shadow);
-        }
-
-        .search-input {
-            flex: 1;
-            padding: 0.75rem;
-            border: 2px solid var(--gray-200);
-            border-radius: 10px;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        .search-input:focus {
-            outline: none;
-            border-color: var(--primary-blue);
-            box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
         }
 
         /* Buttons */
@@ -203,11 +152,6 @@
             cursor: pointer;
             transition: all 0.3s ease;
             font-size: 0.95rem;
-        }
-
-        .btn-sm {
-            padding: 0.5rem 1rem;
-            font-size: 0.85rem;
         }
 
         .btn-primary {
@@ -242,10 +186,6 @@
         .btn-danger {
             background: var(--danger);
             color: var(--white);
-        }
-
-        .btn-danger:hover {
-            background: #DC2626;
         }
 
         /* Stats Cards */
@@ -302,8 +242,6 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
         }
 
         .section-title {
@@ -317,15 +255,13 @@
         }
 
         /* Tables */
-        .table-wrapper {
+        .table-container {
             overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 600px;
         }
 
         th, td {
@@ -338,22 +274,10 @@
             background: var(--gray-100);
             font-weight: 600;
             color: var(--gray-800);
-            position: sticky;
-            top: 0;
-            z-index: 10;
         }
 
         tr:hover {
             background: var(--gray-100);
-        }
-
-        /* Row Selection */
-        .row-checkbox {
-            margin-right: 0.5rem;
-        }
-
-        .selected-row {
-            background: rgba(0, 102, 255, 0.1) !important;
         }
 
         /* Status Badges */
@@ -365,7 +289,6 @@
             border-radius: 20px;
             font-size: 0.8rem;
             font-weight: 600;
-            white-space: nowrap;
         }
 
         .status-received { background: #EEF2FF; color: #3730A3; }
@@ -375,42 +298,15 @@
         .status-testing { background: #E0E7FF; color: #5B21B6; }
         .status-ready { background: #D1FAE5; color: #065F46; }
         .status-completed { background: #F3F4F6; color: #374151; }
-        .status-awaiting-customer { background: #FEF3C7; color: #92400E; }
-        .status-unrepairable { background: #1F2937; color: #F3F4F6; }
-        .status-declined { background: #7F1D1D; color: #FFFFFF; }
 
-        /* Email Composer */
-        .email-composer {
-            background: var(--gray-100);
-            border-radius: 15px;
-            padding: 1.5rem;
-            margin-top: 1rem;
-        }
-
-        /* Progress History */
-        .progress-item {
-            padding: 1rem;
-            background: var(--white);
-            border-radius: 10px;
-            margin-bottom: 1rem;
-            position: relative;
-        }
-
-        .progress-delete {
-            position: absolute;
-            top: 0.5rem;
-            right: 0.5rem;
+        /* Delete button */
+        .btn-danger {
             background: var(--danger);
             color: var(--white);
-            border: none;
-            border-radius: 50%;
-            width: 25px;
-            height: 25px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        }
+
+        .btn-danger:hover {
+            background: #DC2626;
         }
 
         /* Photo upload in modal */
@@ -621,34 +517,11 @@
             border: 1px solid #FCA5A5;
         }
 
-        /* Mobile Actions */
-        .mobile-actions {
-            display: none;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: var(--white);
-            border-top: 1px solid var(--gray-200);
-            padding: 1rem;
-            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.1);
-            z-index: 999;
-        }
-
-        .mobile-actions-content {
-            display: flex;
-            gap: 0.5rem;
-            justify-content: space-around;
-        }
-
         /* Responsive */
         @media (max-width: 1024px) {
-            .mobile-menu-toggle {
-                display: block;
-            }
-
             .sidebar {
                 transform: translateX(-100%);
+                transition: transform 0.3s ease;
             }
 
             .sidebar.show {
@@ -657,19 +530,6 @@
 
             .main-content {
                 margin-left: 0;
-                padding-top: 4rem;
-            }
-
-            .header {
-                margin-top: 3rem;
-            }
-
-            .mobile-actions {
-                display: block;
-            }
-
-            .main-content {
-                padding-bottom: 5rem;
             }
         }
 
@@ -682,72 +542,19 @@
 
             .main-content {
                 padding: 1rem;
-                padding-top: 4rem;
-                padding-bottom: 5rem;
             }
 
             .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: 1fr;
             }
 
             .form-grid {
                 grid-template-columns: 1fr;
             }
-
-            .section-header {
-                padding: 1rem;
-            }
-
-            .section-content {
-                padding: 1rem;
-            }
-
-            table {
-                font-size: 0.85rem;
-            }
-
-            th, td {
-                padding: 0.5rem;
-            }
-
-            .btn {
-                padding: 0.5rem 1rem;
-                font-size: 0.85rem;
-            }
-
-            .modal-content {
-                padding: 1.5rem;
-                margin: 1rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .stat-card {
-                padding: 1rem;
-            }
-
-            .stat-icon {
-                width: 40px;
-                height: 40px;
-                font-size: 1.2rem;
-            }
-
-            .stat-number {
-                font-size: 1.5rem;
-            }
         }
     </style>
 </head>
 <body>
-    <!-- Mobile Menu Toggle -->
-    <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
-        <i class="fas fa-bars"></i>
-    </button>
-
     <!-- Login Screen -->
     <div id="login-screen">
         <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--deep-blue), var(--primary-blue));">
@@ -778,7 +585,7 @@
     <!-- Main Dashboard -->
     <div id="dashboard" class="admin-layout hidden">
         <!-- Sidebar -->
-        <aside class="sidebar" id="sidebar">
+        <aside class="sidebar">
             <div class="sidebar-header">
                 <div class="logo">OnlineFix</div>
                 <div class="user-info" id="user-email">Admin Dashboard</div>
@@ -794,12 +601,6 @@
                     <a href="#" class="nav-link" data-section="repairs">
                         <i class="fas fa-tools"></i>
                         All Repairs
-                    </a>
-                </div>
-                <div class="nav-item">
-                    <a href="#" class="nav-link" data-section="email">
-                        <i class="fas fa-envelope"></i>
-                        Email Customers
                     </a>
                 </div>
                 <div class="nav-item">
@@ -819,22 +620,9 @@
                 <div class="header-actions">
                     <a href="../new-repair/" class="btn btn-primary">
                         <i class="fas fa-plus"></i>
-                        <span class="btn-text">New Repair</span>
+                        New Repair
                     </a>
                 </div>
-            </div>
-
-            <!-- Search Bar -->
-            <div class="search-container" id="search-container">
-                <input type="text" class="search-input" id="search-input" placeholder="Search by customer name, phone number, or repair ID...">
-                <button class="btn btn-primary" onclick="searchRepairs()">
-                    <i class="fas fa-search"></i>
-                    <span class="btn-text">Search</span>
-                </button>
-                <button class="btn btn-secondary" onclick="clearSearch()">
-                    <i class="fas fa-times"></i>
-                    <span class="btn-text">Clear</span>
-                </button>
             </div>
 
             <!-- Overview Section -->
@@ -878,7 +666,7 @@
                         <button class="btn btn-secondary" onclick="showSection('repairs')">View All</button>
                     </div>
                     <div class="section-content">
-                        <div class="table-wrapper">
+                        <div class="table-container">
                             <table id="recent-repairs-table">
                                 <thead>
                                     <tr>
@@ -902,39 +690,43 @@
             <!-- All Repairs Section -->
             <div id="repairs-section" class="content-section hidden">
                 <div class="section-header">
-                    <h2 class="section-title">Email Customers</h2>
+                    <h2 class="section-title">All Repairs</h2>
+                    <div>
+                        <select id="status-filter" class="form-input" style="display: inline-block; width: auto; margin-right: 1rem;">
+                            <option value="">All Statuses</option>
+                            <option value="received">Received</option>
+                            <option value="diagnosing">Diagnosing</option>
+                            <option value="waiting-parts">Waiting for Parts</option>
+                            <option value="in-repair">In Repair</option>
+                            <option value="testing">Testing</option>
+                            <option value="ready">Ready</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                        <a href="../new-repair/" class="btn btn-primary">
+                            <i class="fas fa-plus"></i>
+                            New Repair
+                        </a>
+                    </div>
                 </div>
                 <div class="section-content">
-                    <div class="email-composer">
-                        <div class="form-group">
-                            <label class="form-label">Recipients</label>
-                            <select class="form-input" id="email-recipients">
-                                <option value="all">All Customers</option>
-                                <option value="active">Customers with Active Repairs</option>
-                                <option value="ready">Customers with Ready Repairs</option>
-                                <option value="selected">Selected Customers</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Subject</label>
-                            <input type="text" class="form-input" id="email-subject" placeholder="Enter email subject...">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Message</label>
-                            <textarea class="form-input form-textarea" id="email-message" rows="6" placeholder="Enter your message..."></textarea>
-                        </div>
-                        <div class="template-selector">
-                            <label class="form-label">Quick Templates:</label>
-                            <div>
-                                <button class="template-btn" onclick="loadEmailTemplate('ready')">Ready for Collection</button>
-                                <button class="template-btn" onclick="loadEmailTemplate('update')">Status Update</button>
-                                <button class="template-btn" onclick="loadEmailTemplate('reminder')">Payment Reminder</button>
-                            </div>
-                        </div>
-                        <button class="btn btn-primary" onclick="sendBulkEmail()">
-                            <i class="fas fa-paper-plane"></i>
-                            Send Email
-                        </button>
+                    <div class="table-container">
+                        <table id="all-repairs-table">
+                            <thead>
+                                <tr>
+                                    <th>Repair ID</th>
+                                    <th>Customer</th>
+                                    <th>Device</th>
+                                    <th>Issue</th>
+                                    <th>Status</th>
+                                    <th>Date Received</th>
+                                    <th>Est. Completion</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Populated by JavaScript -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -945,30 +737,9 @@
                 <p>Loading dashboard data...</p>
             </div>
         </main>
-
-        <!-- Mobile Actions Bar -->
-        <div class="mobile-actions">
-            <div class="mobile-actions-content">
-                <button class="btn btn-primary btn-sm" onclick="showSection('overview')">
-                    <i class="fas fa-chart-line"></i>
-                </button>
-                <button class="btn btn-primary btn-sm" onclick="showSection('repairs')">
-                    <i class="fas fa-tools"></i>
-                </button>
-                <a href="../new-repair/" class="btn btn-primary btn-sm">
-                    <i class="fas fa-plus"></i>
-                </a>
-                <button class="btn btn-primary btn-sm" onclick="showSection('email')">
-                    <i class="fas fa-envelope"></i>
-                </button>
-            </div>
-        </div>
     </div>
 
     <script>
-        // Initialize EmailJS (Replace with your actual public key)
-        emailjs.init("YOUR_EMAILJS_PUBLIC_KEY");
-
         // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyAuPjwwwkqau6Wzfx7rURAe9jYPpgNbil4",
@@ -988,11 +759,9 @@
         // Global variables
         let currentUser = null;
         let allRepairs = [];
-        let filteredRepairs = [];
-        let selectedRepairs = new Set();
         let updatePhotos = [];
 
-        // Status configuration with new statuses
+        // Status configuration
         const statusConfig = {
             'received': { label: 'Received', class: 'status-received' },
             'diagnosing': { label: 'Diagnosing', class: 'status-diagnosing' },
@@ -1000,9 +769,6 @@
             'in-repair': { label: 'In Repair', class: 'status-in-repair' },
             'testing': { label: 'Testing', class: 'status-testing' },
             'ready': { label: 'Ready for Collection', class: 'status-ready' },
-            'awaiting-customer': { label: 'Awaiting Customer Reply', class: 'status-awaiting-customer' },
-            'unrepairable': { label: 'Unrepairable', class: 'status-unrepairable' },
-            'declined': { label: 'Declined Repair', class: 'status-declined' },
             'completed': { label: 'Completed', class: 'status-completed' }
         };
 
@@ -1033,85 +799,11 @@
                 'Repair completed successfully. Your device is ready to be picked up at your convenience.',
                 'Your device has been fully repaired and tested. Ready for collection during business hours.'
             ],
-            'awaiting-customer': [
-                'We need your response regarding the repair quote we provided. Please contact us to proceed.',
-                'Awaiting your approval for the repair cost. Please reply at your earliest convenience.',
-                'We\'ve sent you a repair estimate. Waiting for your confirmation to proceed.'
-            ],
-            'unrepairable': [
-                'Unfortunately, after thorough diagnosis, we\'ve determined your device is beyond economical repair.',
-                'The damage to your device is too extensive for repair. Please contact us to discuss options.',
-                'Your device cannot be repaired due to critical component failure. Ready for collection.'
-            ],
-            'declined': [
-                'As per your request, we have not proceeded with the repair. Device ready for collection.',
-                'Repair declined by customer. Your device is available for pickup.',
-                'No repair work performed as requested. Please collect your device at your convenience.'
-            ],
             'completed': [
                 'Repair completed and device collected. Thank you for choosing OnlineFix!',
                 'Service completed. We hope you\'re satisfied with our repair service.',
                 'Device successfully repaired and delivered to customer.'
             ]
-        };
-
-        // Email templates
-        const emailTemplates = {
-            'ready': {
-                subject: 'Your device is ready for collection - OnlineFix',
-                message: `Dear {customerName},
-
-Great news! Your {device} has been successfully repaired and is ready for collection.
-
-Repair ID: {repairId}
-Total Cost: £{cost}
-
-Please bring your receipt or repair ID when collecting your device. Our business hours are:
-Monday - Friday: 9:00 AM - 6:00 PM
-Saturday: 10:00 AM - 4:00 PM
-
-If you have any questions, please don't hesitate to contact us.
-
-Best regards,
-OnlineFix Team`
-            },
-            'update': {
-                subject: 'Repair Status Update - OnlineFix',
-                message: `Dear {customerName},
-
-We wanted to update you on the status of your device repair.
-
-Repair ID: {repairId}
-Device: {device}
-Current Status: {status}
-
-{statusNotes}
-
-You can track your repair progress at any time using this link:
-{trackingUrl}
-
-If you have any questions, please feel free to contact us.
-
-Best regards,
-OnlineFix Team`
-            },
-            'reminder': {
-                subject: 'Payment Reminder - OnlineFix',
-                message: `Dear {customerName},
-
-This is a friendly reminder about the outstanding payment for your device repair.
-
-Repair ID: {repairId}
-Device: {device}
-Amount Due: £{cost}
-
-Please contact us to arrange payment so we can proceed with your repair.
-
-Thank you for your cooperation.
-
-Best regards,
-OnlineFix Team`
-            }
         };
 
         // Authentication state observer
@@ -1146,10 +838,6 @@ OnlineFix Team`
                 const section = e.target.closest('.nav-link').dataset.section;
                 if (section) {
                     showSection(section);
-                    // Close mobile menu when selecting
-                    if (window.innerWidth <= 1024) {
-                        document.getElementById('sidebar').classList.remove('show');
-                    }
                 }
             });
         });
@@ -1158,12 +846,6 @@ OnlineFix Team`
         document.getElementById('status-filter').addEventListener('change', (e) => {
             loadAllRepairs(e.target.value);
         });
-
-        // Mobile menu toggle
-        function toggleMobileMenu() {
-            const sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('show');
-        }
 
         // Show/hide screens
         function showLogin() {
@@ -1211,51 +893,13 @@ OnlineFix Team`
             // Update page title
             const titles = {
                 'overview': 'Dashboard Overview',
-                'repairs': 'All Repairs',
-                'email': 'Email Customers'
+                'repairs': 'All Repairs'
             };
             document.getElementById('page-title').textContent = titles[sectionName] || 'Dashboard';
 
             // Load section-specific data
             if (sectionName === 'repairs') {
                 loadAllRepairs();
-            }
-        }
-
-        // Search functionality
-        function searchRepairs() {
-            const searchTerm = document.getElementById('search-input').value.toLowerCase().trim();
-            
-            if (!searchTerm) {
-                filteredRepairs = allRepairs;
-            } else {
-                filteredRepairs = allRepairs.filter(repair => {
-                    return (
-                        repair.repairId.toLowerCase().includes(searchTerm) ||
-                        repair.customerName.toLowerCase().includes(searchTerm) ||
-                        repair.customerPhone.toLowerCase().includes(searchTerm) ||
-                        (repair.customerEmail && repair.customerEmail.toLowerCase().includes(searchTerm))
-                    );
-                });
-            }
-
-            displayFilteredRepairs();
-        }
-
-        function clearSearch() {
-            document.getElementById('search-input').value = '';
-            filteredRepairs = allRepairs;
-            displayFilteredRepairs();
-        }
-
-        function displayFilteredRepairs() {
-            const currentSection = document.querySelector('.content-section:not(.hidden)').id;
-            
-            if (currentSection === 'overview-section') {
-                loadRecentRepairs(filteredRepairs);
-            } else if (currentSection === 'repairs-section') {
-                const statusFilter = document.getElementById('status-filter').value;
-                loadAllRepairs(statusFilter, filteredRepairs);
             }
         }
 
@@ -1270,8 +914,6 @@ OnlineFix Team`
                     id: doc.id,
                     ...doc.data()
                 }));
-
-                filteredRepairs = allRepairs;
 
                 // Update stats
                 updateStats();
@@ -1290,7 +932,7 @@ OnlineFix Team`
         // Update stats
         function updateStats() {
             const activeRepairs = allRepairs.filter(r => 
-                !['completed', 'declined'].includes(r.currentStatus)
+                !['completed'].includes(r.currentStatus)
             ).length;
 
             const readyRepairs = allRepairs.filter(r => 
@@ -1306,8 +948,8 @@ OnlineFix Team`
         }
 
         // Load recent repairs
-        function loadRecentRepairs(repairs = filteredRepairs) {
-            const recent = repairs
+        function loadRecentRepairs() {
+            const recent = allRepairs
                 .sort((a, b) => {
                     const aTime = a.dateReceived?.seconds || 0;
                     const bTime = b.dateReceived?.seconds || 0;
@@ -1330,13 +972,10 @@ OnlineFix Team`
             const status = statusConfig[repair.currentStatus] || statusConfig['received'];
             const date = repair.dateReceived ? new Date(repair.dateReceived.seconds * 1000).toLocaleDateString('en-GB') : 'N/A';
             
-            // For mobile, show device if available, otherwise show type
-            const deviceDisplay = repair.device || `${repair.brand} ${repair.model}`;
-            
             row.innerHTML = `
                 <td><strong>${repair.repairId}</strong></td>
                 <td>${repair.customerName}</td>
-                <td>${deviceDisplay}</td>
+                <td>${repair.brand} ${repair.model}</td>
                 <td><span class="status-badge ${status.class}">${status.label}</span></td>
                 <td>${date}</td>
                 <td>
@@ -1374,13 +1013,15 @@ OnlineFix Team`
                                 <p><strong>Name:</strong> ${repair.customerName}</p>
                                 <p><strong>Phone:</strong> ${repair.customerPhone}</p>
                                 ${repair.customerEmail ? `<p><strong>Email:</strong> ${repair.customerEmail}</p>` : ''}
+                                ${repair.customerAddress ? `<p><strong>Address:</strong> ${repair.customerAddress}</p>` : ''}
                             </div>
                             <div style="background: var(--gray-100); padding: 1.5rem; border-radius: 15px;">
                                 <h3 style="color: var(--deep-blue); margin-bottom: 1rem;">Device Information</h3>
-                                ${repair.device ? `<p><strong>Device:</strong> ${repair.device}</p>` : ''}
                                 <p><strong>Type:</strong> ${repair.deviceType}</p>
                                 <p><strong>Brand:</strong> ${repair.brand}</p>
                                 <p><strong>Model:</strong> ${repair.model}</p>
+                                ${repair.serialNumber ? `<p><strong>Serial:</strong> ${repair.serialNumber}</p>` : ''}
+                                <p><strong>Condition:</strong> ${repair.deviceCondition || 'Not specified'}</p>
                             </div>
                         </div>
                         <div style="background: var(--gray-100); padding: 1.5rem; border-radius: 15px; margin-bottom: 2rem;">
@@ -1389,16 +1030,14 @@ OnlineFix Team`
                             <p><strong>Current Status:</strong> <span class="status-badge ${statusConfig[repair.currentStatus]?.class || 'status-received'}">${statusConfig[repair.currentStatus]?.label || 'Received'}</span></p>
                             <p><strong>Date Received:</strong> ${repair.dateReceived ? new Date(repair.dateReceived.seconds * 1000).toLocaleString('en-GB') : 'N/A'}</p>
                             ${repair.estimatedCompletion ? `<p><strong>Est. Completion:</strong> ${new Date(repair.estimatedCompletion.seconds * 1000).toLocaleDateString('en-GB')}</p>` : ''}
-                            ${repair.estimatedCost || repair.price ? `<p><strong>Cost:</strong> £${repair.estimatedCost || repair.price}</p>` : ''}
+                            ${repair.estimatedCost ? `<p><strong>Est. Cost:</strong> £${repair.estimatedCost}</p>` : ''}
+                            ${repair.additionalNotes ? `<p><strong>Notes:</strong> ${repair.additionalNotes}</p>` : ''}
                         </div>
                         ${repair.progress && repair.progress.length > 0 ? `
                             <div style="background: var(--gray-100); padding: 1.5rem; border-radius: 15px; margin-bottom: 2rem;">
                                 <h3 style="color: var(--deep-blue); margin-bottom: 1rem;">Progress History</h3>
-                                ${repair.progress.map((p, index) => `
-                                    <div class="progress-item" data-progress-index="${index}">
-                                        <button class="progress-delete" onclick="deleteProgress('${repair.id}', ${index})" title="Delete this progress entry">
-                                            <i class="fas fa-times"></i>
-                                        </button>
+                                ${repair.progress.map(p => `
+                                    <div style="padding: 1rem; background: var(--white); border-radius: 10px; margin-bottom: 1rem;">
                                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                                             <strong>${statusConfig[p.status]?.label || p.status}</strong>
                                             <small>${p.timestamp ? new Date(p.timestamp.seconds * 1000).toLocaleString('en-GB') : 'N/A'}</small>
@@ -1429,38 +1068,6 @@ OnlineFix Team`
             document.body.appendChild(modal);
         }
 
-        // Delete progress entry
-        async function deleteProgress(repairId, progressIndex) {
-            if (!confirm('Are you sure you want to delete this progress entry?')) return;
-
-            try {
-                const repair = allRepairs.find(r => r.id === repairId);
-                if (!repair || !repair.progress) return;
-
-                // Remove the progress entry
-                const updatedProgress = [...repair.progress];
-                updatedProgress.splice(progressIndex, 1);
-
-                // Update in Firestore
-                await db.collection('repairs').doc(repairId).update({
-                    progress: updatedProgress
-                });
-
-                showAlert('Progress entry deleted successfully!', 'success');
-                
-                // Refresh the modal
-                document.querySelector('.modal').remove();
-                viewRepair(repairId);
-                
-                // Reload data
-                loadDashboardData();
-
-            } catch (error) {
-                console.error('Error deleting progress:', error);
-                showAlert('Error deleting progress: ' + error.message, 'error');
-            }
-        }
-
         // Edit repair - show status update modal
         function editRepair(repairId) {
             const repair = allRepairs.find(r => r.id === repairId);
@@ -1480,7 +1087,7 @@ OnlineFix Team`
                     <form id="update-repair-form" data-repair-id="${repairId}">
                         <div class="form-group">
                             <label class="form-label">Customer: ${repair.customerName}</label>
-                            <label class="form-label">Device: ${repair.device || `${repair.brand} ${repair.model}`}</label>
+                            <label class="form-label">Device: ${repair.brand} ${repair.model}</label>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Update Status</label>
@@ -1491,9 +1098,6 @@ OnlineFix Team`
                                 <option value="in-repair" ${repair.currentStatus === 'in-repair' ? 'selected' : ''}>In Repair</option>
                                 <option value="testing" ${repair.currentStatus === 'testing' ? 'selected' : ''}>Testing</option>
                                 <option value="ready" ${repair.currentStatus === 'ready' ? 'selected' : ''}>Ready for Collection</option>
-                                <option value="awaiting-customer" ${repair.currentStatus === 'awaiting-customer' ? 'selected' : ''}>Awaiting Customer Reply</option>
-                                <option value="unrepairable" ${repair.currentStatus === 'unrepairable' ? 'selected' : ''}>Unrepairable</option>
-                                <option value="declined" ${repair.currentStatus === 'declined' ? 'selected' : ''}>Declined Repair</option>
                                 <option value="completed" ${repair.currentStatus === 'completed' ? 'selected' : ''}>Completed</option>
                             </select>
                         </div>
@@ -1521,9 +1125,9 @@ OnlineFix Team`
                                     value="${repair.estimatedCompletion ? new Date(repair.estimatedCompletion.seconds * 1000).toISOString().split('T')[0] : ''}">
                             </div>
                             <div class="form-group">
-                                <label class="form-label">Cost (£)</label>
+                                <label class="form-label">Estimated Cost (£)</label>
                                 <input type="number" class="form-input" name="estimatedCost" step="0.01" 
-                                    value="${repair.estimatedCost || repair.price || ''}">
+                                    value="${repair.estimatedCost || ''}">
                             </div>
                         </div>
                         <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem;">
@@ -1567,7 +1171,6 @@ OnlineFix Team`
                 }
                 if (data.estimatedCost) {
                     updateData.estimatedCost = parseFloat(data.estimatedCost);
-                    updateData.price = parseFloat(data.estimatedCost); // Update both fields for compatibility
                 }
 
                 // Upload photos if any
@@ -1584,6 +1187,9 @@ OnlineFix Team`
                             console.error('Error uploading photo:', error);
                         }
                     }
+                    
+                    // Add new photos to existing photos array
+                    updateData.photos = firebase.firestore.FieldValue.arrayUnion(...photoUrls);
                 }
 
                 // Add progress entry
@@ -1614,161 +1220,50 @@ OnlineFix Team`
             }
         }
 
-        // Toggle all selection
-        function toggleAllSelection() {
-            const selectAll = document.getElementById('select-all');
-            const checkboxes = document.querySelectorAll('#all-repairs-table tbody input[type="checkbox"]');
-            
-            checkboxes.forEach(checkbox => {
-                checkbox.checked = selectAll.checked;
-                const row = checkbox.closest('tr');
-                if (selectAll.checked) {
-                    row.classList.add('selected-row');
-                    selectedRepairs.add(checkbox.value);
-                } else {
-                    row.classList.remove('selected-row');
-                    selectedRepairs.delete(checkbox.value);
-                }
-            });
-        }
-
-        // Toggle individual selection
-        function toggleSelection(repairId, checkbox) {
-            const row = checkbox.closest('tr');
-            if (checkbox.checked) {
-                row.classList.add('selected-row');
-                selectedRepairs.add(repairId);
-            } else {
-                row.classList.remove('selected-row');
-                selectedRepairs.delete(repairId);
-            }
-            
-            // Update select all checkbox
-            const selectAll = document.getElementById('select-all');
-            const allCheckboxes = document.querySelectorAll('#all-repairs-table tbody input[type="checkbox"]');
-            const checkedBoxes = document.querySelectorAll('#all-repairs-table tbody input[type="checkbox"]:checked');
-            selectAll.checked = allCheckboxes.length === checkedBoxes.length && allCheckboxes.length > 0;
-        }
-
         // Load all repairs with optional filter
-        function loadAllRepairs(statusFilter = '', repairs = filteredRepairs) {
-            let displayRepairs = repairs;
+        function loadAllRepairs(statusFilter = '') {
+            let filteredRepairs = allRepairs;
             
             if (statusFilter) {
-                displayRepairs = repairs.filter(r => r.currentStatus === statusFilter);
+                filteredRepairs = allRepairs.filter(r => r.currentStatus === statusFilter);
             }
 
             const tbody = document.querySelector('#all-repairs-table tbody');
             tbody.innerHTML = '';
 
-            displayRepairs.forEach(repair => {
+            filteredRepairs.forEach(repair => {
                 const row = createDetailedRepairRow(repair);
                 tbody.appendChild(row);
             });
-
-            // Reset select all checkbox
-            document.getElementById('select-all').checked = false;
-            selectedRepairs.clear();
         }
 
         function createDetailedRepairRow(repair) {
             const row = document.createElement('tr');
             const status = statusConfig[repair.currentStatus] || statusConfig['received'];
             const dateReceived = repair.dateReceived ? new Date(repair.dateReceived.seconds * 1000).toLocaleDateString('en-GB') : 'N/A';
-            const deviceDisplay = repair.device || `${repair.brand} ${repair.model}`;
+            const estCompletion = repair.estimatedCompletion ? new Date(repair.estimatedCompletion.seconds * 1000).toLocaleDateString('en-GB') : 'TBD';
             
             row.innerHTML = `
-                <td>
-                    <input type="checkbox" class="row-checkbox" value="${repair.id}" onchange="toggleSelection('${repair.id}', this)">
-                </td>
                 <td><strong>${repair.repairId}</strong></td>
                 <td>${repair.customerName}<br><small>${repair.customerPhone}</small></td>
-                <td>${deviceDisplay}</td>
+                <td>${repair.deviceType}<br><small>${repair.brand} ${repair.model}</small></td>
                 <td title="${repair.issueDescription}">${repair.issueDescription.substring(0, 50)}${repair.issueDescription.length > 50 ? '...' : ''}</td>
                 <td><span class="status-badge ${status.class}">${status.label}</span></td>
                 <td>${dateReceived}</td>
+                <td>${estCompletion}</td>
                 <td>
-                    <button class="btn btn-secondary" style="padding: 0.5rem;" onclick="viewRepair('${repair.id}')" title="View">
+                    <button class="btn btn-secondary" style="padding: 0.5rem;" onclick="viewRepair('${repair.id}')">
                         <i class="fas fa-eye"></i>
                     </button>
-                    <button class="btn btn-primary" style="padding: 0.5rem;" onclick="editRepair('${repair.id}')" title="Edit">
+                    <button class="btn btn-primary" style="padding: 0.5rem;" onclick="editRepair('${repair.id}')">
                         <i class="fas fa-edit"></i>
                     </button>
-                    <button class="btn btn-danger" style="padding: 0.5rem;" onclick="deleteRepair('${repair.id}', '${repair.repairId}')" title="Delete">
+                    <button class="btn btn-danger" style="padding: 0.5rem;" onclick="deleteRepair('${repair.id}', '${repair.repairId}')">
                         <i class="fas fa-trash"></i>
                     </button>
                 </td>
             `;
             return row;
-        }
-
-        // Email selected customers
-        function emailSelectedCustomers() {
-            if (selectedRepairs.size === 0) {
-                showAlert('Please select at least one repair to email customers.', 'warning');
-                return;
-            }
-
-            showSection('email');
-            document.getElementById('email-recipients').value = 'selected';
-        }
-
-        // Load email template
-        function loadEmailTemplate(templateType) {
-            const template = emailTemplates[templateType];
-            if (template) {
-                document.getElementById('email-subject').value = template.subject;
-                document.getElementById('email-message').value = template.message;
-            }
-        }
-
-        // Send bulk email
-        async function sendBulkEmail() {
-            const recipientType = document.getElementById('email-recipients').value;
-            const subject = document.getElementById('email-subject').value;
-            const message = document.getElementById('email-message').value;
-
-            if (!subject || !message) {
-                showAlert('Please enter a subject and message.', 'warning');
-                return;
-            }
-
-            let recipients = [];
-
-            switch (recipientType) {
-                case 'all':
-                    recipients = allRepairs.filter(r => r.customerEmail);
-                    break;
-                case 'active':
-                    recipients = allRepairs.filter(r => 
-                        r.customerEmail && !['completed', 'declined'].includes(r.currentStatus)
-                    );
-                    break;
-                case 'ready':
-                    recipients = allRepairs.filter(r => 
-                        r.customerEmail && r.currentStatus === 'ready'
-                    );
-                    break;
-                case 'selected':
-                    recipients = allRepairs.filter(r => 
-                        r.customerEmail && selectedRepairs.has(r.id)
-                    );
-                    break;
-            }
-
-            if (recipients.length === 0) {
-                showAlert('No customers with email addresses found in the selected group.', 'warning');
-                return;
-            }
-
-            // Since we can't send actual emails without EmailJS configuration,
-            // we'll create a mailto link with all recipients
-            const emailAddresses = [...new Set(recipients.map(r => r.customerEmail))];
-            const mailtoLink = `mailto:${emailAddresses.join(',')}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`;
-            
-            window.open(mailtoLink);
-            
-            showAlert(`Email draft created for ${emailAddresses.length} customer(s).`, 'success');
         }
 
         // Show alert
@@ -1783,6 +1278,13 @@ OnlineFix Team`
                 alert.remove();
             }, 5000);
         }
+
+        // Close modals when clicking outside
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal')) {
+                e.target.classList.remove('show');
+            }
+        });
 
         // Show templates for selected status
         function showTemplates(status) {
@@ -1855,6 +1357,13 @@ OnlineFix Team`
                     // Delete from Firestore
                     await db.collection('repairs').doc(repairId).delete();
                     
+                    // Delete photos from Storage if any
+                    const repair = allRepairs.find(r => r.id === repairId);
+                    if (repair && repair.photos && repair.photos.length > 0) {
+                        // Note: You might want to delete photos from storage here
+                        // This requires parsing the photo URLs to get the storage paths
+                    }
+                    
                     showAlert(`Repair ${repairIdNumber} deleted successfully!`, 'success');
                     
                     // Reload data
@@ -1866,81 +1375,6 @@ OnlineFix Team`
                 }
             }
         }
-
-        // Close modals when clicking outside
-        document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('modal')) {
-                e.target.classList.remove('show');
-            }
-        });
-
-        // Handle window resize for mobile
-        window.addEventListener('resize', () => {
-            if (window.innerWidth > 1024) {
-                document.getElementById('sidebar').classList.remove('show');
-            }
-        });
-
-        // Add keyboard shortcut for search (Ctrl/Cmd + K)
-        document.addEventListener('keydown', (e) => {
-            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-                e.preventDefault();
-                document.getElementById('search-input').focus();
-            }
-        });
     </script>
 </body>
-</html>title">All Repairs</h2>
-                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                        <select id="status-filter" class="form-input" style="display: inline-block; width: auto;">
-                            <option value="">All Statuses</option>
-                            <option value="received">Received</option>
-                            <option value="diagnosing">Diagnosing</option>
-                            <option value="waiting-parts">Waiting for Parts</option>
-                            <option value="in-repair">In Repair</option>
-                            <option value="testing">Testing</option>
-                            <option value="ready">Ready</option>
-                            <option value="awaiting-customer">Awaiting Customer Reply</option>
-                            <option value="unrepairable">Unrepairable</option>
-                            <option value="declined">Declined Repair</option>
-                            <option value="completed">Completed</option>
-                        </select>
-                        <button class="btn btn-warning btn-sm" onclick="emailSelectedCustomers()">
-                            <i class="fas fa-envelope"></i>
-                            Email Selected
-                        </button>
-                        <a href="../new-repair/" class="btn btn-primary btn-sm">
-                            <i class="fas fa-plus"></i>
-                            New Repair
-                        </a>
-                    </div>
-                </div>
-                <div class="section-content">
-                    <div class="table-wrapper">
-                        <table id="all-repairs-table">
-                            <thead>
-                                <tr>
-                                    <th>
-                                        <input type="checkbox" id="select-all" onchange="toggleAllSelection()">
-                                    </th>
-                                    <th>Repair ID</th>
-                                    <th>Customer</th>
-                                    <th>Device</th>
-                                    <th>Issue</th>
-                                    <th>Status</th>
-                                    <th>Date</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Populated by JavaScript -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Email Section -->
-            <div id="email-section" class="content-section hidden">
-                <div class="section-header">
-                    <h2 class="section-
+</html>
