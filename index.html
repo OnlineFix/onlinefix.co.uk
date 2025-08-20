@@ -313,7 +313,7 @@
         }
 
         /* Animated Background */
-        .hero {
+        .hero, .cta-section {
             background: linear-gradient(135deg, var(--deep-blue) 0%, var(--primary-blue) 50%, var(--trust-teal) 100%);
             min-height: 100vh;
             position: relative;
@@ -323,7 +323,12 @@
             padding-top: 80px;
         }
 
-        .hero::before {
+        .cta-section {
+            min-height: auto;
+            padding: 4rem 0;
+        }
+
+        .hero::before, .cta-section::before {
             content: '';
             position: absolute;
             top: 0;
@@ -403,6 +408,60 @@
             color: var(--primary-blue);
         }
 
+        /* CTA Section */
+        .cta-section {
+            color: var(--white);
+            text-align: center;
+        }
+
+        .cta-content h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .cta-content p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 4rem 0;
+            background: var(--white);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-item {
+            text-align: center;
+            padding: 1.5rem;
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--trust-teal));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 2rem;
+            color: var(--white);
+        }
+
+        .feature-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--deep-blue);
+        }
+
         /* Services Preview */
         .services-preview {
             padding: 4rem 0;
@@ -458,62 +517,6 @@
             font-weight: 600;
             margin-bottom: 0.5rem;
             color: var(--deep-blue);
-        }
-
-        /* Why Choose Us */
-        .features {
-            padding: 4rem 0;
-            background: var(--white);
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-        }
-
-        .feature-item {
-            text-align: center;
-            padding: 1.5rem;
-        }
-
-        .feature-icon {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, var(--primary-blue), var(--trust-teal));
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 1rem;
-            font-size: 2rem;
-            color: var(--white);
-        }
-
-        .feature-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: var(--deep-blue);
-        }
-
-        /* CTA Section */
-        .cta-section {
-            padding: 4rem 0;
-            background: linear-gradient(135deg, var(--deep-blue), var(--primary-blue));
-            color: var(--white);
-            text-align: center;
-        }
-
-        .cta-content h2 {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .cta-content p {
-            font-size: 1.2rem;
-            margin-bottom: 2rem;
-            opacity: 0.9;
         }
 
         /* Mobile Optimizations */
@@ -695,42 +698,6 @@
         </div>
     </section>
 
-    <!-- Services Preview Section -->
-    <section class="services-preview">
-        <div class="container">
-            <h2 class="section-title fade-in">Our Expert Repair Services</h2>
-            <div class="services-grid">
-                <div class="service-card fade-in">
-                    <div class="service-icon">
-                        <i class="fas fa-mobile-alt"></i>
-                    </div>
-                    <h3 class="service-title">Smartphones</h3>
-                    <p>Screen repairs, battery replacement, water damage recovery for all smartphone brands</p>
-                </div>
-                <div class="service-card fade-in">
-                    <div class="service-icon">
-                        <i class="fas fa-laptop"></i>
-                    </div>
-                    <h3 class="service-title">Laptops</h3>
-                    <p>Hardware repairs, screen replacement, keyboard fixes, and performance optimization</p>
-                </div>
-                <div class="service-card fade-in">
-                    <div class="service-icon">
-                        <i class="fas fa-gamepad"></i>
-                    </div>
-                    <h3 class="service-title">Gaming Consoles</h3>
-                    <p>PlayStation, Xbox, Nintendo repairs and performance enhancements</p>
-                </div>
-            </div>
-            <div style="text-align: center;">
-                <a href="/services.html" class="cta-button">
-                    <i class="fas fa-arrow-right"></i>
-                    View All Services
-                </a>
-            </div>
-        </div>
-    </section>
-
     <!-- Features Section -->
     <section class="features">
         <div class="container">
@@ -784,6 +751,42 @@
                         Get Directions
                     </a>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Preview Section -->
+    <section class="services-preview">
+        <div class="container">
+            <h2 class="section-title fade-in">Our Expert Repair Services</h2>
+            <div class="services-grid">
+                <div class="service-card fade-in">
+                    <div class="service-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3 class="service-title">Smartphones</h3>
+                    <p>Screen repairs, battery replacement, water damage recovery for all smartphone brands</p>
+                </div>
+                <div class="service-card fade-in">
+                    <div class="service-icon">
+                        <i class="fas fa-laptop"></i>
+                    </div>
+                    <h3 class="service-title">Laptops</h3>
+                    <p>Hardware repairs, screen replacement, keyboard fixes, and performance optimization</p>
+                </div>
+                <div class="service-card fade-in">
+                    <div class="service-icon">
+                        <i class="fas fa-gamepad"></i>
+                    </div>
+                    <h3 class="service-title">Gaming Consoles</h3>
+                    <p>PlayStation, Xbox, Nintendo repairs and performance enhancements</p>
+                </div>
+            </div>
+            <div style="text-align: center;">
+                <a href="/services.html" class="cta-button">
+                    <i class="fas fa-arrow-right"></i>
+                    View All Services
+                </a>
             </div>
         </div>
     </section>
@@ -904,13 +907,13 @@
         
         setTimeout(typeWriter, 1000);
 
-        // Add random floating animation to background
-        function createFloatingElement() {
+        // Add random floating animation to background for both hero and CTA sections
+        function createFloatingElement(targetSection) {
             const element = document.createElement('div');
             element.style.cssText = `
                 position: absolute;
-                width: 4px;
-                height: 4px;
+                width: 10px;
+                height: 10px;
                 background: rgba(144, 224, 239, 0.6);
                 border-radius: 50%;
                 pointer-events: none;
@@ -920,15 +923,19 @@
                 z-index: 1;
             `;
             
-            document.querySelector('.hero').appendChild(element);
+            targetSection.appendChild(element);
             
             setTimeout(() => {
                 element.remove();
             }, 4000);
         }
 
-        // Add floating elements periodically
-        setInterval(createFloatingElement, 200);
+        // Add floating elements periodically to both hero and CTA sections
+        const heroSection = document.querySelector('.hero');
+        const ctaSection = document.querySelector('.cta-section');
+        
+        setInterval(() => createFloatingElement(heroSection), 200);
+        setInterval(() => createFloatingElement(ctaSection), 200);
 
         // Add CSS for floating animation
         const floatingStyle = document.createElement('style');
