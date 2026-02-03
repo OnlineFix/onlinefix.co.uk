@@ -5,16 +5,9 @@
     <!-- SEO FIX: Removed user-scalable=no to meet WCAG Accessibility standards and improve Mobile SEO score -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#0033FF">
-
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q0PC3B1W31"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'G-Q0PC3B1W31');
-    </script>
+    
+    <!-- Security & Privacy -->
+    <meta name="referrer" content="strict-origin-when-cross-origin">
     
     <!-- SEO Meta Tags -->
     <!-- SEO FIX: Optimized Title for CTR and Keywords. Removed Copyright year (waste of space in SERP). -->
@@ -23,8 +16,9 @@
     <meta name="keywords" content="electronics repair Guildford, smartphone repair Surrey, iPhone screen repair Guildford, MacBook repair, PS5 repair, data recovery, OnlineFix">
     <meta name="author" content="OnlineFix - Tomas">
     <meta name="robots" content="index, follow">
-    <meta name="format-detection" content="telephone=yes">
+    <meta name="format-detection" content="telephone=no">
     <link rel="canonical" href="https://onlinefix.co.uk/">
+    <link rel="sitemap" type="application/xml" href="/sitemap.xml">
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
@@ -47,6 +41,10 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon.png">
     <link rel="shortcut icon" href="/favicon.png">
+
+    <!-- Performance: DNS Prefetch and Preconnect -->
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 
     <!-- Performance: Preload Critical Assets -->
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
@@ -115,7 +113,23 @@
         "sameAs": [
             "https://instagram.com/onlinefixrepairs",
             "https://tiktok.com/@onlinefix",
-            "https://maps.app.goo.gl/zqbFNuYM2z7u8xux8"
+            "https://g.page/r/Cc0Vz3kdmt8bEBE/review"
+        ]
+    }
+    </script>
+
+    <!-- Breadcrumb Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://onlinefix.co.uk/"
+            }
         ]
     }
     </script>
@@ -190,7 +204,6 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
         }
 
         body {
@@ -201,6 +214,37 @@
             overflow-x: hidden;
             font-weight: 500;
             padding-bottom: calc(60px + var(--safe-area-bottom)); /* Space for fixed nav */
+        }
+
+        /* ACCESSIBILITY: Skip Link */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: var(--hex-black);
+            color: var(--hex-white);
+            padding: 8px 16px;
+            z-index: 10000;
+            transition: top 0.3s;
+            text-decoration: none;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+        }
+
+        .skip-link:focus {
+            top: 0;
+        }
+
+        /* ACCESSIBILITY: Focus Indicators */
+        :focus-visible {
+            outline: 3px solid var(--hex-accent);
+            outline-offset: 2px;
+        }
+
+        /* Remove default tap highlight but keep focus visible */
+        * {
+            -webkit-tap-highlight-color: transparent;
         }
 
         /* UTILITY */
@@ -297,10 +341,13 @@
             transition: all 0.2s;
         }
 
-        .nav-link:hover {
-            background: var(--hazard-stripe); /* STRIPES ON HOVER */
-            color: var(--hex-white);
-            text-shadow: 2px 2px 0 #000; /* Contrast for stripes */
+        /* HOVER FIX: Only apply hover effects on devices with a mouse/pointer */
+        @media (hover: hover) {
+            .nav-link:hover {
+                background: var(--hazard-stripe);
+                color: var(--hex-white);
+                text-shadow: 2px 2px 0 #000;
+            }
         }
         
         .nav-link.active {
@@ -321,24 +368,27 @@
             border-left: 2px solid var(--hex-black);
         }
         
-        /* QUOTES REMOVED */
-        .nav-cta::before { content: none; }
-        .nav-cta::after { content: none; }
+        .nav-cta::before, .nav-cta::after { content: none; }
 
-        .nav-cta:hover {
-            background: var(--gradient-blue);
-            color: var(--hex-white);
+        @media (hover: hover) {
+            .nav-cta:hover {
+                background: var(--gradient-blue);
+                color: var(--hex-white);
+            }
         }
 
+        /* FIXED: Frameless Mobile Toggle */
         .mobile-menu-toggle {
             display: none;
-            background: var(--hex-white);
-            border: none;
-            border-left: 2px solid var(--hex-black);
+            background: transparent;
+            border: none; /* Removed Border */
             font-size: 1.5rem;
             color: var(--hex-black);
             cursor: pointer;
             padding: 0 1.5rem;
+            /* Added explicit width to keep layout stable without border */
+            min-width: 60px; 
+            outline: none;
         }
 
         /* HERO - "THE DISPLAY" */
@@ -405,15 +455,12 @@
             display: inline-block;
         }
         
-        /* ALIGNED TM - CENTER HERO */
         .logo::after {
             content: "™";
             font-size: 0.25em;
-            position: relative;
-            top: -2.2em; /* CALIBRATED */
-            margin-left: 4px;
+            vertical-align: super;
             line-height: 0;
-            vertical-align: baseline;
+            margin-left: 4px;
             color: var(--hex-black);
         }
 
@@ -447,9 +494,11 @@
             cursor: pointer;
         }
         
-        .cta-button:hover {
-            transform: translate(4px, 4px);
-            box-shadow: -4px -4px 0 var(--hex-black);
+        @media (hover: hover) {
+            .cta-button:hover {
+                transform: translate(4px, 4px);
+                box-shadow: -4px -4px 0 var(--hex-black);
+            }
         }
 
         .cta-secondary {
@@ -457,11 +506,19 @@
             color: var(--hex-black);
         }
 
-        .cta-secondary:hover {
-            background: var(--hazard-stripe); /* STRIPES */
-            color: var(--hex-white);
-            text-shadow: 2px 2px 0 #000;
-            border-color: var(--hex-black);
+        /* FIXED: Hover only on non-touch devices to prevent 'stuck' state */
+        @media (hover: hover) {
+            .cta-secondary:hover {
+                background: var(--hazard-stripe);
+                color: var(--hex-white);
+                text-shadow: 2px 2px 0 #000;
+                border-color: var(--hex-black);
+            }
+        }
+        
+        /* Mobile active state simulation for touch feedback */
+        .cta-secondary:active {
+            background: #e0e0e0;
         }
 
         /* FEATURES - "THE SPECS" */
@@ -622,33 +679,33 @@
             height: 100%;
         }
 
-        /* CARD HOVER STATE - HAZARD PATTERN */
-        .service-card:hover {
-            background: var(--hazard-stripe); /* STRIPES */
-            transform: translateY(-5px);
-            box-shadow: 8px 8px 0 #000;
-        }
-        
-        /* HOVER TEXT READABILITY - STICKER STYLE */
-        .service-card:hover .service-title,
-        .service-card:hover .keyword-link,
-        .service-card:hover p {
-            background: var(--hex-white);
-            color: var(--hex-black);
-            box-shadow: 4px 4px 0 var(--hex-black);
-            padding: 2px 5px;
-            display: inline-block; /* Wraps text like a sticker */
-            position: relative;
-            z-index: 2;
-        }
-        
-        /* Icon needs special handling to look like a stamp */
-        .service-card:hover .service-icon {
-            color: var(--hex-white);
-            background: var(--hex-black); /* Invert icon */
-            padding: 10px;
-            display: inline-block;
-            box-shadow: 4px 4px 0 var(--hex-white);
+        /* FIXED: Hover only on non-touch devices */
+        @media (hover: hover) {
+            .service-card:hover {
+                background: var(--hazard-stripe);
+                transform: translateY(-5px);
+                box-shadow: 8px 8px 0 #000;
+            }
+            
+            .service-card:hover .service-title,
+            .service-card:hover .keyword-link,
+            .service-card:hover p {
+                background: var(--hex-white);
+                color: var(--hex-black);
+                box-shadow: 4px 4px 0 var(--hex-black);
+                padding: 2px 5px;
+                display: inline-block;
+                position: relative;
+                z-index: 2;
+            }
+            
+            .service-card:hover .service-icon {
+                color: var(--hex-white);
+                background: var(--hex-black);
+                padding: 10px;
+                display: inline-block;
+                box-shadow: 4px 4px 0 var(--hex-white);
+            }
         }
 
         .service-icon {
@@ -804,6 +861,11 @@
             align-items: center;
             margin-bottom: -2px;
             text-transform: uppercase;
+            list-style: none;
+        }
+
+        .faq-question::-webkit-details-marker {
+            display: none;
         }
         
         .faq-answer {
@@ -815,20 +877,49 @@
             font-family: monospace;
         }
 
-        /* MOBILE OPTIMIZATIONS */
+        /* CTA Section */
+        .cta-section {
+            background: var(--hex-black);
+            color: var(--hex-white);
+            padding: 5rem 0;
+            text-align: center;
+        }
+
+        .cta-section h2 {
+            font-size: 3rem;
+            text-transform: uppercase;
+            font-weight: 900;
+            margin-bottom: 2rem;
+        }
+
+        .cta-box {
+            border: 1px solid white;
+            padding: 2rem;
+            display: inline-block;
+        }
+
+        /* MOBILE OPTIMIZATIONS & FIXES */
+        
+        /* FIXED: Frameless Sticky Bar with Glass Effect */
         .mobile-sticky-bar {
             display: none;
             position: fixed;
             bottom: 0;
             left: 0;
             width: 100%;
-            background: var(--hex-white);
-            border-top: 2px solid var(--hex-black);
+            /* Transparency and Glass effect */
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            /* Removed Border */
+            border: none;
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.05); /* Soft shadow instead of border */
             padding: 12px;
             padding-bottom: max(12px, var(--safe-area-bottom));
             z-index: 9999;
         }
         
+        /* FIXED: Frameless Button with Shadow */
         .sticky-call-btn {
             display: block;
             background: var(--gradient-blue);
@@ -838,8 +929,31 @@
             text-decoration: none;
             font-weight: 900;
             text-transform: uppercase;
-            border: 2px solid var(--hex-black);
+            /* Removed Border */
+            border: none;
+            border-radius: 4px; /* Slight roundness */
             font-size: 1.1rem;
+            box-shadow: 0 4px 15px rgba(0, 51, 255, 0.3); /* Glow effect */
+        }
+        
+        .sticky-call-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Reduced Motion Support */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+
+            .scroll-hint {
+                animation: none;
+            }
         }
 
         /* MOBILE SPECIFIC OVERRIDES */
@@ -859,11 +973,11 @@
                 justify-content: flex-end; 
             }
             
-            /* MENU BUTTON - JUST STRIPES */
+            /* FIXED: Frameless Menu Toggle */
             .mobile-menu-toggle { 
                 display: block; 
-                background: transparent;
-                border: none;
+                background: transparent; /* Ensure transparent */
+                border: none; /* No border */
                 font-size: 2rem;
                 padding: 1rem 1.5rem;
                 color: var(--hex-black);
@@ -876,11 +990,10 @@
                 top: 70px; /* Push down slightly */
                 left: 0;
                 right: 0;
-                background: transparent; /* TRANSPARENT AS REQUESTED */
-                border-top: none; /* NO BORDERS */
-                border-bottom: none;
-                box-shadow: none;
-                backdrop-filter: blur(5px); /* Subtly blur background for readability */
+                background: var(--hex-white);
+                border-top: 2px solid var(--hex-black); /* Re-add border for menu container */
+                border-bottom: 2px solid var(--hex-black);
+                box-shadow: 0 10px 20px rgba(0,0,0,0.1);
             }
             
             .nav-menu.active { display: flex; }
@@ -888,18 +1001,13 @@
             .nav-link { 
                 padding: 1.5rem; 
                 border-left: none;
-                border-bottom: none; /* REMOVED INTERNAL LINES */
-                font-size: 1.5rem; /* Larger text for better touch */
-                text-align: right;
-                padding-right: 2rem;
+                border-bottom: 1px solid #eee;
             }
             
             .nav-cta {
                 padding: 1.5rem;
-                justify-content: flex-end;
-                padding-right: 2rem;
+                justify-content: center;
                 border-left: none;
-                background: transparent;
             }
 
             .mobile-sticky-bar { display: block; }
@@ -949,6 +1057,10 @@
             .cta-button { width: 100%; margin: 0.5rem 0; }
             
             .logo { font-size: 4rem; }
+
+            .cta-section h2 {
+                font-size: 2rem;
+            }
         }
 
         /* ANIMATIONS */
@@ -967,230 +1079,236 @@
         ::-webkit-scrollbar-track { background: var(--hex-concrete); }
         ::-webkit-scrollbar-thumb { background: var(--gradient-blue); border-radius: 3px; }
     </style>
+<base target="_blank">
 </head>
 <body>
+    <!-- Accessibility: Skip Link -->
+    <a href="#main" class="skip-link">Skip to main content</a>
+
     <!-- Navigation -->
-    <nav class="navbar" id="navbar">
+    <nav class="navbar" id="navbar" aria-label="Main navigation">
         <div class="nav-container">
             <a href="#" class="nav-logo" aria-label="OnlineFix Home">OnlineFix</a>
-            <ul class="nav-menu" id="nav-menu">
-                <li><a href="/" class="nav-link active">Home</a></li>
+            <ul class="nav-menu" id="nav-menu" role="menubar">
+                <li role="none"><a href="/" class="nav-link active" role="menuitem" aria-current="page">Home</a></li>
                 <!-- SEO FIX: Restored real file links based on user's file structure -->
-                <li><a href="services.html" class="nav-link">Services</a></li>
-                <li><a href="about.html" class="nav-link">About</a></li>
-                <li><a href="reviews.html" class="nav-link">Reviews</a></li>
-                <li><a href="contact.html" class="nav-link">Contact</a></li>
-                <li><a href="tel:+447940730537" class="nav-cta">
+                <li role="none"><a href="services.html" class="nav-link" role="menuitem">Services</a></li>
+                <li role="none"><a href="about.html" class="nav-link" role="menuitem">About</a></li>
+                <li role="none"><a href="reviews.html" class="nav-link" role="menuitem">Reviews</a></li>
+                <li role="none"><a href="contact.html" class="nav-link" role="menuitem">Contact</a></li>
+                <li role="none"><a href="tel:+447940730537" class="nav-cta" role="menuitem">
                     <span>Call Now</span>
                 </a></li>
             </ul>
-            <button class="mobile-menu-toggle" id="mobile-toggle" aria-label="Toggle navigation menu">
-                <i class="fas fa-bars"></i>
+            <button class="mobile-menu-toggle" id="mobile-toggle" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="nav-menu">
+                <i class="fas fa-bars" aria-hidden="true"></i>
             </button>
         </div>
     </nav>
 
-    <!-- Mobile Sticky Footer -->
-    <div class="mobile-sticky-bar">
+    <!-- Mobile Sticky Footer (FIXED: Frameless + Glass) -->
+    <div class="mobile-sticky-bar" role="complementary" aria-label="Quick contact">
         <a href="tel:+447940730537" class="sticky-call-btn">
             "CALL US"
         </a>
     </div>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="container">
-            <header class="header fade-in">
-                <h1 class="logo">ONLINE<span>FIX</span></h1>
-                <p class="tagline">GUILDFORD, UK // TECH REPAIR ATELIER</p>
-                <div>
-                    <a href="tel:+447940730537" class="cta-button">
-                        CALL NOW
-                    </a>
-                    <a href="services.html" class="cta-button cta-secondary">
-                        VIEW SERVICES
-                    </a>
-                </div>
-            </header>
-        </div>
-    </section>
+    <main id="main">
+        <!-- Hero Section -->
+        <section class="hero" aria-label="Hero">
+            <div class="container">
+                <header class="header fade-in">
+                    <h1 class="logo">ONLINE<span>FIX</span></h1>
+                    <p class="tagline">GUILDFORD, UK // TECH REPAIR ATELIER</p>
+                    <div>
+                        <a href="tel:+447940730537" class="cta-button">
+                            CALL NOW
+                        </a>
+                        <a href="services.html" class="cta-button cta-secondary">
+                            VIEW SERVICES
+                        </a>
+                    </div>
+                </header>
+            </div>
+        </section>
 
-    <!-- Features Section -->
-    <section class="features" id="about">
-        <div class="container">
-            <h2 class="section-title fade-in">"WHY CHOOSE US"</h2>
-            <p class="section-subtitle fade-in">Specifications & Standards</p>
-            <div class="scroll-hint">SCROLL -></div>
-            <div class="features-grid">
-                <div class="feature-item fade-in">
-                    <div class="feature-icon"><i class="fas fa-clock"></i></div>
-                    <h3 class="feature-title">Same-Day</h3>
-                    <p>Fast repairs without compromising quality - most repairs completed same day</p>
-                </div>
-                <div class="feature-item fade-in">
-                    <div class="feature-icon"><i class="fas fa-pound-sign"></i></div>
-                    <h3 class="feature-title">Fair Price</h3>
-                    <p>No hidden fees, transparent upfront costs. Quality service at competitive prices</p>
-                </div>
-                <div class="feature-item fade-in">
-                    <div class="feature-icon"><i class="fas fa-star"></i></div>
-                    <h3 class="feature-title">5-Star</h3>
-                    <p>Consistently excellent reviews from satisfied customers across Guildford and Surrey</p>
-                </div>
-                <div class="feature-item fade-in">
-                    <div class="feature-icon"><i class="fas fa-user-cog"></i></div>
-                    <h3 class="feature-title">Expert</h3>
-                    <p>Tomas brings years of proven expertise in electronics repair and customer service</p>
+        <!-- Features Section -->
+        <section class="features" id="about" aria-labelledby="features-heading">
+            <div class="container">
+                <h2 class="section-title fade-in" id="features-heading">"WHY CHOOSE US"</h2>
+                <p class="section-subtitle fade-in">Specifications & Standards</p>
+                <div class="scroll-hint" aria-hidden="true">SCROLL -></div>
+                <div class="features-grid" role="list">
+                    <div class="feature-item fade-in" role="listitem">
+                        <div class="feature-icon" aria-hidden="true"><i class="fas fa-clock"></i></div>
+                        <h3 class="feature-title">Same-Day</h3>
+                        <p>Fast repairs without compromising quality - most repairs completed same day</p>
+                    </div>
+                    <div class="feature-item fade-in" role="listitem">
+                        <div class="feature-icon" aria-hidden="true"><i class="fas fa-pound-sign"></i></div>
+                        <h3 class="feature-title">Fair Price</h3>
+                        <p>No hidden fees, transparent upfront costs. Quality service at competitive prices</p>
+                    </div>
+                    <div class="feature-item fade-in" role="listitem">
+                        <div class="feature-icon" aria-hidden="true"><i class="fas fa-star"></i></div>
+                        <h3 class="feature-title">5-Star</h3>
+                        <p>Consistently excellent reviews from satisfied customers across Guildford and Surrey</p>
+                    </div>
+                    <div class="feature-item fade-in" role="listitem">
+                        <div class="feature-icon" aria-hidden="true"><i class="fas fa-user-cog"></i></div>
+                        <h3 class="feature-title">Expert</h3>
+                        <p>Tomas brings years of proven expertise in electronics repair and customer service</p>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- How It Works Section -->
-    <section class="process-section">
-        <div class="container">
-            <h2 class="section-title fade-in">WORKFLOW</h2>
-            <p class="section-subtitle fade-in">Operational Procedure</p>
-            <div class="process-grid">
-                <div class="process-item fade-in">
-                    <div class="process-number">01</div>
-                    <div class="process-icon"><i class="fas fa-phone-alt"></i></div>
-                    <h3>Contact Us</h3>
-                    <p>Call Tomas or send a message to get a free quote and arrange a drop-off time.</p>
-                </div>
-                <div class="process-item fade-in">
-                    <div class="process-number">02</div>
-                    <div class="process-icon"><i class="fas fa-wrench"></i></div>
-                    <h3>Diagnosis</h3>
-                    <p>For unknown issues, we provide a diagnosis and quote within 2-24 hours.</p>
-                </div>
-                <div class="process-item fade-in">
-                    <div class="process-number">03</div>
-                    <div class="process-icon"><i class="fas fa-check-circle"></i></div>
-                    <h3>Collect</h3>
-                    <p>Pick up your fully repaired device and pay only when you are 100% satisfied.</p>
+        <!-- How It Works Section -->
+        <section class="process-section" aria-labelledby="workflow-heading">
+            <div class="container">
+                <h2 class="section-title fade-in" id="workflow-heading">WORKFLOW</h2>
+                <p class="section-subtitle fade-in">Operational Procedure</p>
+                <div class="process-grid" role="list">
+                    <div class="process-item fade-in" role="listitem">
+                        <div class="process-number" aria-hidden="true">01</div>
+                        <div class="process-icon" aria-hidden="true"><i class="fas fa-phone-alt"></i></div>
+                        <h3>Contact Us</h3>
+                        <p>Call Tomas or send a message to get a free quote and arrange a drop-off time.</p>
+                    </div>
+                    <div class="process-item fade-in" role="listitem">
+                        <div class="process-number" aria-hidden="true">02</div>
+                        <div class="process-icon" aria-hidden="true"><i class="fas fa-wrench"></i></div>
+                        <h3>Diagnosis</h3>
+                        <p>For unknown issues, we provide a diagnosis and quote within 2-24 hours.</p>
+                    </div>
+                    <div class="process-item fade-in" role="listitem">
+                        <div class="process-number" aria-hidden="true">03</div>
+                        <div class="process-icon" aria-hidden="true"><i class="fas fa-check-circle"></i></div>
+                        <h3>Collect</h3>
+                        <p>Pick up your fully repaired device and pay only when you are 100% satisfied.</p>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Services Preview Section -->
-    <section class="services-preview" id="services">
-        <div class="container">
-            <h2 class="section-title fade-in" style="margin-bottom: 2rem;">SERVICES CATALOG</h2>
-            <div class="scroll-hint">SCROLL -></div>
-            <div class="services-grid">
-                <div class="service-card fade-in">
-                    <div class="service-icon"><i class="fas fa-mobile-alt"></i></div>
-                    <h3 class="service-title">Phones</h3>
-                    <p>Specializing in <a href="services.html" class="keyword-link">iPhone repair</a>, screen fixes, and battery replacements for all brands.</p>
+        <!-- Services Preview Section -->
+        <section class="services-preview" id="services" aria-labelledby="services-heading">
+            <div class="container">
+                <h2 class="section-title fade-in" id="services-heading" style="margin-bottom: 2rem;">SERVICES CATALOG</h2>
+                <div class="scroll-hint" aria-hidden="true">SCROLL -></div>
+                <div class="services-grid" role="list">
+                    <div class="service-card fade-in" role="listitem">
+                        <div class="service-icon" aria-hidden="true"><i class="fas fa-mobile-alt"></i></div>
+                        <h3 class="service-title">Phones</h3>
+                        <p>Specializing in <a href="services.html" class="keyword-link">iPhone repair</a>, screen fixes, and battery replacements for all brands.</p>
+                    </div>
+                    <div class="service-card fade-in" role="listitem">
+                        <div class="service-icon" aria-hidden="true"><i class="fas fa-laptop"></i></div>
+                        <h3 class="service-title">Laptops</h3>
+                        <p>Expert <a href="services.html" class="keyword-link">MacBook repair</a>, hardware cleaning, and SSD performance upgrades.</p>
+                    </div>
+                    <div class="service-card fade-in" role="listitem">
+                        <div class="service-icon" aria-hidden="true"><i class="fas fa-gamepad"></i></div>
+                        <h3 class="service-title">Consoles</h3>
+                        <p>Professional <a href="services.html" class="keyword-link">PlayStation and Xbox repair</a> including HDMI port reinforcement.</p>
+                    </div>
                 </div>
-                <div class="service-card fade-in">
-                    <div class="service-icon"><i class="fas fa-laptop"></i></div>
-                    <h3 class="service-title">Laptops</h3>
-                    <p>Expert <a href="services.html" class="keyword-link">MacBook repair</a>, hardware cleaning, and SSD performance upgrades.</p>
-                </div>
-                <div class="service-card fade-in">
-                    <div class="service-icon"><i class="fas fa-gamepad"></i></div>
-                    <h3 class="service-title">Consoles</h3>
-                    <p>Professional <a href="services.html" class="keyword-link">PlayStation and Xbox repair</a> including HDMI port reinforcement.</p>
-                </div>
-            </div>
-            <div style="text-align: center; margin-top: 2rem;">
-                <a href="services.html" class="cta-button">
-                    VIEW ALL "SERVICES"
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Testimonials Section -->
-    <section class="testimonials-section" id="reviews">
-        <div class="container">
-            <h2 class="section-title fade-in">FEEDBACK LOOP</h2>
-            <p class="section-subtitle fade-in">Verified Customer Data</p>
-            <div class="scroll-hint">SCROLL -></div>
-            <div class="testimonial-grid">
-                <div class="testimonial-card fade-in">
-                    <div class="stars">★★★★★</div>
-                    <p class="review-text">"Tomas saved my MacBook when I thought it was gone for good. Fast, professional."</p>
-                    <p class="reviewer-name">SARAH J.</p>
-                </div>
-                <div class="testimonial-card fade-in">
-                    <div class="stars">★★★★★</div>
-                    <p class="review-text">"Fixed my iPhone screen in under an hour. Excellent service."</p>
-                    <p class="reviewer-name">MIKE T.</p>
-                </div>
-                <div class="testimonial-card fade-in">
-                    <div class="stars">★★★★★</div>
-                    <p class="review-text">"My PS5 HDMI port was broken. OnlineFix sorted it out quickly."</p>
-                    <p class="reviewer-name">DAVID R.</p>
-                </div>
-            </div>
-            <div style="text-align: center; margin-top: 2rem;">
-                <a href="https://maps.app.goo.gl/zqbFNuYM2z7u8xux8" target="_blank" rel="noopener noreferrer" class="google-btn">
-                    <!-- Google G Logo SVG -->
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="24px" height="24px">
-                        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-                        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-                        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-                        <path fill="#34A853" d="M24 48c6.48 0 11.95-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-                    </svg>
-                    <span>READ 100+ REVIEWS</span>
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- FAQ Section -->
-    <section class="faq-section" id="faq">
-        <div class="container">
-            <h2 class="section-title fade-in">FAQ</h2>
-            <div class="faq-container fade-in">
-                <div class="faq-item">
-                    <details>
-                        <summary class="faq-question">DURATION? <i class="fas fa-plus"></i></summary>
-                        <div class="faq-answer">
-                            Most common repairs, such as iPhone screen replacements, are completed within an hour. Console HDMI port replacements typically take about 3 hours. Complex board repairs may take 24-48 hours.
-                        </div>
-                    </details>
-                </div>
-                <div class="faq-item">
-                    <details>
-                        <summary class="faq-question">WARRANTY? <i class="fas fa-plus"></i></summary>
-                        <div class="faq-answer">
-                            Yes! We offer warranties ranging from 3 months to lifetime, depending on the specific repair and parts used. Ask us for details on your specific fix.
-                        </div>
-                    </details>
-                </div>
-                <div class="faq-item">
-                    <details>
-                        <summary class="faq-question">APPOINTMENT? <i class="fas fa-plus"></i></summary>
-                        <div class="faq-answer">
-                            Yes, <strong>appointment only</strong>. We do not accept walk-ins. Please get in touch to arrange a drop-off time that suits you.
-                        </div>
-                    </details>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- CTA Section -->
-    <section class="cta-section" id="contact" style="background: var(--hex-black); color: var(--hex-white); padding: 5rem 0; text-align: center;">
-        <div class="container">
-            <div class="cta-content fade-in">
-                <h2 style="font-size: 3rem; text-transform: uppercase; font-weight: 900; margin-bottom: 2rem;">FIX YOUR DEVICE</h2>
-                <div style="border: 1px solid white; padding: 2rem; display: inline-block;">
-                    <a href="tel:+447940730537" class="cta-button">
-                        CALL: 07940 730537
+                <div style="text-align: center; margin-top: 2rem;">
+                    <a href="services.html" class="cta-button">
+                        VIEW ALL "SERVICES"
                     </a>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
+
+        <!-- Testimonials Section -->
+        <section class="testimonials-section" id="reviews" aria-labelledby="reviews-heading">
+            <div class="container">
+                <h2 class="section-title fade-in" id="reviews-heading">FEEDBACK LOOP</h2>
+                <p class="section-subtitle fade-in">Verified Customer Data</p>
+                <div class="scroll-hint" aria-hidden="true">SCROLL -></div>
+                <div class="testimonial-grid" role="list">
+                    <div class="testimonial-card fade-in" role="listitem">
+                        <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
+                        <p class="review-text">"Tomas saved my MacBook when I thought it was gone for good. Fast, professional."</p>
+                        <p class="reviewer-name">SARAH J.</p>
+                    </div>
+                    <div class="testimonial-card fade-in" role="listitem">
+                        <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
+                        <p class="review-text">"Fixed my iPhone screen in under an hour. Excellent service."</p>
+                        <p class="reviewer-name">MIKE T.</p>
+                    </div>
+                    <div class="testimonial-card fade-in" role="listitem">
+                        <div class="stars" aria-label="5 out of 5 stars">★★★★★</div>
+                        <p class="review-text">"My PS5 HDMI port was broken. OnlineFix sorted it out quickly."</p>
+                        <p class="reviewer-name">DAVID R.</p>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 2rem;">
+                    <a href="https://g.page/r/Cc0Vz3kdmt8bEBE/review" target="_blank" rel="noopener noreferrer" class="google-btn">
+                        <!-- Google G Logo SVG -->
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="24px" height="24px" aria-hidden="true">
+                            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                            <path fill="#34A853" d="M24 48c6.48 0 11.95-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                        </svg>
+                        <span>READ 100+ REVIEWS</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ Section -->
+        <section class="faq-section" id="faq" aria-labelledby="faq-heading">
+            <div class="container">
+                <h2 class="section-title fade-in" id="faq-heading">FAQ</h2>
+                <div class="faq-container fade-in">
+                    <div class="faq-item">
+                        <details>
+                            <summary class="faq-question">DURATION? <i class="fas fa-plus" aria-hidden="true"></i></summary>
+                            <div class="faq-answer">
+                                Most common repairs, such as iPhone screen replacements, are completed within an hour. Console HDMI port replacements typically take about 3 hours. Complex board repairs may take 24-48 hours.
+                            </div>
+                        </details>
+                    </div>
+                    <div class="faq-item">
+                        <details>
+                            <summary class="faq-question">WARRANTY? <i class="fas fa-plus" aria-hidden="true"></i></summary>
+                            <div class="faq-answer">
+                                Yes! We offer warranties ranging from 3 months to lifetime, depending on the specific repair and parts used. Ask us for details on your specific fix.
+                            </div>
+                        </details>
+                    </div>
+                    <div class="faq-item">
+                        <details>
+                            <summary class="faq-question">APPOINTMENT? <i class="fas fa-plus" aria-hidden="true"></i></summary>
+                            <div class="faq-answer">
+                                Yes, <strong>appointment only</strong>. We do not accept walk-ins. Please get in touch to arrange a drop-off time that suits you.
+                            </div>
+                        </details>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="cta-section" id="contact" aria-labelledby="cta-heading">
+            <div class="container">
+                <div class="cta-content fade-in">
+                    <h2 id="cta-heading">FIX YOUR DEVICE</h2>
+                    <div class="cta-box">
+                        <a href="tel:+447940730537" class="cta-button">
+                            CALL: 07940 730537
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
 
     <!-- Footer -->
-    <footer class="footer">
+    <footer class="footer" role="contentinfo">
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-column">
@@ -1198,8 +1316,8 @@
                     <p style="font-family: monospace; color: #999;">Expert electronics repair in Guildford. Trusted, fast, and reliable service by Tomas.</p>
                     <div class="social-links" style="margin-top: 1rem; font-size: 1.5rem;">
                         <!-- SEO FIX: Added rel="noopener noreferrer nofollow" to empty links so Google ignores them -->
-                        <a href="#" rel="noopener noreferrer nofollow" style="color: white; margin-right: 1rem;" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                        <a href="#" rel="noopener noreferrer nofollow" style="color: white; margin-right: 1rem;" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
+                        <a href="#" rel="noopener noreferrer nofollow" style="color: white; margin-right: 1rem;" aria-label="Instagram"><i class="fab fa-instagram" aria-hidden="true"></i></a>
+                        <a href="#" rel="noopener noreferrer nofollow" style="color: white; margin-right: 1rem;" aria-label="TikTok"><i class="fab fa-tiktok" aria-hidden="true"></i></a>
                     </div>
                 </div>
                 <div class="footer-column">
@@ -1238,28 +1356,36 @@
         const mobileToggle = document.getElementById('mobile-toggle');
         const navMenu = document.getElementById('nav-menu');
 
-        mobileToggle.addEventListener('click', (e) => {
-            e.stopPropagation();
-            navMenu.classList.toggle('active');
-            const icon = mobileToggle.querySelector('i');
-            icon.classList.toggle('fa-bars');
-            icon.classList.toggle('fa-times');
-        });
-
-        // Close mobile menu when clicking outside
-        document.addEventListener('click', (e) => {
-            const isClickInsideMenu = navMenu.contains(e.target);
-            const isClickOnToggle = mobileToggle.contains(e.target);
-            const isLink = e.target.tagName === 'A' || e.target.closest('a');
-
-            if ((!isClickInsideMenu && !isClickOnToggle && navMenu.classList.contains('active')) || 
-                (isLink && navMenu.classList.contains('active'))) {
-                navMenu.classList.remove('active');
+        if (mobileToggle && navMenu) {
+            mobileToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isExpanded = navMenu.classList.toggle('active');
+                mobileToggle.setAttribute('aria-expanded', isExpanded.toString());
                 const icon = mobileToggle.querySelector('i');
-                icon.classList.add('fa-bars');
-                icon.classList.remove('fa-times');
-            }
-        });
+                if (icon) {
+                    icon.classList.toggle('fa-bars');
+                    icon.classList.toggle('fa-times');
+                }
+            });
+
+            // Close mobile menu when clicking outside
+            document.addEventListener('click', (e) => {
+                const isClickInsideMenu = navMenu.contains(e.target);
+                const isClickOnToggle = mobileToggle.contains(e.target);
+                const isLink = e.target.tagName === 'A' || e.target.closest('a');
+
+                if ((!isClickInsideMenu && !isClickOnToggle && navMenu.classList.contains('active')) || 
+                    (isLink && navMenu.classList.contains('active'))) {
+                    navMenu.classList.remove('active');
+                    mobileToggle.setAttribute('aria-expanded', 'false');
+                    const icon = mobileToggle.querySelector('i');
+                    if (icon) {
+                        icon.classList.add('fa-bars');
+                        icon.classList.remove('fa-times');
+                    }
+                }
+            });
+        }
 
         // Intersection Observer
         const observerOptions = {
@@ -1282,6 +1408,8 @@
         });
         
         // "INDUSTRIAL FLOW" - SMOOTHER, DENSER PARTICLES
+        let particleInterval = null;
+        
         function createFloatingElement(targetSection) {
             if (!targetSection) return;
             
@@ -1306,7 +1434,9 @@
             
             // Cleanup
             setTimeout(() => {
-                element.remove();
+                if (element.parentNode) {
+                    element.remove();
+                }
             }, 8000);
         }
 
@@ -1320,8 +1450,31 @@
         document.head.appendChild(floatingStyle);
 
         const heroSection = document.querySelector('.hero');
-        // Increased density by lowering interval to 100ms
-        if (heroSection) setInterval(() => createFloatingElement(heroSection), 100);
+        
+        function startParticles() {
+            if (heroSection && !particleInterval) {
+                particleInterval = setInterval(() => createFloatingElement(heroSection), 100);
+            }
+        }
+        
+        function stopParticles() {
+            if (particleInterval) {
+                clearInterval(particleInterval);
+                particleInterval = null;
+            }
+        }
+
+        // Start particles initially
+        startParticles();
+
+        // Pause animations when tab hidden (performance optimization)
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                stopParticles();
+            } else {
+                startParticles();
+            }
+        });
 
         // "KINETIC NUDGE" - Mobile Interaction Hint
         if (window.innerWidth < 768) {
@@ -1345,7 +1498,6 @@
 
             scrollGrids.forEach(grid => nudgeObserver.observe(grid));
         }
-
     </script>
 </body>
 </html>
