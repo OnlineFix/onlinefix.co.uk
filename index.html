@@ -5,6 +5,16 @@
     <!-- SEO FIX: Removed user-scalable=no to meet WCAG Accessibility standards and improve Mobile SEO score -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#0033FF">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q0PC3B1W31"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-Q0PC3B1W31');
+    </script>
     
     <!-- SEO Meta Tags -->
     <!-- SEO FIX: Optimized Title for CTR and Keywords. Removed Copyright year (waste of space in SERP). -->
@@ -836,19 +846,41 @@
         @media (max-width: 768px) {
             .scroll-hint { display: block; }
 
+            /* TRANSPARENT HEADER - NO WHITE BOX OR LINES */
+            .navbar {
+                background: transparent;
+                border-bottom: none;
+            }
+
             /* HIDE LOGO ON MOBILE */
             .nav-logo { display: none; }
-            .nav-container { justify-content: flex-end; }
             
+            .nav-container { 
+                justify-content: flex-end; 
+            }
+            
+            /* MENU BUTTON - JUST STRIPES */
+            .mobile-menu-toggle { 
+                display: block; 
+                background: transparent;
+                border: none;
+                font-size: 2rem;
+                padding: 1rem 1.5rem;
+                color: var(--hex-black);
+            }
+
             .nav-menu {
                 display: none;
                 flex-direction: column;
                 position: absolute;
-                top: 60px;
+                top: 70px; /* Push down slightly */
                 left: 0;
                 right: 0;
-                background: var(--hex-white);
-                border-bottom: 2px solid var(--hex-black);
+                background: transparent; /* TRANSPARENT AS REQUESTED */
+                border-top: none; /* NO BORDERS */
+                border-bottom: none;
+                box-shadow: none;
+                backdrop-filter: blur(5px); /* Subtly blur background for readability */
             }
             
             .nav-menu.active { display: flex; }
@@ -856,16 +888,20 @@
             .nav-link { 
                 padding: 1.5rem; 
                 border-left: none;
-                border-bottom: 1px solid #eee;
+                border-bottom: none; /* REMOVED INTERNAL LINES */
+                font-size: 1.5rem; /* Larger text for better touch */
+                text-align: right;
+                padding-right: 2rem;
             }
             
             .nav-cta {
                 padding: 1.5rem;
-                justify-content: center;
+                justify-content: flex-end;
+                padding-right: 2rem;
                 border-left: none;
+                background: transparent;
             }
 
-            .mobile-menu-toggle { display: block; }
             .mobile-sticky-bar { display: block; }
             
             .hero {
