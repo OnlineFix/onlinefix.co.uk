@@ -1,981 +1,494 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-GB">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <!-- SEO Meta Tags -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0033FF">
+
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+
     <title>About OnlineFix - Meet Tomas, Expert Electronics Repair Technician in Guildford</title>
     <meta name="description" content="Learn about OnlineFix and Tomas, your trusted electronics repair expert in Guildford, Surrey. Years of experience in smartphone, laptop, tablet, and gaming console repairs with 5-star service.">
     <meta name="keywords" content="about OnlineFix, Tomas electronics repair, electronics repair technician Guildford, professional repair service Surrey, expert tech repair Guildford">
     <meta name="author" content="OnlineFix - Tomas">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://onlinefix.co.uk/about.html">
-    
-    <!-- Open Graph / Facebook -->
+
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://onlinefix.co.uk/about.html">
     <meta property="og:title" content="About OnlineFix - Meet Tomas, Expert Electronics Repair Technician">
     <meta property="og:description" content="Learn about OnlineFix and Tomas, your trusted electronics repair expert in Guildford, Surrey.">
+    <meta property="og:image" content="https://onlinefix.co.uk/images/onlinefix-og-image.jpg">
 
-    <!-- Favicon -->
     <link rel="icon" type="image/png" sizes="512x512" href="/favicon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon.png">
     <link rel="shortcut icon" href="/favicon.png">
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+
+    <!-- Breadcrumb Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://onlinefix.co.uk/"
+            },
+            {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "About",
+                "item": "https://onlinefix.co.uk/about.html"
+            }
+        ]
+    }
+    </script>
+
+    <!-- WebPage Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "AboutPage",
+        "name": "About OnlineFix - Meet Tomas",
+        "description": "Learn about OnlineFix and Tomas, your trusted electronics repair expert in Guildford, Surrey.",
+        "url": "https://onlinefix.co.uk/about.html",
+        "isPartOf": {
+            "@type": "WebSite",
+            "name": "OnlineFix",
+            "url": "https://onlinefix.co.uk"
+        },
+        "about": {
+            "@type": "LocalBusiness",
+            "@id": "https://onlinefix.co.uk/#organization",
+            "name": "OnlineFix",
+            "founder": {
+                "@type": "Person",
+                "name": "Tomas",
+                "jobTitle": "Owner & Lead Technician"
+            }
+        },
+        "breadcrumb": {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://onlinefix.co.uk/"},
+                {"@type": "ListItem", "position": 2, "name": "About", "item": "https://onlinefix.co.uk/about.html"}
+            ]
+        }
+    }
+    </script>
+
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         :root {
-            --primary-blue: #0066FF;
-            --trust-teal: #00B4D8;
-            --deep-blue: #023E8A;
-            --accent-cyan: #90E0EF;
-            --dark-bg: #0A0E27;
-            --light-bg: #F8FAFC;
-            --white: #FFFFFF;
-            --gray-100: #F1F5F9;
-            --gray-600: #64748B;
-            --gray-800: #1E293B;
-            --success: #10B981;
-            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            --hex-accent: #0033FF;
+            --gradient-blue: linear-gradient(135deg, #0033FF 0%, #00C6FF 100%);
+            --hex-black: #111111;
+            --hex-concrete: #F2F2F2;
+            --hex-white: #FFFFFF;
+            --hex-grid: #DCDCDC;
+            --hazard-stripe: repeating-linear-gradient(135deg, #111111, #111111 10px, #ffffff 10px, #ffffff 20px);
+            --font-main: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            --safe-area-bottom: env(safe-area-inset-bottom);
         }
-
+        html { scroll-behavior: smooth; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            line-height: 1.6;
-            color: var(--gray-800);
-            overflow-x: hidden;
+            font-family: var(--font-main); background-color: var(--hex-concrete);
+            color: var(--hex-black); line-height: 1.4; overflow-x: hidden;
+            font-weight: 500; padding-bottom: calc(60px + var(--safe-area-bottom));
         }
+        .skip-link { position: absolute; top: -40px; left: 0; background: var(--hex-black); color: var(--hex-white); padding: 8px 16px; z-index: 10000; transition: top 0.3s; text-decoration: none; font-weight: 700; text-transform: uppercase; font-size: 0.9rem; }
+        .skip-link:focus { top: 0; }
+        :focus-visible { outline: 3px solid var(--hex-accent); outline-offset: 2px; }
+        * { -webkit-tap-highlight-color: transparent; }
 
-        /* Navigation - Same as other pages */
-        .navbar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            z-index: 1000;
-            padding: 1rem 0;
-            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-        }
+        /* NAV */
+        .navbar { position: fixed; top: 0; left: 0; right: 0; background: var(--hex-white); z-index: 1000; border-bottom: 2px solid var(--hex-black); padding: 0; }
+        .nav-container { max-width: 100%; display: flex; justify-content: space-between; align-items: stretch; height: 60px; }
+        .nav-logo { font-size: 1.5rem; font-weight: 900; color: var(--hex-white); text-decoration: none; text-transform: uppercase; letter-spacing: -1px; padding: 0 1.5rem; display: flex; align-items: center; background: var(--gradient-blue); border-right: 2px solid var(--hex-black); position: relative; }
+        .nav-logo::after { content: "\2122"; font-size: 0.4em; position: relative; top: -0.6em; margin-left: 2px; line-height: 0; }
+        .nav-menu { display: flex; list-style: none; gap: 0; align-items: stretch; flex-grow: 1; justify-content: flex-end; }
+        .nav-menu li { display: flex; align-items: stretch; }
+        .nav-link { text-decoration: none; color: var(--hex-black); font-weight: 700; text-transform: uppercase; font-size: 0.9rem; padding: 0 2rem; display: flex; align-items: center; border-left: 1px solid var(--hex-grid); position: relative; transition: all 0.2s; }
+        @media (hover: hover) { .nav-link:hover { background: var(--hazard-stripe); color: var(--hex-white); text-shadow: 2px 2px 0 #000; } }
+        .nav-link.active { text-decoration: line-through; }
+        .nav-cta { background: var(--hex-black); color: var(--hex-white); padding: 0 2rem; text-decoration: none; font-weight: 700; text-transform: uppercase; display: flex; align-items: center; gap: 10px; font-size: 0.8rem; border-left: 2px solid var(--hex-black); }
+        .nav-cta::before, .nav-cta::after { content: none; }
+        @media (hover: hover) { .nav-cta:hover { background: var(--gradient-blue); color: var(--hex-white); } }
+        .mobile-menu-toggle { display: none; background: transparent; border: none; font-size: 1.5rem; color: var(--hex-black); cursor: pointer; padding: 0 1.5rem; min-width: 60px; outline: none; }
 
-        .navbar.scrolled {
-            background: rgba(255, 255, 255, 0.98);
-            padding: 0.5rem 0;
-        }
+        .container { max-width: 1400px; margin: 0 auto; padding: 0 20px; position: relative; z-index: 2; width: 100%; }
+        .section-title { font-size: clamp(2rem, 5vw, 3rem); font-weight: 900; text-transform: uppercase; text-align: center; padding-top: 4rem; letter-spacing: -1px; margin-bottom: 0.5rem; }
+        .section-subtitle { text-align: center; font-family: monospace; text-transform: uppercase; margin-bottom: 3rem; color: #666; font-size: 0.9rem; }
 
-        .nav-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .nav-logo {
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: var(--primary-blue);
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-
-        .nav-logo:hover {
-            transform: scale(1.05);
-            color: var(--trust-teal);
-        }
-
-        .nav-menu {
-            display: flex;
-            list-style: none;
-            gap: 2rem;
-            align-items: center;
-        }
-
-        .nav-link {
-            text-decoration: none;
-            color: var(--gray-800);
-            font-weight: 500;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .nav-link:hover {
-            color: var(--primary-blue);
-        }
-
-        .nav-link::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--primary-blue);
-            transition: width 0.3s ease;
-        }
-
-        .nav-link:hover::after {
-            width: 100%;
-        }
-
-        .nav-link.active {
-            color: var(--primary-blue);
-        }
-
-        .nav-link.active::after {
-            width: 100%;
-        }
-
-        .nav-cta {
-            background: var(--primary-blue);
-            color: var(--white);
-            padding: 0.5rem 1rem;
-            border-radius: 25px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .nav-cta:hover {
-            background: var(--trust-teal);
-            transform: translateY(-2px);
-        }
-
-        .mobile-menu-toggle {
-            display: none;
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            color: var(--primary-blue);
-            cursor: pointer;
-        }
-
-        /* Mobile Navigation */
-        @media (max-width: 768px) {
-            .nav-menu {
-                position: fixed;
-                top: 100%;
-                left: 0;
-                right: 0;
-                background: var(--white);
-                flex-direction: column;
-                padding: 2rem;
-                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-                transform: translateY(-100vh);
-                transition: transform 0.3s ease;
-            }
-
-            .nav-menu.active {
-                transform: translateY(0);
-            }
-
-            .mobile-menu-toggle {
-                display: block;
-            }
-
-            .nav-cta {
-                margin-top: 1rem;
-            }
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        /* Page Header */
+        /* PAGE HEADER */
         .page-header {
-            background: linear-gradient(135deg, var(--deep-blue) 0%, var(--primary-blue) 50%, var(--trust-teal) 100%);
-            padding: 120px 0 80px;
-            color: var(--white);
-            text-align: center;
-            position: relative;
-            overflow: hidden;
+            padding: 60px 0 0;
+            background: linear-gradient(90deg, var(--hex-grid) 1px, transparent 1px) 0 0, linear-gradient(180deg, var(--hex-grid) 1px, transparent 1px) 0 0;
+            background-size: 40px 40px; background-color: var(--hex-concrete);
+            position: relative; overflow: hidden;
         }
+        .page-header::before { content: "FIG. 04 — PERSONNEL FILE"; position: absolute; top: 80px; left: 20px; font-family: monospace; font-size: 0.7rem; color: var(--hex-black); opacity: 0.6; }
+        .page-header-content { max-width: 1400px; margin: 0 auto; padding: 4rem 20px; position: relative; z-index: 2; }
+        .page-header-box { text-align: center; border: 2px solid var(--hex-black); padding: 3rem 4rem; background: var(--hex-white); box-shadow: 15px 15px 0px var(--hex-black); }
+        .page-title { font-size: clamp(2rem, 6vw, 4rem); font-weight: 900; line-height: 0.9; text-transform: uppercase; letter-spacing: -2px; color: var(--hex-black); margin-bottom: 1rem; }
+        .page-title span { background: var(--gradient-blue); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: inline-block; }
+        .page-subtitle { font-family: 'Courier New', Courier, monospace; font-size: clamp(0.9rem, 2vw, 1.1rem); text-transform: uppercase; background: var(--hex-black); color: var(--hex-white); display: inline-block; padding: 5px 8px; }
 
-        .page-header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
-            animation: float 20s ease-in-out infinite;
+        /* ABOUT CONTENT */
+        .about-section { padding: 0 0 4rem; border-top: 2px solid var(--hex-black); background: var(--hex-white); }
+        .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 2px solid var(--hex-black); margin-top: 0; }
+        .about-text { padding: 3rem; border-right: 2px solid var(--hex-black); }
+        .about-text h2 { font-size: 1.8rem; font-weight: 900; text-transform: uppercase; margin-bottom: 1.5rem; border-bottom: 4px solid; border-image: var(--gradient-blue) 1; display: inline-block; padding-bottom: 0.5rem; }
+        .about-text p { margin-bottom: 1.5rem; line-height: 1.7; color: #444; }
+        .about-text .highlight { color: var(--hex-accent); font-weight: 700; }
+        .about-profile { padding: 3rem; display: flex; align-items: center; justify-content: center; background: var(--hex-concrete); }
+        .profile-card { border: 2px solid var(--hex-black); background: var(--hex-white); padding: 2rem; text-align: center; box-shadow: 8px 8px 0 var(--hex-black); max-width: 280px; width: 100%; }
+        .profile-card::before { content: "PERSONNEL"; font-family: monospace; font-size: 0.6rem; color: #ccc; display: block; margin-bottom: 1rem; }
+        .profile-avatar { width: 100px; height: 100px; background: var(--gradient-blue); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 2.5rem; color: var(--hex-white); font-weight: 900; }
+        .profile-name { font-size: 1.5rem; font-weight: 900; text-transform: uppercase; margin-bottom: 0.3rem; }
+        .profile-title { font-family: monospace; color: #666; margin-bottom: 1rem; text-transform: uppercase; font-size: 0.85rem; }
+        .profile-skills { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; }
+        .skill-tag { background: var(--hex-black); color: var(--hex-white); padding: 0.3rem 0.8rem; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; font-family: monospace; }
+
+        /* TIMELINE */
+        .timeline-section { padding: 4rem 0; background: var(--hex-black); color: var(--hex-white); }
+        .timeline-section .section-title { color: var(--hex-white); border-bottom: 1px solid #333; padding-bottom: 2rem; margin-bottom: 4rem; padding-top: 0; }
+        .timeline-section .section-subtitle { color: #999; margin-top: -3rem; }
+        .timeline-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; border: 1px solid #333; }
+        .timeline-item { padding: 2rem; border-right: 1px solid #333; position: relative; }
+        .timeline-item:last-child { border-right: none; }
+        .timeline-year { font-weight: 900; font-size: 2rem; background: var(--gradient-blue); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1; margin-bottom: 1rem; }
+        .timeline-item h3 { font-size: 1rem; text-transform: uppercase; margin-bottom: 0.5rem; font-weight: 800; }
+        .timeline-item p { font-family: monospace; color: #aaa; font-size: 0.85rem; line-height: 1.5; }
+
+        /* VALUES */
+        .values-section { padding: 0 0 4rem; border-top: 2px solid var(--hex-black); background: var(--hex-white); }
+        .values-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2px; background: var(--hex-black); border-top: 2px solid var(--hex-black); }
+        .value-item { background: var(--hex-white); padding: 3rem 2rem; text-align: left; position: relative; }
+        .value-item::before { content: "VALUE"; font-family: monospace; font-size: 0.6rem; position: absolute; top: 10px; right: 10px; color: #ccc; }
+        .value-icon { font-size: 2.5rem; color: var(--hex-black); margin-bottom: 1.5rem; }
+        .value-title { font-size: 1.4rem; text-transform: uppercase; font-weight: 800; margin-bottom: 1rem; background: var(--hex-concrete); display: inline-block; padding: 2px 5px; }
+        .value-title::before { content: '"'; }
+        .value-title::after { content: '"'; }
+        .value-description { color: #555; line-height: 1.6; }
+
+        /* CERTIFICATIONS */
+        .cert-section { padding: 4rem 0; background: var(--hex-concrete); }
+        .cert-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; }
+        .cert-item { background: var(--hex-white); border: 2px solid var(--hex-black); padding: 2rem; text-align: center; transition: all 0.2s; }
+        @media (hover: hover) {
+            .cert-item:hover { background: var(--hazard-stripe); transform: translateY(-5px); box-shadow: 8px 8px 0 #000; }
+            .cert-item:hover .cert-icon, .cert-item:hover .cert-title { background: var(--hex-white); color: var(--hex-black); box-shadow: 4px 4px 0 var(--hex-black); padding: 4px 8px; display: inline-block; position: relative; z-index: 2; }
         }
+        .cert-icon { font-size: 2.5rem; color: var(--hex-black); margin-bottom: 1rem; }
+        .cert-title { font-size: 0.9rem; font-weight: 800; text-transform: uppercase; }
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(2deg); }
-        }
+        /* CTA */
+        .cta-section { background: var(--hex-black); color: var(--hex-white); padding: 5rem 0; text-align: center; }
+        .cta-section h2 { font-size: 3rem; text-transform: uppercase; font-weight: 900; margin-bottom: 2rem; }
+        .cta-box { border: 1px solid white; padding: 2rem; display: inline-block; }
+        .cta-button { display: inline-flex; align-items: center; justify-content: center; background: var(--gradient-blue); color: var(--hex-white); padding: 1rem 2rem; text-decoration: none; font-weight: 800; text-transform: uppercase; font-size: 0.9rem; border: 2px solid var(--hex-white); margin: 0.5rem; transition: all 0.1s; }
+        @media (hover: hover) { .cta-button:hover { transform: translate(4px, 4px); box-shadow: -4px -4px 0 var(--hex-white); } }
 
-        .page-header h1 {
-            font-size: 3rem;
-            font-weight: 800;
-            margin-bottom: 1rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-            position: relative;
-            z-index: 2;
-        }
+        /* FOOTER */
+        .footer { background: var(--hex-black); color: var(--hex-white); padding: 4rem 0 6rem; border-top: 10px solid; border-image: var(--gradient-blue) 1; }
+        .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 3rem; margin-bottom: 3rem; }
+        .footer h4 { font-size: 1.2rem; text-transform: uppercase; border-bottom: 1px solid #555; padding-bottom: 1rem; margin-bottom: 1.5rem; background: var(--gradient-blue); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: inline-block; }
+        .footer-links { list-style: none; font-family: monospace; }
+        .footer-links li { margin-bottom: 0.5rem; }
+        .footer-links a { color: #aaa; text-decoration: none; text-transform: uppercase; }
+        .footer-links a:hover { color: var(--hex-white); text-decoration: underline; }
+        .copyright { text-align: left; font-family: monospace; color: #555; font-size: 0.7rem; border-top: 1px solid #333; padding-top: 2rem; }
 
-        .page-header p {
-            font-size: 1.2rem;
-            opacity: 0.9;
-            position: relative;
-            z-index: 2;
-        }
+        /* MOBILE STICKY */
+        .mobile-sticky-bar { display: none; position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(255,255,255,0.85); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: none; box-shadow: 0 -5px 15px rgba(0,0,0,0.05); padding: 12px; padding-bottom: max(12px, var(--safe-area-bottom)); z-index: 9999; }
+        .sticky-call-btn { display: block; background: var(--gradient-blue); color: var(--hex-white); text-align: center; padding: 16px; text-decoration: none; font-weight: 900; text-transform: uppercase; border: none; border-radius: 4px; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(0,51,255,0.3); }
+        .sticky-call-btn:active { transform: scale(0.98); }
 
-        /* About Hero */
-        .about-hero {
-            padding: 4rem 0;
-            background: var(--white);
-        }
+        @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; } }
 
-        .about-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 4rem;
-            align-items: center;
-        }
-
-        .about-text h2 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--deep-blue);
-            margin-bottom: 1.5rem;
-        }
-
-        .about-text p {
-            font-size: 1.1rem;
-            line-height: 1.8;
-            color: var(--gray-600);
-            margin-bottom: 1.5rem;
-        }
-
-        .about-text .highlight {
-            color: var(--primary-blue);
-            font-weight: 600;
-        }
-
-        .about-image {
-            position: relative;
-            text-align: center;
-        }
-
-        .profile-card {
-            background: var(--white);
-            padding: 2rem;
-            border-radius: 20px;
-            box-shadow: var(--shadow);
-            border: 1px solid rgba(0, 102, 255, 0.1);
-            transition: all 0.3s ease;
-            max-width: 300px;
-            margin: 0 auto;
-        }
-
-        .profile-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(0, 102, 255, 0.15);
-        }
-
-        .profile-avatar {
-            width: 120px;
-            height: 120px;
-            background: linear-gradient(135deg, var(--primary-blue), var(--trust-teal));
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 1rem;
-            font-size: 3rem;
-            color: var(--white);
-            font-weight: bold;
-        }
-
-        .profile-name {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--deep-blue);
-            margin-bottom: 0.5rem;
-        }
-
-        .profile-title {
-            color: var(--gray-600);
-            margin-bottom: 1rem;
-        }
-
-        .profile-skills {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            justify-content: center;
-        }
-
-        .skill-tag {
-            background: var(--accent-cyan);
-            color: var(--deep-blue);
-            padding: 0.3rem 0.8rem;
-            border-radius: 15px;
-            font-size: 0.8rem;
-            font-weight: 500;
-        }
-
-        /* Experience Section */
-        .experience {
-            padding: 4rem 0;
-            background: var(--light-bg);
-        }
-
-        .section-title {
-            text-align: center;
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 3rem;
-            color: var(--deep-blue);
-        }
-
-        .timeline {
-            position: relative;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .timeline::before {
-            content: '';
-            position: absolute;
-            left: 50%;
-            top: 0;
-            bottom: 0;
-            width: 2px;
-            background: var(--primary-blue);
-            transform: translateX(-50%);
-        }
-
-        .timeline-item {
-            position: relative;
-            margin-bottom: 3rem;
-        }
-
-        .timeline-item:nth-child(odd) .timeline-content {
-            margin-left: 0;
-            margin-right: 50%;
-            text-align: right;
-            padding-right: 2rem;
-        }
-
-        .timeline-item:nth-child(even) .timeline-content {
-            margin-left: 50%;
-            margin-right: 0;
-            text-align: left;
-            padding-left: 2rem;
-        }
-
-        .timeline-marker {
-            position: absolute;
-            left: 50%;
-            top: 1rem;
-            width: 20px;
-            height: 20px;
-            background: var(--primary-blue);
-            border-radius: 50%;
-            transform: translateX(-50%);
-            border: 4px solid var(--white);
-            box-shadow: 0 0 0 4px var(--primary-blue);
-        }
-
-        .timeline-content {
-            background: var(--white);
-            padding: 2rem;
-            border-radius: 15px;
-            box-shadow: var(--shadow);
-            transition: all 0.3s ease;
-        }
-
-        .timeline-content:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 30px rgba(0, 102, 255, 0.15);
-        }
-
-        .timeline-year {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: var(--primary-blue);
-            margin-bottom: 0.5rem;
-        }
-
-        .timeline-title {
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: var(--deep-blue);
-            margin-bottom: 0.5rem;
-        }
-
-        .timeline-description {
-            color: var(--gray-600);
-            line-height: 1.6;
-        }
-
-        /* Values Section */
-        .values {
-            padding: 4rem 0;
-            background: var(--white);
-        }
-
-        .values-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-        }
-
-        .value-item {
-            text-align: center;
-            padding: 2rem;
-        }
-
-        .value-icon {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, var(--primary-blue), var(--trust-teal));
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 1rem;
-            font-size: 2rem;
-            color: var(--white);
-            transition: all 0.3s ease;
-        }
-
-        .value-item:hover .value-icon {
-            transform: scale(1.1) rotate(10deg);
-        }
-
-        .value-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: var(--deep-blue);
-        }
-
-        .value-description {
-            color: var(--gray-600);
-            line-height: 1.6;
-        }
-
-        /* Certifications */
-        .certifications {
-            padding: 4rem 0;
-            background: var(--light-bg);
-        }
-
-        .cert-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 2rem;
-            text-align: center;
-        }
-
-        .cert-item {
-            background: var(--white);
-            padding: 2rem;
-            border-radius: 15px;
-            box-shadow: var(--shadow);
-            transition: all 0.3s ease;
-        }
-
-        .cert-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 30px rgba(0, 102, 255, 0.15);
-        }
-
-        .cert-icon {
-            font-size: 3rem;
-            color: var(--primary-blue);
-            margin-bottom: 1rem;
-        }
-
-        .cert-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--deep-blue);
-        }
-
-        /* CTA Section */
-        .cta-section {
-            padding: 4rem 0;
-            background: linear-gradient(135deg, var(--deep-blue), var(--primary-blue));
-            color: var(--white);
-            text-align: center;
-        }
-
-        .cta-content h2 {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .cta-content p {
-            font-size: 1.2rem;
-            margin-bottom: 2rem;
-            opacity: 0.9;
-        }
-
-        .cta-button {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            background: var(--white);
-            color: var(--primary-blue);
-            padding: 1rem 2rem;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
-            margin: 0.5rem;
-        }
-
-        .cta-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.2);
-            background: var(--accent-cyan);
-        }
-
-        /* Mobile Optimizations */
         @media (max-width: 768px) {
-            .page-header h1 {
-                font-size: 2.5rem;
-            }
-
-            .about-content {
-                grid-template-columns: 1fr;
-                gap: 2rem;
-            }
-
-            .about-text h2 {
-                font-size: 2rem;
-            }
-
-            .timeline::before {
-                left: 20px;
-            }
-
-            .timeline-item:nth-child(odd) .timeline-content,
-            .timeline-item:nth-child(even) .timeline-content {
-                margin-left: 50px;
-                margin-right: 0;
-                text-align: left;
-                padding-left: 1rem;
-                padding-right: 1rem;
-            }
-
-            .timeline-marker {
-                left: 20px;
-            }
-
-            .section-title {
-                font-size: 2rem;
-            }
-
-            .container {
-                padding: 0 15px;
-            }
-
-            .values-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .cert-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
+            .navbar { background: transparent; border-bottom: none; }
+            .nav-logo { display: none; }
+            .nav-container { justify-content: flex-end; }
+            .mobile-menu-toggle { display: block; background: transparent; border: none; font-size: 2rem; padding: 1rem 1.5rem; color: var(--hex-black); }
+            .nav-menu { display: none; flex-direction: column; position: absolute; top: 70px; left: 0; right: 0; background: var(--hex-white); border-top: 2px solid var(--hex-black); border-bottom: 2px solid var(--hex-black); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+            .nav-menu.active { display: flex; }
+            .nav-link { padding: 1.5rem; border-left: none; border-bottom: 1px solid #eee; }
+            .nav-cta { padding: 1.5rem; justify-content: center; border-left: none; }
+            .mobile-sticky-bar { display: block; }
+            .page-header-box { padding: 2rem 1.5rem; box-shadow: 10px 10px 0 var(--hex-black); }
+            .page-title { font-size: 2.5rem; }
+            .section-title { padding-top: 2rem; margin-bottom: 0; }
+            .section-subtitle { margin-bottom: 2rem; }
+            .about-grid { grid-template-columns: 1fr; }
+            .about-text { border-right: none; border-bottom: 2px solid var(--hex-black); }
+            .timeline-grid { grid-template-columns: 1fr; }
+            .timeline-item { border-right: none; border-bottom: 1px solid #333; }
+            .timeline-item:last-child { border-bottom: none; }
+            .cta-section h2 { font-size: 2rem; }
+            .cta-button { width: 100%; margin: 0.5rem 0; }
         }
 
-        @media (max-width: 480px) {
-            .page-header {
-                padding: 100px 0 60px;
-            }
-
-            .page-header h1 {
-                font-size: 2rem;
-            }
-
-            .profile-avatar {
-                width: 100px;
-                height: 100px;
-                font-size: 2.5rem;
-            }
-
-            .cert-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .timeline-content {
-                padding: 1.5rem;
-            }
-        }
-
-        /* Smooth scrolling */
-        html {
-            scroll-behavior: smooth;
-        }
-
-        /* Loading animation */
-        .fade-in {
-            opacity: 0;
-            transform: translateY(30px);
-            animation: fadeInUp 0.8s ease forwards;
-        }
-
-        @keyframes fadeInUp {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+        .fade-in { opacity: 0; transform: translateY(20px); animation: appear 0.5s ease forwards; }
+        @keyframes appear { to { opacity: 1; transform: translateY(0); } }
+        ::-webkit-scrollbar { width: 10px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--hex-concrete); }
+        ::-webkit-scrollbar-thumb { background: var(--gradient-blue); border-radius: 3px; }
     </style>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="navbar" id="navbar">
+    <a href="#main" class="skip-link">Skip to main content</a>
+
+    <nav class="navbar" id="navbar" aria-label="Main navigation">
         <div class="nav-container">
-            <a href="/" class="nav-logo">OnlineFix</a>
-            <ul class="nav-menu" id="nav-menu">
-                <li><a href="/" class="nav-link">Home</a></li>
-                <li><a href="/services.html" class="nav-link">Services</a></li>
-                <li><a href="/about.html" class="nav-link active">About</a></li>
-                <li><a href="/reviews.html" class="nav-link">Reviews</a></li>
-                <li><a href="/contact.html" class="nav-link">Contact</a></li>
-                <li><a href="tel:+447940730537" class="nav-cta">
-                    <i class="fas fa-phone"></i>
-                    Call Now
-                </a></li>
+            <a href="/" class="nav-logo" aria-label="OnlineFix Home">OnlineFix</a>
+            <ul class="nav-menu" id="nav-menu" role="menubar">
+                <li role="none"><a href="/" class="nav-link" role="menuitem">Home</a></li>
+                <li role="none"><a href="services.html" class="nav-link" role="menuitem">Services</a></li>
+                <li role="none"><a href="about.html" class="nav-link active" role="menuitem" aria-current="page">About</a></li>
+                <li role="none"><a href="reviews.html" class="nav-link" role="menuitem">Reviews</a></li>
+                <li role="none"><a href="contact.html" class="nav-link" role="menuitem">Contact</a></li>
+                <li role="none"><a href="tel:+447940730537" class="nav-cta" role="menuitem"><span>Call Now</span></a></li>
             </ul>
-            <button class="mobile-menu-toggle" id="mobile-toggle">
-                <i class="fas fa-bars"></i>
+            <button class="mobile-menu-toggle" id="mobile-toggle" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="nav-menu">
+                <i class="fas fa-bars" aria-hidden="true"></i>
             </button>
         </div>
     </nav>
 
-    <!-- Page Header -->
-    <section class="page-header">
-        <div class="container">
-            <h1>About OnlineFix</h1>
-            <p>Meet Tomas, your trusted electronics repair expert in Guildford</p>
-        </div>
-    </section>
+    <div class="mobile-sticky-bar" role="complementary" aria-label="Quick contact">
+        <a href="tel:+447940730537" class="sticky-call-btn">"CALL US"</a>
+    </div>
 
-    <!-- About Hero -->
-    <section class="about-hero">
-        <div class="container">
-            <div class="about-content">
-                <div class="about-text fade-in">
-                    <h2>Your Local Electronics Repair Expert</h2>
-                    <p>
-                        Welcome to OnlineFix! I'm <span class="highlight">Tomas</span>, a passionate electronics repair technician serving Guildford and the surrounding Surrey area. With years of hands-on experience and a genuine love for technology, I've dedicated my career to bringing your devices back to life.
-                    </p>
-                    <p>
-                        What started as a hobby tinkering with electronics has grown into a thriving repair business built on <span class="highlight">trust, quality, and customer satisfaction</span>. I believe that every device deserves a second chance, and I take pride in offering affordable, reliable repair solutions that extend the life of your valuable electronics.
-                    </p>
-                    <p>
-                        Whether it's a cracked phone screen, a slow laptop, or a gaming console that won't start, I approach every repair with the same level of care and attention to detail. Your device isn't just another job to me - it's your connection to work, family, and the digital world.
-                    </p>
+    <main id="main">
+        <section class="page-header" aria-label="Page header">
+            <div class="page-header-content">
+                <div class="page-header-box fade-in">
+                    <div class="page-title">ABOUT <span>US</span></div>
+                    <p class="page-subtitle">MEET TOMAS // PERSONNEL FILE</p>
                 </div>
-                <div class="about-image fade-in">
-                    <div class="profile-card">
-                        <div class="profile-avatar">T</div>
-                        <div class="profile-name">Tomas</div>
-                        <div class="profile-title">Electronics Repair Specialist</div>
-                        <div class="profile-skills">
-                            <span class="skill-tag">Smartphones</span>
-                            <span class="skill-tag">Laptops</span>
-                            <span class="skill-tag">Tablets</span>
-                            <span class="skill-tag">Gaming</span>
-                            <span class="skill-tag">Data Recovery</span>
+            </div>
+        </section>
+
+        <section class="about-section" aria-labelledby="about-heading">
+            <div class="container">
+                <h2 class="section-title fade-in" id="about-heading">"THE TECHNICIAN"</h2>
+                <p class="section-subtitle fade-in">Background & Expertise</p>
+            </div>
+            <div class="container">
+                <div class="about-grid fade-in">
+                    <div class="about-text">
+                        <h2>Your Local Electronics Repair Expert</h2>
+                        <p>Welcome to OnlineFix! I'm <span class="highlight">Tomas</span>, a passionate electronics repair technician serving Guildford and the surrounding Surrey area. With years of hands-on experience and a genuine love for technology, I've dedicated my career to bringing your devices back to life.</p>
+                        <p>What started as a hobby tinkering with electronics has grown into a thriving repair business built on <span class="highlight">trust, quality, and customer satisfaction</span>. I believe that every device deserves a second chance, and I take pride in offering affordable, reliable repair solutions.</p>
+                        <p>Whether it's a cracked phone screen, a slow laptop, or a gaming console that won't start, I approach every repair with the same level of care and attention to detail. Your device isn't just another job to me - it's your connection to work, family, and the digital world.</p>
+                    </div>
+                    <div class="about-profile">
+                        <div class="profile-card">
+                            <div class="profile-avatar">T</div>
+                            <div class="profile-name">Tomas</div>
+                            <div class="profile-title">Owner & Lead Technician</div>
+                            <div class="profile-skills">
+                                <span class="skill-tag">Smartphones</span>
+                                <span class="skill-tag">Laptops</span>
+                                <span class="skill-tag">Tablets</span>
+                                <span class="skill-tag">Gaming</span>
+                                <span class="skill-tag">Data Recovery</span>
+                                <span class="skill-tag">Soldering</span>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Experience Timeline -->
-    <section class="experience">
-        <div class="container">
-            <h2 class="section-title fade-in">My Journey in Electronics Repair</h2>
-            <div class="timeline">
-                <div class="timeline-item fade-in">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-content">
+        <section class="timeline-section" aria-labelledby="timeline-heading">
+            <div class="container">
+                <h2 class="section-title fade-in" id="timeline-heading">TIMELINE</h2>
+                <p class="section-subtitle fade-in">Operational History</p>
+                <div class="timeline-grid" role="list">
+                    <div class="timeline-item fade-in" role="listitem">
                         <div class="timeline-year">2018</div>
-                        <div class="timeline-title">Started OnlineFix</div>
-                        <div class="timeline-description">
-                            Established OnlineFix as a local electronics repair service in Guildford, focusing on providing honest, affordable repairs with quick turnaround times.
-                        </div>
+                        <h3>Started OnlineFix</h3>
+                        <p>Established as a local electronics repair service in Guildford, focusing on honest, affordable repairs.</p>
                     </div>
-                </div>
-                <div class="timeline-item fade-in">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-content">
+                    <div class="timeline-item fade-in" role="listitem">
                         <div class="timeline-year">2019</div>
-                        <div class="timeline-title">Specialized Training</div>
-                        <div class="timeline-description">
-                            Completed advanced training in smartphone and tablet repair, including specialized courses in water damage recovery and micro-soldering techniques.
-                        </div>
+                        <h3>Advanced Training</h3>
+                        <p>Completed specialized courses in water damage recovery and micro-soldering techniques.</p>
                     </div>
-                </div>
-                <div class="timeline-item fade-in">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-content">
+                    <div class="timeline-item fade-in" role="listitem">
                         <div class="timeline-year">2020</div>
-                        <div class="timeline-title">Gaming Console Expertise</div>
-                        <div class="timeline-description">
-                            Expanded services to include gaming console repairs, becoming proficient in PlayStation, Xbox, and Nintendo systems repair and modification.
-                        </div>
+                        <h3>Console Expertise</h3>
+                        <p>Expanded to gaming console repairs - PlayStation, Xbox, and Nintendo systems.</p>
                     </div>
-                </div>
-                <div class="timeline-item fade-in">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-content">
+                    <div class="timeline-item fade-in" role="listitem">
                         <div class="timeline-year">2021</div>
-                        <div class="timeline-title">Data Recovery Services</div>
-                        <div class="timeline-description">
-                            Added professional data recovery services, helping customers recover precious memories and important business data from damaged storage devices.
-                        </div>
+                        <h3>Data Recovery</h3>
+                        <p>Added professional data recovery services for damaged storage devices.</p>
                     </div>
-                </div>
-                <div class="timeline-item fade-in">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-content">
+                    <div class="timeline-item fade-in" role="listitem">
                         <div class="timeline-year">2023</div>
-                        <div class="timeline-title">500+ Repairs Milestone</div>
-                        <div class="timeline-description">
-                            Reached the milestone of 500+ successful repairs with maintaining a 98% success rate and 5-star customer satisfaction rating.
-                        </div>
+                        <h3>500+ Repairs</h3>
+                        <p>Reached 500+ successful repairs with a 5-star customer satisfaction rating.</p>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Values Section -->
-    <section class="values">
+        <section class="values-section" aria-labelledby="values-heading">
+            <div class="container">
+                <h2 class="section-title fade-in" id="values-heading">"OUR VALUES"</h2>
+                <p class="section-subtitle fade-in">Operational Standards</p>
+            </div>
+            <div class="container">
+                <div class="values-grid" role="list">
+                    <div class="value-item fade-in" role="listitem">
+                        <div class="value-icon" aria-hidden="true"><i class="fas fa-heart"></i></div>
+                        <h3 class="value-title">Honest</h3>
+                        <p class="value-description">Complete transparency. You'll always know exactly what's wrong and how much it will cost before any work begins.</p>
+                    </div>
+                    <div class="value-item fade-in" role="listitem">
+                        <div class="value-icon" aria-hidden="true"><i class="fas fa-tools"></i></div>
+                        <h3 class="value-title">Quality</h3>
+                        <p class="value-description">Only high-quality replacement parts and proven repair techniques. Every repair comes with a warranty.</p>
+                    </div>
+                    <div class="value-item fade-in" role="listitem">
+                        <div class="value-icon" aria-hidden="true"><i class="fas fa-clock"></i></div>
+                        <h3 class="value-title">Speed</h3>
+                        <p class="value-description">Same-day repairs whenever possible. We understand how important your devices are to your daily life.</p>
+                    </div>
+                    <div class="value-item fade-in" role="listitem">
+                        <div class="value-icon" aria-hidden="true"><i class="fas fa-handshake"></i></div>
+                        <h3 class="value-title">Personal</h3>
+                        <p class="value-description">As a local business, every customer is treated like a neighbour. You deal directly with me every time.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="cert-section" aria-labelledby="cert-heading">
+            <div class="container">
+                <h2 class="section-title fade-in" id="cert-heading">EXPERTISE</h2>
+                <p class="section-subtitle fade-in">Certified Capabilities</p>
+                <div class="cert-grid">
+                    <div class="cert-item fade-in">
+                        <div class="cert-icon" aria-hidden="true"><i class="fab fa-apple"></i></div>
+                        <div class="cert-title">Apple Specialist</div>
+                    </div>
+                    <div class="cert-item fade-in">
+                        <div class="cert-icon" aria-hidden="true"><i class="fab fa-android"></i></div>
+                        <div class="cert-title">Android Expert</div>
+                    </div>
+                    <div class="cert-item fade-in">
+                        <div class="cert-icon" aria-hidden="true"><i class="fas fa-laptop"></i></div>
+                        <div class="cert-title">Laptop Specialist</div>
+                    </div>
+                    <div class="cert-item fade-in">
+                        <div class="cert-icon" aria-hidden="true"><i class="fas fa-gamepad"></i></div>
+                        <div class="cert-title">Console Repair Pro</div>
+                    </div>
+                    <div class="cert-item fade-in">
+                        <div class="cert-icon" aria-hidden="true"><i class="fas fa-hdd"></i></div>
+                        <div class="cert-title">Data Recovery</div>
+                    </div>
+                    <div class="cert-item fade-in">
+                        <div class="cert-icon" aria-hidden="true"><i class="fas fa-shield-alt"></i></div>
+                        <div class="cert-title">Quality Assured</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="cta-section" aria-labelledby="cta-heading">
+            <div class="container">
+                <div class="fade-in">
+                    <h2 id="cta-heading">FIX YOUR DEVICE</h2>
+                    <div class="cta-box">
+                        <a href="tel:+447940730537" class="cta-button">CALL: 07940 730537</a>
+                        <a href="contact.html" class="cta-button">VISIT WORKSHOP</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer" role="contentinfo">
         <div class="container">
-            <h2 class="section-title fade-in">My Values & Approach</h2>
-            <div class="values-grid">
-                <div class="value-item fade-in">
-                    <div class="value-icon">
-                        <i class="fas fa-heart"></i>
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <h4>"ONLINEFIX"</h4>
+                    <p style="font-family: monospace; color: #999;">Expert electronics repair in Guildford. Trusted, fast, and reliable service by Tomas.</p>
+                    <div style="margin-top: 1rem; font-size: 1.5rem;">
+                        <a href="https://instagram.com/onlinefixrepairs" target="_blank" rel="noopener noreferrer" style="color: white; margin-right: 1rem;" aria-label="Instagram"><i class="fab fa-instagram" aria-hidden="true"></i></a>
+                        <a href="https://tiktok.com/@onlinefix" target="_blank" rel="noopener noreferrer" style="color: white; margin-right: 1rem;" aria-label="TikTok"><i class="fab fa-tiktok" aria-hidden="true"></i></a>
                     </div>
-                    <h3 class="value-title">Honest Service</h3>
-                    <p class="value-description">
-                        I believe in complete transparency. You'll always know exactly what's wrong with your device and how much it will cost to fix before any work begins.
-                    </p>
                 </div>
-                <div class="value-item fade-in">
-                    <div class="value-icon">
-                        <i class="fas fa-tools"></i>
-                    </div>
-                    <h3 class="value-title">Quality First</h3>
-                    <p class="value-description">
-                        I use only high-quality replacement parts and proven repair techniques. Every repair comes with a warranty because I stand behind my work.
-                    </p>
+                <div class="footer-column">
+                    <h4>LINKS</h4>
+                    <ul class="footer-links">
+                        <li><a href="/">Home</a></li>
+                        <li><a href="services.html">Services</a></li>
+                        <li><a href="about.html">About</a></li>
+                        <li><a href="reviews.html">Reviews</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
                 </div>
-                <div class="value-item fade-in">
-                    <div class="value-icon">
-                        <i class="fas fa-clock"></i>
-                    </div>
-                    <h3 class="value-title">Speedy Solutions</h3>
-                    <p class="value-description">
-                        I understand how important your devices are to your daily life. That's why I offer same-day repairs whenever possible and emergency services when needed.
-                    </p>
-                </div>
-                <div class="value-item fade-in">
-                    <div class="value-icon">
-                        <i class="fas fa-handshake"></i>
-                    </div>
-                    <h3 class="value-title">Personal Touch</h3>
-                    <p class="value-description">
-                        As a local business owner, I treat every customer like a neighbor. You'll always deal directly with me, ensuring personalized service and care.
-                    </p>
+                <div class="footer-column">
+                    <h4>CONTACT</h4>
+                    <ul class="footer-links">
+                        <li><a href="tel:+447940730537">07940 730537</a></li>
+                        <li><a href="mailto:hello@onlinefix.uk">hello@onlinefix.uk</a></li>
+                        <li>GUILDFORD, SURREY</li>
+                        <li style="margin-top: 1rem; color: #999;">MON-SUN: 10AM - 10PM</li>
+                    </ul>
                 </div>
             </div>
-        </div>
-    </section>
-
-    <!-- Certifications -->
-    <section class="certifications">
-        <div class="container">
-            <h2 class="section-title fade-in">Expertise & Certifications</h2>
-            <div class="cert-grid">
-                <div class="cert-item fade-in">
-                    <div class="cert-icon">
-                        <i class="fab fa-apple"></i>
-                    </div>
-                    <div class="cert-title">Apple Device Specialist</div>
-                </div>
-                <div class="cert-item fade-in">
-                    <div class="cert-icon">
-                        <i class="fab fa-android"></i>
-                    </div>
-                    <div class="cert-title">Android Repair Expert</div>
-                </div>
-                <div class="cert-item fade-in">
-                    <div class="cert-icon">
-                        <i class="fas fa-laptop"></i>
-                    </div>
-                    <div class="cert-title">Laptop Specialist</div>
-                </div>
-                <div class="cert-item fade-in">
-                    <div class="cert-icon">
-                        <i class="fas fa-gamepad"></i>
-                    </div>
-                    <div class="cert-title">Console Repair Pro</div>
-                </div>
-                <div class="cert-item fade-in">
-                    <div class="cert-icon">
-                        <i class="fas fa-hdd"></i>
-                    </div>
-                    <div class="cert-title">Data Recovery Certified</div>
-                </div>
-                <div class="cert-item fade-in">
-                    <div class="cert-icon">
-                        <i class="fas fa-shield-alt"></i>
-                    </div>
-                    <div class="cert-title">Quality Assured</div>
-                </div>
+            <div class="copyright">
+                <p>&copy; 2026 ONLINEFIX. ALL RIGHTS RESERVED. "DESIGN"</p>
             </div>
         </div>
-    </section>
+    </footer>
 
-    <!-- CTA Section -->
-    <section class="cta-section">
-        <div class="container">
-            <div class="cta-content fade-in">
-                <h2>Ready to Work Together?</h2>
-                <p>Let me help bring your device back to life with expert repair service you can trust.</p>
-                <div>
-                    <a href="tel:+447940730537" class="cta-button">
-                        <i class="fas fa-phone"></i>
-                        Call: 07940 730537
-                    </a>
-                    <a href="/contact.html" class="cta-button">
-                        <i class="fas fa-map-marker-alt"></i>
-                        Visit My Workshop
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" defer></script>
     <script>
-        // Mobile menu toggle
         const mobileToggle = document.getElementById('mobile-toggle');
         const navMenu = document.getElementById('nav-menu');
-
-        mobileToggle.addEventListener('click', () => {
-            navMenu.classList.toggle('active');
-            const icon = mobileToggle.querySelector('i');
-            icon.classList.toggle('fa-bars');
-            icon.classList.toggle('fa-times');
-        });
-
-        // Navbar scroll effect
-        window.addEventListener('scroll', () => {
-            const navbar = document.getElementById('navbar');
-            if (window.scrollY > 50) {
-                navbar.classList.add('scrolled');
-            } else {
-                navbar.classList.remove('scrolled');
-            }
-        });
-
-        // Intersection Observer for fade-in animations
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.animationDelay = Math.random() * 0.3 + 's';
-                    entry.target.classList.add('fade-in');
+        if (mobileToggle && navMenu) {
+            mobileToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isExpanded = navMenu.classList.toggle('active');
+                mobileToggle.setAttribute('aria-expanded', isExpanded.toString());
+                const icon = mobileToggle.querySelector('i');
+                if (icon) { icon.classList.toggle('fa-bars'); icon.classList.toggle('fa-times'); }
+            });
+            document.addEventListener('click', (e) => {
+                const isClickInsideMenu = navMenu.contains(e.target);
+                const isClickOnToggle = mobileToggle.contains(e.target);
+                const isLink = e.target.tagName === 'A' || e.target.closest('a');
+                if ((!isClickInsideMenu && !isClickOnToggle && navMenu.classList.contains('active')) || (isLink && navMenu.classList.contains('active'))) {
+                    navMenu.classList.remove('active');
+                    mobileToggle.setAttribute('aria-expanded', 'false');
+                    const icon = mobileToggle.querySelector('i');
+                    if (icon) { icon.classList.add('fa-bars'); icon.classList.remove('fa-times'); }
                 }
             });
-        }, observerOptions);
-
-        // Observe all elements with fade-in class
-        document.addEventListener('DOMContentLoaded', () => {
-            const fadeElements = document.querySelectorAll('.fade-in');
-            fadeElements.forEach(el => observer.observe(el));
-        });
-
-        // Add random floating animation to background
-        function createFloatingElement() {
-            const element = document.createElement('div');
-            element.style.cssText = `
-                position: absolute;
-                width: 4px;
-                height: 4px;
-                background: rgba(144, 224, 239, 0.6);
-                border-radius: 50%;
-                pointer-events: none;
-                animation: float-up 4s linear infinite;
-                left: ${Math.random() * 100}%;
-                top: 100%;
-                z-index: 1;
-            `;
-            
-            document.querySelector('.page-header').appendChild(element);
-            
-            setTimeout(() => {
-                element.remove();
-            }, 4000);
         }
-
-        // Add floating elements periodically
-        setInterval(createFloatingElement, 200);
-
-        // Add CSS for floating animation
-        const floatingStyle = document.createElement('style');
-        floatingStyle.textContent = `
-            @keyframes float-up {
-                0% {
-                    transform: translateY(0px) rotate(0deg);
-                    opacity: 1;
-                }
-                100% {
-                    transform: translateY(-100vh) rotate(360deg);
-                    opacity: 0;
-                }
-            }
-        `;
-        document.head.appendChild(floatingStyle);
-
-        // Close mobile menu when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!navMenu.contains(e.target) && !mobileToggle.contains(e.target)) {
-                navMenu.classList.remove('active');
-                const icon = mobileToggle.querySelector('i');
-                icon.classList.add('fa-bars');
-                icon.classList.remove('fa-times');
-            }
-        });
+        const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -50px 0px' };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('fade-in'); observer.unobserve(entry.target); } });
+        }, observerOptions);
+        document.addEventListener('DOMContentLoaded', () => { document.querySelectorAll('.fade-in').forEach(el => observer.observe(el)); });
     </script>
 </body>
 </html>
