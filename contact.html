@@ -31,6 +31,71 @@
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
 
+    <!-- Breadcrumb Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://onlinefix.co.uk/"
+            },
+            {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Contact",
+                "item": "https://onlinefix.co.uk/contact.html"
+            }
+        ]
+    }
+    </script>
+
+    <!-- WebPage & ContactPage Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "ContactPage",
+        "name": "Contact OnlineFix",
+        "description": "Contact OnlineFix for electronics repair in Guildford, Surrey. Call 07940 730537 or visit our workshop.",
+        "url": "https://onlinefix.co.uk/contact.html",
+        "isPartOf": {
+            "@type": "WebSite",
+            "name": "OnlineFix",
+            "url": "https://onlinefix.co.uk"
+        },
+        "about": {
+            "@type": "LocalBusiness",
+            "@id": "https://onlinefix.co.uk/#organization",
+            "name": "OnlineFix",
+            "telephone": "+447940730537",
+            "email": "hello@onlinefix.uk",
+            "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Guildford",
+                "addressRegion": "Surrey",
+                "postalCode": "GU1 4PD",
+                "addressCountry": "GB"
+            },
+            "openingHoursSpecification": {
+                "@type": "OpeningHoursSpecification",
+                "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
+                "opens": "10:00",
+                "closes": "22:00"
+            }
+        },
+        "breadcrumb": {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://onlinefix.co.uk/"},
+                {"@type": "ListItem", "position": 2, "name": "Contact", "item": "https://onlinefix.co.uk/contact.html"}
+            ]
+        }
+    }
+    </script>
+
     <style>
         :root {
             --hex-accent: #0033FF;

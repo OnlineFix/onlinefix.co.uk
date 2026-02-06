@@ -38,6 +38,84 @@
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
 
+    <!-- Breadcrumb Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://onlinefix.co.uk/"
+            },
+            {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Services",
+                "item": "https://onlinefix.co.uk/services.html"
+            }
+        ]
+    }
+    </script>
+
+    <!-- WebPage Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "name": "Electronics Repair Services in Guildford",
+        "description": "Complete electronics repair services in Guildford, Surrey. Smartphone, laptop, tablet, gaming console, desktop PC repairs and data recovery.",
+        "url": "https://onlinefix.co.uk/services.html",
+        "isPartOf": {
+            "@type": "WebSite",
+            "name": "OnlineFix",
+            "url": "https://onlinefix.co.uk"
+        },
+        "about": {
+            "@id": "https://onlinefix.co.uk/#organization"
+        },
+        "breadcrumb": {
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://onlinefix.co.uk/"},
+                {"@type": "ListItem", "position": 2, "name": "Services", "item": "https://onlinefix.co.uk/services.html"}
+            ]
+        }
+    }
+    </script>
+
+    <!-- Service Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Service",
+        "serviceType": "Electronics Repair",
+        "provider": {
+            "@type": "LocalBusiness",
+            "@id": "https://onlinefix.co.uk/#organization",
+            "name": "OnlineFix"
+        },
+        "areaServed": {
+            "@type": "City",
+            "name": "Guildford"
+        },
+        "hasOfferCatalog": {
+            "@type": "OfferCatalog",
+            "name": "Repair Services",
+            "itemListElement": [
+                {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Smartphone Repair", "description": "Expert repair for all smartphone brands including iPhone and Samsung"}},
+                {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Laptop Repair", "description": "Complete laptop repair for MacBook, Dell, HP, Lenovo, and ASUS"}},
+                {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Tablet Repair", "description": "Professional tablet repair for iPad, Samsung Galaxy Tab, and Surface"}},
+                {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Gaming Console Repair", "description": "PlayStation, Xbox, and Nintendo Switch repair services"}},
+                {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Desktop PC Repair", "description": "Desktop computer repair, upgrades, and custom builds"}},
+                {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Data Recovery", "description": "Professional data recovery for damaged hard drives, SSDs, and USB drives"}}
+            ]
+        }
+    }
+    </script>
+
     <style>
         :root {
             --hex-accent: #0033FF;
