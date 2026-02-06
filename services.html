@@ -488,10 +488,32 @@
             .page-title { font-size: 2.5rem; }
             .section-title { padding-top: 2rem; margin-bottom: 0; }
             .section-subtitle { margin-bottom: 2rem; }
-            .services-grid { grid-template-columns: 1fr; }
+
+            /* Services grid → horizontal scroll with snap */
+            .services-grid {
+                display: flex; overflow-x: auto; scroll-snap-type: x mandatory;
+                gap: 15px; padding-bottom: 2rem; -webkit-overflow-scrolling: touch;
+                padding-left: 20px; padding-right: 20vw;
+            }
+            .service-card {
+                min-width: 80vw; scroll-snap-align: start; flex-shrink: 0;
+            }
+
+            /* Process grid stacked */
             .process-grid { grid-template-columns: 1fr; }
             .process-item { border-right: none; border-bottom: 2px solid var(--hex-black); }
             .process-item:last-child { border-bottom: none; }
+            .process-number { font-size: clamp(2rem, 7vw, 3rem); }
+
+            /* Font scaling */
+            .service-title { font-size: clamp(1.1rem, 4vw, 1.4rem); }
+            .service-features li { font-size: 0.95rem; }
+            .emergency-section p { font-size: 0.9rem; }
+
+            /* Footer mobile */
+            .footer-grid { gap: 2rem; grid-template-columns: 1fr 1fr; }
+            .footer-links a { display: inline-block; padding: 0.4rem 0; }
+            .copyright { font-size: 0.75rem; }
         }
 
         .fade-in {
@@ -548,6 +570,7 @@
                 <h2 class="section-title fade-in" id="services-heading">"WHAT WE FIX"</h2>
                 <p class="section-subtitle fade-in">Full Service Specifications</p>
 
+                <div class="scroll-hint" aria-hidden="true">SCROLL &rarr;</div>
                 <div class="services-grid">
                     <div class="service-card fade-in">
                         <div class="service-header">

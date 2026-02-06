@@ -210,9 +210,13 @@
         .sticky-call-btn { display: block; background: var(--gradient-blue); color: var(--hex-white); text-align: center; padding: 16px; text-decoration: none; font-weight: 900; text-transform: uppercase; border: none; border-radius: 4px; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(0,51,255,0.3); }
         .sticky-call-btn:active { transform: scale(0.98); }
 
-        @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; } }
+        .scroll-hint { display: none; text-align: right; font-size: 0.7rem; color: var(--hex-accent); margin-bottom: 0.5rem; font-family: monospace; text-transform: uppercase; font-weight: 700; animation: pulse-hint 2s infinite; }
+        @keyframes pulse-hint { 0%, 100% { opacity: 1; transform: translateX(0); } 50% { opacity: 0.5; transform: translateX(5px); } }
+
+        @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; } .scroll-hint { animation: none; } }
 
         @media (max-width: 768px) {
+            .scroll-hint { display: block; }
             .navbar { background: transparent; border-bottom: none; }
             .nav-logo { display: none; }
             .nav-container { justify-content: flex-end; }
@@ -226,14 +230,41 @@
             .page-title { font-size: 2.5rem; }
             .section-title { padding-top: 2rem; margin-bottom: 0; }
             .section-subtitle { margin-bottom: 2rem; }
+
+            /* Stats grid 2x2 */
             .stats-grid { grid-template-columns: repeat(2, 1fr); }
             .stat-item:nth-child(2) { border-right: none; }
             .stat-item:nth-child(1), .stat-item:nth-child(2) { border-bottom: 2px solid var(--hex-black); }
-            .reviews-grid { grid-template-columns: 1fr; }
+            .stat-number { font-size: clamp(2rem, 8vw, 3rem); }
+            .stat-item { padding: 2rem 1.5rem; }
+
+            /* Featured review */
+            .featured-review { padding: 2rem 1.5rem; }
+            .featured-stars { font-size: 1.5rem; }
+            .featured-text { font-size: 1.05rem; line-height: 1.7; }
+
+            /* Reviews grid → horizontal scroll with snap */
+            .reviews-grid {
+                display: flex; overflow-x: auto; scroll-snap-type: x mandatory;
+                gap: 15px; padding-bottom: 2rem; -webkit-overflow-scrolling: touch;
+                padding-left: 20px; padding-right: 20vw;
+            }
+            .review-card {
+                min-width: 80vw; scroll-snap-align: start; flex-shrink: 0;
+            }
+
+            /* Trust grid stacked */
             .trust-grid { grid-template-columns: 1fr; }
-            .trust-item { border-right: none; border-bottom: 2px solid var(--hex-black); }
+            .trust-item { border-right: none; border-bottom: 2px solid var(--hex-black); padding: 2rem 1.5rem; }
             .trust-item:last-child { border-bottom: none; }
-            .featured-review { padding: 2rem; }
+
+            /* Google link full width */
+            .google-link { max-width: 100%; width: 100%; padding: 1rem 1.5rem; }
+
+            /* Footer mobile */
+            .footer-grid { gap: 2rem; grid-template-columns: 1fr 1fr; }
+            .footer-links a { display: inline-block; padding: 0.4rem 0; }
+            .copyright { font-size: 0.75rem; }
         }
 
         .fade-in { opacity: 0; transform: translateY(20px); animation: appear 0.5s ease forwards; }
@@ -355,6 +386,7 @@
                 <h2 class="section-title fade-in" id="reviews-heading">"WHAT THEY SAY"</h2>
                 <p class="section-subtitle fade-in">Client Testimonials Archive</p>
 
+                <div class="scroll-hint" aria-hidden="true">SCROLL &rarr;</div>
                 <div class="reviews-grid">
                     <div class="review-card fade-in">
                         <div class="review-header">
