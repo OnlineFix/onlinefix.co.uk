@@ -28,8 +28,8 @@
 
     <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer"></noscript>
 
     <!-- Breadcrumb Schema -->
     <script type="application/ld+json">
@@ -231,12 +231,33 @@
             .page-title { font-size: 2.5rem; }
             .section-title { padding-top: 2rem; margin-bottom: 0; }
             .section-subtitle { margin-bottom: 2rem; }
+
+            /* Contact grid stacked */
             .contact-grid { grid-template-columns: 1fr; }
-            .contact-card { border-right: none; border-bottom: 2px solid var(--hex-black); }
+            .contact-card { border-right: none; border-bottom: 2px solid var(--hex-black); padding: 2rem 1.5rem; }
             .contact-card:last-child { border-bottom: none; }
+            .contact-title { font-size: clamp(1.1rem, 4vw, 1.4rem); }
+            .contact-info { font-size: 0.95rem; }
+            .contact-btn { padding: 1rem 1.5rem; font-size: 0.9rem; }
+
+            /* Location grid stacked */
             .location-grid { grid-template-columns: 1fr; }
-            .location-details { border-right: none; border-bottom: 1px solid #333; }
+            .location-details { border-right: none; border-bottom: 1px solid #333; padding: 2rem 1.5rem; }
+            .location-map { padding: 2rem 1.5rem; }
+            .detail-icon { width: 44px; height: 44px; }
+
+            /* Contact form */
             .contact-form { padding: 2rem 1.5rem; box-shadow: 5px 5px 0 var(--hex-black); }
+            .form-label { font-size: 0.9rem; }
+
+            /* Social links responsive */
+            .social-links { gap: clamp(10px, 3vw, 20px); flex-wrap: wrap; }
+            .social-link { width: 52px; height: 52px; font-size: 1.3rem; }
+
+            /* Footer mobile */
+            .footer-grid { gap: 2rem; grid-template-columns: 1fr 1fr; }
+            .footer-links a { display: inline-block; padding: 0.4rem 0; }
+            .copyright { font-size: 0.75rem; }
         }
 
         .fade-in { opacity: 0; transform: translateY(20px); animation: appear 0.5s ease forwards; }
@@ -476,7 +497,7 @@
         </div>
     </footer>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" integrity="sha512-fD9DI5bZwQxOi7MhYWnnNPlvXdp/2Pj3XSTRrFs5FQa4mizyGLnJcN6tuvUS6LbmgN1ut+XGSABKvjN0H6Aoow==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
     <script>
         const mobileToggle = document.getElementById('mobile-toggle');
         const navMenu = document.getElementById('nav-menu');

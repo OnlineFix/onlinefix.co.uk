@@ -28,8 +28,8 @@
 
     <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer"></noscript>
 
     <!-- Breadcrumb Schema -->
     <script type="application/ld+json">
@@ -214,9 +214,13 @@
         .sticky-call-btn { display: block; background: var(--gradient-blue); color: var(--hex-white); text-align: center; padding: 16px; text-decoration: none; font-weight: 900; text-transform: uppercase; border: none; border-radius: 4px; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(0,51,255,0.3); }
         .sticky-call-btn:active { transform: scale(0.98); }
 
-        @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; } }
+        .scroll-hint { display: none; text-align: right; font-size: 0.7rem; color: var(--hex-accent); margin-bottom: 0.5rem; font-family: monospace; text-transform: uppercase; font-weight: 700; animation: pulse-hint 2s infinite; }
+        @keyframes pulse-hint { 0%, 100% { opacity: 1; transform: translateX(0); } 50% { opacity: 0.5; transform: translateX(5px); } }
+
+        @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; } .scroll-hint { animation: none; } }
 
         @media (max-width: 768px) {
+            .scroll-hint { display: block; }
             .navbar { background: transparent; border-bottom: none; }
             .nav-logo { display: none; }
             .nav-container { justify-content: flex-end; }
@@ -230,13 +234,48 @@
             .page-title { font-size: 2.5rem; }
             .section-title { padding-top: 2rem; margin-bottom: 0; }
             .section-subtitle { margin-bottom: 2rem; }
+
+            /* About grid stacked */
             .about-grid { grid-template-columns: 1fr; }
-            .about-text { border-right: none; border-bottom: 2px solid var(--hex-black); }
-            .timeline-grid { grid-template-columns: 1fr; }
-            .timeline-item { border-right: none; border-bottom: 1px solid #333; }
-            .timeline-item:last-child { border-bottom: none; }
+            .about-text { border-right: none; border-bottom: 2px solid var(--hex-black); padding: 2rem 1.5rem; }
+            .about-text h2 { font-size: clamp(1.3rem, 5vw, 1.8rem); }
+            .about-profile { padding: 2rem 1.5rem; }
+
+            /* Timeline → horizontal scroll with snap */
+            .timeline-grid {
+                display: flex; overflow-x: auto; scroll-snap-type: x mandatory;
+                gap: 0; padding-bottom: 1rem; -webkit-overflow-scrolling: touch;
+                border: 1px solid #333;
+            }
+            .timeline-item {
+                min-width: 75vw; scroll-snap-align: start; flex-shrink: 0;
+                border-right: 1px solid #333; border-bottom: none;
+            }
+            .timeline-item:last-child { border-right: none; }
+
+            /* Values grid → responsive columns */
+            .values-grid { grid-template-columns: 1fr 1fr; }
+            .value-item { padding: 2rem 1.5rem; }
+            .value-title { font-size: clamp(1.1rem, 4vw, 1.4rem); }
+            .value-icon { font-size: 2rem; }
+
+            /* Cert grid → 3 columns on tablet, 2 on small */
+            .cert-grid { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; }
+            .cert-item { padding: 1.5rem 1rem; }
+            .cert-icon { font-size: 2rem; }
+
+            /* CTA section */
             .cta-section h2 { font-size: 2rem; }
             .cta-button { width: 100%; margin: 0.5rem 0; }
+            .cta-box { padding: 1.5rem; display: block; }
+
+            /* Footer mobile */
+            .footer-grid { gap: 2rem; grid-template-columns: 1fr 1fr; }
+            .footer-links a { display: inline-block; padding: 0.4rem 0; }
+            .copyright { font-size: 0.75rem; }
+
+            /* Skill tags readability */
+            .skill-tag { font-size: 0.8rem; padding: 0.4rem 0.8rem; }
         }
 
         .fade-in { opacity: 0; transform: translateY(20px); animation: appear 0.5s ease forwards; }
@@ -316,6 +355,7 @@
             <div class="container">
                 <h2 class="section-title fade-in" id="timeline-heading">TIMELINE</h2>
                 <p class="section-subtitle fade-in">Operational History</p>
+                <div class="scroll-hint" aria-hidden="true">SCROLL &rarr;</div>
                 <div class="timeline-grid" role="list">
                     <div class="timeline-item fade-in" role="listitem">
                         <div class="timeline-year">2018</div>
@@ -460,7 +500,7 @@
         </div>
     </footer>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" integrity="sha512-fD9DI5bZwQxOi7MhYWnnNPlvXdp/2Pj3XSTRrFs5FQa4mizyGLnJcN6tuvUS6LbmgN1ut+XGSABKvjN0H6Aoow==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
     <script>
         const mobileToggle = document.getElementById('mobile-toggle');
         const navMenu = document.getElementById('nav-menu');
