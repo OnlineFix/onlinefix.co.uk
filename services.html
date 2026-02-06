@@ -1,9 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-GB">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0033FF">
+
+    <!-- Security & Privacy -->
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+
     <!-- SEO Meta Tags -->
     <title>Electronics Repair Services in Guildford | OnlineFix - Professional Tech Repair</title>
     <meta name="description" content="Complete electronics repair services in Guildford, Surrey. Smartphone, laptop, tablet, gaming console, desktop PC repairs & data recovery. Expert service by Tomas. Call 07940 730537">
@@ -11,13 +15,14 @@
     <meta name="author" content="OnlineFix - Tomas">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://onlinefix.co.uk/services.html">
-    
+
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://onlinefix.co.uk/services.html">
     <meta property="og:title" content="Electronics Repair Services in Guildford | OnlineFix">
     <meta property="og:description" content="Professional electronics repair services in Guildford. Smartphones, laptops, tablets, gaming consoles, desktop PCs, and data recovery.">
-    
+    <meta property="og:image" content="https://onlinefix.co.uk/images/onlinefix-og-image.jpg">
+
     <!-- Favicon -->
     <link rel="icon" type="image/png" sizes="512x512" href="/favicon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
@@ -25,967 +30,721 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon.png">
     <link rel="shortcut icon" href="/favicon.png">
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <!-- Performance: DNS Prefetch and Preconnect -->
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+
+    <!-- Performance: Preload Critical Assets -->
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --hex-accent: #0033FF;
+            --gradient-blue: linear-gradient(135deg, #0033FF 0%, #00C6FF 100%);
+            --hex-black: #111111;
+            --hex-concrete: #F2F2F2;
+            --hex-white: #FFFFFF;
+            --hex-grid: #DCDCDC;
+            --hazard-stripe: repeating-linear-gradient(
+                135deg, #111111, #111111 10px, #ffffff 10px, #ffffff 20px
+            );
+            --font-main: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            --border-width: 1px;
+            --safe-area-bottom: env(safe-area-inset-bottom);
         }
 
-        :root {
-            --primary-blue: #0066FF;
-            --trust-teal: #00B4D8;
-            --deep-blue: #023E8A;
-            --accent-cyan: #90E0EF;
-            --dark-bg: #0A0E27;
-            --light-bg: #F8FAFC;
-            --white: #FFFFFF;
-            --gray-100: #F1F5F9;
-            --gray-600: #64748B;
-            --gray-800: #1E293B;
-            --success: #10B981;
-            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-        }
+        html { scroll-behavior: smooth; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            line-height: 1.6;
-            color: var(--gray-800);
+            font-family: var(--font-main);
+            background-color: var(--hex-concrete);
+            color: var(--hex-black);
+            line-height: 1.4;
             overflow-x: hidden;
-        }
-
-        /* Navigation - Same as homepage */
-        .navbar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            z-index: 1000;
-            padding: 1rem 0;
-            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-        }
-
-        .navbar.scrolled {
-            background: rgba(255, 255, 255, 0.98);
-            padding: 0.5rem 0;
-        }
-
-        .nav-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .nav-logo {
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: var(--primary-blue);
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-
-        .nav-logo:hover {
-            transform: scale(1.05);
-            color: var(--trust-teal);
-        }
-
-        .nav-menu {
-            display: flex;
-            list-style: none;
-            gap: 2rem;
-            align-items: center;
-        }
-
-        .nav-link {
-            text-decoration: none;
-            color: var(--gray-800);
             font-weight: 500;
-            transition: all 0.3s ease;
+            padding-bottom: calc(60px + var(--safe-area-bottom));
+        }
+
+        .skip-link {
+            position: absolute; top: -40px; left: 0;
+            background: var(--hex-black); color: var(--hex-white);
+            padding: 8px 16px; z-index: 10000; transition: top 0.3s;
+            text-decoration: none; font-weight: 700; text-transform: uppercase; font-size: 0.9rem;
+        }
+        .skip-link:focus { top: 0; }
+        :focus-visible { outline: 3px solid var(--hex-accent); outline-offset: 2px; }
+        * { -webkit-tap-highlight-color: transparent; }
+
+        .uppercase { text-transform: uppercase; }
+        .bold { font-weight: 700; }
+        .scroll-hint {
+            display: none; text-align: right; font-size: 0.7rem; color: var(--hex-accent);
+            margin-bottom: 0.5rem; font-family: monospace; text-transform: uppercase;
+            font-weight: 700; animation: pulse-hint 2s infinite;
+        }
+        @keyframes pulse-hint {
+            0%, 100% { opacity: 1; transform: translateX(0); }
+            50% { opacity: 0.5; transform: translateX(5px); }
+        }
+
+        /* NAVIGATION */
+        .navbar {
+            position: fixed; top: 0; left: 0; right: 0;
+            background: var(--hex-white); z-index: 1000;
+            border-bottom: 2px solid var(--hex-black); padding: 0;
+        }
+        .nav-container {
+            max-width: 100%; display: flex; justify-content: space-between;
+            align-items: stretch; height: 60px;
+        }
+        .nav-logo {
+            font-size: 1.5rem; font-weight: 900; color: var(--hex-white);
+            text-decoration: none; text-transform: uppercase; letter-spacing: -1px;
+            padding: 0 1.5rem; display: flex; align-items: center;
+            background: var(--gradient-blue); border-right: 2px solid var(--hex-black);
             position: relative;
         }
-
-        .nav-link:hover {
-            color: var(--primary-blue);
+        .nav-logo::after {
+            content: "\2122"; font-size: 0.4em; position: relative;
+            top: -0.6em; margin-left: 2px; line-height: 0;
         }
-
-        .nav-link::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--primary-blue);
-            transition: width 0.3s ease;
+        .nav-menu {
+            display: flex; list-style: none; gap: 0; align-items: stretch;
+            flex-grow: 1; justify-content: flex-end;
         }
-
-        .nav-link:hover::after {
-            width: 100%;
+        .nav-menu li { display: flex; align-items: stretch; }
+        .nav-link {
+            text-decoration: none; color: var(--hex-black); font-weight: 700;
+            text-transform: uppercase; font-size: 0.9rem; padding: 0 2rem;
+            display: flex; align-items: center; border-left: 1px solid var(--hex-grid);
+            position: relative; transition: all 0.2s;
         }
-
-        .nav-link.active {
-            color: var(--primary-blue);
+        @media (hover: hover) {
+            .nav-link:hover {
+                background: var(--hazard-stripe); color: var(--hex-white);
+                text-shadow: 2px 2px 0 #000;
+            }
         }
-
-        .nav-link.active::after {
-            width: 100%;
-        }
-
+        .nav-link.active { text-decoration: line-through; }
         .nav-cta {
-            background: var(--primary-blue);
-            color: var(--white);
-            padding: 0.5rem 1rem;
-            border-radius: 25px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+            background: var(--hex-black); color: var(--hex-white); padding: 0 2rem;
+            text-decoration: none; font-weight: 700; text-transform: uppercase;
+            display: flex; align-items: center; gap: 10px; font-size: 0.8rem;
+            border-left: 2px solid var(--hex-black);
         }
-
-        .nav-cta:hover {
-            background: var(--trust-teal);
-            transform: translateY(-2px);
+        .nav-cta::before, .nav-cta::after { content: none; }
+        @media (hover: hover) {
+            .nav-cta:hover { background: var(--gradient-blue); color: var(--hex-white); }
         }
-
         .mobile-menu-toggle {
-            display: none;
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            color: var(--primary-blue);
-            cursor: pointer;
+            display: none; background: transparent; border: none;
+            font-size: 1.5rem; color: var(--hex-black); cursor: pointer;
+            padding: 0 1.5rem; min-width: 60px; outline: none;
         }
 
-        /* Mobile Navigation */
-        @media (max-width: 768px) {
-            .nav-menu {
-                position: fixed;
-                top: 100%;
-                left: 0;
-                right: 0;
-                background: var(--white);
-                flex-direction: column;
-                padding: 2rem;
-                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-                transform: translateY(-100vh);
-                transition: transform 0.3s ease;
-            }
-
-            .nav-menu.active {
-                transform: translateY(0);
-            }
-
-            .mobile-menu-toggle {
-                display: block;
-            }
-
-            .nav-cta {
-                margin-top: 1rem;
-            }
+        /* PAGE HEADER */
+        .page-header {
+            padding: 60px 0 0;
+            background:
+                linear-gradient(90deg, var(--hex-grid) 1px, transparent 1px) 0 0,
+                linear-gradient(180deg, var(--hex-grid) 1px, transparent 1px) 0 0;
+            background-size: 40px 40px;
+            background-color: var(--hex-concrete);
+            position: relative; overflow: hidden;
+        }
+        .page-header::before {
+            content: "FIG. 03 — SERVICE CATALOG";
+            position: absolute; top: 80px; left: 20px;
+            font-family: monospace; font-size: 0.7rem;
+            color: var(--hex-black); opacity: 0.6;
+        }
+        .page-header-content {
+            max-width: 1400px; margin: 0 auto; padding: 4rem 20px;
+            position: relative; z-index: 2;
+        }
+        .page-header-box {
+            text-align: center; border: 2px solid var(--hex-black);
+            padding: 3rem 4rem; background: var(--hex-white);
+            box-shadow: 15px 15px 0px var(--hex-black);
+        }
+        .page-title {
+            font-size: clamp(2rem, 6vw, 4rem); font-weight: 900;
+            line-height: 0.9; text-transform: uppercase; letter-spacing: -2px;
+            color: var(--hex-black); margin-bottom: 1rem;
+        }
+        .page-title span {
+            background: var(--gradient-blue); -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent; display: inline-block;
+        }
+        .page-subtitle {
+            font-family: 'Courier New', Courier, monospace; font-size: clamp(0.9rem, 2vw, 1.1rem);
+            text-transform: uppercase; background: var(--hex-black);
+            color: var(--hex-white); display: inline-block; padding: 5px 8px;
         }
 
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        /* Page Header */
-        .page-header {
-            background: linear-gradient(135deg, var(--deep-blue) 0%, var(--primary-blue) 50%, var(--trust-teal) 100%);
-            padding: 120px 0 80px;
-            color: var(--white);
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .page-header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
-            animation: float 20s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(2deg); }
-        }
-
-        .page-header h1 {
-            font-size: 3rem;
-            font-weight: 800;
-            margin-bottom: 1rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-            position: relative;
-            z-index: 2;
-        }
-
-        .page-header p {
-            font-size: 1.2rem;
-            opacity: 0.9;
-            position: relative;
-            z-index: 2;
-        }
-
-        /* Services Section */
-        .services {
-            padding: 4rem 0;
-            background: var(--light-bg);
+            max-width: 1400px; margin: 0 auto; padding: 0 20px;
+            position: relative; z-index: 2; width: 100%;
         }
 
         .section-title {
-            text-align: center;
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 3rem;
-            color: var(--deep-blue);
+            font-size: clamp(2rem, 5vw, 3rem); font-weight: 900;
+            text-transform: uppercase; text-align: center;
+            padding-top: 4rem; letter-spacing: -1px; margin-bottom: 0.5rem;
+        }
+        .section-subtitle {
+            text-align: center; font-family: monospace; text-transform: uppercase;
+            margin-bottom: 3rem; color: #666; font-size: 0.9rem;
         }
 
+        /* SERVICES GRID */
+        .services-section {
+            padding: 0 0 4rem;
+            border-top: 2px solid var(--hex-black);
+            background: var(--hex-white);
+        }
         .services-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 2rem;
-            margin-bottom: 3rem;
-            align-items: stretch; /* Make all cards the same height */
+            gap: 20px; margin-bottom: 2rem;
         }
-
         .service-card {
-            background: var(--white);
-            padding: 2.5rem;
-            border-radius: 20px;
-            box-shadow: var(--shadow);
-            transition: all 0.3s ease;
-            border: 1px solid rgba(0, 102, 255, 0.1);
-            position: relative;
-            display: flex;
-            flex-direction: column; /* Stack content vertically */
+            background: var(--hex-white); border: 2px solid var(--hex-black);
+            padding: 2rem; position: relative; transition: all 0.2s;
+            display: flex; flex-direction: column;
         }
-
-        .service-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 30px -5px rgba(0, 102, 255, 0.2);
-            border-color: var(--trust-teal);
-        }
-
-        .service-card:hover .service-icon {
-            transform: scale(1.05);
-            color: var(--trust-teal);
-        }
-
-        .service-header {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .service-icon {
-            font-size: 3rem;
-            color: var(--primary-blue);
-            transition: all 0.3s ease;
-        }
-
-        .service-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: var(--deep-blue);
-        }
-
-        .service-description {
-            margin-bottom: 1.5rem;
-            color: var(--gray-600);
-            line-height: 1.7;
-        }
-
-        .service-features {
-            list-style: none;
-            margin-bottom: 1.5rem;
-            flex-grow: 1; /* Take up available space */
-        }
-
-        .service-features li {
-            padding: 0.5rem 0;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--gray-700);
-        }
-
-        .service-features li::before {
-            content: '✓';
-            color: var(--success);
-            font-weight: bold;
-            font-size: 1.1rem;
-        }
-
-        .service-bottom {
-            margin-top: auto; /* Push to bottom of card */
-        }
-
-        .service-pricing {
-            background: var(--gray-100);
-            padding: 1rem;
-            border-radius: 10px;
-            text-align: center;
-            margin-bottom: 1rem;
-        }
-
-        .price-text {
-            font-size: 0.9rem;
-            color: var(--gray-600);
-            margin-bottom: 0.5rem;
-        }
-
-        .price-amount {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: var(--primary-blue);
-        }
-
-        .service-cta {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            background: var(--primary-blue);
-            color: var(--white);
-            padding: 1rem 1.5rem;
-            border-radius: 25px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            width: 100%;
-            border: none;
-            cursor: pointer;
-            font-size: 1rem;
-            font-family: inherit;
-            min-height: 48px; /* Better touch target for mobile */
-            position: relative;
-            overflow: hidden;
-        }
-
-        .service-cta:hover {
-            background: var(--trust-teal);
-            transform: translateY(-2px);
-        }
-
-        .service-cta:active {
-            transform: translateY(0);
-        }
-
-        /* Ensure buttons work on mobile */
-        .service-cta:focus {
-            outline: 2px solid var(--accent-cyan);
-            outline-offset: 2px;
-        }
-
-        /* Emergency Service */
-        .emergency-service {
-            background: linear-gradient(135deg, var(--deep-blue), var(--primary-blue));
-            padding: 3rem 0;
-            color: var(--white);
-            text-align: center;
-            margin: 2rem 0;
-        }
-
-        .emergency-content h3 {
-            font-size: 2rem;
-            margin-bottom: 1rem;
-        }
-
-        .emergency-content p {
-            font-size: 1.1rem;
-            margin-bottom: 2rem;
-            opacity: 0.9;
-        }
-
-        .emergency-button {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            background: var(--white);
-            color: var(--primary-blue);
-            padding: 1rem 2rem;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
-            animation: pulse 2s infinite;
-            min-height: 48px;
-        }
-
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(255, 255, 255, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
-        }
-
-        .emergency-button:hover {
-            transform: translateY(-2px);
-            animation: none;
-            box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.2);
-        }
-
-        /* Process Section */
-        .process {
-            padding: 4rem 0;
-            background: var(--white);
-        }
-
-        .process-steps {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            margin-top: 3rem;
-        }
-
-        .process-step {
-            text-align: center;
-            padding: 2rem 1rem;
-            position: relative;
-        }
-
-        .step-number {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, var(--primary-blue), var(--trust-teal));
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 1rem;
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--white);
-        }
-
-        .step-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: var(--deep-blue);
-        }
-
-        /* Mobile Optimizations */
-        @media (max-width: 768px) {
-            .page-header h1 {
-                font-size: 2.5rem;
+        @media (hover: hover) {
+            .service-card:hover {
+                background: var(--hazard-stripe); transform: translateY(-5px);
+                box-shadow: 8px 8px 0 #000;
             }
-
-            .services-grid {
-                grid-template-columns: 1fr;
+            .service-card:hover .service-title,
+            .service-card:hover .service-description,
+            .service-card:hover .service-features li,
+            .service-card:hover .price-amount,
+            .service-card:hover .price-text {
+                background: var(--hex-white); color: var(--hex-black);
+                box-shadow: 4px 4px 0 var(--hex-black); padding: 2px 5px;
+                display: inline-block; position: relative; z-index: 2;
             }
-
-            .service-card {
-                padding: 2rem;
-            }
-
-            .service-header {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .section-title {
-                font-size: 2rem;
-            }
-
-            .container {
-                padding: 0 15px;
-            }
-
-            .process-steps {
-                grid-template-columns: 1fr;
-            }
-
-            /* Enhanced mobile button styling */
-            .service-cta {
-                padding: 1.2rem 1.5rem;
-                font-size: 1.1rem;
-                min-height: 52px;
-            }
-
-            .emergency-button {
-                padding: 1.2rem 2rem;
-                font-size: 1rem;
-                min-height: 52px;
+            .service-card:hover .service-icon {
+                color: var(--hex-white); background: var(--hex-black);
+                padding: 10px; display: inline-block;
+                box-shadow: 4px 4px 0 var(--hex-white);
             }
         }
-
-        @media (max-width: 480px) {
-            .page-header {
-                padding: 100px 0 60px;
-            }
-
-            .page-header h1 {
-                font-size: 2rem;
-            }
-
-            .service-icon {
-                font-size: 2.5rem;
-            }
-
-            .service-title {
-                font-size: 1.3rem;
-            }
-
-            .services-grid {
-                grid-template-columns: 1fr;
-                gap: 1.5rem;
-            }
-        }
-
-        /* Smooth scrolling */
-        html {
-            scroll-behavior: smooth;
-        }
-
-        /* Loading animation */
-        .fade-in {
-            opacity: 0;
-            transform: translateY(30px);
-            animation: fadeInUp 0.8s ease forwards;
-        }
-
-        @keyframes fadeInUp {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Animated border on hover */
         .service-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            border-radius: 20px;
-            padding: 1px;
-            background: linear-gradient(45deg, var(--primary-blue), var(--trust-teal));
-            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            mask-composite: exclude;
-            opacity: 0;
-            transition: opacity 0.3s ease;
+            content: "SERVICE"; font-family: monospace; font-size: 0.6rem;
+            position: absolute; top: 10px; right: 10px; color: #ccc;
+        }
+        .service-header {
+            display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;
+        }
+        .service-icon {
+            font-size: 2rem; color: var(--hex-black); transition: all 0.2s;
+        }
+        .service-title {
+            font-size: 1.4rem; text-transform: uppercase; font-weight: 800;
+            border-bottom: 4px solid; border-image: var(--gradient-blue) 1;
+            display: inline-block;
+        }
+        .service-description {
+            margin-bottom: 1.5rem; color: #555; line-height: 1.6;
+        }
+        .service-features {
+            list-style: none; margin-bottom: 1.5rem; flex-grow: 1;
+        }
+        .service-features li {
+            padding: 0.4rem 0; display: flex; align-items: center;
+            gap: 0.5rem; font-family: monospace; font-size: 0.9rem;
+        }
+        .service-features li::before {
+            content: "\2713"; color: var(--hex-accent); font-weight: bold;
+        }
+        .service-bottom { margin-top: auto; }
+        .service-pricing {
+            background: var(--hex-concrete); padding: 1rem;
+            border: 1px solid var(--hex-grid); margin-bottom: 1rem; text-align: center;
+        }
+        .price-text { font-family: monospace; font-size: 0.8rem; color: #666; margin-bottom: 0.3rem; text-transform: uppercase; }
+        .price-amount { font-size: 1.5rem; font-weight: 900; color: var(--hex-black); }
+        .service-cta {
+            display: flex; align-items: center; justify-content: center;
+            background: var(--gradient-blue); color: var(--hex-white);
+            padding: 1rem; text-decoration: none; font-weight: 800;
+            text-transform: uppercase; font-size: 0.9rem;
+            border: 2px solid var(--hex-black); transition: all 0.1s;
+            cursor: pointer; gap: 0.5rem; width: 100%;
+        }
+        @media (hover: hover) {
+            .service-cta:hover {
+                transform: translate(4px, 4px); box-shadow: -4px -4px 0 var(--hex-black);
+            }
         }
 
-        .service-card:hover::before {
-            opacity: 0.3;
+        /* EMERGENCY */
+        .emergency-section {
+            background: var(--hex-black); color: var(--hex-white);
+            padding: 4rem 0; text-align: center;
+            border-top: 10px solid; border-image: var(--gradient-blue) 1;
         }
+        .emergency-section h2 {
+            font-size: clamp(1.5rem, 4vw, 2.5rem); text-transform: uppercase;
+            font-weight: 900; margin-bottom: 1rem;
+        }
+        .emergency-section p {
+            font-family: monospace; color: #aaa; margin-bottom: 2rem; font-size: 1rem;
+        }
+        .emergency-btn {
+            display: inline-flex; align-items: center; gap: 10px;
+            background: var(--gradient-blue); color: var(--hex-white);
+            padding: 1rem 2rem; text-decoration: none; font-weight: 800;
+            text-transform: uppercase; font-size: 1rem;
+            border: 2px solid var(--hex-white); transition: all 0.1s;
+        }
+        @media (hover: hover) {
+            .emergency-btn:hover {
+                transform: translate(4px, 4px); box-shadow: -4px -4px 0 var(--hex-white);
+            }
+        }
+
+        /* PROCESS */
+        .process-section {
+            padding: 4rem 0; background: var(--hex-concrete);
+        }
+        .process-grid {
+            display: grid; grid-template-columns: repeat(5, 1fr);
+            gap: 0; border: 2px solid var(--hex-black);
+        }
+        .process-item {
+            padding: 2rem; border-right: 2px solid var(--hex-black);
+            position: relative; background: var(--hex-white);
+        }
+        .process-item:last-child { border-right: none; }
+        .process-number {
+            font-weight: 900; font-size: 3rem;
+            background: var(--gradient-blue); -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent; line-height: 1; margin-bottom: 1rem;
+        }
+        .process-item h4 {
+            font-size: 1.1rem; text-transform: uppercase; font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+        .process-item p {
+            font-family: monospace; color: #666; font-size: 0.85rem; line-height: 1.5;
+        }
+
+        /* FOOTER */
+        .footer {
+            background: var(--hex-black); color: var(--hex-white);
+            padding: 4rem 0 6rem;
+            border-top: 10px solid; border-image: var(--gradient-blue) 1;
+        }
+        .footer-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 3rem; margin-bottom: 3rem;
+        }
+        .footer h4 {
+            font-size: 1.2rem; text-transform: uppercase;
+            border-bottom: 1px solid #555; padding-bottom: 1rem; margin-bottom: 1.5rem;
+            background: var(--gradient-blue); -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent; display: inline-block;
+        }
+        .footer-links { list-style: none; font-family: monospace; }
+        .footer-links li { margin-bottom: 0.5rem; }
+        .footer-links a { color: #aaa; text-decoration: none; text-transform: uppercase; }
+        .footer-links a:hover { color: var(--hex-white); text-decoration: underline; }
+        .copyright {
+            text-align: left; font-family: monospace; color: #555;
+            font-size: 0.7rem; border-top: 1px solid #333; padding-top: 2rem;
+        }
+
+        /* MOBILE STICKY BAR */
+        .mobile-sticky-bar {
+            display: none; position: fixed; bottom: 0; left: 0; width: 100%;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            border: none; box-shadow: 0 -5px 15px rgba(0,0,0,0.05);
+            padding: 12px; padding-bottom: max(12px, var(--safe-area-bottom)); z-index: 9999;
+        }
+        .sticky-call-btn {
+            display: block; background: var(--gradient-blue); color: var(--hex-white);
+            text-align: center; padding: 16px; text-decoration: none;
+            font-weight: 900; text-transform: uppercase; border: none;
+            border-radius: 4px; font-size: 1.1rem;
+            box-shadow: 0 4px 15px rgba(0, 51, 255, 0.3);
+        }
+        .sticky-call-btn:active { transform: scale(0.98); }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .scroll-hint { display: block; }
+            .navbar { background: transparent; border-bottom: none; }
+            .nav-logo { display: none; }
+            .nav-container { justify-content: flex-end; }
+            .mobile-menu-toggle {
+                display: block; background: transparent; border: none;
+                font-size: 2rem; padding: 1rem 1.5rem; color: var(--hex-black);
+            }
+            .nav-menu {
+                display: none; flex-direction: column; position: absolute;
+                top: 70px; left: 0; right: 0; background: var(--hex-white);
+                border-top: 2px solid var(--hex-black); border-bottom: 2px solid var(--hex-black);
+                box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            }
+            .nav-menu.active { display: flex; }
+            .nav-link { padding: 1.5rem; border-left: none; border-bottom: 1px solid #eee; }
+            .nav-cta { padding: 1.5rem; justify-content: center; border-left: none; }
+            .mobile-sticky-bar { display: block; }
+            .page-header-box { padding: 2rem 1.5rem; box-shadow: 10px 10px 0 var(--hex-black); }
+            .page-title { font-size: 2.5rem; }
+            .section-title { padding-top: 2rem; margin-bottom: 0; }
+            .section-subtitle { margin-bottom: 2rem; }
+            .services-grid { grid-template-columns: 1fr; }
+            .process-grid { grid-template-columns: 1fr; }
+            .process-item { border-right: none; border-bottom: 2px solid var(--hex-black); }
+            .process-item:last-child { border-bottom: none; }
+        }
+
+        .fade-in {
+            opacity: 0; transform: translateY(20px);
+            animation: appear 0.5s ease forwards;
+        }
+        @keyframes appear { to { opacity: 1; transform: translateY(0); } }
+
+        ::-webkit-scrollbar { width: 10px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--hex-concrete); }
+        ::-webkit-scrollbar-thumb { background: var(--gradient-blue); border-radius: 3px; }
     </style>
 </head>
 <body>
+    <a href="#main" class="skip-link">Skip to main content</a>
+
     <!-- Navigation -->
-    <nav class="navbar" id="navbar">
+    <nav class="navbar" id="navbar" aria-label="Main navigation">
         <div class="nav-container">
-            <a href="/" class="nav-logo">OnlineFix</a>
-            <ul class="nav-menu" id="nav-menu">
-                <li><a href="/" class="nav-link">Home</a></li>
-                <li><a href="/services.html" class="nav-link active">Services</a></li>
-                <li><a href="/about.html" class="nav-link">About</a></li>
-                <li><a href="/reviews.html" class="nav-link">Reviews</a></li>
-                <li><a href="/contact.html" class="nav-link">Contact</a></li>
-                <li><a href="tel:+447940730537" class="nav-cta">
-                    <i class="fas fa-phone"></i>
-                    Call Now
-                </a></li>
+            <a href="/" class="nav-logo" aria-label="OnlineFix Home">OnlineFix</a>
+            <ul class="nav-menu" id="nav-menu" role="menubar">
+                <li role="none"><a href="/" class="nav-link" role="menuitem">Home</a></li>
+                <li role="none"><a href="services.html" class="nav-link active" role="menuitem" aria-current="page">Services</a></li>
+                <li role="none"><a href="about.html" class="nav-link" role="menuitem">About</a></li>
+                <li role="none"><a href="reviews.html" class="nav-link" role="menuitem">Reviews</a></li>
+                <li role="none"><a href="contact.html" class="nav-link" role="menuitem">Contact</a></li>
+                <li role="none"><a href="tel:+447940730537" class="nav-cta" role="menuitem"><span>Call Now</span></a></li>
             </ul>
-            <button class="mobile-menu-toggle" id="mobile-toggle">
-                <i class="fas fa-bars"></i>
+            <button class="mobile-menu-toggle" id="mobile-toggle" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="nav-menu">
+                <i class="fas fa-bars" aria-hidden="true"></i>
             </button>
         </div>
     </nav>
 
-    <!-- Page Header -->
-    <section class="page-header">
-        <div class="container">
-            <h1>Our Repair Services</h1>
-            <p>Professional electronics repair for all your devices in Guildford and Surrey</p>
-        </div>
-    </section>
+    <!-- Mobile Sticky Footer -->
+    <div class="mobile-sticky-bar" role="complementary" aria-label="Quick contact">
+        <a href="tel:+447940730537" class="sticky-call-btn">"CALL US"</a>
+    </div>
 
-    <!-- Services Section -->
-    <section class="services">
-        <div class="container">
-            <div class="services-grid">
-                <div class="service-card fade-in">
-                    <div class="service-header">
-                        <div class="service-icon">
-                            <i class="fas fa-mobile-alt"></i>
-                        </div>
-                        <h3 class="service-title">Smartphone Repair</h3>
-                    </div>
-                    <p class="service-description">
-                        Expert repair services for all smartphone brands including iPhone, Samsung, Google, OnePlus, and more. From cracked screens to water damage, we've got you covered.
-                    </p>
-                    <ul class="service-features">
-                        <li>Screen replacement and repair</li>
-                        <li>Battery replacement</li>
-                        <li>Water damage recovery</li>
-                        <li>Charging port repair</li>
-                        <li>Camera and speaker fixes</li>
-                        <li>Software troubleshooting</li>
-                    </ul>
-                    <div class="service-bottom">
-                        <div class="service-pricing">
-                            <div class="price-text">Starting from</div>
-                            <div class="price-amount">£25</div>
-                        </div>
-                        <a href="tel:+447940730537" class="service-cta">
-                            <i class="fas fa-phone"></i>
-                            Get Quote
-                        </a>
-                    </div>
+    <main id="main">
+        <!-- Page Header -->
+        <section class="page-header" aria-label="Page header">
+            <div class="page-header-content">
+                <div class="page-header-box fade-in">
+                    <div class="page-title">SERVICE <span>CATALOG</span></div>
+                    <p class="page-subtitle">PROFESSIONAL ELECTRONICS REPAIR // GUILDFORD, UK</p>
                 </div>
+            </div>
+        </section>
 
-                <div class="service-card fade-in">
-                    <div class="service-header">
-                        <div class="service-icon">
-                            <i class="fas fa-laptop"></i>
-                        </div>
-                        <h3 class="service-title">Laptop Repair</h3>
-                    </div>
-                    <p class="service-description">
-                        Complete laptop repair services for all brands including MacBook, Dell, HP, Lenovo, ASUS, and more. Hardware and software solutions available.
-                    </p>
-                    <ul class="service-features">
-                        <li>Screen replacement</li>
-                        <li>Keyboard and trackpad repair</li>
-                        <li>Hard drive replacement/upgrade</li>
-                        <li>RAM upgrades</li>
-                        <li>Cooling system cleaning</li>
-                        <li>Performance optimization</li>
-                    </ul>
-                    <div class="service-bottom">
-                        <div class="service-pricing">
-                            <div class="price-text">Starting from</div>
-                            <div class="price-amount">£45</div>
-                        </div>
-                        <a href="tel:+447940730537" class="service-cta">
-                            <i class="fas fa-phone"></i>
-                            Get Quote
-                        </a>
-                    </div>
-                </div>
+        <!-- Services Section -->
+        <section class="services-section" aria-labelledby="services-heading">
+            <div class="container">
+                <h2 class="section-title fade-in" id="services-heading">"WHAT WE FIX"</h2>
+                <p class="section-subtitle fade-in">Full Service Specifications</p>
 
-                <div class="service-card fade-in">
-                    <div class="service-header">
-                        <div class="service-icon">
-                            <i class="fas fa-tablet-alt"></i>
+                <div class="services-grid">
+                    <div class="service-card fade-in">
+                        <div class="service-header">
+                            <div class="service-icon" aria-hidden="true"><i class="fas fa-mobile-alt"></i></div>
+                            <h3 class="service-title">Smartphone Repair</h3>
                         </div>
-                        <h3 class="service-title">Tablet Repair</h3>
-                    </div>
-                    <p class="service-description">
-                        Professional tablet repair for iPad, Samsung Galaxy Tab, Microsoft Surface, and other tablet devices. Quick turnaround times guaranteed.
-                    </p>
-                    <ul class="service-features">
-                        <li>Touch screen digitizer repair</li>
-                        <li>LCD display replacement</li>
-                        <li>Charging port fixes</li>
-                        <li>Battery replacement</li>
-                        <li>Home button repair</li>
-                        <li>Software restoration</li>
-                    </ul>
-                    <div class="service-bottom">
-                        <div class="service-pricing">
-                            <div class="price-text">Starting from</div>
-                            <div class="price-amount">£35</div>
+                        <p class="service-description">Expert repair services for all smartphone brands including iPhone, Samsung, Google, OnePlus, and more.</p>
+                        <ul class="service-features">
+                            <li>Screen replacement and repair</li>
+                            <li>Battery replacement</li>
+                            <li>Water damage recovery</li>
+                            <li>Charging port repair</li>
+                            <li>Camera and speaker fixes</li>
+                            <li>Software troubleshooting</li>
+                        </ul>
+                        <div class="service-bottom">
+                            <div class="service-pricing">
+                                <div class="price-text">Starting from</div>
+                                <div class="price-amount">&pound;25</div>
+                            </div>
+                            <a href="tel:+447940730537" class="service-cta">
+                                <i class="fas fa-phone" aria-hidden="true"></i> Get Quote
+                            </a>
                         </div>
-                        <a href="tel:+447940730537" class="service-cta">
-                            <i class="fas fa-phone"></i>
-                            Get Quote
-                        </a>
                     </div>
-                </div>
 
-                <div class="service-card fade-in">
-                    <div class="service-header">
-                        <div class="service-icon">
-                            <i class="fas fa-gamepad"></i>
+                    <div class="service-card fade-in">
+                        <div class="service-header">
+                            <div class="service-icon" aria-hidden="true"><i class="fas fa-laptop"></i></div>
+                            <h3 class="service-title">Laptop Repair</h3>
                         </div>
-                        <h3 class="service-title">Gaming Console Repair</h3>
-                    </div>
-                    <p class="service-description">
-                        Specialized gaming console repair for PlayStation 4/5, Xbox One/Series, Nintendo Switch, and retro consoles. Get back to gaming fast!
-                    </p>
-                    <ul class="service-features">
-                        <li>HDMI port repair</li>
-                        <li>Charging issues</li>
-                        <li>Overheating solutions</li>
-                        <li>Disc drive repair</li>
-                        <li>Software troubleshooting</li>
-                        <li>Performance upgrades</li>
-                    </ul>
-                    <div class="service-bottom">
-                        <div class="service-pricing">
-                            <div class="price-text">Starting from</div>
-                            <div class="price-amount">£40</div>
+                        <p class="service-description">Complete laptop repair services for MacBook, Dell, HP, Lenovo, ASUS, and more. Hardware and software solutions.</p>
+                        <ul class="service-features">
+                            <li>Screen replacement</li>
+                            <li>Keyboard and trackpad repair</li>
+                            <li>Hard drive replacement/upgrade</li>
+                            <li>RAM upgrades</li>
+                            <li>Cooling system cleaning</li>
+                            <li>Performance optimization</li>
+                        </ul>
+                        <div class="service-bottom">
+                            <div class="service-pricing">
+                                <div class="price-text">Starting from</div>
+                                <div class="price-amount">&pound;45</div>
+                            </div>
+                            <a href="tel:+447940730537" class="service-cta">
+                                <i class="fas fa-phone" aria-hidden="true"></i> Get Quote
+                            </a>
                         </div>
-                        <a href="tel:+447940730537" class="service-cta">
-                            <i class="fas fa-phone"></i>
-                            Get Quote
-                        </a>
                     </div>
-                </div>
 
-                <div class="service-card fade-in">
-                    <div class="service-header">
-                        <div class="service-icon">
-                            <i class="fas fa-desktop"></i>
+                    <div class="service-card fade-in">
+                        <div class="service-header">
+                            <div class="service-icon" aria-hidden="true"><i class="fas fa-tablet-alt"></i></div>
+                            <h3 class="service-title">Tablet Repair</h3>
                         </div>
-                        <h3 class="service-title">Desktop PC Repair</h3>
-                    </div>
-                    <p class="service-description">
-                        Complete desktop computer repair and upgrade services. From virus removal to custom builds, we handle all your PC needs.
-                    </p>
-                    <ul class="service-features">
-                        <li>Component upgrades (RAM, GPU, CPU)</li>
-                        <li>Virus and malware removal</li>
-                        <li>System optimization</li>
-                        <li>Custom PC builds</li>
-                        <li>Hardware diagnostics</li>
-                        <li>Operating system installation</li>
-                    </ul>
-                    <div class="service-bottom">
-                        <div class="service-pricing">
-                            <div class="price-text">Starting from</div>
-                            <div class="price-amount">£30</div>
+                        <p class="service-description">Professional tablet repair for iPad, Samsung Galaxy Tab, Microsoft Surface, and other tablet devices.</p>
+                        <ul class="service-features">
+                            <li>Touch screen digitizer repair</li>
+                            <li>LCD display replacement</li>
+                            <li>Charging port fixes</li>
+                            <li>Battery replacement</li>
+                            <li>Home button repair</li>
+                            <li>Software restoration</li>
+                        </ul>
+                        <div class="service-bottom">
+                            <div class="service-pricing">
+                                <div class="price-text">Starting from</div>
+                                <div class="price-amount">&pound;35</div>
+                            </div>
+                            <a href="tel:+447940730537" class="service-cta">
+                                <i class="fas fa-phone" aria-hidden="true"></i> Get Quote
+                            </a>
                         </div>
-                        <a href="tel:+447940730537" class="service-cta">
-                            <i class="fas fa-phone"></i>
-                            Get Quote
-                        </a>
                     </div>
-                </div>
 
-                <div class="service-card fade-in">
-                    <div class="service-header">
-                        <div class="service-icon">
-                            <i class="fas fa-hdd"></i>
+                    <div class="service-card fade-in">
+                        <div class="service-header">
+                            <div class="service-icon" aria-hidden="true"><i class="fas fa-gamepad"></i></div>
+                            <h3 class="service-title">Gaming Console Repair</h3>
                         </div>
-                        <h3 class="service-title">Data Recovery</h3>
+                        <p class="service-description">Specialized gaming console repair for PlayStation 4/5, Xbox One/Series, Nintendo Switch, and retro consoles.</p>
+                        <ul class="service-features">
+                            <li>HDMI port repair</li>
+                            <li>Charging issues</li>
+                            <li>Overheating solutions</li>
+                            <li>Disc drive repair</li>
+                            <li>Software troubleshooting</li>
+                            <li>Performance upgrades</li>
+                        </ul>
+                        <div class="service-bottom">
+                            <div class="service-pricing">
+                                <div class="price-text">Starting from</div>
+                                <div class="price-amount">&pound;40</div>
+                            </div>
+                            <a href="tel:+447940730537" class="service-cta">
+                                <i class="fas fa-phone" aria-hidden="true"></i> Get Quote
+                            </a>
+                        </div>
                     </div>
-                    <p class="service-description">
-                        Professional data recovery services for damaged hard drives, SSDs, USB drives, and memory cards. Don't lose your precious memories!
-                    </p>
-                    <ul class="service-features">
-                        <li>Hard drive recovery</li>
-                        <li>SSD data restoration</li>
-                        <li>USB drive recovery</li>
-                        <li>Memory card restoration</li>
-                        <li>Deleted file recovery</li>
-                        <li>Corrupted storage fixes</li>
-                    </ul>
-                    <div class="service-bottom">
-                        <div class="service-pricing">
-                            <div class="price-text">Starting from</div>
-                            <div class="price-amount">£50</div>
+
+                    <div class="service-card fade-in">
+                        <div class="service-header">
+                            <div class="service-icon" aria-hidden="true"><i class="fas fa-desktop"></i></div>
+                            <h3 class="service-title">Desktop PC Repair</h3>
                         </div>
-                        <a href="tel:+447940730537" class="service-cta">
-                            <i class="fas fa-phone"></i>
-                            Get Quote
-                        </a>
+                        <p class="service-description">Complete desktop computer repair and upgrade services. From virus removal to custom builds.</p>
+                        <ul class="service-features">
+                            <li>Component upgrades (RAM, GPU, CPU)</li>
+                            <li>Virus and malware removal</li>
+                            <li>System optimization</li>
+                            <li>Custom PC builds</li>
+                            <li>Hardware diagnostics</li>
+                            <li>Operating system installation</li>
+                        </ul>
+                        <div class="service-bottom">
+                            <div class="service-pricing">
+                                <div class="price-text">Starting from</div>
+                                <div class="price-amount">&pound;30</div>
+                            </div>
+                            <a href="tel:+447940730537" class="service-cta">
+                                <i class="fas fa-phone" aria-hidden="true"></i> Get Quote
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="service-card fade-in">
+                        <div class="service-header">
+                            <div class="service-icon" aria-hidden="true"><i class="fas fa-hdd"></i></div>
+                            <h3 class="service-title">Data Recovery</h3>
+                        </div>
+                        <p class="service-description">Professional data recovery services for damaged hard drives, SSDs, USB drives, and memory cards.</p>
+                        <ul class="service-features">
+                            <li>Hard drive recovery</li>
+                            <li>SSD data restoration</li>
+                            <li>USB drive recovery</li>
+                            <li>Memory card restoration</li>
+                            <li>Deleted file recovery</li>
+                            <li>Corrupted storage fixes</li>
+                        </ul>
+                        <div class="service-bottom">
+                            <div class="service-pricing">
+                                <div class="price-text">Starting from</div>
+                                <div class="price-amount">&pound;50</div>
+                            </div>
+                            <a href="tel:+447940730537" class="service-cta">
+                                <i class="fas fa-phone" aria-hidden="true"></i> Get Quote
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Emergency Service -->
-    <section class="emergency-service">
-        <div class="container">
-            <div class="emergency-content">
-                <h3>Emergency Repair Service Available</h3>
-                <p>Device completely dead? Water damage? We offer emergency same-day repair services for urgent situations.</p>
-                <a href="tel:+447940730537" class="emergency-button">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    Emergency Repair: 07940 730537
+        <!-- Emergency Service -->
+        <section class="emergency-section" aria-labelledby="emergency-heading">
+            <div class="container">
+                <h2 id="emergency-heading">EMERGENCY REPAIR</h2>
+                <p>Device completely dead? Water damage? Same-day emergency repair available.</p>
+                <a href="tel:+447940730537" class="emergency-btn">
+                    <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
+                    EMERGENCY: 07940 730537
                 </a>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Process Section -->
-    <section class="process">
-        <div class="container">
-            <h2 class="section-title fade-in">Our Repair Process</h2>
-            <div class="process-steps">
-                <div class="process-step fade-in">
-                    <div class="step-number">1</div>
-                    <h4 class="step-title">Contact Us</h4>
-                    <p>Call or message us with details about your device issue. We'll provide initial guidance and pricing.</p>
-                </div>
-                <div class="process-step fade-in">
-                    <div class="step-number">2</div>
-                    <h4 class="step-title">Diagnosis</h4>
-                    <p>Bring your device for a free diagnostic. We'll identify the problem and provide a detailed quote.</p>
-                </div>
-                <div class="process-step fade-in">
-                    <div class="step-number">3</div>
-                    <h4 class="step-title">Repair</h4>
-                    <p>Once approved, we begin the repair using quality parts and professional techniques.</p>
-                </div>
-                <div class="process-step fade-in">
-                    <div class="step-number">4</div>
-                    <h4 class="step-title">Testing</h4>
-                    <p>Every repair is thoroughly tested to ensure it's working perfectly before return.</p>
-                </div>
-                <div class="process-step fade-in">
-                    <div class="step-number">5</div>
-                    <h4 class="step-title">Collection</h4>
-                    <p>Collect your fully working device with warranty coverage on all repairs.</p>
+        <!-- Process Section -->
+        <section class="process-section" aria-labelledby="process-heading">
+            <div class="container">
+                <h2 class="section-title fade-in" id="process-heading">WORKFLOW</h2>
+                <p class="section-subtitle fade-in">Operational Procedure</p>
+                <div class="process-grid">
+                    <div class="process-item fade-in">
+                        <div class="process-number">01</div>
+                        <h4>Contact</h4>
+                        <p>Call or message us with details about your device issue.</p>
+                    </div>
+                    <div class="process-item fade-in">
+                        <div class="process-number">02</div>
+                        <h4>Diagnosis</h4>
+                        <p>Free diagnostic to identify the problem and provide a quote.</p>
+                    </div>
+                    <div class="process-item fade-in">
+                        <div class="process-number">03</div>
+                        <h4>Repair</h4>
+                        <p>Professional repair using quality parts and techniques.</p>
+                    </div>
+                    <div class="process-item fade-in">
+                        <div class="process-number">04</div>
+                        <h4>Testing</h4>
+                        <p>Thorough testing to ensure everything works perfectly.</p>
+                    </div>
+                    <div class="process-item fade-in">
+                        <div class="process-number">05</div>
+                        <h4>Collect</h4>
+                        <p>Pick up your device with warranty coverage on all repairs.</p>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
+    </main>
 
+    <!-- Footer -->
+    <footer class="footer" role="contentinfo">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <h4>"ONLINEFIX"</h4>
+                    <p style="font-family: monospace; color: #999;">Expert electronics repair in Guildford. Trusted, fast, and reliable service by Tomas.</p>
+                    <div style="margin-top: 1rem; font-size: 1.5rem;">
+                        <a href="https://instagram.com/onlinefixrepairs" target="_blank" rel="noopener noreferrer" style="color: white; margin-right: 1rem;" aria-label="Instagram"><i class="fab fa-instagram" aria-hidden="true"></i></a>
+                        <a href="https://tiktok.com/@onlinefix" target="_blank" rel="noopener noreferrer" style="color: white; margin-right: 1rem;" aria-label="TikTok"><i class="fab fa-tiktok" aria-hidden="true"></i></a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h4>LINKS</h4>
+                    <ul class="footer-links">
+                        <li><a href="/">Home</a></li>
+                        <li><a href="services.html">Services</a></li>
+                        <li><a href="about.html">About</a></li>
+                        <li><a href="reviews.html">Reviews</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h4>CONTACT</h4>
+                    <ul class="footer-links">
+                        <li><a href="tel:+447940730537">07940 730537</a></li>
+                        <li><a href="mailto:hello@onlinefix.uk">hello@onlinefix.uk</a></li>
+                        <li>GUILDFORD, SURREY</li>
+                        <li style="margin-top: 1rem; color: #999;">MON-SUN: 10AM - 10PM</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2026 ONLINEFIX. ALL RIGHTS RESERVED. "DESIGN"</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" defer></script>
     <script>
-        // Mobile menu toggle
         const mobileToggle = document.getElementById('mobile-toggle');
         const navMenu = document.getElementById('nav-menu');
 
-        mobileToggle.addEventListener('click', () => {
-            navMenu.classList.toggle('active');
-            const icon = mobileToggle.querySelector('i');
-            icon.classList.toggle('fa-bars');
-            icon.classList.toggle('fa-times');
-        });
-
-        // Navbar scroll effect
-        window.addEventListener('scroll', () => {
-            const navbar = document.getElementById('navbar');
-            if (window.scrollY > 50) {
-                navbar.classList.add('scrolled');
-            } else {
-                navbar.classList.remove('scrolled');
-            }
-        });
-
-        // Enhanced button functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            // Add enhanced click functionality for service buttons
-            const serviceButtons = document.querySelectorAll('.service-cta');
-            
-            serviceButtons.forEach(button => {
-                // Add visual feedback
-                button.addEventListener('touchstart', function() {
-                    this.style.transform = 'translateY(0) scale(0.98)';
-                }, { passive: true });
-                
-                button.addEventListener('touchend', function() {
-                    this.style.transform = '';
-                }, { passive: true });
-
-                // Ensure the phone call works on mobile
-                button.addEventListener('click', function(e) {
-                    // Add a small delay to ensure visual feedback is seen
-                    setTimeout(() => {
-                        // The href="tel:" will handle the actual call
-                        console.log('Quote button clicked');
-                    }, 100);
-                });
+        if (mobileToggle && navMenu) {
+            mobileToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isExpanded = navMenu.classList.toggle('active');
+                mobileToggle.setAttribute('aria-expanded', isExpanded.toString());
+                const icon = mobileToggle.querySelector('i');
+                if (icon) { icon.classList.toggle('fa-bars'); icon.classList.toggle('fa-times'); }
             });
-
-            // Same for emergency button
-            const emergencyButton = document.querySelector('.emergency-button');
-            if (emergencyButton) {
-                emergencyButton.addEventListener('touchstart', function() {
-                    this.style.transform = 'translateY(0) scale(0.98)';
-                }, { passive: true });
-                
-                emergencyButton.addEventListener('touchend', function() {
-                    this.style.transform = '';
-                }, { passive: true });
-            }
-        });
-
-        // Intersection Observer for fade-in animations
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.animationDelay = Math.random() * 0.3 + 's';
-                    entry.target.classList.add('fade-in');
+            document.addEventListener('click', (e) => {
+                const isClickInsideMenu = navMenu.contains(e.target);
+                const isClickOnToggle = mobileToggle.contains(e.target);
+                const isLink = e.target.tagName === 'A' || e.target.closest('a');
+                if ((!isClickInsideMenu && !isClickOnToggle && navMenu.classList.contains('active')) ||
+                    (isLink && navMenu.classList.contains('active'))) {
+                    navMenu.classList.remove('active');
+                    mobileToggle.setAttribute('aria-expanded', 'false');
+                    const icon = mobileToggle.querySelector('i');
+                    if (icon) { icon.classList.add('fa-bars'); icon.classList.remove('fa-times'); }
                 }
             });
-        }, observerOptions);
-
-        // Observe all elements with fade-in class
-        document.addEventListener('DOMContentLoaded', () => {
-            const fadeElements = document.querySelectorAll('.fade-in');
-            fadeElements.forEach(el => observer.observe(el));
-        });
-
-        // Add random floating animation to background
-        function createFloatingElement() {
-            const element = document.createElement('div');
-            element.style.cssText = `
-                position: absolute;
-                width: 4px;
-                height: 4px;
-                background: rgba(144, 224, 239, 0.6);
-                border-radius: 50%;
-                pointer-events: none;
-                animation: float-up 4s linear infinite;
-                left: ${Math.random() * 100}%;
-                top: 100%;
-                z-index: 1;
-            `;
-            
-            document.querySelector('.page-header').appendChild(element);
-            
-            setTimeout(() => {
-                element.remove();
-            }, 4000);
         }
 
-        // Add floating elements periodically
-        setInterval(createFloatingElement, 200);
-
-        // Add CSS for floating animation
-        const floatingStyle = document.createElement('style');
-        floatingStyle.textContent = `
-            @keyframes float-up {
-                0% {
-                    transform: translateY(0px) rotate(0deg);
-                    opacity: 1;
-                }
-                100% {
-                    transform: translateY(-100vh) rotate(360deg);
-                    opacity: 0;
-                }
-            }
-        `;
-        document.head.appendChild(floatingStyle);
-
-        // Close mobile menu when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!navMenu.contains(e.target) && !mobileToggle.contains(e.target)) {
-                navMenu.classList.remove('active');
-                const icon = mobileToggle.querySelector('i');
-                icon.classList.add('fa-bars');
-                icon.classList.remove('fa-times');
-            }
+        const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -50px 0px' };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) { entry.target.classList.add('fade-in'); observer.unobserve(entry.target); }
+            });
+        }, observerOptions);
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
         });
     </script>
 </body>
