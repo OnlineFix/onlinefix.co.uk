@@ -247,7 +247,7 @@
             --font-main: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             --safe-area-bottom: env(safe-area-inset-bottom);
         }
-        html { scroll-behavior: smooth; }
+        html { scroll-behavior: smooth; overflow-x: hidden; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: var(--font-main); background-color: var(--hex-concrete); color: var(--hex-black); line-height: 1.4; overflow-x: hidden; font-weight: 500; padding-bottom: calc(60px + var(--safe-area-bottom)); }
         .skip-link { position: absolute; top: -40px; left: 0; background: var(--hex-black); color: var(--hex-white); padding: 8px 16px; z-index: 10000; transition: top 0.3s; text-decoration: none; font-weight: 700; text-transform: uppercase; font-size: 0.9rem; }
@@ -284,7 +284,7 @@
         .page-subtitle { font-family: 'Courier New', Courier, monospace; font-size: clamp(0.9rem, 2vw, 1.1rem); text-transform: uppercase; background: var(--hex-black); color: var(--hex-white); display: inline-block; padding: 5px 8px; }
 
         /* CONSOLES WE REPAIR */
-        .consoles-section { padding: 0; border-top: 2px solid var(--hex-black); background: var(--hex-white); }
+        .consoles-section { padding: 0; border-top: 2px solid var(--hex-black); background: var(--hex-white); overflow: hidden; }
         .consoles-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0; border: 2px solid var(--hex-black); }
         .console-item { padding: 2rem 1.5rem; text-align: center; border-right: 2px solid var(--hex-black); position: relative; transition: all 0.2s; }
         .console-item:last-child { border-right: none; }
@@ -297,7 +297,7 @@
         .console-name { font-size: 0.9rem; font-weight: 800; text-transform: uppercase; }
 
         /* COMMON ISSUES GRID */
-        .issues-section { padding: 0 0 4rem; border-top: 2px solid var(--hex-black); background: var(--hex-white); }
+        .issues-section { padding: 0 0 4rem; border-top: 2px solid var(--hex-black); background: var(--hex-white); overflow: hidden; }
         .issues-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; }
         .issue-card { background: var(--hex-white); border: 2px solid var(--hex-black); padding: 2.5rem; position: relative; transition: all 0.2s; display: flex; flex-direction: column; }
         .issue-card::before { content: attr(data-issue-num); font-family: monospace; font-size: 0.6rem; position: absolute; top: 10px; right: 10px; color: #ccc; }
@@ -322,7 +322,7 @@
         @media (hover: hover) { .issue-cta:hover { transform: translate(4px, 4px); box-shadow: -4px -4px 0 var(--hex-black); } }
 
         /* WHY CHOOSE US */
-        .why-section { padding: 0 0 4rem; border-top: 2px solid var(--hex-black); background: var(--hex-white); }
+        .why-section { padding: 0 0 4rem; border-top: 2px solid var(--hex-black); background: var(--hex-white); overflow: hidden; }
         .why-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; border: 2px solid var(--hex-black); }
         .why-item { padding: 2.5rem 2rem; text-align: center; border-right: 2px solid var(--hex-black); background: var(--hex-white); position: relative; }
         .why-item:last-child { border-right: none; }
@@ -388,53 +388,112 @@
 
         @media (max-width: 768px) {
             .scroll-hint { display: block; }
+
+            /* NAV */
             .navbar { background: transparent; border-bottom: none; }
             .nav-logo { display: none; }
             .nav-container { justify-content: flex-end; }
             .mobile-menu-toggle { display: block; background: transparent; border: none; font-size: 2rem; padding: 1rem 1.5rem; color: var(--hex-black); }
             .nav-menu { display: none; flex-direction: column; position: absolute; top: 70px; left: 0; right: 0; background: var(--hex-white); border-top: 2px solid var(--hex-black); border-bottom: 2px solid var(--hex-black); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
             .nav-menu.active { display: flex; }
-            .nav-link { padding: 1.5rem; border-left: none; border-bottom: 1px solid #eee; }
-            .nav-cta { padding: 1.5rem; justify-content: center; border-left: none; }
+            .nav-link { padding: 1.5rem; border-left: none; border-bottom: 1px solid #eee; min-height: 48px; }
+            .nav-cta { padding: 1.5rem; justify-content: center; border-left: none; min-height: 48px; }
             .mobile-sticky-bar { display: block; }
-            .page-header-box { padding: 2rem 1.5rem; box-shadow: 10px 10px 0 var(--hex-black); }
-            .page-title { font-size: 2.5rem; }
-            .section-title { padding-top: 2rem; margin-bottom: 0; }
-            .section-subtitle { margin-bottom: 2rem; }
 
-            /* Consoles → horizontal scroll */
+            /* PAGE HEADER — prevent overflow */
+            .page-header-box { padding: 1.5rem 1rem; box-shadow: 6px 6px 0 var(--hex-black); }
+            .page-title { font-size: clamp(1.8rem, 7vw, 2.5rem); letter-spacing: -1px; }
+            .page-subtitle { font-size: clamp(0.65rem, 2.5vw, 0.85rem); word-break: break-word; padding: 4px 6px; }
+            .page-header::before { display: none; }
+            .page-header-content { padding: 2.5rem 12px; }
+
+            .section-title { padding-top: 2rem; margin-bottom: 0; font-size: clamp(1.5rem, 5vw, 2.2rem); }
+            .section-subtitle { margin-bottom: 1.5rem; font-size: 0.8rem; }
+            .container { padding: 0 12px; }
+
+            /* CONSOLES — horizontal scroll */
             .consoles-grid { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; border: 2px solid var(--hex-black); }
-            .console-item { min-width: 40vw; scroll-snap-align: start; flex-shrink: 0; border-right: 2px solid var(--hex-black); }
+            .console-item { min-width: 35vw; scroll-snap-align: start; flex-shrink: 0; border-right: 2px solid var(--hex-black); padding: 1.5rem 1rem; }
+            .console-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+            .console-name { font-size: 0.75rem; }
 
-            /* Issues → horizontal scroll with snap */
-            .issues-grid { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 15px; padding-bottom: 2rem; -webkit-overflow-scrolling: touch; padding-left: 20px; padding-right: 20vw; }
-            .issue-card { min-width: 80vw; scroll-snap-align: start; flex-shrink: 0; }
-            .issue-title { font-size: clamp(1.1rem, 4vw, 1.4rem); }
+            /* ISSUES — horizontal scroll with snap */
+            .issues-grid { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 12px; padding-bottom: 1.5rem; -webkit-overflow-scrolling: touch; padding-left: 12px; padding-right: 15vw; }
+            .issue-card { min-width: 82vw; scroll-snap-align: start; flex-shrink: 0; padding: 1.5rem; }
+            .issue-title { font-size: clamp(1rem, 4vw, 1.3rem); }
+            .issue-header { gap: 0.75rem; margin-bottom: 1rem; }
+            .issue-icon { font-size: 1.6rem; }
+            .issue-description { font-size: 0.9rem; line-height: 1.6; margin-bottom: 1rem; }
+            .issue-symptoms li { font-size: 0.8rem; padding: 0.3rem 0; }
+            .issue-pricing { padding: 0.75rem; }
+            .issue-price { font-size: 1.3rem; }
+            .issue-cta { padding: 0.9rem; font-size: 0.85rem; min-height: 48px; }
 
-            /* Why Choose Us */
+            /* WHY CHOOSE US — 2x2 grid */
             .why-grid { grid-template-columns: repeat(2, 1fr); }
             .why-item:nth-child(2) { border-right: none; }
             .why-item:nth-child(1), .why-item:nth-child(2) { border-bottom: 2px solid var(--hex-black); }
-            .why-item { padding: 2rem 1.5rem; }
-            .why-vs-row { gap: 1.5rem; }
+            .why-item:nth-child(4) { border-right: none; }
+            .why-item { padding: 1.5rem 1rem; }
+            .why-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+            .why-title { font-size: 0.95rem; }
+            .why-description { font-size: 0.8rem; }
+            /* Comparison table — stack vertically */
+            .why-vs { padding: 1.5rem 1rem; }
+            .why-vs-title { font-size: 1rem; }
+            .why-vs-row { flex-direction: column; gap: 1.5rem; }
+            .why-vs-col { width: 100%; padding: 1rem; background: var(--hex-white); border: 1px solid var(--hex-grid); }
+            .why-vs-label { font-size: 0.75rem; margin-bottom: 0.5rem; }
+            .why-vs-value { font-size: 0.8rem; line-height: 1.8; }
 
-            /* Process grid stacked */
+            /* PROCESS — stacked */
+            .process-section { padding: 2rem 0; }
             .process-grid { grid-template-columns: 1fr; }
-            .process-item { border-right: none; border-bottom: 2px solid var(--hex-black); }
+            .process-item { border-right: none; border-bottom: 2px solid var(--hex-black); padding: 1.5rem; }
             .process-item:last-child { border-bottom: none; }
             .process-number { font-size: clamp(2rem, 7vw, 3rem); }
+            .process-item h4 { font-size: 1rem; }
+            .process-item p { font-size: 0.8rem; }
+
+            /* EMERGENCY CTA */
+            .emergency-section { padding: 2.5rem 0; }
+            .emergency-section h2 { font-size: clamp(1.3rem, 5vw, 2rem); }
+            .emergency-section p { font-size: 0.85rem; padding: 0 0.5rem; margin-bottom: 1.5rem; }
+            .emergency-btn { padding: 1rem 1.5rem; font-size: 0.9rem; min-height: 48px; width: 100%; justify-content: center; }
 
             /* FAQ */
-            .faq-question { font-size: 0.95rem; padding: 1.2rem 1.5rem; }
-            .faq-answer { padding: 0 1.5rem 1.2rem; font-size: 0.9rem; }
-            .faq-item.active .faq-answer { padding-top: 1.2rem; }
+            .faq-question { font-size: 0.9rem; padding: 1rem 1.2rem; min-height: 48px; }
+            .faq-answer { padding: 0 1.2rem 1rem; font-size: 0.85rem; }
+            .faq-item.active .faq-answer { padding-top: 1rem; }
 
-            /* Emergency */
-            .emergency-section p { font-size: 0.9rem; }
-
-            /* Footer mobile */
+            /* FOOTER */
+            .footer { padding: 3rem 0 5rem; }
             .footer-grid { gap: 2rem; grid-template-columns: 1fr 1fr; }
-            .copyright { font-size: 0.75rem; }
+            .footer-links a { display: inline-block; padding: 0.4rem 0; min-height: 44px; line-height: 2.2; }
+            .copyright { font-size: 0.7rem; }
+        }
+
+        /* EXTRA SMALL SCREENS */
+        @media (max-width: 400px) {
+            .page-header-box { padding: 1.2rem 0.75rem; box-shadow: 4px 4px 0 var(--hex-black); }
+            .page-title { font-size: clamp(1.5rem, 8vw, 2rem); }
+            .page-subtitle { font-size: 0.6rem; letter-spacing: 0; }
+            .section-title { font-size: clamp(1.3rem, 6vw, 1.8rem); }
+            .container { padding: 0 8px; }
+
+            .console-item { min-width: 40vw; padding: 1rem 0.75rem; }
+            .issue-card { min-width: 88vw; padding: 1.2rem; }
+            .issue-description { font-size: 0.85rem; }
+
+            /* Why Choose Us → single column */
+            .why-grid { grid-template-columns: 1fr; }
+            .why-item { border-right: none !important; border-bottom: 2px solid var(--hex-black); }
+            .why-item:last-child { border-bottom: none; }
+
+            .emergency-btn { font-size: 0.8rem; padding: 0.9rem 1rem; }
+            .faq-question { font-size: 0.8rem; padding: 0.9rem 1rem; }
+
+            .footer-grid { grid-template-columns: 1fr; }
         }
 
         .fade-in { opacity: 0; transform: translateY(20px); animation: appear 0.5s ease forwards; }
