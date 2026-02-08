@@ -396,7 +396,7 @@
         @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; } .scroll-hint { animation: none; } }
 
         @media (max-width: 768px) {
-            .scroll-hint { display: block; }
+            .scroll-hint { display: none; }
 
             /* NAV */
             .navbar { background: transparent; border-bottom: none; }
@@ -420,15 +420,17 @@
             .section-subtitle { margin-bottom: 1.5rem; font-size: 0.8rem; }
             .container { padding: 0 12px; }
 
-            /* MODELS — horizontal scroll */
-            .models-grid { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; border: 2px solid var(--hex-black); }
-            .model-item { min-width: 45vw; scroll-snap-align: start; flex-shrink: 0; border-right: 2px solid var(--hex-black); padding: 1.5rem 1rem; }
-            .model-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+            /* MODELS — 2-col compact grid */
+            .models-grid { display: grid; grid-template-columns: repeat(2, 1fr); border: 2px solid var(--hex-black); }
+            .model-item { min-width: unset; border-right: 2px solid var(--hex-black); border-bottom: 2px solid var(--hex-black); padding: 1.2rem 0.75rem; }
+            .model-item:nth-child(2n) { border-right: none; }
+            .model-item:nth-child(n+3) { border-bottom: none; }
+            .model-icon { font-size: 1.8rem; margin-bottom: 0.3rem; }
             .model-name { font-size: 0.75rem; }
 
-            /* ISSUES — horizontal scroll with snap */
-            .issues-grid { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 12px; padding-bottom: 1.5rem; -webkit-overflow-scrolling: touch; padding-left: 12px; padding-right: 15vw; }
-            .issue-card { min-width: 82vw; scroll-snap-align: start; flex-shrink: 0; padding: 1.5rem; }
+            /* ISSUES — stacked vertical */
+            .issues-grid { display: grid; grid-template-columns: 1fr; gap: 12px; padding-bottom: 1.5rem; }
+            .issue-card { min-width: unset; padding: 1.5rem; }
             .issue-title { font-size: clamp(1rem, 4vw, 1.3rem); }
             .issue-header { gap: 0.75rem; margin-bottom: 1rem; }
             .issue-icon { font-size: 1.6rem; }
@@ -489,8 +491,8 @@
             .section-title { font-size: clamp(1.3rem, 6vw, 1.8rem); }
             .container { padding: 0 8px; }
 
-            .model-item { min-width: 50vw; padding: 1rem 0.75rem; }
-            .issue-card { min-width: 88vw; padding: 1.2rem; }
+            .model-item { padding: 1rem 0.5rem; }
+            .issue-card { padding: 1.2rem; }
             .issue-description { font-size: 0.85rem; }
 
             .why-grid { grid-template-columns: 1fr; }

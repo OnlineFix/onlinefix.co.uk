@@ -466,7 +466,7 @@
         }
 
         @media (max-width: 768px) {
-            .scroll-hint { display: block; }
+            .scroll-hint { display: none; }
             .navbar { background: transparent; border-bottom: none; }
             .nav-logo { display: none; }
             .nav-container { justify-content: flex-end; }
@@ -489,14 +489,13 @@
             .section-title { padding-top: 2rem; margin-bottom: 0; }
             .section-subtitle { margin-bottom: 2rem; }
 
-            /* Services grid → horizontal scroll with snap */
+            /* Services grid → stacked vertical on mobile */
             .services-grid {
-                display: flex; overflow-x: auto; scroll-snap-type: x mandatory;
-                gap: 15px; padding-bottom: 2rem; -webkit-overflow-scrolling: touch;
-                padding-left: 20px; padding-right: 20vw;
+                display: grid; grid-template-columns: 1fr;
+                gap: 15px; padding-bottom: 2rem;
             }
             .service-card {
-                min-width: 80vw; scroll-snap-align: start; flex-shrink: 0;
+                min-width: unset;
             }
 
             /* Process grid stacked */

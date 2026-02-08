@@ -220,7 +220,7 @@
         @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; } .scroll-hint { animation: none; } }
 
         @media (max-width: 768px) {
-            .scroll-hint { display: block; }
+            .scroll-hint { display: none; }
             .navbar { background: transparent; border-bottom: none; }
             .nav-logo { display: none; }
             .nav-container { justify-content: flex-end; }
@@ -241,17 +241,17 @@
             .about-text h2 { font-size: clamp(1.3rem, 5vw, 1.8rem); }
             .about-profile { padding: 2rem 1.5rem; }
 
-            /* Timeline → horizontal scroll with snap */
+            /* Timeline → stacked vertical on mobile */
             .timeline-grid {
-                display: flex; overflow-x: auto; scroll-snap-type: x mandatory;
-                gap: 0; padding-bottom: 1rem; -webkit-overflow-scrolling: touch;
+                display: grid; grid-template-columns: 1fr;
+                gap: 0; padding-bottom: 1rem;
                 border: 1px solid #333;
             }
             .timeline-item {
-                min-width: 75vw; scroll-snap-align: start; flex-shrink: 0;
-                border-right: 1px solid #333; border-bottom: none;
+                min-width: unset;
+                border-right: none; border-bottom: 1px solid #333;
             }
-            .timeline-item:last-child { border-right: none; }
+            .timeline-item:last-child { border-bottom: none; }
 
             /* Values grid → responsive columns */
             .values-grid { grid-template-columns: 1fr 1fr; }
