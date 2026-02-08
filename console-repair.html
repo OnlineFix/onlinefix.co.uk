@@ -411,13 +411,13 @@
             .section-subtitle { margin-bottom: 1.5rem; font-size: 0.8rem; }
             .container { padding: 0 12px; }
 
-            /* CONSOLES — 3-col compact grid */
-            .consoles-grid { display: grid; grid-template-columns: repeat(3, 1fr); border: 2px solid var(--hex-black); }
-            .console-item { min-width: unset; border-right: 2px solid var(--hex-black); border-bottom: 2px solid var(--hex-black); padding: 1.2rem 0.5rem; }
-            .console-item:nth-child(3n) { border-right: none; }
-            .console-item:nth-child(n+4) { border-bottom: none; }
+            /* CONSOLES — 2-col compact grid */
+            .consoles-grid { display: grid; grid-template-columns: repeat(2, 1fr); border: 2px solid var(--hex-black); }
+            .console-item { min-width: unset; border-right: 2px solid var(--hex-black); border-bottom: 2px solid var(--hex-black); padding: 1.2rem 0.75rem; }
+            .console-item:nth-child(2n) { border-right: none; }
+            .console-item:nth-child(n+5) { border-bottom: none; }
             .console-icon { font-size: 1.5rem; margin-bottom: 0.3rem; }
-            .console-name { font-size: 0.7rem; }
+            .console-name { font-size: 0.75rem; }
 
             /* ISSUES — stacked vertical */
             .issues-grid { display: grid; grid-template-columns: 1fr; gap: 12px; padding-bottom: 1.5rem; }
@@ -484,11 +484,6 @@
             .container { padding: 0 8px; }
 
             .console-item { padding: 1rem 0.5rem; }
-            .consoles-grid { grid-template-columns: repeat(2, 1fr); }
-            .console-item:nth-child(3n) { border-right: 2px solid var(--hex-black); }
-            .console-item:nth-child(2n) { border-right: none; }
-            .console-item:nth-child(n+5) { border-bottom: none; }
-            .console-item:nth-child(n+3):nth-child(-n+4) { border-bottom: 2px solid var(--hex-black); }
             .issue-card { padding: 1.2rem; }
             .issue-description { font-size: 0.85rem; }
 
