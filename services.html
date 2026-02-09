@@ -481,11 +481,11 @@
                 box-shadow: 0 10px 20px rgba(0,0,0,0.1);
             }
             .nav-menu.active { display: flex; }
-            .nav-link { padding: 1.5rem; border-left: none; border-bottom: 1px solid #eee; }
-            .nav-cta { padding: 1.5rem; justify-content: center; border-left: none; }
+            .nav-link { padding: 1.5rem; border-left: none; border-bottom: 1px solid #eee; min-height: 48px; }
+            .nav-cta { padding: 1.5rem; justify-content: center; border-left: none; min-height: 48px; }
             .mobile-sticky-bar { display: block; }
-            .page-header-box { padding: 2rem 1.5rem; box-shadow: 10px 10px 0 var(--hex-black); }
-            .page-title { font-size: 2.5rem; }
+            .page-header-box { padding: 1.5rem 1rem; box-shadow: 6px 6px 0 var(--hex-black); }
+            .page-title { font-size: clamp(1.8rem, 7vw, 2.5rem); }
             .section-title { padding-top: 2rem; margin-bottom: 0; }
             .section-subtitle { margin-bottom: 2rem; }
 
@@ -511,8 +511,8 @@
 
             /* Footer mobile */
             .footer-grid { gap: 2rem; grid-template-columns: 1fr 1fr; }
-            .footer-links a { display: inline-block; padding: 0.4rem 0; }
-            .copyright { font-size: 0.75rem; }
+            .footer-links a { display: inline-block; padding: 0.4rem 0; min-height: 44px; line-height: 2.2; }
+            .copyright { font-size: 0.7rem; }
         }
 
         .fade-in {
@@ -789,6 +789,7 @@
                     <ul class="footer-links">
                         <li><a href="/">Home</a></li>
                         <li><a href="services.html">Services</a></li>
+                        <li><a href="iphone-repair.html">iPhone Repair</a></li>
                         <li><a href="console-repair.html">Console Repair</a></li>
                         <li><a href="macbook-repair.html">MacBook Repair</a></li>
                         <li><a href="about.html">About</a></li>

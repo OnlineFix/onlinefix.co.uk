@@ -25,6 +25,14 @@
     <priority>0.9</priority>
   </url>
 
+  <!-- iPhone Repair landing page - High priority, service-specific SEO page -->
+  <url>
+    <loc>https://onlinefix.co.uk/iphone-repair.html</loc>
+    <lastmod>2026-02-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
   <!-- MacBook Repair landing page - High priority, service-specific SEO page -->
   <url>
     <loc>https://onlinefix.co.uk/macbook-repair.html</loc>
