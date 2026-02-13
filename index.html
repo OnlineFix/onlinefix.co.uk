@@ -1098,29 +1098,44 @@
                 overflow-x: auto;
                 scroll-snap-type: x mandatory;
                 -webkit-overflow-scrolling: touch;
-                gap: 0;
+                gap: 12px;
                 padding-bottom: 1rem;
                 border: none;
             }
 
             .feature-item {
-                min-width: 80vw;
+                min-width: 55vw;
+                max-width: 55vw;
                 scroll-snap-align: start;
                 border: 2px solid var(--hex-black);
                 flex-shrink: 0;
+                padding: 1.5rem 1.2rem;
             }
+
+            .feature-icon { font-size: 1.8rem; margin-bottom: 0.8rem; }
+            .feature-title { font-size: 1.1rem; margin-bottom: 0.5rem; }
 
             .service-card {
-                min-width: 80vw;
+                min-width: 60vw;
+                max-width: 60vw;
                 scroll-snap-align: start;
                 flex-shrink: 0;
+                padding: 1.5rem 1.2rem;
             }
 
+            .service-icon { font-size: 1.8rem; margin-bottom: 0.8rem; }
+            .service-title { font-size: 1.1rem; }
+
             .testimonial-card {
-                min-width: 80vw;
+                min-width: 65vw;
+                max-width: 65vw;
                 scroll-snap-align: start;
                 flex-shrink: 0;
+                padding: 1.2rem 1rem;
             }
+
+            .review-text { font-size: 0.85rem; }
+            .reviewer { font-size: 0.75rem; }
             
             .process-grid { grid-template-columns: 1fr; }
             .process-item { border-right: none; border-bottom: 1px solid #333; padding: 2rem; }
