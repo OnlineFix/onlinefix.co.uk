@@ -593,10 +593,25 @@
 
                 <!-- Device Information -->
                 <div class="form-section">
-                    <h2 class="section-title">
-                        <i class="fas fa-mobile-alt"></i>
-                        Device & Repair Details
-                    </h2>
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+                        <h2 class="section-title" style="margin-bottom: 0;">
+                            <i class="fas fa-mobile-alt"></i>
+                            Device & Repair Details
+                        </h2>
+                        <div style="min-width: 250px;">
+                            <select class="form-input" id="quick-select-repair" onchange="autoFillRepair()"
+                                style="padding: 0.5rem 1rem; font-size: 0.9rem; background: rgba(0, 51, 255, 0.05); border-color: var(--primary-blue); color: var(--accent-cyan); cursor: pointer; border-radius: 20px;">
+                                <option value="">⚡ Quick Fill Common Repair...</option>
+                                <option value="ps5-hdmi">PS5 HDMI Port</option>
+                                <option value="xsx-hdmi">Xbox Series X HDMI</option>
+                                <option value="ps5-clean">PS5 Deep Clean</option>
+                                <option value="xsx-clean">Xbox Series X Clean</option>
+                                <option value="pc-rebuild">PC Rebuild</option>
+                                <option value="laptop-diag">Laptop Diagnostics</option>
+                            </select>
+                        </div>
+                    </div>
                     <div class="form-grid">
                         <div class="form-group">
                             <label class="form-label">Device</label>
@@ -661,7 +676,8 @@
                 style="margin: 2rem 0; padding: 1.5rem; background: rgba(0, 51, 255, 0.05); border-radius: var(--radius-md); border: 1px solid rgba(0, 51, 255, 0.2);">
                 <p
                     style="color: var(--text-muted); margin-bottom: 0.75rem; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em;">
-                    <i class="fas fa-link" style="margin-right: 0.5rem;"></i>Secure Public Tracking URL:</p>
+                    <i class="fas fa-link" style="margin-right: 0.5rem;"></i>Secure Public Tracking URL:
+                </p>
                 <div class="copy-container">
                     <div class="nfc-url" id="nfc-url" style="padding-right: 4.5rem;">
                         [URL will be generated]
@@ -778,6 +794,38 @@
             e.preventDefault();
             await createRepair();
         });
+
+        // Auto-fill common repairs
+        function autoFillRepair() {
+            const select = document.getElementById('quick-select-repair');
+            const deviceInput = document.querySelector('input[name="device"]');
+            const issueInput = document.querySelector('textarea[name="issue"]');
+
+            const repairs = {
+                'ps5-hdmi': { device: 'Sony PlayStation 5', issue: 'HDMI Port Replacement' },
+                'xsx-hdmi': { device: 'Microsoft Xbox Series X', issue: 'HDMI Port Replacement' },
+                'ps5-clean': { device: 'Sony PlayStation 5', issue: 'Deep Cleaning & Thermal Paste' },
+                'xsx-clean': { device: 'Microsoft Xbox Series X', issue: 'Deep Cleaning & Thermal Paste' },
+                'pc-rebuild': { device: 'Custom PC', issue: 'Full PC Rebuild / Assembly' },
+                'laptop-diag': { device: 'Laptop', issue: 'General Diagnostics' }
+            };
+
+            if (select.value && repairs[select.value]) {
+                const data = repairs[select.value];
+                deviceInput.value = data.device;
+                issueInput.value = data.issue;
+
+                // Flash inputs briefly to show they changed
+                [deviceInput, issueInput].forEach(el => {
+                    const originalBorder = el.style.borderColor;
+                    el.style.borderColor = 'var(--primary-cyan)';
+                    setTimeout(() => el.style.borderColor = originalBorder, 800);
+                });
+
+                // Reset dropdown to default after selection so they can use it again if needed
+                setTimeout(() => select.value = "", 500);
+            }
+        }
 
         // Photo upload handling
         document.getElementById('photo-input').addEventListener('change', handlePhotoUpload);

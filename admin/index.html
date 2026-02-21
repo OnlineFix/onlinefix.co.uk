@@ -894,6 +894,14 @@
                 <div class="section-header">
                     <h2 class="section-title">All Repairs</h2>
                     <div>
+                        <select id="common-repair-filter" class="form-input"
+                            style="display: inline-block; width: auto; margin-right: 1rem;">
+                            <option value="">All Services</option>
+                            <option value="hdmi">Console HDMI Port Replacement</option>
+                            <option value="cleaning">Console Cleaning</option>
+                            <option value="pc-rebuild">PC Rebuild</option>
+                            <option value="laptop-diag">Laptop Diagnostics</option>
+                        </select>
                         <select id="status-filter" class="form-input"
                             style="display: inline-block; width: auto; margin-right: 1rem;">
                             <option value="">All Statuses</option>
@@ -1057,8 +1065,13 @@
         });
 
         // Status filter
-        document.getElementById('status-filter').addEventListener('change', (e) => {
-            loadAllRepairs(e.target.value);
+        document.getElementById('status-filter').addEventListener('change', () => {
+            loadAllRepairs();
+        });
+
+        // Common repair filter
+        document.getElementById('common-repair-filter').addEventListener('change', () => {
+            loadAllRepairs();
         });
 
         // Show/hide screens
@@ -1114,6 +1127,9 @@
             // Load section-specific data
             if (sectionName === 'repairs') {
                 loadAllRepairs();
+            } else if (sectionName === 'overview') {
+                updateStats();
+                loadRecentRepairs();
             }
         }
 
@@ -1134,6 +1150,9 @@
 
                 // Load recent repairs
                 loadRecentRepairs();
+
+                // Keep 'All Repairs' table in sync
+                loadAllRepairs();
 
                 document.getElementById('loading').style.display = 'none';
             } catch (error) {
@@ -1435,11 +1454,38 @@
         }
 
         // Load all repairs with optional filter
-        function loadAllRepairs(statusFilter = '') {
+        function loadAllRepairs() {
+            const statusFilter = document.getElementById('status-filter').value;
+            const commonFilter = document.getElementById('common-repair-filter').value;
+
             let filteredRepairs = allRepairs;
 
+            // Apply Status Filter
             if (statusFilter) {
-                filteredRepairs = allRepairs.filter(r => r.currentStatus === statusFilter);
+                filteredRepairs = filteredRepairs.filter(r => r.currentStatus === statusFilter);
+            }
+
+            // Apply Common Repair Filter
+            if (commonFilter) {
+                filteredRepairs = filteredRepairs.filter(r => {
+                    // Combine relevant fields for text search
+                    const text = `${r.deviceType || ''} ${r.brand || ''} ${r.model || ''} ${r.issueDescription || ''}`.toLowerCase();
+
+                    if (commonFilter === 'hdmi') {
+                        return text.includes('hdmi');
+                    }
+                    if (commonFilter === 'cleaning') {
+                        return text.includes('clean') || text.includes('dust');
+                    }
+                    if (commonFilter === 'pc-rebuild') {
+                        return text.includes('rebuild') || text.includes('build') || text.includes('assembly');
+                    }
+                    if (commonFilter === 'laptop-diag') {
+                        return (text.includes('laptop') || text.includes('macbook')) &&
+                            (text.includes('diag') || text.includes('check') || text.includes('inspect'));
+                    }
+                    return true;
+                });
             }
 
             const tbody = document.querySelector('#all-repairs-table tbody');
