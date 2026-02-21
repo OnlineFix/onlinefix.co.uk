@@ -1,16 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Track Your Repair - OnlineFix</title>
-    <meta name="description" content="Track your device repair status with OnlineFix. Real-time updates on your smartphone, laptop, or tablet repair progress.">
-    
+    <meta name="description"
+        content="Track your device repair status with OnlineFix. Real-time updates on your smartphone, laptop, or tablet repair progress.">
+
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" integrity="sha512-fD9DI5bZwQxOi7MhYWnnNPlvXdp/2Pj3XSTRrFs5FQa4mizyGLnJcN6tuvUS6LbmgN1ut+XGSABKvjN0H6Aoow==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"
+        integrity="sha512-fD9DI5bZwQxOi7MhYWnnNPlvXdp/2Pj3XSTRrFs5FQa4mizyGLnJcN6tuvUS6LbmgN1ut+XGSABKvjN0H6Aoow=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <style>
         * {
             margin: 0;
@@ -87,8 +91,13 @@
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         /* Error State */
@@ -160,13 +169,40 @@
             margin-bottom: 1rem;
         }
 
-        .status-received { background: #EEF2FF; color: #3730A3; }
-        .status-diagnosing { background: #FEF3C7; color: #92400E; }
-        .status-waiting-parts { background: #FEE2E2; color: #B91C1C; }
-        .status-in-repair { background: #DBEAFE; color: #1D4ED8; }
-        .status-testing { background: #E0E7FF; color: #5B21B6; }
-        .status-ready { background: #D1FAE5; color: #065F46; }
-        .status-completed { background: #F3F4F6; color: #374151; }
+        .status-received {
+            background: #EEF2FF;
+            color: #3730A3;
+        }
+
+        .status-diagnosing {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .status-waiting-parts {
+            background: #FEE2E2;
+            color: #B91C1C;
+        }
+
+        .status-in-repair {
+            background: #DBEAFE;
+            color: #1D4ED8;
+        }
+
+        .status-testing {
+            background: #E0E7FF;
+            color: #5B21B6;
+        }
+
+        .status-ready {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .status-completed {
+            background: #F3F4F6;
+            color: #374151;
+        }
 
         .estimated-completion {
             font-size: 1rem;
@@ -187,19 +223,40 @@
             animation: slideInLeft 0.4s ease forwards;
         }
 
-        .timeline-item:nth-child(1) { animation-delay: 0.1s; }
-        .timeline-item:nth-child(2) { animation-delay: 0.2s; }
-        .timeline-item:nth-child(3) { animation-delay: 0.3s; }
-        .timeline-item:nth-child(4) { animation-delay: 0.4s; }
-        .timeline-item:nth-child(5) { animation-delay: 0.5s; }
-        .timeline-item:nth-child(6) { animation-delay: 0.6s; }
-        .timeline-item:nth-child(7) { animation-delay: 0.7s; }
+        .timeline-item:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .timeline-item:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .timeline-item:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .timeline-item:nth-child(4) {
+            animation-delay: 0.4s;
+        }
+
+        .timeline-item:nth-child(5) {
+            animation-delay: 0.5s;
+        }
+
+        .timeline-item:nth-child(6) {
+            animation-delay: 0.6s;
+        }
+
+        .timeline-item:nth-child(7) {
+            animation-delay: 0.7s;
+        }
 
         @keyframes slideInLeft {
             from {
                 opacity: 0;
                 transform: translateX(-20px);
             }
+
             to {
                 opacity: 1;
                 transform: translateX(0);
@@ -505,6 +562,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="header">
         <div class="container">
@@ -605,6 +663,17 @@
     </div>
 
     <script>
+        // Utility for escaping HTML to prevent XSS
+        function escapeHTML(str) {
+            if (str === null || str === undefined) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
         // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyAuPjwwwkqau6Wzfx7rURAe9jYPpgNbil4",
@@ -683,7 +752,7 @@
             try {
                 // Query by repairId field instead of document ID
                 const querySnapshot = await db.collection('repairs').where('repairId', '==', repairId).get();
-                
+
                 if (querySnapshot.empty) {
                     showError();
                     return;
@@ -693,7 +762,7 @@
                 const doc = querySnapshot.docs[0];
                 const data = doc.data();
                 displayRepairData(data);
-                
+
             } catch (error) {
                 console.error('Error loading repair data:', error);
                 showError();
@@ -711,10 +780,10 @@
             } else {
                 deviceInfo = 'Device';
             }
-            
+
             document.getElementById('deviceTitle').textContent = deviceInfo;
             document.getElementById('deviceId').textContent = `Repair ID: ${data.repairId}`;
-            
+
             // Update device icon - use device field to determine icon if possible
             let deviceTypeForIcon = data.deviceType || 'Device';
             if (data.device) {
@@ -744,7 +813,7 @@
                 const date = new Date(data.estimatedCompletion.seconds * 1000);
                 completionText = `Estimated completion: ${date.toLocaleDateString('en-GB')}`;
             }
-            
+
             // Show estimated cost if available
             if (data.estimatedCost || data.price) {
                 const cost = data.estimatedCost || data.price;
@@ -753,7 +822,7 @@
                 }
                 completionText += `Estimated cost: £${cost}`;
             }
-            
+
             document.getElementById('estimatedCompletion').innerHTML = completionText;
 
             // Get initial photos (photos not in progress updates)
@@ -765,7 +834,7 @@
                     }
                 });
             }
-            
+
             const initialPhotos = (data.photos || []).filter(photo => !progressPhotos.has(photo));
 
             // Build timeline with initial photos
@@ -813,7 +882,7 @@
 
             // Build timeline only for used statuses
             const statusOrder = ['received', 'diagnosing', 'waiting-parts', 'in-repair', 'testing', 'ready', 'completed'];
-            
+
             statusOrder.forEach((statusKey) => {
                 // Skip if this status was never used
                 if (!usedStatuses.has(statusKey)) {
@@ -822,7 +891,7 @@
 
                 const status = statusConfig[statusKey];
                 const progressItem = progress.find(p => p.status === statusKey);
-                
+
                 let iconClass = 'pending';
                 let timeText = '';
                 let notes = '';
@@ -871,12 +940,12 @@
                     <div class="timeline-content">
                         <div class="timeline-title">${status.label}</div>
                         ${timeText ? `<div class="timeline-time">${timeText}</div>` : ''}
-                        ${notes ? `<div class="timeline-notes">${notes}</div>` : ''}
+                        ${notes ? `<div class="timeline-notes">${escapeHTML(notes)}</div>` : ''}
                         ${photos.length > 0 ? `
                             <div class="timeline-photos">
                                 ${photos.map(photo => `
-                                    <div class="timeline-photo" onclick="showPhotoModal('${photo}')">
-                                        <img src="${photo}" alt="Progress photo">
+                                    <div class="timeline-photo" onclick="showPhotoModal('${escapeHTML(photo)}')">
+                                        <img src="${escapeHTML(photo)}" alt="Progress photo">
                                     </div>
                                 `).join('')}
                             </div>
@@ -891,7 +960,7 @@
         // Update device details
         function updateDeviceDetails(data) {
             const details = [];
-            
+
             // Show device if available, otherwise show type/brand/model
             if (data.device) {
                 details.push({ label: 'Device', value: data.device });
@@ -900,12 +969,12 @@
                 if (data.brand) details.push({ label: 'Brand', value: data.brand });
                 if (data.model) details.push({ label: 'Model', value: data.model });
             }
-            
+
             if (data.issueDescription) details.push({ label: 'Issue', value: data.issueDescription });
             if (data.dateReceived) {
-                details.push({ 
-                    label: 'Received Date', 
-                    value: new Date(data.dateReceived.seconds * 1000).toLocaleDateString('en-GB') 
+                details.push({
+                    label: 'Received Date',
+                    value: new Date(data.dateReceived.seconds * 1000).toLocaleDateString('en-GB')
                 });
             }
             if (data.customerName) details.push({ label: 'Customer', value: data.customerName });
@@ -918,7 +987,7 @@
                 detailItem.className = 'detail-item';
                 detailItem.innerHTML = `
                     <span class="detail-label">${detail.label}:</span>
-                    <span class="detail-value">${detail.value}</span>
+                    <span class="detail-value">${escapeHTML(detail.value)}</span>
                 `;
                 detailsContainer.appendChild(detailItem);
             });
@@ -945,7 +1014,7 @@
         // Initialize app
         document.addEventListener('DOMContentLoaded', () => {
             const repairId = getRepairId();
-            
+
             if (!repairId) {
                 showError();
                 return;
@@ -963,4 +1032,5 @@
         }, 30000);
     </script>
 </body>
+
 </html>

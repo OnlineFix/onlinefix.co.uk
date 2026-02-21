@@ -740,6 +740,17 @@
     </div>
 
     <script>
+        // Utility for escaping HTML to prevent XSS
+        function escapeHTML(str) {
+            if (str === null || str === undefined) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
         // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyAuPjwwwkqau6Wzfx7rURAe9jYPpgNbil4",
@@ -973,9 +984,9 @@
             const date = repair.dateReceived ? new Date(repair.dateReceived.seconds * 1000).toLocaleDateString('en-GB') : 'N/A';
             
             row.innerHTML = `
-                <td><strong>${repair.repairId}</strong></td>
-                <td>${repair.customerName}</td>
-                <td>${repair.brand} ${repair.model}</td>
+                <td><strong>${escapeHTML(repair.repairId)}</strong></td>
+                <td>${escapeHTML(repair.customerName)}</td>
+                <td>${escapeHTML(repair.brand)} ${escapeHTML(repair.model)}</td>
                 <td><span class="status-badge ${status.class}">${status.label}</span></td>
                 <td>${date}</td>
                 <td>
@@ -1003,35 +1014,35 @@
             modal.innerHTML = `
                 <div class="modal-content" style="max-width: 800px;">
                     <div class="modal-header">
-                        <h2 class="modal-title">Repair Details - ${repair.repairId}</h2>
+                        <h2 class="modal-title">Repair Details - ${escapeHTML(repair.repairId)}</h2>
                         <button class="close-btn" onclick="this.closest('.modal').remove()">&times;</button>
                     </div>
                     <div style="max-height: 70vh; overflow-y: auto;">
                         <div class="form-grid" style="margin-bottom: 2rem;">
                             <div style="background: var(--gray-100); padding: 1.5rem; border-radius: 15px;">
                                 <h3 style="color: var(--deep-blue); margin-bottom: 1rem;">Customer Information</h3>
-                                <p><strong>Name:</strong> ${repair.customerName}</p>
-                                <p><strong>Phone:</strong> ${repair.customerPhone}</p>
-                                ${repair.customerEmail ? `<p><strong>Email:</strong> ${repair.customerEmail}</p>` : ''}
-                                ${repair.customerAddress ? `<p><strong>Address:</strong> ${repair.customerAddress}</p>` : ''}
+                                <p><strong>Name:</strong> ${escapeHTML(repair.customerName)}</p>
+                                <p><strong>Phone:</strong> ${escapeHTML(repair.customerPhone)}</p>
+                                ${repair.customerEmail ? `<p><strong>Email:</strong> ${escapeHTML(repair.customerEmail)}</p>` : ''}
+                                ${repair.customerAddress ? `<p><strong>Address:</strong> ${escapeHTML(repair.customerAddress)}</p>` : ''}
                             </div>
                             <div style="background: var(--gray-100); padding: 1.5rem; border-radius: 15px;">
                                 <h3 style="color: var(--deep-blue); margin-bottom: 1rem;">Device Information</h3>
-                                <p><strong>Type:</strong> ${repair.deviceType}</p>
-                                <p><strong>Brand:</strong> ${repair.brand}</p>
-                                <p><strong>Model:</strong> ${repair.model}</p>
-                                ${repair.serialNumber ? `<p><strong>Serial:</strong> ${repair.serialNumber}</p>` : ''}
-                                <p><strong>Condition:</strong> ${repair.deviceCondition || 'Not specified'}</p>
+                                <p><strong>Type:</strong> ${escapeHTML(repair.deviceType)}</p>
+                                <p><strong>Brand:</strong> ${escapeHTML(repair.brand)}</p>
+                                <p><strong>Model:</strong> ${escapeHTML(repair.model)}</p>
+                                ${repair.serialNumber ? `<p><strong>Serial:</strong> ${escapeHTML(repair.serialNumber)}</p>` : ''}
+                                <p><strong>Condition:</strong> ${escapeHTML(repair.deviceCondition) || 'Not specified'}</p>
                             </div>
                         </div>
                         <div style="background: var(--gray-100); padding: 1.5rem; border-radius: 15px; margin-bottom: 2rem;">
                             <h3 style="color: var(--deep-blue); margin-bottom: 1rem;">Repair Details</h3>
-                            <p><strong>Issue:</strong> ${repair.issueDescription}</p>
+                            <p><strong>Issue:</strong> ${escapeHTML(repair.issueDescription)}</p>
                             <p><strong>Current Status:</strong> <span class="status-badge ${statusConfig[repair.currentStatus]?.class || 'status-received'}">${statusConfig[repair.currentStatus]?.label || 'Received'}</span></p>
                             <p><strong>Date Received:</strong> ${repair.dateReceived ? new Date(repair.dateReceived.seconds * 1000).toLocaleString('en-GB') : 'N/A'}</p>
                             ${repair.estimatedCompletion ? `<p><strong>Est. Completion:</strong> ${new Date(repair.estimatedCompletion.seconds * 1000).toLocaleDateString('en-GB')}</p>` : ''}
-                            ${repair.estimatedCost ? `<p><strong>Est. Cost:</strong> £${repair.estimatedCost}</p>` : ''}
-                            ${repair.additionalNotes ? `<p><strong>Notes:</strong> ${repair.additionalNotes}</p>` : ''}
+                            ${repair.estimatedCost ? `<p><strong>Est. Cost:</strong> £${escapeHTML(repair.estimatedCost)}</p>` : ''}
+                            ${repair.additionalNotes ? `<p><strong>Notes:</strong> ${escapeHTML(repair.additionalNotes)}</p>` : ''}
                         </div>
                         ${repair.progress && repair.progress.length > 0 ? `
                             <div style="background: var(--gray-100); padding: 1.5rem; border-radius: 15px; margin-bottom: 2rem;">
@@ -1042,8 +1053,8 @@
                                             <strong>${statusConfig[p.status]?.label || p.status}</strong>
                                             <small>${p.timestamp ? new Date(p.timestamp.seconds * 1000).toLocaleString('en-GB') : 'N/A'}</small>
                                         </div>
-                                        ${p.notes ? `<p style="color: var(--gray-600); margin: 0;">${p.notes}</p>` : ''}
-                                        ${p.technician ? `<p style="color: var(--gray-500); font-size: 0.9rem; margin: 0.5rem 0 0 0;">By: ${p.technician}</p>` : ''}
+                                        ${p.notes ? `<p style="color: var(--gray-600); margin: 0;">${escapeHTML(p.notes)}</p>` : ''}
+                                        ${p.technician ? `<p style="color: var(--gray-500); font-size: 0.9rem; margin: 0.5rem 0 0 0;">By: ${escapeHTML(p.technician)}</p>` : ''}
                                         ${p.photos && p.photos.length > 0 ? `
                                             <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 0.5rem; margin-top: 0.5rem;">
                                                 ${p.photos.map(photo => `
@@ -1081,13 +1092,13 @@
             modal.innerHTML = `
                 <div class="modal-content" style="max-width: 700px;">
                     <div class="modal-header">
-                        <h2 class="modal-title">Update Repair - ${repair.repairId}</h2>
+                        <h2 class="modal-title">Update Repair - ${escapeHTML(repair.repairId)}</h2>
                         <button class="close-btn" onclick="this.closest('.modal').remove()">&times;</button>
                     </div>
                     <form id="update-repair-form" data-repair-id="${repairId}">
                         <div class="form-group">
-                            <label class="form-label">Customer: ${repair.customerName}</label>
-                            <label class="form-label">Device: ${repair.brand} ${repair.model}</label>
+                            <label class="form-label">Customer: ${escapeHTML(repair.customerName)}</label>
+                            <label class="form-label">Device: ${escapeHTML(repair.brand)} ${escapeHTML(repair.model)}</label>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Update Status</label>
@@ -1244,10 +1255,10 @@
             const estCompletion = repair.estimatedCompletion ? new Date(repair.estimatedCompletion.seconds * 1000).toLocaleDateString('en-GB') : 'TBD';
             
             row.innerHTML = `
-                <td><strong>${repair.repairId}</strong></td>
-                <td>${repair.customerName}<br><small>${repair.customerPhone}</small></td>
-                <td>${repair.deviceType}<br><small>${repair.brand} ${repair.model}</small></td>
-                <td title="${repair.issueDescription}">${repair.issueDescription.substring(0, 50)}${repair.issueDescription.length > 50 ? '...' : ''}</td>
+                <td><strong>${escapeHTML(repair.repairId)}</strong></td>
+                <td>${escapeHTML(repair.customerName)}<br><small>${escapeHTML(repair.customerPhone)}</small></td>
+                <td>${escapeHTML(repair.deviceType)}<br><small>${escapeHTML(repair.brand)} ${escapeHTML(repair.model)}</small></td>
+                <td title="${escapeHTML(repair.issueDescription)}">${escapeHTML(repair.issueDescription).substring(0, 50)}${repair.issueDescription.length > 50 ? '...' : ''}</td>
                 <td><span class="status-badge ${status.class}">${status.label}</span></td>
                 <td>${dateReceived}</td>
                 <td>${estCompletion}</td>
@@ -1332,8 +1343,8 @@
             
             const photoId = 'photo_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
             photoItem.innerHTML = `
-                <img src="${src}" alt="Update photo">
-                <button type="button" class="photo-remove-small" onclick="removeUpdatePhoto('${photoId}')">×</button>
+                <img src="${escapeHTML(src)}" alt="Update photo">
+                <button type="button" class="photo-remove-small" onclick="removeUpdatePhoto('${escapeHTML(photoId)}')">×</button>
             `;
             
             photoItem.dataset.photoId = photoId;

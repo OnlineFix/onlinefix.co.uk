@@ -1,20 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>New Repair - OnlineFix</title>
-    
+
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    
+
     <!-- EmailJS for sending emails -->
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" integrity="sha512-fD9DI5bZwQxOi7MhYWnnNPlvXdp/2Pj3XSTRrFs5FQa4mizyGLnJcN6tuvUS6LbmgN1ut+XGSABKvjN0H6Aoow==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"
+        integrity="sha512-fD9DI5bZwQxOi7MhYWnnNPlvXdp/2Pj3XSTRrFs5FQa4mizyGLnJcN6tuvUS6LbmgN1ut+XGSABKvjN0H6Aoow=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <style>
         * {
             margin: 0;
@@ -330,8 +333,13 @@
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         /* Alerts */
@@ -365,7 +373,8 @@
                 visibility: hidden;
             }
 
-            .print-label, .print-label * {
+            .print-label,
+            .print-label * {
                 visibility: visible;
             }
 
@@ -420,6 +429,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <!-- Header -->
@@ -474,7 +484,8 @@
                     <div class="form-grid">
                         <div class="form-group">
                             <label class="form-label">Device</label>
-                            <input type="text" class="form-input" name="device" placeholder="iPhone 13 Pro, Samsung S22, etc.">
+                            <input type="text" class="form-input" name="device"
+                                placeholder="iPhone 13 Pro, Samsung S22, etc.">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Price (£)</label>
@@ -483,7 +494,8 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label">Issue Description</label>
-                        <textarea class="form-input form-textarea" name="issue" placeholder="Describe the problem with the device..."></textarea>
+                        <textarea class="form-input form-textarea" name="issue"
+                            placeholder="Describe the problem with the device..."></textarea>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Device Photos</label>
@@ -527,14 +539,15 @@
             </div>
             <h2 style="color: var(--deep-blue); margin-bottom: 1rem;">Repair Created Successfully!</h2>
             <div class="repair-id" id="generated-repair-id">REPAIR_123456</div>
-            
+
             <div style="margin: 2rem 0;">
                 <p style="color: var(--gray-600); margin-bottom: 0.5rem;">NFC Card URL:</p>
                 <div class="copy-container">
                     <div class="nfc-url" id="nfc-url" style="padding-right: 4rem;">
                         [URL will be generated]
                     </div>
-                    <button class="btn btn-secondary" onclick="copyNFCLink()" style="position: absolute; right: 0.5rem; top: 50%; transform: translateY(-50%); padding: 0.5rem 1rem; font-size: 0.85rem;">
+                    <button class="btn btn-secondary" onclick="copyNFCLink()"
+                        style="position: absolute; right: 0.5rem; top: 50%; transform: translateY(-50%); padding: 0.5rem 1rem; font-size: 0.85rem;">
                         <i class="fas fa-copy"></i>
                         Copy
                     </button>
@@ -584,7 +597,7 @@
     <script>
         // IMPORTANT: Update this to match your GitHub Pages URL structure
         const GITHUB_PAGES_BASE_URL = 'https://onlinefix.co.uk';
-        
+
         // Initialize EmailJS (You need to sign up at emailjs.com and get your own keys)
         // Instructions:
         // 1. Sign up at https://www.emailjs.com/
@@ -594,6 +607,17 @@
         // 5. Replace YOUR_EMAILJS_PUBLIC_KEY below with your actual public key
         // 6. Update the emailjs.send() call with your Service ID and Template ID
         emailjs.init("YOUR_EMAILJS_PUBLIC_KEY"); // Replace with your EmailJS public key
+
+        // Utility for escaping HTML to prevent XSS
+        function escapeHTML(str) {
+            if (str === null || str === undefined) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
 
         // Firebase Configuration
         const firebaseConfig = {
@@ -652,16 +676,16 @@
             const preview = document.getElementById('photo-preview');
             const photoItem = document.createElement('div');
             photoItem.className = 'photo-item';
-            
+
             const photoId = 'photo_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
             photoItem.innerHTML = `
-                <img src="${src}" alt="Device photo">
-                <button type="button" class="photo-remove" onclick="removePhoto('${photoId}')">×</button>
+                <img src="${escapeHTML(src)}" alt="Device photo">
+                <button type="button" class="photo-remove" onclick="removePhoto('${escapeHTML(photoId)}')">×</button>
             `;
-            
+
             photoItem.dataset.photoId = photoId;
             preview.appendChild(photoItem);
-            
+
             uploadedPhotos.push({ id: photoId, file, src });
         }
 
@@ -675,7 +699,7 @@
 
         // Drag and drop for photos
         const photoUpload = document.querySelector('.photo-upload');
-        
+
         photoUpload.addEventListener('dragover', (e) => {
             e.preventDefault();
             photoUpload.classList.add('dragover');
@@ -688,7 +712,7 @@
         photoUpload.addEventListener('drop', (e) => {
             e.preventDefault();
             photoUpload.classList.remove('dragover');
-            
+
             const files = Array.from(e.dataTransfer.files);
             files.forEach(file => {
                 if (file.type.startsWith('image/')) {
@@ -730,14 +754,14 @@
                 let brand = 'Unknown';
                 let model = 'Unknown';
                 let deviceType = 'Device';
-                
+
                 if (data.device) {
                     // Try to extract brand and model from device string
                     const deviceParts = data.device.trim().split(' ');
                     if (deviceParts.length > 0) {
                         brand = deviceParts[0];
                         model = data.device;
-                        
+
                         // Determine device type
                         const deviceLower = data.device.toLowerCase();
                         if (deviceLower.includes('iphone') || deviceLower.includes('phone')) {
@@ -783,11 +807,11 @@
 
                 // Save to Firestore
                 const docRef = await db.collection('repairs').add(repairData);
-                
+
                 console.log('Repair created successfully:', repairData);
                 console.log('Document ID:', docRef.id);
                 console.log('Tracking URL:', `${GITHUB_PAGES_BASE_URL}/track/?id=${repairId}`);
-                
+
                 // Verify the repair was saved by reading it back
                 const savedDoc = await docRef.get();
                 if (!savedDoc.exists) {
@@ -834,15 +858,15 @@
                 // 3. Create email template with variables above
                 // 4. Get your IDs from EmailJS dashboard
                 // 5. Replace the IDs below:
-                
+
                 // Uncomment this line when EmailJS is configured:
                 // await emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', templateParams);
-                
+
                 console.log('Email notification ready to send:', templateParams);
-                
+
                 // Always use mailto as fallback for now
                 sendEmailViaMailto(repairData);
-                
+
             } catch (error) {
                 console.error('Error with email notification:', error);
                 // Try mailto as fallback
@@ -855,51 +879,51 @@
             document.getElementById('loading').style.display = 'none';
             document.getElementById('generated-repair-id').textContent = repairId;
             document.getElementById('nfc-url').textContent = `${GITHUB_PAGES_BASE_URL}/track/?id=${repairId}`;
-            
+
             // Show label preview
             updateLabelPreview();
             document.getElementById('label-preview').style.display = 'block';
-            
+
             document.getElementById('success-modal').classList.add('show');
         }
 
         // Update label preview
         function updateLabelPreview() {
             if (!currentRepairData) return;
-            
+
             const labelContent = `
                 <strong>OnlineFix</strong><br>
-                ${currentRepairData.repairId}<br>
-                ${currentRepairData.customerName}<br>
-                ${currentRepairData.device}<br>
-                ${currentRepairData.customerPhone}<br>
-                ${currentRepairData.estimatedCost ? `£${currentRepairData.estimatedCost}` : ''}<br>
+                ${escapeHTML(currentRepairData.repairId)}<br>
+                ${escapeHTML(currentRepairData.customerName)}<br>
+                ${escapeHTML(currentRepairData.device)}<br>
+                ${escapeHTML(currentRepairData.customerPhone)}<br>
+                ${currentRepairData.estimatedCost ? `£${escapeHTML(currentRepairData.estimatedCost)}` : ''}<br>
                 ${new Date().toLocaleDateString('en-GB')}<br>
                 <small style="font-size: 0.7em;">onlinefix.co.uk/track</small>
             `;
-            
+
             document.getElementById('label-content').innerHTML = labelContent;
         }
 
         // Print label
         function printLabel() {
             if (!currentRepairData) return;
-            
+
             // Create print content for Dymo label (2.25" x 1.25")
             const printLabel = document.getElementById('print-label');
             printLabel.innerHTML = `
                 <div style="width: 2.25in; height: 1.25in; padding: 0.1in; font-family: Arial, sans-serif; font-size: 10pt; line-height: 1.2;">
                     <div style="font-weight: bold; font-size: 11pt;">OnlineFix</div>
-                    <div style="font-weight: bold; margin: 2px 0;">${currentRepairData.repairId}</div>
-                    <div>${currentRepairData.customerName}</div>
-                    <div style="font-size: 9pt;">${currentRepairData.device}</div>
-                    <div style="font-size: 9pt;">${currentRepairData.customerPhone}</div>
-                    ${currentRepairData.estimatedCost ? `<div style="font-size: 9pt;">£${currentRepairData.estimatedCost}</div>` : ''}
+                    <div style="font-weight: bold; margin: 2px 0;">${escapeHTML(currentRepairData.repairId)}</div>
+                    <div>${escapeHTML(currentRepairData.customerName)}</div>
+                    <div style="font-size: 9pt;">${escapeHTML(currentRepairData.device)}</div>
+                    <div style="font-size: 9pt;">${escapeHTML(currentRepairData.customerPhone)}</div>
+                    ${currentRepairData.estimatedCost ? `<div style="font-size: 9pt;">£${escapeHTML(currentRepairData.estimatedCost)}</div>` : ''}
                     <div style="font-size: 8pt; margin-top: 2px;">${new Date().toLocaleDateString('en-GB')}</div>
                     <div style="font-size: 7pt; margin-top: 2px;">Track: onlinefix.co.uk/track</div>
                 </div>
             `;
-            
+
             printLabel.style.display = 'block';
             window.print();
             printLabel.style.display = 'none';
@@ -925,9 +949,9 @@
             const alert = document.createElement('div');
             alert.className = `alert alert-${type}`;
             alert.textContent = message;
-            
+
             document.body.appendChild(alert);
-            
+
             setTimeout(() => {
                 alert.style.opacity = '0';
                 setTimeout(() => alert.remove(), 300);
@@ -958,7 +982,7 @@ NFC URL: ${GITHUB_PAGES_BASE_URL}/track/?id=${repairData.repairId}
 
 Date: ${new Date().toLocaleString('en-GB')}
             `;
-            
+
             const mailtoLink = `mailto:onlinerepairbooking@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
             window.open(mailtoLink);
         }
@@ -966,7 +990,7 @@ Date: ${new Date().toLocaleString('en-GB')}
         // Copy NFC link to clipboard
         function copyNFCLink() {
             const nfcUrl = document.getElementById('nfc-url').textContent.trim();
-            
+
             if (navigator.clipboard) {
                 navigator.clipboard.writeText(nfcUrl).then(() => {
                     showAlert('NFC link copied to clipboard!', 'success');
@@ -987,16 +1011,17 @@ Date: ${new Date().toLocaleString('en-GB')}
             textArea.style.opacity = '0';
             document.body.appendChild(textArea);
             textArea.select();
-            
+
             try {
                 document.execCommand('copy');
                 showAlert('NFC link copied to clipboard!', 'success');
             } catch (err) {
                 showAlert('Failed to copy link', 'error');
             }
-            
+
             document.body.removeChild(textArea);
         }
     </script>
 </body>
+
 </html>
