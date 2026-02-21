@@ -26,186 +26,238 @@
         }
 
         :root {
-            --primary-blue: #0066FF;
-            --trust-teal: #00B4D8;
-            --deep-blue: #023E8A;
-            --accent-cyan: #90E0EF;
-            --light-bg: #F8FAFC;
-            --white: #FFFFFF;
-            --gray-100: #F1F5F9;
-            --gray-200: #E2E8F0;
-            --gray-600: #64748B;
-            --gray-800: #1E293B;
+            /* Premium Dark Mode Colors */
+            --bg-base: #0B0E14;
+            /* Deepest dark for background */
+            --bg-surface: #151A23;
+            /* Slightly lighter for cards/sections */
+            --bg-elevated: #1F2735;
+            /* Pop-outs, modals, hover states */
+
+            --primary-blue: #0033FF;
+            /* Brand color */
+            --primary-glow: rgba(0, 51, 255, 0.4);
+            --accent-cyan: #00E4FF;
+            /* Secondary accent */
+
+            --text-main: #FFFFFF;
+            --text-muted: #94A3B8;
+            --text-dark: #64748B;
+
+            --border-color: rgba(255, 255, 255, 0.08);
+
+            /* Status Colors */
             --success: #10B981;
             --warning: #F59E0B;
             --danger: #EF4444;
-            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            --info: #3B82F6;
+
+            --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            --shadow-glow: 0 0 20px var(--primary-glow);
+
+            /* Utilities */
+            --radius-md: 12px;
+            --radius-lg: 20px;
         }
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             line-height: 1.6;
-            color: var(--gray-800);
-            background: var(--light-bg);
+            color: var(--text-main);
+            background: var(--bg-base);
             min-height: 100vh;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1000px;
+            /* Kept slightly wider for forms */
             margin: 0 auto;
-            padding: 2rem;
+            padding: 2rem 1.5rem;
         }
 
         /* Header */
         .header {
-            background: var(--white);
-            border-radius: 20px;
-            padding: 2rem;
-            box-shadow: var(--shadow);
+            background: var(--bg-surface);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem 2rem;
+            box-shadow: var(--shadow-sm);
             margin-bottom: 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border: 1px solid var(--border-color);
         }
 
         .logo {
             font-size: 1.8rem;
             font-weight: 800;
-            color: var(--primary-blue);
+            color: var(--text-main);
+            text-shadow: 0 0 15px var(--primary-glow);
         }
 
         .user-info {
-            color: var(--gray-600);
+            color: var(--text-muted);
             font-size: 0.9rem;
         }
 
         /* Main Form */
         .form-container {
-            background: var(--white);
-            border-radius: 20px;
-            box-shadow: var(--shadow);
-            padding: 2rem;
+            background: var(--bg-surface);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            padding: 2.5rem;
+            border: 1px solid var(--border-color);
         }
 
         .form-title {
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             font-weight: 700;
-            color: var(--deep-blue);
-            margin-bottom: 2rem;
+            color: var(--text-main);
+            margin-bottom: 2.5rem;
             text-align: center;
         }
 
         /* Form Grid */
         .form-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 1.5rem;
             margin-bottom: 2rem;
         }
 
         .form-section {
-            background: var(--gray-100);
-            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: var(--radius-md);
             padding: 1.5rem;
             margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
         }
 
         .section-title {
             font-size: 1.2rem;
             font-weight: 600;
-            color: var(--deep-blue);
-            margin-bottom: 1rem;
+            color: var(--text-main);
+            margin-bottom: 1.5rem;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.75rem;
+        }
+
+        .section-title i {
+            color: var(--primary-cyan);
+            background: rgba(0, 51, 255, 0.15);
+            padding: 0.5rem;
+            border-radius: 8px;
         }
 
         /* Form Elements */
         .form-group {
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
         }
 
         .form-label {
             display: block;
             margin-bottom: 0.5rem;
-            font-weight: 500;
-            color: var(--gray-800);
-            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
         .form-input {
             width: 100%;
-            padding: 0.75rem;
-            border: 2px solid var(--gray-200);
-            border-radius: 10px;
+            padding: 0.85rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
             font-size: 1rem;
             transition: all 0.3s ease;
-            background: var(--white);
+            background: var(--bg-base);
+            color: var(--text-main);
         }
 
         .form-input:focus {
             outline: none;
             border-color: var(--primary-blue);
-            box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
+            box-shadow: 0 0 0 3px rgba(0, 51, 255, 0.2);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-dark);
         }
 
         .form-textarea {
-            min-height: 100px;
+            min-height: 120px;
             resize: vertical;
         }
 
         /* Photo Upload */
         .photo-upload {
-            border: 2px dashed var(--gray-200);
-            border-radius: 10px;
-            padding: 1.5rem;
+            border: 2px dashed var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 2.5rem 1.5rem;
             text-align: center;
             transition: all 0.3s ease;
             cursor: pointer;
-            background: var(--white);
+            background: rgba(255, 255, 255, 0.02);
         }
 
         .photo-upload:hover {
             border-color: var(--primary-blue);
-            background: rgba(0, 102, 255, 0.02);
+            background: rgba(0, 51, 255, 0.05);
+            box-shadow: inset 0 0 20px rgba(0, 51, 255, 0.1);
         }
 
         .photo-upload.dragover {
-            border-color: var(--primary-blue);
-            background: rgba(0, 102, 255, 0.1);
+            border-color: var(--primary-cyan);
+            background: rgba(0, 228, 255, 0.1);
+            transform: scale(1.02);
         }
 
         .photo-preview {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-            gap: 0.5rem;
-            margin-top: 1rem;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
         }
 
         .photo-item {
             position: relative;
-            border-radius: 8px;
+            border-radius: var(--radius-md);
             overflow: hidden;
+            border: 1px solid var(--border-color);
         }
 
         .photo-item img {
             width: 100%;
-            height: 100px;
+            height: 120px;
             object-fit: cover;
+            display: block;
         }
 
         .photo-remove {
             position: absolute;
             top: 5px;
             right: 5px;
-            background: var(--danger);
+            background: rgba(239, 68, 68, 0.9);
             color: var(--white);
             border: none;
             border-radius: 50%;
-            width: 20px;
-            height: 20px;
+            width: 24px;
+            height: 24px;
             cursor: pointer;
-            font-size: 0.7rem;
+            font-size: 0.9rem;
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .photo-remove:hover {
+            transform: scale(1.1);
+            background: var(--danger);
         }
 
         /* Buttons */
@@ -213,17 +265,17 @@
             display: flex;
             gap: 1rem;
             justify-content: center;
-            margin-top: 2rem;
+            margin-top: 3rem;
             flex-wrap: wrap;
         }
 
         .btn {
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
-            padding: 0.75rem 1.5rem;
+            gap: 0.75rem;
+            padding: 0.85rem 1.75rem;
             border: none;
-            border-radius: 10px;
+            border-radius: var(--radius-md);
             text-decoration: none;
             font-weight: 600;
             cursor: pointer;
@@ -234,25 +286,33 @@
         .btn-primary {
             background: var(--primary-blue);
             color: var(--white);
+            box-shadow: 0 4px 15px var(--primary-glow);
         }
 
         .btn-primary:hover {
-            background: var(--deep-blue);
             transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--primary-glow);
+            filter: brightness(1.1);
         }
 
         .btn-secondary {
-            background: var(--gray-200);
-            color: var(--gray-800);
+            background: var(--bg-elevated);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
         }
 
         .btn-secondary:hover {
-            background: var(--gray-300);
+            background: rgba(255, 255, 255, 0.1);
         }
 
         .btn-success {
-            background: var(--success);
-            color: var(--white);
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-success:hover {
+            background: rgba(16, 185, 129, 0.25);
         }
 
         /* Success Modal */
@@ -263,51 +323,85 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
         }
 
         .modal.show {
             display: flex;
             align-items: center;
             justify-content: center;
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
 
         .modal-content {
-            background: var(--white);
-            border-radius: 20px;
-            padding: 2rem;
-            max-width: 500px;
+            background: var(--bg-surface);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            padding: 3rem 2rem;
+            max-width: 600px;
             width: 90%;
             text-align: center;
+            box-shadow: var(--shadow-md), 0 0 40px rgba(0, 0, 0, 0.5);
+            animation: modalSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes modalSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .success-icon {
-            font-size: 3rem;
+            font-size: 4rem;
             color: var(--success);
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
         }
 
         .repair-id {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: var(--primary-blue);
-            background: var(--gray-100);
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-main);
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             padding: 1rem 2rem;
-            border-radius: 50px;
+            border-radius: var(--radius-md);
             display: inline-block;
             margin: 1rem 0;
+            letter-spacing: 0.1em;
+            font-family: monospace;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
         }
 
         .nfc-url {
-            background: var(--gray-100);
-            border: 2px solid var(--gray-200);
-            border-radius: 10px;
-            padding: 1rem;
+            background: var(--bg-base);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 1.25rem;
             font-family: monospace;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             word-break: break-all;
             margin: 0;
+            color: var(--primary-cyan);
+            text-align: left;
         }
 
         .copy-container {
@@ -319,17 +413,18 @@
         .loading {
             display: none;
             text-align: center;
-            padding: 2rem;
+            padding: 3rem 2rem;
         }
 
         .spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid var(--gray-200);
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(0, 51, 255, 0.2);
             border-top: 3px solid var(--primary-blue);
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin: 0 auto 1rem;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 0 20px var(--primary-glow);
         }
 
         @keyframes spin {
@@ -345,7 +440,7 @@
         /* Alerts */
         .alert {
             padding: 1rem;
-            border-radius: 10px;
+            border-radius: var(--radius-md);
             margin-bottom: 1rem;
             font-weight: 500;
             position: fixed;
@@ -353,18 +448,31 @@
             right: 20px;
             z-index: 2000;
             min-width: 300px;
+            animation: alertSlideIn 0.3s ease;
+        }
+
+        @keyframes alertSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .alert-success {
-            background: #D1FAE5;
-            color: #065F46;
-            border: 1px solid #A7F3D0;
+            background: rgba(16, 185, 129, 0.1);
+            color: #34D399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
         }
 
         .alert-error {
-            background: #FEE2E2;
-            color: #B91C1C;
-            border: 1px solid #FCA5A5;
+            background: rgba(239, 68, 68, 0.1);
+            color: #F87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
         }
 
         /* Print Styles */
@@ -393,18 +501,23 @@
         /* Dymo Label Preview */
         .label-preview {
             display: none;
-            border: 2px solid var(--gray-200);
-            border-radius: 10px;
-            padding: 1rem;
-            margin-top: 1rem;
-            background: var(--white);
+            border: 1px solid var(--border-color);
+            background: var(--bg-base);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            margin-left: auto;
+            margin-right: auto;
             width: 350px;
-            margin: 1rem auto;
+            max-width: 100%;
+            text-align: left;
         }
 
         .label-content {
             font-size: 0.9rem;
             line-height: 1.4;
+            color: var(--text-main);
+            font-family: monospace;
         }
 
         /* Responsive */
@@ -434,9 +547,12 @@
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <div class="logo">OnlineFix</div>
+            <div class="logo">OnlineFix<span style="color: var(--text-main); font-weight: 300;"> Admin</span></div>
             <div style="display: flex; gap: 1rem; align-items: center;">
-                <div class="user-info" id="user-info">Not logged in</div>
+                <div class="user-info" id="user-info">
+                    <i class="fas fa-user-circle" style="margin-right: 0.5rem; color: var(--text-muted);"></i>
+                    <span>Not logged in</span>
+                </div>
                 <a href="../admin/" class="btn btn-secondary">
                     <i class="fas fa-arrow-left"></i>
                     Dashboard
@@ -535,28 +651,34 @@
     <div class="modal" id="success-modal">
         <div class="modal-content">
             <div class="success-icon">
-                <i class="fas fa-check-circle"></i>
+                <i class="fas fa-shield-check"></i>
             </div>
-            <h2 style="color: var(--deep-blue); margin-bottom: 1rem;">Repair Created Successfully!</h2>
+            <h2 style="color: var(--text-main); margin-bottom: 0.5rem;">Repair Created Securely</h2>
+            <p style="color: var(--text-muted); margin-bottom: 1.5rem;">The device has been logged into the system.</p>
             <div class="repair-id" id="generated-repair-id">REPAIR_123456</div>
 
-            <div style="margin: 2rem 0;">
-                <p style="color: var(--gray-600); margin-bottom: 0.5rem;">NFC Card URL:</p>
+            <div
+                style="margin: 2rem 0; padding: 1.5rem; background: rgba(0, 51, 255, 0.05); border-radius: var(--radius-md); border: 1px solid rgba(0, 51, 255, 0.2);">
+                <p
+                    style="color: var(--text-muted); margin-bottom: 0.75rem; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em;">
+                    <i class="fas fa-link" style="margin-right: 0.5rem;"></i>Secure Public Tracking URL:</p>
                 <div class="copy-container">
-                    <div class="nfc-url" id="nfc-url" style="padding-right: 4rem;">
+                    <div class="nfc-url" id="nfc-url" style="padding-right: 4.5rem;">
                         [URL will be generated]
                     </div>
-                    <button class="btn btn-secondary" onclick="copyNFCLink()"
+                    <button class="btn btn-primary" onclick="copyNFCLink()"
                         style="position: absolute; right: 0.5rem; top: 50%; transform: translateY(-50%); padding: 0.5rem 1rem; font-size: 0.85rem;">
                         <i class="fas fa-copy"></i>
                         Copy
                     </button>
                 </div>
-                <p style="font-size: 0.85rem; color: var(--gray-600); margin-top: 0.5rem;">
-                    Email sent to onlinerepairbooking@gmail.com
+                <p
+                    style="font-size: 0.85rem; color: var(--success); margin-top: 1rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                    <i class="fas fa-paper-plane"></i> Email notifications configured
                 </p>
-                <p style="font-size: 0.75rem; color: var(--gray-600); margin-top: 0.5rem;">
-                    Note: If tracking link doesn't work immediately, wait a few minutes for GitHub Pages to update.
+                <p style="font-size: 0.75rem; color: var(--text-dark); margin-top: 0.5rem;">
+                    <i class="fas fa-info-circle"></i> Note: Please wait a few moments for the tracking link to become
+                    live on the network.
                 </p>
             </div>
 
@@ -571,9 +693,10 @@
                 </button>
                 <button class="btn btn-secondary" onclick="createAnother()">
                     <i class="fas fa-plus"></i>
-                    Create Another
+                    New Repair
                 </button>
-                <a href="../admin/" class="btn btn-success">
+                <a href="../admin/" class="btn btn-success"
+                    style="background: var(--bg-elevated); color: var(--text-main); border: 1px solid var(--border-color);">
                     <i class="fas fa-tachometer-alt"></i>
                     Dashboard
                 </a>

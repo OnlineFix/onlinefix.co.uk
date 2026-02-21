@@ -23,71 +23,177 @@
         }
 
         :root {
-            --primary-blue: #0066FF;
-            --trust-teal: #00B4D8;
-            --deep-blue: #023E8A;
-            --accent-cyan: #90E0EF;
-            --light-bg: #F8FAFC;
-            --white: #FFFFFF;
-            --gray-50: #F9FAFB;
-            --gray-100: #F1F5F9;
-            --gray-300: #CBD5E1;
-            --gray-600: #64748B;
-            --gray-800: #1E293B;
+            /* Premium Dark Mode Colors (Consistent with Admin) */
+            --bg-base: #0B0E14;
+            /* Deepest dark for background */
+            --bg-surface: #151A23;
+            /* Slightly lighter for cards/sections */
+            --bg-elevated: #1F2735;
+            /* Pop-outs, modals, hover states */
+
+            --primary-blue: #0033FF;
+            /* Brand color */
+            --primary-glow: rgba(0, 51, 255, 0.4);
+            --accent-cyan: #00E4FF;
+            /* Secondary accent */
+
+            --text-main: #FFFFFF;
+            --text-muted: #94A3B8;
+            --text-dark: #64748B;
+
+            --border-color: rgba(255, 255, 255, 0.08);
+
+            /* Status Colors */
             --success: #10B981;
             --warning: #F59E0B;
             --danger: #EF4444;
-            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            --info: #3B82F6;
+
+            --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            --shadow-glow: 0 0 20px var(--primary-glow);
+
+            /* Utilities */
+            --radius-md: 12px;
+            --radius-lg: 20px;
         }
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             line-height: 1.6;
-            color: var(--gray-800);
-            background: var(--light-bg);
+            color: var(--text-main);
+            background: var(--bg-base);
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Background Animated Dots (Authenticator Style) */
+        .bg-dots {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .dot {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(40px);
+            opacity: 0.4;
+            animation: float 20s infinite ease-in-out alternate;
+            transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .dot-1 {
+            width: 300px;
+            height: 300px;
+            background: var(--primary-blue);
+            top: -100px;
+            left: -100px;
+            animation-delay: 0s;
+        }
+
+        .dot-2 {
+            width: 400px;
+            height: 400px;
+            background: var(--accent-cyan);
+            bottom: -150px;
+            right: -100px;
+            animation-delay: -5s;
+            opacity: 0.2;
+        }
+
+        .dot-3 {
+            width: 250px;
+            height: 250px;
+            background: rgba(139, 92, 246, 0.4);
+            top: 40%;
+            left: 30%;
+            animation-delay: -10s;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            33% {
+                transform: translate(30px, -50px) scale(1.1);
+            }
+
+            66% {
+                transform: translate(-20px, 20px) scale(0.9);
+            }
+
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
         }
 
         .container {
-            max-width: 800px;
+            max-width: 600px;
+            /* Narrower for authenticator feel */
             margin: 0 auto;
-            padding: 20px;
+            padding: 2rem 1rem;
+            width: 100%;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         /* Header */
         .header {
-            background: linear-gradient(135deg, var(--deep-blue), var(--primary-blue));
-            color: var(--white);
-            padding: 2rem 0;
             text-align: center;
             margin-bottom: 2rem;
+            animation: fadeInDown 0.6s ease forwards;
         }
 
         .logo {
-            font-size: 2rem;
+            font-size: 2.2rem;
             font-weight: 800;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.25rem;
+            letter-spacing: -1px;
+            color: var(--text-main);
+            text-shadow: 0 0 15px var(--primary-glow);
         }
 
         .subtitle {
-            opacity: 0.9;
-            font-size: 1.1rem;
+            color: var(--text-muted);
+            font-size: 1rem;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
         }
 
         /* Loading State */
         .loading {
             text-align: center;
-            padding: 3rem;
+            padding: 4rem 2rem;
+            background: rgba(21, 26, 35, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-md);
         }
 
         .spinner {
             width: 50px;
             height: 50px;
-            border: 4px solid var(--gray-100);
-            border-top: 4px solid var(--primary-blue);
+            border: 3px solid rgba(0, 51, 255, 0.2);
+            border-top: 3px solid var(--primary-blue);
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin: 0 auto 1rem;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 0 20px var(--primary-glow);
         }
 
         @keyframes spin {
@@ -102,50 +208,70 @@
 
         /* Error State */
         .error {
-            background: var(--white);
-            border-radius: 15px;
-            padding: 2rem;
+            background: rgba(21, 26, 35, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: var(--radius-lg);
+            padding: 3rem 2rem;
             text-align: center;
-            box-shadow: var(--shadow);
-            border-left: 4px solid var(--danger);
+            box-shadow: var(--shadow-md);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-top: 4px solid var(--danger);
         }
 
         .error-icon {
-            font-size: 3rem;
+            font-size: 3.5rem;
             color: var(--danger);
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
         }
 
-        /* Repair Card */
+        /* Repair Card (Authenticator Glass Style) */
         .repair-card {
-            background: var(--white);
-            border-radius: 20px;
-            box-shadow: var(--shadow);
+            background: rgba(21, 26, 35, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md), inset 0 0 0 1px var(--border-color);
             overflow: hidden;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
+            position: relative;
         }
 
         .device-header {
-            background: linear-gradient(135deg, var(--primary-blue), var(--trust-teal));
-            color: var(--white);
-            padding: 2rem;
+            padding: 2.5rem 2rem 1.5rem;
             text-align: center;
+            border-bottom: 1px solid var(--border-color);
+            background: linear-gradient(180deg, rgba(0, 51, 255, 0.05) 0%, transparent 100%);
         }
 
         .device-icon {
-            font-size: 3rem;
+            font-size: 3.5rem;
             margin-bottom: 1rem;
+            background: linear-gradient(135deg, #fff, #aaa);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.2));
         }
 
         .device-title {
             font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+            color: var(--text-main);
         }
 
         .device-id {
-            opacity: 0.9;
-            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-family: monospace;
+            letter-spacing: 0.1em;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 0.5rem;
         }
 
         /* Status Section */
@@ -155,58 +281,79 @@
 
         .current-status {
             text-align: center;
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
+            padding: 1.5rem;
+            background: var(--bg-surface);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
         }
 
         .status-badge {
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            padding: 0.75rem 1.5rem;
+            padding: 0.5rem 1.25rem;
             border-radius: 50px;
-            font-weight: 600;
+            font-weight: 700;
             font-size: 1.1rem;
-            margin-bottom: 1rem;
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
         .status-received {
-            background: #EEF2FF;
-            color: #3730A3;
+            background: rgba(59, 130, 246, 0.15);
+            color: #60A5FA;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.1);
         }
 
         .status-diagnosing {
-            background: #FEF3C7;
-            color: #92400E;
+            background: rgba(245, 158, 11, 0.15);
+            color: #FBBF24;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.1);
         }
 
         .status-waiting-parts {
-            background: #FEE2E2;
-            color: #B91C1C;
+            background: rgba(239, 68, 68, 0.15);
+            color: #F87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.1);
         }
 
         .status-in-repair {
-            background: #DBEAFE;
-            color: #1D4ED8;
+            background: rgba(139, 92, 246, 0.15);
+            color: #A78BFA;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.1);
         }
 
         .status-testing {
-            background: #E0E7FF;
-            color: #5B21B6;
+            background: rgba(14, 165, 233, 0.15);
+            color: #38BDF8;
+            border: 1px solid rgba(14, 165, 233, 0.3);
+            box-shadow: 0 0 15px rgba(14, 165, 233, 0.1);
         }
 
         .status-ready {
-            background: #D1FAE5;
-            color: #065F46;
+            background: rgba(16, 185, 129, 0.15);
+            color: #34D399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.1);
         }
 
         .status-completed {
-            background: #F3F4F6;
-            color: #374151;
+            background: rgba(100, 116, 139, 0.15);
+            color: #94A3B8;
+            border: 1px solid rgba(100, 116, 139, 0.3);
+            box-shadow: 0 0 15px rgba(100, 116, 139, 0.1);
         }
 
         .estimated-completion {
-            font-size: 1rem;
-            color: var(--gray-600);
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.5;
         }
 
         /* Progress Timeline */
@@ -268,7 +415,7 @@
             left: 17px;
             top: 38px;
             width: 2px;
-            background: var(--gray-300);
+            background: var(--border-color);
             z-index: 0;
         }
 
@@ -283,88 +430,94 @@
             flex-shrink: 0;
             position: relative;
             z-index: 1;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            box-shadow: var(--shadow-sm);
         }
 
         .timeline-icon.completed {
-            background: var(--success);
-            color: var(--white);
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.3);
         }
 
         .timeline-icon.current {
-            background: var(--primary-blue);
-            color: var(--white);
+            background: rgba(0, 51, 255, 0.2);
+            color: var(--primary-cyan);
+            border: 1px solid var(--primary-blue);
+            box-shadow: 0 0 15px var(--primary-glow);
         }
 
         .timeline-icon.pending {
-            background: var(--gray-300);
-            color: var(--gray-600);
+            background: var(--bg-elevated);
+            color: var(--text-dark);
+            border: 1px solid var(--border-color);
         }
 
         /* Status-specific icon colors */
         .timeline-icon.status-received {
-            background: #6366F1;
-            color: var(--white);
-            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+            border-color: #60A5FA;
+            color: #60A5FA;
+            box-shadow: 0 0 10px rgba(96, 165, 250, 0.2);
         }
 
         .timeline-icon.status-diagnosing {
-            background: #F59E0B;
-            color: var(--white);
-            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+            border-color: #FBBF24;
+            color: #FBBF24;
+            box-shadow: 0 0 10px rgba(251, 191, 36, 0.2);
         }
 
         .timeline-icon.status-waiting-parts {
-            background: #EF4444;
-            color: var(--white);
-            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+            border-color: #F87171;
+            color: #F87171;
+            box-shadow: 0 0 10px rgba(248, 113, 113, 0.2);
         }
 
         .timeline-icon.status-in-repair {
-            background: #3B82F6;
-            color: var(--white);
-            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+            border-color: #A78BFA;
+            color: #A78BFA;
+            box-shadow: 0 0 10px rgba(167, 139, 250, 0.2);
         }
 
         .timeline-icon.status-testing {
-            background: #8B5CF6;
-            color: var(--white);
-            box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
+            border-color: #38BDF8;
+            color: #38BDF8;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
         }
 
         .timeline-icon.status-ready {
-            background: #10B981;
-            color: var(--white);
-            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+            border-color: #34D399;
+            color: #34D399;
+            box-shadow: 0 0 10px rgba(52, 211, 153, 0.2);
         }
 
         .timeline-icon.status-completed {
-            background: #6B7280;
-            color: var(--white);
-            box-shadow: 0 2px 8px rgba(107, 114, 128, 0.3);
+            border-color: #94A3B8;
+            color: #94A3B8;
+            box-shadow: 0 0 10px rgba(148, 163, 184, 0.2);
         }
 
         .timeline-content {
             flex: 1;
             padding-left: 0.5rem;
+            padding-bottom: 1.5rem;
         }
 
         .timeline-title {
             font-weight: 600;
             margin-bottom: 0.25rem;
-            color: var(--gray-800);
+            color: var(--text-main);
         }
 
         .timeline-time {
-            font-size: 0.9rem;
-            color: var(--gray-600);
+            font-size: 0.85rem;
+            color: var(--text-muted);
             margin-bottom: 0.5rem;
+            font-family: monospace;
         }
 
         .timeline-notes {
             font-size: 0.9rem;
-            color: var(--gray-700);
-            line-height: 1.4;
+            color: var(--text-dark);
+            line-height: 1.5;
         }
 
         /* Progress Photos */
@@ -399,49 +552,55 @@
 
         /* Device Details */
         .device-details {
-            background: var(--gray-100);
-            border-radius: 15px;
-            padding: 1.5rem;
-            margin: 2rem 0;
+            padding: 2rem;
         }
 
         .detail-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
+            gap: 1.5rem;
         }
 
         .detail-item {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.5rem 0;
-            border-bottom: 1px solid rgba(100, 116, 139, 0.1);
+            flex-direction: column;
+            gap: 0.5rem;
+            padding: 1rem;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
         }
 
         .detail-label {
-            font-weight: 500;
-            color: var(--gray-600);
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
         .detail-value {
-            font-weight: 600;
+            font-weight: 500;
+            color: var(--text-main);
         }
 
         /* Contact Section */
         .contact-section {
-            background: var(--white);
-            border-radius: 15px;
-            padding: 2rem;
+            background: rgba(21, 26, 35, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: var(--radius-lg);
+            padding: 2.5rem 2rem;
             text-align: center;
-            box-shadow: var(--shadow);
+            box-shadow: var(--shadow-md), inset 0 0 0 1px var(--border-color);
+            margin-bottom: 2rem;
         }
 
         .contact-title {
             font-size: 1.3rem;
             font-weight: 600;
-            margin-bottom: 1rem;
-            color: var(--deep-blue);
+            margin-bottom: 1.5rem;
+            color: var(--text-main);
         }
 
         .contact-buttons {
@@ -454,32 +613,35 @@
         .contact-btn {
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
-            padding: 0.75rem 1.5rem;
-            border-radius: 50px;
+            gap: 0.75rem;
+            padding: 0.85rem 1.5rem;
+            border-radius: var(--radius-md);
             text-decoration: none;
             font-weight: 600;
             transition: all 0.3s ease;
+            border: 1px solid transparent;
         }
 
         .contact-btn.primary {
             background: var(--primary-blue);
-            color: var(--white);
+            color: var(--text-main);
+            box-shadow: 0 4px 15px var(--primary-glow);
         }
 
         .contact-btn.primary:hover {
-            background: var(--deep-blue);
             transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--primary-glow);
+            filter: brightness(1.1);
         }
 
         .contact-btn.secondary {
-            background: var(--gray-100);
-            color: var(--gray-800);
+            background: var(--bg-elevated);
+            color: var(--text-main);
+            border-color: var(--border-color);
         }
 
         .contact-btn.secondary:hover {
-            background: var(--gray-800);
-            color: var(--white);
+            background: rgba(255, 255, 255, 0.1);
         }
 
         /* Photo Modal */
@@ -564,31 +726,39 @@
 </head>
 
 <body>
-    <div class="header">
-        <div class="container">
-            <div class="logo">OnlineFix</div>
-            <div class="subtitle">Device Repair Tracking</div>
-        </div>
+    <!-- Background animated dots -->
+    <div class="bg-dots">
+        <div class="dot dot-1"></div>
+        <div class="dot dot-2"></div>
+        <div class="dot dot-3"></div>
     </div>
 
-    <div class="container">
+    <!-- Main Container -->
+    <div class="container fade-in" style="position: relative; z-index: 1;">
+        <div class="header">
+            <div class="logo">OnlineFix</div>
+            <div class="subtitle"><i class="fas fa-microchip" style="margin-right: 0.5rem;"></i> Secure Device Tracking
+            </div>
+        </div>
+
         <!-- Loading State -->
         <div id="loading" class="loading">
             <div class="spinner"></div>
-            <p>Loading repair details...</p>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">Retrieving secure repair logs...</p>
         </div>
 
         <!-- Error State -->
         <div id="error" class="error" style="display: none;">
             <div class="error-icon">
-                <i class="fas fa-exclamation-triangle"></i>
+                <i class="fas fa-shield-alt" style="color: var(--danger);"></i>
             </div>
-            <h2>Repair Not Found</h2>
-            <p>We couldn't find a repair with this ID. Please check your NFC card or contact us for assistance.</p>
-            <div style="margin-top: 1.5rem;">
-                <a href="tel:+447940730537" class="contact-btn primary">
-                    <i class="fas fa-phone"></i>
-                    Call Us
+            <h2 style="color: var(--text-main); margin-bottom: 0.5rem;">Repair Record Not Found</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.5;">We couldn't verify a repair with
+                this secure ID. Please check your NFC tag or contact our support team.</p>
+            <div style="margin-top: 2rem;">
+                <a href="tel:+447940730537" class="contact-btn primary" style="width: 100%; justify-content: center;">
+                    <i class="fas fa-phone-alt"></i>
+                    Call Support
                 </a>
             </div>
         </div>
@@ -596,7 +766,7 @@
         <!-- Main Content -->
         <div id="main-content" style="display: none;">
             <!-- Repair Card -->
-            <div class="repair-card fade-in">
+            <div class="repair-card">
                 <div class="device-header">
                     <div class="device-icon" id="deviceIcon">
                         <i class="fas fa-mobile-alt"></i>
@@ -608,6 +778,9 @@
                 <div class="status-section">
                     <!-- Current Status -->
                     <div class="current-status">
+                        <div
+                            style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 0.75rem;">
+                            Authentication Status</div>
                         <div class="status-badge" id="statusBadge">
                             <i class="fas fa-clock"></i>
                             Loading...
@@ -623,11 +796,12 @@
             </div>
 
             <!-- Device Details -->
-            <div class="repair-card fade-in">
+            <div class="repair-card">
                 <div class="device-details">
-                    <h3 style="margin-bottom: 1rem; color: var(--deep-blue);">
-                        <i class="fas fa-info-circle"></i>
-                        Device Information
+                    <h3
+                        style="margin-bottom: 1.5rem; color: var(--text-main); font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-fingerprint" style="color: var(--primary-cyan);"></i>
+                        Device Fingerprint
                     </h3>
                     <div class="detail-grid" id="deviceDetails">
                         <!-- Details will be populated by JavaScript -->
@@ -636,11 +810,12 @@
             </div>
 
             <!-- Contact Section -->
-            <div class="contact-section fade-in">
-                <div class="contact-title">Need to get in touch?</div>
+            <div class="contact-section">
+                <div class="contact-title"><i class="fas fa-headset"
+                        style="margin-right: 0.5rem; color: var(--text-muted);"></i> Support Center</div>
                 <div class="contact-buttons">
                     <a href="tel:+447940730537" class="contact-btn primary">
-                        <i class="fas fa-phone"></i>
+                        <i class="fas fa-phone-alt"></i>
                         Call Now
                     </a>
                     <a href="https://wa.me/447940730537" class="contact-btn secondary" target="_blank">
@@ -649,7 +824,7 @@
                     </a>
                     <a href="mailto:info@onlinefix.co.uk" class="contact-btn secondary">
                         <i class="fas fa-envelope"></i>
-                        Email
+                        Email Us
                     </a>
                 </div>
             </div>

@@ -1,17 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - OnlineFix Repair Management</title>
-    
+
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" integrity="sha512-fD9DI5bZwQxOi7MhYWnnNPlvXdp/2Pj3XSTRrFs5FQa4mizyGLnJcN6tuvUS6LbmgN1ut+XGSABKvjN0H6Aoow==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"
+        integrity="sha512-fD9DI5bZwQxOi7MhYWnnNPlvXdp/2Pj3XSTRrFs5FQa4mizyGLnJcN6tuvUS6LbmgN1ut+XGSABKvjN0H6Aoow=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <style>
         * {
             margin: 0;
@@ -20,27 +23,47 @@
         }
 
         :root {
-            --primary-blue: #0066FF;
-            --trust-teal: #00B4D8;
-            --deep-blue: #023E8A;
-            --accent-cyan: #90E0EF;
-            --light-bg: #F8FAFC;
-            --white: #FFFFFF;
-            --gray-100: #F1F5F9;
-            --gray-200: #E2E8F0;
-            --gray-600: #64748B;
-            --gray-800: #1E293B;
+            /* Premium Dark Mode Colors */
+            --bg-base: #0B0E14;
+            /* Deepest dark for background */
+            --bg-surface: #151A23;
+            /* Slightly lighter for cards/sections */
+            --bg-elevated: #1F2735;
+            /* Pop-outs, modals, hover states */
+
+            --primary-blue: #0033FF;
+            /* Brand color */
+            --primary-glow: rgba(0, 51, 255, 0.4);
+            --accent-cyan: #00E4FF;
+            /* Secondary accent */
+
+            --text-main: #FFFFFF;
+            --text-muted: #94A3B8;
+            --text-dark: #64748B;
+
+            --border-color: rgba(255, 255, 255, 0.08);
+
+            /* Status Colors */
             --success: #10B981;
             --warning: #F59E0B;
             --danger: #EF4444;
-            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            --info: #3B82F6;
+
+            --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            --shadow-glow: 0 0 20px var(--primary-glow);
+
+            /* Utilities */
+            --radius-md: 12px;
+            --radius-lg: 20px;
         }
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             line-height: 1.6;
-            color: var(--gray-800);
-            background: var(--light-bg);
+            color: var(--text-main);
+            background: var(--bg-base);
+            min-height: 100vh;
         }
 
         /* Layout */
@@ -52,8 +75,8 @@
         /* Sidebar */
         .sidebar {
             width: 280px;
-            background: var(--white);
-            border-right: 1px solid var(--gray-200);
+            background: var(--bg-surface);
+            border-right: 1px solid var(--border-color);
             padding: 2rem 0;
             position: fixed;
             height: 100vh;
@@ -63,20 +86,21 @@
 
         .sidebar-header {
             padding: 0 2rem 2rem;
-            border-bottom: 1px solid var(--gray-200);
+            border-bottom: 1px solid var(--border-color);
             margin-bottom: 2rem;
         }
 
         .logo {
             font-size: 1.5rem;
             font-weight: 800;
-            color: var(--primary-blue);
+            color: var(--text-main);
             margin-bottom: 0.5rem;
+            text-shadow: 0 0 10px var(--primary-glow);
         }
 
         .user-info {
             font-size: 0.9rem;
-            color: var(--gray-600);
+            color: var(--text-muted);
         }
 
         .sidebar-nav {
@@ -91,22 +115,31 @@
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            padding: 0.75rem 1rem;
-            color: var(--gray-600);
+            padding: 0.85rem 1rem;
+            color: var(--text-muted);
             text-decoration: none;
-            border-radius: 10px;
+            border-radius: var(--radius-md);
             transition: all 0.3s ease;
             font-weight: 500;
         }
 
-        .nav-link:hover, .nav-link.active {
-            background: var(--primary-blue);
-            color: var(--white);
+        .nav-link:hover,
+        .nav-link.active {
+            background: var(--bg-elevated);
+            color: var(--primary-cyan);
+            box-shadow: inset 3px 0 0 var(--primary-blue);
+        }
+
+        .nav-link.active {
+            color: var(--text-main);
+            background: linear-gradient(90deg, rgba(0, 51, 255, 0.15) 0%, transparent 100%);
+            box-shadow: inset 3px 0 0 var(--primary-blue);
         }
 
         .nav-link i {
             width: 20px;
             text-align: center;
+            color: inherit;
         }
 
         /* Main Content */
@@ -118,20 +151,21 @@
 
         /* Header */
         .header {
-            background: var(--white);
-            border-radius: 15px;
+            background: var(--bg-surface);
+            border-radius: var(--radius-lg);
             padding: 1.5rem 2rem;
-            box-shadow: var(--shadow);
+            box-shadow: var(--shadow-sm);
             margin-bottom: 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border: 1px solid var(--border-color);
         }
 
         .header-title {
             font-size: 1.8rem;
             font-weight: 700;
-            color: var(--deep-blue);
+            color: var(--text-main);
         }
 
         .header-actions {
@@ -146,7 +180,7 @@
             gap: 0.5rem;
             padding: 0.75rem 1.5rem;
             border: none;
-            border-radius: 10px;
+            border-radius: var(--radius-md);
             text-decoration: none;
             font-weight: 600;
             cursor: pointer;
@@ -157,35 +191,41 @@
         .btn-primary {
             background: var(--primary-blue);
             color: var(--white);
+            box-shadow: 0 4px 15px var(--primary-glow);
         }
 
         .btn-primary:hover {
-            background: var(--deep-blue);
             transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--primary-glow);
+            filter: brightness(1.1);
         }
 
         .btn-secondary {
-            background: var(--gray-100);
-            color: var(--gray-800);
+            background: var(--bg-elevated);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
         }
 
         .btn-secondary:hover {
-            background: var(--gray-200);
+            background: rgba(255, 255, 255, 0.1);
         }
 
         .btn-success {
-            background: var(--success);
-            color: var(--white);
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.3);
         }
 
         .btn-warning {
-            background: var(--warning);
-            color: var(--white);
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--warning);
+            border: 1px solid rgba(245, 158, 11, 0.3);
         }
 
         .btn-danger {
-            background: var(--danger);
-            color: var(--white);
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.3);
         }
 
         /* Stats Cards */
@@ -197,11 +237,19 @@
         }
 
         .stat-card {
-            background: var(--white);
-            border-radius: 15px;
+            background: var(--bg-surface);
+            border-radius: var(--radius-lg);
             padding: 1.5rem;
-            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
             text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+            border-color: rgba(255, 255, 255, 0.15);
         }
 
         .stat-icon {
@@ -214,31 +262,38 @@
             font-size: 1.5rem;
             margin: 0 auto 1rem;
             color: var(--white);
+            box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.2);
         }
 
         .stat-number {
-            font-size: 2rem;
+            font-size: 2.2rem;
             font-weight: 800;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.2rem;
+            background: linear-gradient(135deg, #fff, #aaa);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .stat-label {
-            color: var(--gray-600);
+            color: var(--text-muted);
             font-weight: 500;
+            font-size: 0.95rem;
         }
 
         /* Content Sections */
         .content-section {
-            background: var(--white);
-            border-radius: 15px;
-            box-shadow: var(--shadow);
+            background: var(--bg-surface);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-md);
             overflow: hidden;
             margin-bottom: 2rem;
         }
 
         .section-header {
             padding: 1.5rem 2rem;
-            border-bottom: 1px solid var(--gray-200);
+            border-bottom: 1px solid var(--border-color);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -247,7 +302,7 @@
         .section-title {
             font-size: 1.3rem;
             font-weight: 600;
-            color: var(--deep-blue);
+            color: var(--text-main);
         }
 
         .section-content {
@@ -264,40 +319,84 @@
             border-collapse: collapse;
         }
 
-        th, td {
+        th,
+        td {
             text-align: left;
-            padding: 1rem;
-            border-bottom: 1px solid var(--gray-200);
+            padding: 1.25rem 1rem;
+            border-bottom: 1px solid var(--border-color);
         }
 
         th {
-            background: var(--gray-100);
+            background: rgba(0, 0, 0, 0.2);
             font-weight: 600;
-            color: var(--gray-800);
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.05em;
+        }
+
+        tr {
+            transition: background-color 0.2s ease;
         }
 
         tr:hover {
-            background: var(--gray-100);
+            background: rgba(255, 255, 255, 0.03);
         }
 
         /* Status Badges */
         .status-badge {
             display: inline-flex;
             align-items: center;
-            gap: 0.25rem;
-            padding: 0.25rem 0.75rem;
+            gap: 0.35rem;
+            padding: 0.35rem 0.85rem;
             border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
-        .status-received { background: #EEF2FF; color: #3730A3; }
-        .status-diagnosing { background: #FEF3C7; color: #92400E; }
-        .status-waiting-parts { background: #FEE2E2; color: #B91C1C; }
-        .status-in-repair { background: #DBEAFE; color: #1D4ED8; }
-        .status-testing { background: #E0E7FF; color: #5B21B6; }
-        .status-ready { background: #D1FAE5; color: #065F46; }
-        .status-completed { background: #F3F4F6; color: #374151; }
+        .status-received {
+            background: rgba(59, 130, 246, 0.15);
+            color: #60A5FA;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .status-diagnosing {
+            background: rgba(245, 158, 11, 0.15);
+            color: #FBBF24;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .status-waiting-parts {
+            background: rgba(239, 68, 68, 0.15);
+            color: #F87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .status-in-repair {
+            background: rgba(139, 92, 246, 0.15);
+            color: #A78BFA;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+
+        .status-testing {
+            background: rgba(14, 165, 233, 0.15);
+            color: #38BDF8;
+            border: 1px solid rgba(14, 165, 233, 0.3);
+        }
+
+        .status-ready {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34D399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .status-completed {
+            background: rgba(100, 116, 139, 0.15);
+            color: #94A3B8;
+            border: 1px solid rgba(100, 116, 139, 0.3);
+        }
 
         /* Delete button */
         .btn-danger {
@@ -311,18 +410,20 @@
 
         /* Photo upload in modal */
         .photo-upload-small {
-            border: 2px dashed var(--gray-200);
-            border-radius: 10px;
+            border: 2px dashed var(--border-color);
+            border-radius: var(--radius-md);
             padding: 1rem;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
             margin-top: 1rem;
+            background: var(--bg-base);
         }
 
         .photo-upload-small:hover {
             border-color: var(--primary-blue);
-            background: rgba(0, 102, 255, 0.02);
+            background: rgba(0, 51, 255, 0.05);
+            box-shadow: inset 0 0 10px rgba(0, 51, 255, 0.1);
         }
 
         .photo-preview-small {
@@ -336,6 +437,7 @@
             position: relative;
             border-radius: 8px;
             overflow: hidden;
+            border: 1px solid var(--border-color);
         }
 
         .photo-item-small img {
@@ -348,7 +450,7 @@
             position: absolute;
             top: 2px;
             right: 2px;
-            background: var(--danger);
+            background: rgba(239, 68, 68, 0.9);
             color: var(--white);
             border: none;
             border-radius: 50%;
@@ -356,6 +458,7 @@
             height: 20px;
             cursor: pointer;
             font-size: 0.7rem;
+            backdrop-filter: blur(4px);
         }
 
         /* Template selector */
@@ -367,17 +470,19 @@
             font-size: 0.85rem;
             padding: 0.5rem 1rem;
             margin: 0.25rem;
-            background: var(--gray-100);
-            border: 1px solid var(--gray-200);
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.2s ease;
+            color: var(--text-muted);
         }
 
         .template-btn:hover {
-            background: var(--primary-blue);
-            color: var(--white);
-            border-color: var(--primary-blue);
+            background: var(--bg-elevated);
+            color: var(--text-main);
+            border-color: var(--primary-cyan);
+            box-shadow: inset 0 0 5px rgba(0, 228, 255, 0.2);
         }
 
         /* Forms */
@@ -395,21 +500,31 @@
             display: block;
             margin-bottom: 0.5rem;
             font-weight: 600;
-            color: var(--gray-800);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
         .form-input {
             width: 100%;
-            padding: 0.75rem;
-            border: 2px solid var(--gray-200);
-            border-radius: 10px;
+            padding: 0.85rem;
+            border: 1px solid var(--border-color);
+            background: var(--bg-base);
+            color: var(--text-main);
+            border-radius: var(--radius-md);
             font-size: 1rem;
-            transition: border-color 0.3s ease;
+            transition: all 0.3s ease;
         }
 
         .form-input:focus {
             outline: none;
             border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(0, 51, 255, 0.2);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-dark);
         }
 
         .form-textarea {
@@ -418,8 +533,18 @@
         }
 
         .form-select {
-            background: var(--white);
             cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394A3B8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path মুক্তির%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 1.2rem;
+            padding-right: 2.5rem;
+        }
+
+        .form-select option {
+            background-color: var(--bg-surface);
+            color: var(--text-main);
         }
 
         /* Modal */
@@ -430,7 +555,8 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
             z-index: 2000;
         }
 
@@ -438,16 +564,42 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
 
         .modal-content {
-            background: var(--white);
-            border-radius: 15px;
+            background: var(--bg-surface);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
             padding: 2rem;
             max-width: 600px;
             width: 90%;
             max-height: 90vh;
             overflow-y: auto;
+            box-shadow: var(--shadow-md), 0 0 40px rgba(0, 0, 0, 0.5);
+            animation: modalSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes modalSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .modal-header {
@@ -455,66 +607,96 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
         }
 
         .modal-title {
             font-size: 1.5rem;
             font-weight: 600;
-            color: var(--deep-blue);
+            color: var(--text-main);
         }
 
         .close-btn {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
             cursor: pointer;
-            color: var(--gray-600);
+            color: var(--text-muted);
+            transition: all 0.2s ease;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-main);
+            transform: rotate(90deg);
         }
 
         /* Loading States */
         .loading {
             text-align: center;
             padding: 3rem;
+            color: var(--text-muted);
         }
 
         .spinner {
             width: 40px;
             height: 40px;
-            border: 3px solid var(--gray-200);
+            border: 3px solid rgba(0, 51, 255, 0.2);
             border-top: 3px solid var(--primary-blue);
             border-radius: 50%;
             animation: spin 1s linear infinite;
             margin: 0 auto 1rem;
+            box-shadow: 0 0 15px var(--primary-glow);
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+            0% {
+                transform: rotate(0deg);
+            }
 
-        /* Hide elements initially */
-        .hidden {
-            display: none !important;
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         /* Success/Error messages */
         .alert {
             padding: 1rem;
-            border-radius: 10px;
+            border-radius: var(--radius-md);
             margin-bottom: 1rem;
             font-weight: 500;
+            animation: alertSlideIn 0.3s ease;
+        }
+
+        @keyframes alertSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .alert-success {
-            background: #D1FAE5;
-            color: #065F46;
-            border: 1px solid #A7F3D0;
+            background: rgba(16, 185, 129, 0.1);
+            color: #34D399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
         }
 
         .alert-error {
-            background: #FEE2E2;
-            color: #B91C1C;
-            border: 1px solid #FCA5A5;
+            background: rgba(239, 68, 68, 0.1);
+            color: #F87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
         }
 
         /* Responsive */
@@ -552,32 +734,52 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* Helper Classes */
+        .hidden {
+            display: none !important;
+        }
     </style>
 </head>
+
 <body>
     <!-- Login Screen -->
     <div id="login-screen">
-        <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--deep-blue), var(--primary-blue));">
-            <div style="background: var(--white); padding: 3rem; border-radius: 20px; box-shadow: var(--shadow); max-width: 400px; width: 90%;">
-                <div style="text-align: center; margin-bottom: 2rem;">
-                    <div class="logo" style="font-size: 2rem; margin-bottom: 0.5rem;">OnlineFix</div>
-                    <p style="color: var(--gray-600);">Admin Dashboard Login</p>
+        <div
+            style="min-height: 100vh; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at center, var(--bg-surface), var(--bg-base)); position: relative; overflow: hidden;">
+            <!-- Subtle background elements -->
+            <div
+                style="position: absolute; width: 600px; height: 600px; background: radial-gradient(circle, var(--primary-glow) 0%, transparent 70%); top: -300px; left: -300px; opacity: 0.5; pointer-events: none;">
+            </div>
+            <div
+                style="position: absolute; width: 400px; height: 400px; background: radial-gradient(circle, rgba(0,228,255,0.15) 0%, transparent 70%); bottom: -200px; right: -200px; opacity: 0.6; pointer-events: none;">
+            </div>
+
+            <div
+                style="background: rgba(21, 26, 35, 0.7); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); padding: 3rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-md), inset 0 0 0 1px var(--border-color); max-width: 400px; width: 90%; z-index: 1;">
+                <div style="text-align: center; margin-bottom: 2.5rem;">
+                    <div class="logo" style="font-size: 2.5rem; margin-bottom: 0.5rem; letter-spacing: -1px;">OnlineFix
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 0.95rem;">Admin Dashboard Secure Auth</p>
                 </div>
                 <form id="login-form">
                     <div class="form-group">
-                        <label class="form-label">Email</label>
-                        <input type="email" class="form-input" id="login-email" required>
+                        <label class="form-label">Admin Email</label>
+                        <input type="email" class="form-input" id="login-email" placeholder="admin@onlinefix.co.uk"
+                            required>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Password</label>
-                        <input type="password" class="form-input" id="login-password" required>
+                        <input type="password" class="form-input" id="login-password" placeholder="••••••••" required>
                     </div>
-                    <button type="submit" class="btn btn-primary" style="width: 100%;">
-                        <i class="fas fa-sign-in-alt"></i>
-                        Login
+                    <button type="submit" class="btn btn-primary"
+                        style="width: 100%; justify-content: center; margin-top: 1rem; padding: 1rem;">
+                        <i class="fas fa-lock"></i>
+                        Authenticate
                     </button>
                 </form>
-                <div id="login-error" class="alert alert-error hidden" style="margin-top: 1rem;"></div>
+                <div id="login-error" class="alert alert-error hidden"
+                    style="margin-top: 1.5rem; text-align: center; font-size: 0.9rem;"></div>
             </div>
         </div>
     </div>
@@ -692,7 +894,8 @@
                 <div class="section-header">
                     <h2 class="section-title">All Repairs</h2>
                     <div>
-                        <select id="status-filter" class="form-input" style="display: inline-block; width: auto; margin-right: 1rem;">
+                        <select id="status-filter" class="form-input"
+                            style="display: inline-block; width: auto; margin-right: 1rem;">
                             <option value="">All Statuses</option>
                             <option value="received">Received</option>
                             <option value="diagnosing">Diagnosing</option>
@@ -917,7 +1120,7 @@
         // Load dashboard data
         async function loadDashboardData() {
             document.getElementById('loading').style.display = 'block';
-            
+
             try {
                 // Load repairs
                 const repairsSnapshot = await db.collection('repairs').get();
@@ -942,11 +1145,11 @@
 
         // Update stats
         function updateStats() {
-            const activeRepairs = allRepairs.filter(r => 
+            const activeRepairs = allRepairs.filter(r =>
                 !['completed'].includes(r.currentStatus)
             ).length;
 
-            const readyRepairs = allRepairs.filter(r => 
+            const readyRepairs = allRepairs.filter(r =>
                 r.currentStatus === 'ready'
             ).length;
 
@@ -982,7 +1185,7 @@
             const row = document.createElement('tr');
             const status = statusConfig[repair.currentStatus] || statusConfig['received'];
             const date = repair.dateReceived ? new Date(repair.dateReceived.seconds * 1000).toLocaleDateString('en-GB') : 'N/A';
-            
+
             row.innerHTML = `
                 <td><strong>${escapeHTML(repair.repairId)}</strong></td>
                 <td>${escapeHTML(repair.customerName)}</td>
@@ -1017,48 +1220,48 @@
                         <h2 class="modal-title">Repair Details - ${escapeHTML(repair.repairId)}</h2>
                         <button class="close-btn" onclick="this.closest('.modal').remove()">&times;</button>
                     </div>
-                    <div style="max-height: 70vh; overflow-y: auto;">
+                    <div style="max-height: 70vh; overflow-y: auto; padding-right: 1rem;">
                         <div class="form-grid" style="margin-bottom: 2rem;">
-                            <div style="background: var(--gray-100); padding: 1.5rem; border-radius: 15px;">
-                                <h3 style="color: var(--deep-blue); margin-bottom: 1rem;">Customer Information</h3>
-                                <p><strong>Name:</strong> ${escapeHTML(repair.customerName)}</p>
-                                <p><strong>Phone:</strong> ${escapeHTML(repair.customerPhone)}</p>
-                                ${repair.customerEmail ? `<p><strong>Email:</strong> ${escapeHTML(repair.customerEmail)}</p>` : ''}
-                                ${repair.customerAddress ? `<p><strong>Address:</strong> ${escapeHTML(repair.customerAddress)}</p>` : ''}
+                            <div style="background: var(--bg-surface); border: 1px solid var(--border-color); padding: 1.5rem; border-radius: var(--radius-lg);">
+                                <h3 style="color: var(--text-main); margin-bottom: 1rem;">Customer Information</h3>
+                                <p><strong>Name:</strong> <span style="color: var(--text-muted);">${escapeHTML(repair.customerName)}</span></p>
+                                <p><strong>Phone:</strong> <span style="color: var(--text-muted);">${escapeHTML(repair.customerPhone)}</span></p>
+                                ${repair.customerEmail ? `<p><strong>Email:</strong> <span style="color: var(--text-muted);">${escapeHTML(repair.customerEmail)}</span></p>` : ''}
+                                ${repair.customerAddress ? `<p><strong>Address:</strong> <span style="color: var(--text-muted);">${escapeHTML(repair.customerAddress)}</span></p>` : ''}
                             </div>
-                            <div style="background: var(--gray-100); padding: 1.5rem; border-radius: 15px;">
-                                <h3 style="color: var(--deep-blue); margin-bottom: 1rem;">Device Information</h3>
-                                <p><strong>Type:</strong> ${escapeHTML(repair.deviceType)}</p>
-                                <p><strong>Brand:</strong> ${escapeHTML(repair.brand)}</p>
+                            <div style="background: var(--bg-surface); border: 1px solid var(--border-color); padding: 1.5rem; border-radius: var(--radius-lg);">
+                                <h3 style="color: var(--text-main); margin-bottom: 1rem;">Device Information</h3>
+                                <p><strong>Type:</strong> <span style="color: var(--text-muted);">${escapeHTML(repair.deviceType)}</span></p>
+                                <p><strong>Brand:</strong> <span style="color: var(--text-muted);">${escapeHTML(repair.brand)}</span></p>
                                 <p><strong>Model:</strong> ${escapeHTML(repair.model)}</p>
                                 ${repair.serialNumber ? `<p><strong>Serial:</strong> ${escapeHTML(repair.serialNumber)}</p>` : ''}
                                 <p><strong>Condition:</strong> ${escapeHTML(repair.deviceCondition) || 'Not specified'}</p>
                             </div>
                         </div>
-                        <div style="background: var(--gray-100); padding: 1.5rem; border-radius: 15px; margin-bottom: 2rem;">
-                            <h3 style="color: var(--deep-blue); margin-bottom: 1rem;">Repair Details</h3>
-                            <p><strong>Issue:</strong> ${escapeHTML(repair.issueDescription)}</p>
+                        <div style="background: var(--bg-surface); border: 1px solid var(--border-color); padding: 1.5rem; border-radius: var(--radius-lg); margin-bottom: 2rem;">
+                            <h3 style="color: var(--text-main); margin-bottom: 1rem;">Repair Details</h3>
+                            <p><strong>Issue:</strong> <span style="color: var(--text-muted);">${escapeHTML(repair.issueDescription)}</span></p>
                             <p><strong>Current Status:</strong> <span class="status-badge ${statusConfig[repair.currentStatus]?.class || 'status-received'}">${statusConfig[repair.currentStatus]?.label || 'Received'}</span></p>
-                            <p><strong>Date Received:</strong> ${repair.dateReceived ? new Date(repair.dateReceived.seconds * 1000).toLocaleString('en-GB') : 'N/A'}</p>
-                            ${repair.estimatedCompletion ? `<p><strong>Est. Completion:</strong> ${new Date(repair.estimatedCompletion.seconds * 1000).toLocaleDateString('en-GB')}</p>` : ''}
-                            ${repair.estimatedCost ? `<p><strong>Est. Cost:</strong> £${escapeHTML(repair.estimatedCost)}</p>` : ''}
-                            ${repair.additionalNotes ? `<p><strong>Notes:</strong> ${escapeHTML(repair.additionalNotes)}</p>` : ''}
+                            <p><strong>Date Received:</strong> <span style="color: var(--text-muted);">${repair.dateReceived ? new Date(repair.dateReceived.seconds * 1000).toLocaleString('en-GB') : 'N/A'}</span></p>
+                            ${repair.estimatedCompletion ? `<p><strong>Est. Completion:</strong> <span style="color: var(--text-muted);">${new Date(repair.estimatedCompletion.seconds * 1000).toLocaleDateString('en-GB')}</span></p>` : ''}
+                            ${repair.estimatedCost ? `<p><strong>Est. Cost:</strong> <span style="color: var(--text-muted);">£${escapeHTML(repair.estimatedCost)}</span></p>` : ''}
+                            ${repair.additionalNotes ? `<p><strong>Notes:</strong> <span style="color: var(--text-muted);">${escapeHTML(repair.additionalNotes)}</span></p>` : ''}
                         </div>
                         ${repair.progress && repair.progress.length > 0 ? `
-                            <div style="background: var(--gray-100); padding: 1.5rem; border-radius: 15px; margin-bottom: 2rem;">
-                                <h3 style="color: var(--deep-blue); margin-bottom: 1rem;">Progress History</h3>
+                            <div style="background: var(--bg-surface); border: 1px solid var(--border-color); padding: 1.5rem; border-radius: var(--radius-lg); margin-bottom: 2rem;">
+                                <h3 style="color: var(--text-main); margin-bottom: 1rem;">Progress History</h3>
                                 ${repair.progress.map(p => `
-                                    <div style="padding: 1rem; background: var(--white); border-radius: 10px; margin-bottom: 1rem;">
+                                    <div style="padding: 1rem; background: var(--bg-base); border: 1px solid var(--border-color); border-radius: var(--radius-md); margin-bottom: 1rem;">
                                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                                            <strong>${statusConfig[p.status]?.label || p.status}</strong>
-                                            <small>${p.timestamp ? new Date(p.timestamp.seconds * 1000).toLocaleString('en-GB') : 'N/A'}</small>
+                                            <strong style="color: var(--text-main);">${statusConfig[p.status]?.label || p.status}</strong>
+                                            <small style="color: var(--text-muted);">${p.timestamp ? new Date(p.timestamp.seconds * 1000).toLocaleString('en-GB') : 'N/A'}</small>
                                         </div>
-                                        ${p.notes ? `<p style="color: var(--gray-600); margin: 0;">${escapeHTML(p.notes)}</p>` : ''}
-                                        ${p.technician ? `<p style="color: var(--gray-500); font-size: 0.9rem; margin: 0.5rem 0 0 0;">By: ${escapeHTML(p.technician)}</p>` : ''}
+                                        ${p.notes ? `<p style="color: var(--text-muted); margin: 0;">${escapeHTML(p.notes)}</p>` : ''}
+                                        ${p.technician ? `<p style="color: var(--text-dark); font-size: 0.9rem; margin: 0.5rem 0 0 0;">By: ${escapeHTML(p.technician)}</p>` : ''}
                                         ${p.photos && p.photos.length > 0 ? `
                                             <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 0.5rem; margin-top: 0.5rem;">
                                                 ${p.photos.map(photo => `
-                                                    <img src="${photo}" alt="Progress photo" style="width: 100%; height: 80px; object-fit: cover; border-radius: 8px; cursor: pointer;" onclick="window.open('${photo}', '_blank')">
+                                                    <img src="${photo}" alt="Progress photo" style="width: 100%; height: 80px; object-fit: cover; border-radius: 8px; cursor: pointer; border: 1px solid var(--border-color);" onclick="window.open('${photo}', '_blank')">
                                                 `).join('')}
                                             </div>
                                         ` : ''}
@@ -1067,7 +1270,7 @@
                             </div>
                         ` : ''}
                     </div>
-                    <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--gray-200);">
+                    <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border-color);">
                         <button class="btn btn-primary" onclick="editRepair('${repairId}'); this.closest('.modal').remove();">
                             <i class="fas fa-edit"></i>
                             Edit Repair
@@ -1096,9 +1299,9 @@
                         <button class="close-btn" onclick="this.closest('.modal').remove()">&times;</button>
                     </div>
                     <form id="update-repair-form" data-repair-id="${repairId}">
-                        <div class="form-group">
-                            <label class="form-label">Customer: ${escapeHTML(repair.customerName)}</label>
-                            <label class="form-label">Device: ${escapeHTML(repair.brand)} ${escapeHTML(repair.model)}</label>
+                        <div class="form-group" style="background: var(--bg-surface); border: 1px solid var(--border-color); padding: 1rem; border-radius: var(--radius-md); margin-bottom: 1.5rem;">
+                            <label class="form-label">Customer: <span style="color: var(--text-main); font-weight: 400;">${escapeHTML(repair.customerName)}</span></label>
+                            <label class="form-label" style="margin-bottom: 0;">Device: <span style="color: var(--text-main); font-weight: 400;">${escapeHTML(repair.brand)} ${escapeHTML(repair.model)}</span></label>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Update Status</label>
@@ -1141,7 +1344,7 @@
                                     value="${repair.estimatedCost || ''}">
                             </div>
                         </div>
-                        <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem;">
+                        <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
                             <button type="button" class="btn btn-secondary" onclick="this.closest('.modal').remove()">Cancel</button>
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-save"></i>
@@ -1151,7 +1354,7 @@
                     </form>
                 </div>
             `;
-            
+
             document.body.appendChild(modal);
 
             // Show templates for current status
@@ -1198,7 +1401,7 @@
                             console.error('Error uploading photo:', error);
                         }
                     }
-                    
+
                     // Add new photos to existing photos array
                     updateData.photos = firebase.firestore.FieldValue.arrayUnion(...photoUrls);
                 }
@@ -1218,7 +1421,7 @@
                 await db.collection('repairs').doc(repairId).update(updateData);
 
                 showAlert('Repair updated successfully!', 'success');
-                
+
                 // Reload data
                 loadDashboardData();
 
@@ -1234,7 +1437,7 @@
         // Load all repairs with optional filter
         function loadAllRepairs(statusFilter = '') {
             let filteredRepairs = allRepairs;
-            
+
             if (statusFilter) {
                 filteredRepairs = allRepairs.filter(r => r.currentStatus === statusFilter);
             }
@@ -1253,7 +1456,7 @@
             const status = statusConfig[repair.currentStatus] || statusConfig['received'];
             const dateReceived = repair.dateReceived ? new Date(repair.dateReceived.seconds * 1000).toLocaleDateString('en-GB') : 'N/A';
             const estCompletion = repair.estimatedCompletion ? new Date(repair.estimatedCompletion.seconds * 1000).toLocaleDateString('en-GB') : 'TBD';
-            
+
             row.innerHTML = `
                 <td><strong>${escapeHTML(repair.repairId)}</strong></td>
                 <td>${escapeHTML(repair.customerName)}<br><small>${escapeHTML(repair.customerPhone)}</small></td>
@@ -1282,9 +1485,9 @@
             const alert = document.createElement('div');
             alert.className = `alert alert-${type}`;
             alert.textContent = message;
-            
+
             document.querySelector('.main-content').insertBefore(alert, document.querySelector('.header').nextSibling);
-            
+
             setTimeout(() => {
                 alert.remove();
             }, 5000);
@@ -1302,11 +1505,11 @@
             const templates = statusTemplates[status];
             const selector = document.getElementById('template-selector');
             const buttonsContainer = document.getElementById('template-buttons');
-            
+
             if (templates && templates.length > 0) {
                 selector.style.display = 'block';
                 buttonsContainer.innerHTML = '';
-                
+
                 templates.forEach((template, index) => {
                     const btn = document.createElement('button');
                     btn.type = 'button';
@@ -1340,16 +1543,16 @@
             const preview = document.getElementById('update-photo-preview');
             const photoItem = document.createElement('div');
             photoItem.className = 'photo-item-small';
-            
+
             const photoId = 'photo_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
             photoItem.innerHTML = `
                 <img src="${escapeHTML(src)}" alt="Update photo">
                 <button type="button" class="photo-remove-small" onclick="removeUpdatePhoto('${escapeHTML(photoId)}')">×</button>
             `;
-            
+
             photoItem.dataset.photoId = photoId;
             preview.appendChild(photoItem);
-            
+
             updatePhotos.push({ id: photoId, file, src });
         }
 
@@ -1367,19 +1570,19 @@
                 try {
                     // Delete from Firestore
                     await db.collection('repairs').doc(repairId).delete();
-                    
+
                     // Delete photos from Storage if any
                     const repair = allRepairs.find(r => r.id === repairId);
                     if (repair && repair.photos && repair.photos.length > 0) {
                         // Note: You might want to delete photos from storage here
                         // This requires parsing the photo URLs to get the storage paths
                     }
-                    
+
                     showAlert(`Repair ${repairIdNumber} deleted successfully!`, 'success');
-                    
+
                     // Reload data
                     loadDashboardData();
-                    
+
                 } catch (error) {
                     console.error('Error deleting repair:', error);
                     showAlert('Error deleting repair: ' + error.message, 'error');
@@ -1388,4 +1591,5 @@
         }
     </script>
 </body>
+
 </html>
