@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
     <title>Track Your Repair - OnlineFix</title>
     <meta name="description"
         content="Track your device repair status with OnlineFix. Real-time updates on your smartphone, laptop, or tablet repair progress.">
@@ -916,10 +917,15 @@
             'Device': 'fas fa-cog'
         };
 
-        // Get repair ID from URL
+        // Get repair ID from URL (validated)
         function getRepairId() {
             const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get('id');
+            const id = urlParams.get('id');
+            // Only allow alphanumeric, underscore, and hyphen characters
+            if (id && /^[a-zA-Z0-9_-]+$/.test(id)) {
+                return id;
+            }
+            return null;
         }
 
         // Load repair data
