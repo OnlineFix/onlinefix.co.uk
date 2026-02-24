@@ -821,42 +821,6 @@
             padding-top: 2rem;
         }
 
-        /* MOBILE STICKY */
-        .mobile-sticky-bar {
-            display: none;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: none;
-            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.05);
-            padding: 12px;
-            padding-bottom: max(12px, var(--safe-area-bottom));
-            z-index: 9999;
-        }
-
-        .sticky-call-btn {
-            display: block;
-            background: var(--gradient-blue);
-            color: var(--hex-white);
-            text-align: center;
-            padding: 16px;
-            text-decoration: none;
-            font-weight: 900;
-            text-transform: uppercase;
-            border: none;
-            border-radius: 4px;
-            font-size: 1.1rem;
-            box-shadow: 0 4px 15px rgba(0, 51, 255, 0.3);
-        }
-
-        .sticky-call-btn:active {
-            transform: scale(0.98);
-        }
-
         @media (prefers-reduced-motion: reduce) {
 
             *,
@@ -919,10 +883,6 @@
                 padding: 1.5rem;
                 justify-content: center;
                 border-left: none;
-            }
-
-            .mobile-sticky-bar {
-                display: block;
             }
 
             .nav-link {
@@ -1092,9 +1052,6 @@
         </div>
     </nav>
 
-    <div class="mobile-sticky-bar" role="complementary" aria-label="Quick contact">
-        <a href="tel:+447940730537" class="sticky-call-btn">"CALL US"</a>
-    </div>
 
     <main id="main">
         <section class="page-header" aria-label="Page header">
