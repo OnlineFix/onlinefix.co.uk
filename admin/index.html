@@ -916,6 +916,57 @@
             }
         }
 
+        /* Communication action buttons */
+        .comms-actions {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .comms-btn {
+            flex: 1;
+            min-width: 120px;
+            justify-content: center;
+            padding: 0.75rem 1rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border-radius: var(--radius-md);
+            transition: all 0.2s ease;
+        }
+
+        .comms-whatsapp {
+            background: #25D366;
+            color: #fff;
+            border: none;
+        }
+
+        .comms-whatsapp:hover {
+            background: #1ebe57;
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+        }
+
+        .comms-sms {
+            background: var(--info);
+            color: #fff;
+            border: none;
+        }
+
+        .comms-sms:hover {
+            background: #2563eb;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .comms-copy {
+            background: var(--bg-elevated);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+        }
+
+        .comms-copy:hover {
+            background: var(--bg-surface);
+            border-color: var(--accent-cyan);
+        }
+
         /* Helper Classes */
         .hidden {
             display: none !important;
@@ -1223,6 +1274,68 @@
             ]
         };
 
+        // Customer message templates (for WhatsApp/SMS)
+        const customerMessages = {
+            'received': (name, device, repairId) =>
+                `Hi ${name}, thanks for dropping off your ${device} at OnlineFix. Your repair ID is ${repairId}. We'll keep you updated as we work on it. You can track progress here: https://onlinefix.co.uk/track/?id=${repairId}`,
+            'diagnosing': (name, device, repairId) =>
+                `Hi ${name}, we've started diagnosing your ${device}. We'll be in touch once we've identified the issue and can give you a quote. Track progress: https://onlinefix.co.uk/track/?id=${repairId}`,
+            'waiting-parts': (name, device, repairId) =>
+                `Hi ${name}, we've diagnosed your ${device} and need to order a part. Expected arrival is 2-3 business days. We'll let you know as soon as it arrives. Track progress: https://onlinefix.co.uk/track/?id=${repairId}`,
+            'in-repair': (name, device, repairId) =>
+                `Hi ${name}, your ${device} is now being repaired. We'll update you once it's done and tested. Track progress: https://onlinefix.co.uk/track/?id=${repairId}`,
+            'testing': (name, device, repairId) =>
+                `Hi ${name}, the repair on your ${device} is complete and we're running final tests to make sure everything works perfectly. Nearly there! Track progress: https://onlinefix.co.uk/track/?id=${repairId}`,
+            'ready': (name, device, repairId) =>
+                `Hi ${name}, great news! Your ${device} is repaired, tested, and ready for collection. Please bring your receipt when you pick up. Give us a call if you need to arrange a time. Track progress: https://onlinefix.co.uk/track/?id=${repairId}`,
+            'completed': (name, device, repairId) =>
+                `Hi ${name}, thanks for choosing OnlineFix for your ${device} repair. Your 90-day warranty is now active. If you have any issues, don't hesitate to get in touch. Cheers, Tomas`
+        };
+
+        // Generate customer message for a repair
+        function getCustomerMessage(repair) {
+            const name = repair.customerName.split(' ')[0]; // first name only
+            const device = `${repair.brand} ${repair.model}`.trim();
+            const template = customerMessages[repair.currentStatus];
+            return template ? template(name, device, repair.repairId) : `Hi ${name}, here's an update on your ${device} repair (${repair.repairId}). Track progress: https://onlinefix.co.uk/track/?id=${repair.repairId}`;
+        }
+
+        // Send via WhatsApp
+        function sendWhatsApp(repairId) {
+            const repair = allRepairs.find(r => r.id === repairId);
+            if (!repair) return;
+            const phone = repair.customerPhone.replace(/\D/g, '').replace(/^0/, '44');
+            const message = encodeURIComponent(getCustomerMessage(repair));
+            window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
+        }
+
+        // Send via SMS
+        function sendSMS(repairId) {
+            const repair = allRepairs.find(r => r.id === repairId);
+            if (!repair) return;
+            const message = encodeURIComponent(getCustomerMessage(repair));
+            window.open(`sms:${repair.customerPhone}?body=${message}`, '_self');
+        }
+
+        // Copy tracking link
+        function copyTrackingLink(repairId) {
+            const repair = allRepairs.find(r => r.id === repairId);
+            if (!repair) return;
+            const link = `https://onlinefix.co.uk/track/?id=${repair.repairId}`;
+            navigator.clipboard.writeText(link).then(() => {
+                showAlert('Tracking link copied to clipboard!', 'success');
+            }).catch(() => {
+                // Fallback for older browsers
+                const input = document.createElement('input');
+                input.value = link;
+                document.body.appendChild(input);
+                input.select();
+                document.execCommand('copy');
+                document.body.removeChild(input);
+                showAlert('Tracking link copied!', 'success');
+            });
+        }
+
         // Authentication state observer
         auth.onAuthStateChanged((user) => {
             if (user) {
@@ -1486,6 +1599,24 @@
                                 `).join('')}
                             </div>
                         ` : ''}
+                    </div>
+                    <div style="background: var(--bg-surface); border: 1px solid var(--border-color); padding: 1.5rem; border-radius: var(--radius-lg); margin-bottom: 2rem;">
+                        <h3 style="color: var(--text-main); margin-bottom: 1rem;"><i class="fas fa-comment-dots" style="margin-right: 0.5rem;"></i>Contact Customer</h3>
+                        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">Send a status update to ${escapeHTML(repair.customerName.split(' ')[0])} — message is pre-filled based on the current repair status.</p>
+                        <div class="comms-actions">
+                            <button class="btn comms-btn comms-whatsapp" onclick="sendWhatsApp('${repairId}')">
+                                <i class="fab fa-whatsapp"></i>
+                                WhatsApp
+                            </button>
+                            <button class="btn comms-btn comms-sms" onclick="sendSMS('${repairId}')">
+                                <i class="fas fa-sms"></i>
+                                SMS
+                            </button>
+                            <button class="btn comms-btn comms-copy" onclick="copyTrackingLink('${repairId}')">
+                                <i class="fas fa-link"></i>
+                                Copy Tracking Link
+                            </button>
+                        </div>
                     </div>
                     <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border-color);">
                         <button class="btn btn-primary" onclick="editRepair('${repairId}'); this.closest('.modal').remove();">
