@@ -918,7 +918,7 @@
                         const downloadURL = await snapshot.ref.getDownloadURL();
                         photoUrls.push(downloadURL);
                     } catch (error) {
-                        console.error('Error uploading photo:', error);
+                        // Photo upload failed, continue with remaining photos
                     }
                 }
 
@@ -980,10 +980,6 @@
                 // Save to Firestore
                 const docRef = await db.collection('repairs').add(repairData);
 
-                console.log('Repair created successfully:', repairData);
-                console.log('Document ID:', docRef.id);
-                console.log('Tracking URL:', `${GITHUB_PAGES_BASE_URL}/track/?id=${repairId}`);
-
                 // Verify the repair was saved by reading it back
                 const savedDoc = await docRef.get();
                 if (!savedDoc.exists) {
@@ -1000,7 +996,6 @@
                 showSuccessModal(repairId);
 
             } catch (error) {
-                console.error('Error creating repair:', error);
                 showAlert('Error creating repair: ' + error.message, 'error');
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('repair-form').style.display = 'block';
@@ -1024,24 +1019,11 @@
                     date: new Date().toLocaleString('en-GB')
                 };
 
-                // EMAILJS SETUP INSTRUCTIONS:
-                // 1. Sign up at https://www.emailjs.com/
-                // 2. Add email service (Gmail recommended)
-                // 3. Create email template with variables above
-                // 4. Get your IDs from EmailJS dashboard
-                // 5. Replace the IDs below:
-
-                // Uncomment this line when EmailJS is configured:
-                // await emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', templateParams);
-
-                console.log('Email notification ready to send:', templateParams);
-
-                // Always use mailto as fallback for now
+                // Use mailto for notification
                 sendEmailViaMailto(repairData);
 
             } catch (error) {
-                console.error('Error with email notification:', error);
-                // Try mailto as fallback
+                // Fallback to mailto
                 sendEmailViaMailto(repairData);
             }
         }
@@ -1167,7 +1149,6 @@ Date: ${new Date().toLocaleString('en-GB')}
                 navigator.clipboard.writeText(nfcUrl).then(() => {
                     showAlert('NFC link copied to clipboard!', 'success');
                 }).catch(err => {
-                    console.error('Failed to copy:', err);
                     fallbackCopy(nfcUrl);
                 });
             } else {

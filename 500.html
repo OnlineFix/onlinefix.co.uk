@@ -9,14 +9,13 @@
     <meta name="theme-color" content="#0033FF">
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; font-src 'self' https://cdnjs.cloudflare.com; img-src 'self' data: https://www.google-analytics.com https://www.googletagmanager.com; connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests;">
-    <title>404 — Page Not Found | OnlineFix</title>
+    <title>500 — Server Error | OnlineFix</title>
     <meta name="robots" content="noindex, follow">
     <link rel="icon" type="image/png" sizes="512x512" href="/favicon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon.png">
     <link rel="shortcut icon" href="/favicon.png">
-    <link rel="manifest" href="/manifest.json">
 
     <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
@@ -62,7 +61,7 @@
 
         .container { max-width: 1400px; margin: 0 auto; padding: 0 20px; position: relative; z-index: 2; width: 100%; }
 
-        /* 404 HERO */
+        /* 500 HERO */
         .error-section {
             min-height: 100vh; display: flex; align-items: center; justify-content: center;
             padding: 80px 0 4rem;
@@ -70,7 +69,7 @@
             background-size: 40px 40px; background-color: var(--hex-concrete);
             position: relative; overflow: hidden;
         }
-        .error-section::before { content: "ERR. 404 — FILE NOT FOUND"; position: absolute; top: 80px; left: 20px; font-family: monospace; font-size: 0.7rem; color: var(--hex-black); opacity: 0.6; }
+        .error-section::before { content: "ERR. 500 — INTERNAL SERVER ERROR"; position: absolute; top: 80px; left: 20px; font-family: monospace; font-size: 0.7rem; color: var(--hex-black); opacity: 0.6; }
         .error-box {
             text-align: center; border: 2px solid var(--hex-black); padding: 3rem 4rem;
             background: var(--hex-white); box-shadow: 15px 15px 0px var(--hex-black); max-width: 600px; width: 100%;
@@ -99,7 +98,6 @@
         .error-btn-call { background: var(--hex-white); color: var(--hex-black); }
         @media (hover: hover) { .error-btn:hover { transform: translate(4px, 4px); box-shadow: -4px -4px 0 var(--hex-black); } }
         .error-hint { font-family: monospace; color: #999; font-size: 0.75rem; text-transform: uppercase; margin-top: 1.5rem; }
-
 
         @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; } }
 
@@ -141,19 +139,18 @@
         </div>
     </nav>
 
-
     <main id="main">
-        <section class="error-section" aria-label="Page not found">
+        <section class="error-section" aria-label="Server error">
             <div class="error-box">
-                <div class="error-code">404</div>
-                <p class="error-label">PAGE NOT FOUND</p>
-                <p class="error-message">The page you're looking for doesn't exist or has been moved. Let's get you back on track — or give us a call if you need help with a repair.</p>
+                <div class="error-code">500</div>
+                <p class="error-label">SERVER ERROR</p>
+                <p class="error-message">Something went wrong on our end. Please try again in a moment, or give us a call if you need urgent help with a repair.</p>
                 <div class="error-actions">
                     <a href="/" class="error-btn error-btn-primary"><i class="fas fa-home" aria-hidden="true"></i> Back to Homepage</a>
                     <a href="services.html" class="error-btn error-btn-secondary"><i class="fas fa-wrench" aria-hidden="true"></i> View Services</a>
                     <a href="tel:+447940730537" class="error-btn error-btn-call"><i class="fas fa-phone" aria-hidden="true"></i> Call: 07940 730537</a>
                 </div>
-                <p class="error-hint">REF: 404 // onlinefix.co.uk</p>
+                <p class="error-hint">REF: 500 // onlinefix.co.uk</p>
             </div>
         </section>
     </main>

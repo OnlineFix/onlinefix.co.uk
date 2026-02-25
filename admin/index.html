@@ -1019,7 +1019,7 @@
     <!-- Main Dashboard -->
     <div id="dashboard" class="admin-layout hidden">
         <!-- Sidebar Overlay -->
-        <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
@@ -1041,7 +1041,7 @@
                     </a>
                 </div>
                 <div class="nav-item">
-                    <a href="#" class="nav-link" onclick="logout()">
+                    <a href="#" class="nav-link" id="logout-link">
                         <i class="fas fa-sign-out-alt"></i>
                         Logout
                     </a>
@@ -1054,7 +1054,7 @@
             <!-- Header -->
             <div class="header">
                 <div style="display: flex; align-items: center; gap: 1rem;">
-                    <button class="menu-toggle" id="menu-toggle" onclick="toggleSidebar()">
+                    <button class="menu-toggle" id="menu-toggle">
                         <i class="fas fa-bars"></i>
                     </button>
                     <h1 class="header-title" id="page-title">Dashboard Overview</h1>
@@ -1105,7 +1105,7 @@
                 <div class="content-section">
                     <div class="section-header">
                         <h2 class="section-title">Recent Repairs</h2>
-                        <button class="btn btn-secondary" onclick="showSection('repairs')">View All</button>
+                        <button class="btn btn-secondary" id="view-all-repairs-btn">View All</button>
                     </div>
                     <div class="section-content">
                         <div class="table-container">
@@ -1467,7 +1467,6 @@
 
                 document.getElementById('loading').style.display = 'none';
             } catch (error) {
-                console.error('Error loading dashboard data:', error);
                 document.getElementById('loading').style.display = 'none';
                 showAlert('Error loading data: ' + error.message, 'error');
             }
@@ -1523,13 +1522,13 @@
                 <td data-label="Status"><span class="status-badge ${status.class}">${status.label}</span></td>
                 <td data-label="Date">${date}</td>
                 <td data-label="">
-                    <button class="btn btn-secondary" style="padding: 0.5rem;" onclick="viewRepair('${repair.id}')">
+                    <button class="btn btn-secondary" style="padding: 0.5rem;" data-action="view" data-id="${repair.id}">
                         <i class="fas fa-eye"></i>
                     </button>
-                    <button class="btn btn-primary" style="padding: 0.5rem;" onclick="editRepair('${repair.id}')">
+                    <button class="btn btn-primary" style="padding: 0.5rem;" data-action="edit" data-id="${repair.id}">
                         <i class="fas fa-edit"></i>
                     </button>
-                    <button class="btn btn-danger" style="padding: 0.5rem;" onclick="deleteRepair('${repair.id}', '${repair.repairId}')">
+                    <button class="btn btn-danger" style="padding: 0.5rem;" data-action="delete" data-id="${repair.id}" data-repair-id="${repair.repairId}">
                         <i class="fas fa-trash"></i>
                     </button>
                 </td>
@@ -1548,7 +1547,7 @@
                 <div class="modal-content" style="max-width: 800px;">
                     <div class="modal-header">
                         <h2 class="modal-title">Repair Details - ${escapeHTML(repair.repairId)}</h2>
-                        <button class="close-btn" onclick="this.closest('.modal').remove()">&times;</button>
+                        <button class="close-btn" data-action="close-modal">&times;</button>
                     </div>
                     <div style="max-height: 70vh; overflow-y: auto; padding-right: 1rem;">
                         <div class="form-grid" style="margin-bottom: 2rem;">
@@ -1591,7 +1590,7 @@
                                         ${p.photos && p.photos.length > 0 ? `
                                             <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 0.5rem; margin-top: 0.5rem;">
                                                 ${p.photos.map(photo => `
-                                                    <img src="${photo}" alt="Progress photo" style="width: 100%; height: 80px; object-fit: cover; border-radius: 8px; cursor: pointer; border: 1px solid var(--border-color);" onclick="window.open('${photo}', '_blank')">
+                                                    <img src="${photo}" alt="Progress photo" style="width: 100%; height: 80px; object-fit: cover; border-radius: 8px; cursor: pointer; border: 1px solid var(--border-color);" data-action="open-photo" data-url="${photo}">
                                                 `).join('')}
                                             </div>
                                         ` : ''}
@@ -1604,26 +1603,26 @@
                         <h3 style="color: var(--text-main); margin-bottom: 1rem;"><i class="fas fa-comment-dots" style="margin-right: 0.5rem;"></i>Contact Customer</h3>
                         <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">Send a status update to ${escapeHTML(repair.customerName.split(' ')[0])} — message is pre-filled based on the current repair status.</p>
                         <div class="comms-actions">
-                            <button class="btn comms-btn comms-whatsapp" onclick="sendWhatsApp('${repairId}')">
+                            <button class="btn comms-btn comms-whatsapp" data-action="whatsapp" data-id="${repairId}">
                                 <i class="fab fa-whatsapp"></i>
                                 WhatsApp
                             </button>
-                            <button class="btn comms-btn comms-sms" onclick="sendSMS('${repairId}')">
+                            <button class="btn comms-btn comms-sms" data-action="sms" data-id="${repairId}">
                                 <i class="fas fa-sms"></i>
                                 SMS
                             </button>
-                            <button class="btn comms-btn comms-copy" onclick="copyTrackingLink('${repairId}')">
+                            <button class="btn comms-btn comms-copy" data-action="copy-link" data-id="${repairId}">
                                 <i class="fas fa-link"></i>
                                 Copy Tracking Link
                             </button>
                         </div>
                     </div>
                     <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border-color);">
-                        <button class="btn btn-primary" onclick="editRepair('${repairId}'); this.closest('.modal').remove();">
+                        <button class="btn btn-primary" data-action="edit-close" data-id="${repairId}">
                             <i class="fas fa-edit"></i>
                             Edit Repair
                         </button>
-                        <button class="btn btn-secondary" onclick="this.closest('.modal').remove()">Close</button>
+                        <button class="btn btn-secondary" data-action="close-modal">Close</button>
                     </div>
                 </div>
             `;
@@ -1644,7 +1643,7 @@
                 <div class="modal-content" style="max-width: 700px;">
                     <div class="modal-header">
                         <h2 class="modal-title">Update Repair - ${escapeHTML(repair.repairId)}</h2>
-                        <button class="close-btn" onclick="this.closest('.modal').remove()">&times;</button>
+                        <button class="close-btn" data-action="close-modal">&times;</button>
                     </div>
                     <form id="update-repair-form" data-repair-id="${repairId}">
                         <div class="form-group" style="background: var(--bg-surface); border: 1px solid var(--border-color); padding: 1rem; border-radius: var(--radius-md); margin-bottom: 1.5rem;">
@@ -1673,7 +1672,7 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">Add Photos (Optional)</label>
-                            <div class="photo-upload-small" onclick="document.getElementById('update-photo-input').click()">
+                            <div class="photo-upload-small" data-action="upload-photo">
                                 <i class="fas fa-camera" style="font-size: 1.5rem; color: var(--gray-400); margin-bottom: 0.5rem; display: block;"></i>
                                 <span style="color: var(--gray-600); font-size: 0.9rem;">Click to add photos</span>
                                 <input type="file" id="update-photo-input" multiple accept="image/*" style="display: none;" onchange="handleUpdatePhotos(event)">
@@ -1693,7 +1692,7 @@
                             </div>
                         </div>
                         <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
-                            <button type="button" class="btn btn-secondary" onclick="this.closest('.modal').remove()">Cancel</button>
+                            <button type="button" class="btn btn-secondary" data-action="close-modal">Cancel</button>
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-save"></i>
                                 Update Repair
@@ -1746,7 +1745,7 @@
                             const downloadURL = await snapshot.ref.getDownloadURL();
                             photoUrls.push(downloadURL);
                         } catch (error) {
-                            console.error('Error uploading photo:', error);
+                            // Photo upload failed, continue with remaining
                         }
                     }
 
@@ -1777,7 +1776,6 @@
                 updatePhotos = [];
 
             } catch (error) {
-                console.error('Error updating repair:', error);
                 showAlert('Error updating repair: ' + error.message, 'error');
             }
         }
@@ -1841,13 +1839,13 @@
                 <td data-label="Received">${dateReceived}</td>
                 <td data-label="Est. Completion">${estCompletion}</td>
                 <td data-label="">
-                    <button class="btn btn-secondary" style="padding: 0.5rem;" onclick="viewRepair('${repair.id}')">
+                    <button class="btn btn-secondary" style="padding: 0.5rem;" data-action="view" data-id="${repair.id}">
                         <i class="fas fa-eye"></i>
                     </button>
-                    <button class="btn btn-primary" style="padding: 0.5rem;" onclick="editRepair('${repair.id}')">
+                    <button class="btn btn-primary" style="padding: 0.5rem;" data-action="edit" data-id="${repair.id}">
                         <i class="fas fa-edit"></i>
                     </button>
-                    <button class="btn btn-danger" style="padding: 0.5rem;" onclick="deleteRepair('${repair.id}', '${repair.repairId}')">
+                    <button class="btn btn-danger" style="padding: 0.5rem;" data-action="delete" data-id="${repair.id}" data-repair-id="${repair.repairId}">
                         <i class="fas fa-trash"></i>
                     </button>
                 </td>
@@ -1922,7 +1920,7 @@
             const photoId = 'photo_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
             photoItem.innerHTML = `
                 <img src="${escapeHTML(src)}" alt="Update photo">
-                <button type="button" class="photo-remove-small" onclick="removeUpdatePhoto('${escapeHTML(photoId)}')">×</button>
+                <button type="button" class="photo-remove-small" data-action="remove-photo" data-id="${escapeHTML(photoId)}">×</button>
             `;
 
             photoItem.dataset.photoId = photoId;
@@ -1959,11 +1957,48 @@
                     loadDashboardData();
 
                 } catch (error) {
-                    console.error('Error deleting repair:', error);
                     showAlert('Error deleting repair: ' + error.message, 'error');
                 }
             }
         }
+        // Event listeners for static elements (replacing inline onclick)
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebarOverlay = document.getElementById('sidebar-overlay');
+            if (sidebarOverlay) sidebarOverlay.addEventListener('click', toggleSidebar);
+
+            const menuToggle = document.getElementById('menu-toggle');
+            if (menuToggle) menuToggle.addEventListener('click', toggleSidebar);
+
+            const logoutLink = document.getElementById('logout-link');
+            if (logoutLink) logoutLink.addEventListener('click', function(e) { e.preventDefault(); logout(); });
+
+            const viewAllBtn = document.getElementById('view-all-repairs-btn');
+            if (viewAllBtn) viewAllBtn.addEventListener('click', function() { showSection('repairs'); });
+
+            // Event delegation for dynamically generated elements
+            document.addEventListener('click', function(e) {
+                const btn = e.target.closest('[data-action]');
+                if (!btn) return;
+
+                const action = btn.dataset.action;
+                const id = btn.dataset.id;
+                const repairId = btn.dataset.repairId;
+
+                switch(action) {
+                    case 'view': viewRepair(id); break;
+                    case 'edit': editRepair(id); break;
+                    case 'delete': deleteRepair(id, repairId); break;
+                    case 'close-modal': btn.closest('.modal').remove(); break;
+                    case 'edit-close': editRepair(id); btn.closest('.modal').remove(); break;
+                    case 'whatsapp': sendWhatsApp(id); break;
+                    case 'sms': sendSMS(id); break;
+                    case 'copy-link': copyTrackingLink(id); break;
+                    case 'open-photo': window.open(btn.dataset.url, '_blank'); break;
+                    case 'upload-photo': document.getElementById('update-photo-input').click(); break;
+                    case 'remove-photo': removeUpdatePhoto(id); break;
+                }
+            });
+        });
     </script>
 </body>
 

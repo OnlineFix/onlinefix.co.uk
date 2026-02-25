@@ -1,0 +1,21 @@
+{
+  "name": "OnlineFix - Electronics Repair Guildford",
+  "short_name": "OnlineFix",
+  "description": "Expert Phone, Laptop, PC, Tablet & Console Repair in Guildford, Surrey",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F2F2F2",
+  "theme_color": "#0033FF",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["business", "utilities"],
+  "lang": "en-GB",
+  "dir": "ltr"
+}
