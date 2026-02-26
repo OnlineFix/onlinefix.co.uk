@@ -36,7 +36,7 @@
     <meta property="og:title" content="Console Repair Guildford | PS5, Xbox & Switch Repair | Same-Day Service">
     <meta property="og:description"
         content="Broken console? Expert Console Repair in Guildford. PS5 HDMI port replacement, Xbox, and Nintendo Switch repairs. Same-day service. 90-day warranty.">
-    <meta property="og:image" content="https://onlinefix.co.uk/images/onlinefix-og-image.jpg">
+    <meta property="og:image" content="https://onlinefix.co.uk/images/onlinefix-og-image.webp">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:image:alt"
@@ -48,14 +48,15 @@
     <meta name="twitter:title" content="Console Repair Guildford | Same-Day Fix | 90-Day Warranty">
     <meta name="twitter:description"
         content="Expert Console Repair in Guildford. PS5 HDMI port replacement, Xbox repair shop, Nintendo Switch repair. Same-day service. 90-day warranty.">
-    <meta name="twitter:image" content="https://onlinefix.co.uk/images/onlinefix-og-image.jpg">
+    <meta name="twitter:image" content="https://onlinefix.co.uk/images/onlinefix-og-image.webp">
 
     <!-- Favicon -->
-    <link rel="icon" type="image/png" sizes="512x512" href="/favicon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="/favicon.png">
-    <link rel="shortcut icon" href="/favicon.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/favicon-512x512.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180x180.png">
+    <link rel="shortcut icon" href="/favicon.ico">
 
     <!-- Performance: DNS Prefetch and Preconnect -->
     <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
@@ -133,63 +134,110 @@
         "@type": "Service",
         "serviceType": "Gaming Console Repair",
         "provider": {
-            "@type": "LocalBusiness",
-            "@id": "https://onlinefix.co.uk/#organization",
-            "name": "OnlineFix"
+                "@type": "LocalBusiness",
+                "@id": "https://onlinefix.co.uk/#organization",
+                "name": "OnlineFix"
         },
         "areaServed": [
-            {"@type": "City", "name": "Guildford"},
-            {"@type": "City", "name": "Woking"},
-            {"@type": "City", "name": "Godalming"},
-            {"@type": "City", "name": "Farnham"}
+                {
+                        "@type": "City",
+                        "name": "Guildford"
+                },
+                {
+                        "@type": "City",
+                        "name": "Woking"
+                },
+                {
+                        "@type": "City",
+                        "name": "Godalming"
+                },
+                {
+                        "@type": "City",
+                        "name": "Farnham"
+                }
         ],
         "hasOfferCatalog": {
-            "@type": "OfferCatalog",
-            "name": "Console Repair Services",
-            "itemListElement": [
-                {
-                    "@type": "Offer",
-                    "itemOffered": {
-                        "@type": "Service",
-                        "name": "HDMI Port Replacement",
-                        "description": "Professional HDMI port replacement for PlayStation 5, PS4, Xbox Series X/S and Xbox One consoles with no video output"
-                    }
-                },
-                {
-                    "@type": "Offer",
-                    "itemOffered": {
-                        "@type": "Service",
-                        "name": "Disk Drive Repair & Replacement",
-                        "description": "Console disk drive repair for games not reading, ejecting issues, or grinding noises on PS5, PS4 and Xbox consoles"
-                    }
-                },
-                {
-                    "@type": "Offer",
-                    "itemOffered": {
-                        "@type": "Service",
-                        "name": "Power Supply & Blue Light of Death Repair",
-                        "description": "Console power supply diagnosis and repair for consoles that won't turn on, Blue Light of Death, random shutdowns, or blinking light issues."
-                    }
-                },
-                {
-                    "@type": "Offer",
-                    "itemOffered": {
-                        "@type": "Service",
-                        "name": "Overheating & Thermal Repair",
-                        "description": "Deep cleaning, thermal paste replacement and fan repair for overheating PlayStation and Xbox consoles"
-                    }
-                },
-                {
-                    "@type": "Offer",
-                    "itemOffered": {
-                        "@type": "Service",
-                        "name": "Nintendo Switch Repair",
-                        "description": "Screen replacement, charging port repair and dock troubleshooting for Nintendo Switch and Switch OLED"
-                    }
-                }
-            ]
+                "@type": "OfferCatalog",
+                "name": "Console Repair Services",
+                "itemListElement": [
+                        {
+                                "@type": "Offer",
+                                "itemOffered": {
+                                        "@type": "Service",
+                                        "name": "HDMI Port Replacement",
+                                        "description": "Professional HDMI port replacement for PlayStation 5, PS4, Xbox Series X/S and Xbox One consoles with no video output"
+                                },
+                                "priceSpecification": {
+                                        "@type": "UnitPriceSpecification",
+                                        "priceCurrency": "GBP",
+                                        "price": "65",
+                                        "unitText": "starts from"
+                                },
+                                "availability": "https://schema.org/InStock"
+                        },
+                        {
+                                "@type": "Offer",
+                                "itemOffered": {
+                                        "@type": "Service",
+                                        "name": "Disk Drive Repair & Replacement",
+                                        "description": "Console disk drive repair for games not reading, ejecting issues, or grinding noises on PS5, PS4 and Xbox consoles"
+                                },
+                                "priceSpecification": {
+                                        "@type": "UnitPriceSpecification",
+                                        "priceCurrency": "GBP",
+                                        "price": "55",
+                                        "unitText": "starts from"
+                                },
+                                "availability": "https://schema.org/InStock"
+                        },
+                        {
+                                "@type": "Offer",
+                                "itemOffered": {
+                                        "@type": "Service",
+                                        "name": "Power Supply & Blue Light of Death Repair",
+                                        "description": "Console power supply diagnosis and repair for consoles that won't turn on, Blue Light of Death, random shutdowns, or blinking light issues."
+                                },
+                                "priceSpecification": {
+                                        "@type": "UnitPriceSpecification",
+                                        "priceCurrency": "GBP",
+                                        "price": "45",
+                                        "unitText": "starts from"
+                                },
+                                "availability": "https://schema.org/InStock"
+                        },
+                        {
+                                "@type": "Offer",
+                                "itemOffered": {
+                                        "@type": "Service",
+                                        "name": "Overheating & Thermal Repair",
+                                        "description": "Deep cleaning, thermal paste replacement and fan repair for overheating PlayStation and Xbox consoles"
+                                },
+                                "priceSpecification": {
+                                        "@type": "UnitPriceSpecification",
+                                        "priceCurrency": "GBP",
+                                        "price": "35",
+                                        "unitText": "starts from"
+                                },
+                                "availability": "https://schema.org/InStock"
+                        },
+                        {
+                                "@type": "Offer",
+                                "itemOffered": {
+                                        "@type": "Service",
+                                        "name": "Nintendo Switch Repair",
+                                        "description": "Screen replacement, charging port repair and dock troubleshooting for Nintendo Switch and Switch OLED"
+                                },
+                                "priceSpecification": {
+                                        "@type": "UnitPriceSpecification",
+                                        "priceCurrency": "GBP",
+                                        "price": "30",
+                                        "unitText": "starts from"
+                                },
+                                "availability": "https://schema.org/InStock"
+                        }
+                ]
         }
-    }
+}
     </script>
 
     <!-- FAQ Schema - Console Repair -->
@@ -250,6 +298,7 @@
     }
     </script>
 
+    <link rel="stylesheet" href="/css/core.css">
     <style>
         :root {
             --hex-accent: #0033FF;
@@ -268,85 +317,6 @@
             overflow-x: hidden;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: var(--font-main);
-            background-color: var(--hex-concrete);
-            color: var(--hex-black);
-            line-height: 1.4;
-            overflow-x: hidden;
-            font-weight: 500;
-            padding-bottom: calc(60px + var(--safe-area-bottom));
-        }
-
-        .skip-link {
-            position: absolute;
-            top: -40px;
-            left: 0;
-            background: var(--hex-black);
-            color: var(--hex-white);
-            padding: 8px 16px;
-            z-index: 10000;
-            transition: top 0.3s;
-            text-decoration: none;
-            font-weight: 700;
-            text-transform: uppercase;
-            font-size: 0.9rem;
-        }
-
-        .skip-link:focus {
-            top: 0;
-        }
-
-        :focus-visible {
-            outline: 3px solid var(--hex-accent);
-            outline-offset: 2px;
-        }
-
-        * {
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        /* NAV */
-        .navbar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: var(--hex-white);
-            z-index: 1000;
-            border-bottom: 2px solid var(--hex-black);
-            padding: 0;
-        }
-
-        .nav-container {
-            max-width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: stretch;
-            height: 60px;
-        }
-
-        .nav-logo {
-            font-size: 1.5rem;
-            font-weight: 900;
-            color: var(--hex-white);
-            text-decoration: none;
-            text-transform: uppercase;
-            letter-spacing: -1px;
-            padding: 0 1.5rem;
-            display: flex;
-            align-items: center;
-            background: var(--gradient-blue);
-            border-right: 2px solid var(--hex-black);
-            position: relative;
-        }
-
         .nav-logo::after {
             content: "\2122";
             font-size: 0.4em;
@@ -354,122 +324,6 @@
             top: -0.6em;
             margin-left: 2px;
             line-height: 0;
-        }
-
-        .nav-menu {
-            display: flex;
-            list-style: none;
-            gap: 0;
-            align-items: stretch;
-            flex-grow: 1;
-            justify-content: flex-end;
-        }
-
-        .nav-menu li {
-            display: flex;
-            align-items: stretch;
-        }
-
-        .nav-link {
-            text-decoration: none;
-            color: var(--hex-black);
-            font-weight: 700;
-            text-transform: uppercase;
-            font-size: 0.9rem;
-            padding: 0 2rem;
-            display: flex;
-            align-items: center;
-            border-left: 1px solid var(--hex-grid);
-            position: relative;
-            transition: all 0.2s;
-        }
-
-        @media (hover: hover) {
-            .nav-link:hover {
-                background: var(--hazard-stripe);
-                color: var(--hex-white);
-                text-shadow: 2px 2px 0 #000;
-            }
-        }
-
-        .nav-link.active {
-            text-decoration: line-through;
-        }
-
-        .nav-cta {
-            background: var(--hex-black);
-            color: var(--hex-white);
-            padding: 0 2rem;
-            text-decoration: none;
-            font-weight: 700;
-            text-transform: uppercase;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 0.8rem;
-            border-left: 2px solid var(--hex-black);
-        }
-
-        .nav-cta::before,
-        .nav-cta::after {
-            content: none;
-        }
-
-        @media (hover: hover) {
-            .nav-cta:hover {
-                background: var(--gradient-blue);
-                color: var(--hex-white);
-            }
-        }
-
-        .mobile-menu-toggle {
-            display: none;
-            background: transparent;
-            border: none;
-            font-size: 1.5rem;
-            color: var(--hex-black);
-            cursor: pointer;
-            padding: 0 1.5rem;
-            min-width: 60px;
-            outline: none;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 20px;
-            position: relative;
-            z-index: 2;
-            width: 100%;
-        }
-
-        .section-title {
-            font-size: clamp(2rem, 5vw, 3rem);
-            font-weight: 900;
-            text-transform: uppercase;
-            text-align: center;
-            padding-top: 4rem;
-            letter-spacing: -1px;
-            margin-bottom: 0.5rem;
-        }
-
-        .section-subtitle {
-            text-align: center;
-            font-family: monospace;
-            text-transform: uppercase;
-            margin-bottom: 3rem;
-            color: #666;
-            font-size: 0.9rem;
-        }
-
-        /* PAGE HEADER */
-        .page-header {
-            padding: 60px 0 0;
-            background: linear-gradient(90deg, var(--hex-grid) 1px, transparent 1px) 0 0, linear-gradient(180deg, var(--hex-grid) 1px, transparent 1px) 0 0;
-            background-size: 40px 40px;
-            background-color: var(--hex-concrete);
-            position: relative;
-            overflow: hidden;
         }
 
         .page-header::before {
@@ -483,50 +337,6 @@
             opacity: 0.6;
         }
 
-        .page-header-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 4rem 20px;
-            position: relative;
-            z-index: 2;
-        }
-
-        .page-header-box {
-            text-align: center;
-            border: 2px solid var(--hex-black);
-            padding: 3rem 4rem;
-            background: var(--hex-white);
-            box-shadow: 15px 15px 0px var(--hex-black);
-        }
-
-        .page-title {
-            font-size: clamp(2rem, 6vw, 4rem);
-            font-weight: 900;
-            line-height: 0.9;
-            text-transform: uppercase;
-            letter-spacing: -2px;
-            color: var(--hex-black);
-            margin-bottom: 1rem;
-        }
-
-        .page-title span {
-            background: var(--gradient-blue);
-            background-clip: text; -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            display: inline-block;
-        }
-
-        .page-subtitle {
-            font-family: 'Courier New', Courier, monospace;
-            font-size: clamp(0.9rem, 2vw, 1.1rem);
-            text-transform: uppercase;
-            background: var(--hex-black);
-            color: var(--hex-white);
-            display: inline-block;
-            padding: 5px 8px;
-        }
-
-        /* CONSOLES WE REPAIR */
         .consoles-section {
             padding: 0;
             border-top: 2px solid var(--hex-black);
@@ -564,11 +374,10 @@
         }
 
         @media (hover: hover) {
-            .console-item:hover {
+        .console-item:hover {
                 background: var(--hazard-stripe);
             }
-
-            .console-item:hover .console-icon,
+        .console-item:hover .console-icon,
             .console-item:hover .console-name {
                 background: var(--hex-white);
                 color: var(--hex-black);
@@ -578,7 +387,7 @@
                 position: relative;
                 z-index: 2;
             }
-        }
+    }
 
         .console-icon {
             font-size: 2.5rem;
@@ -593,7 +402,6 @@
             text-transform: uppercase;
         }
 
-        /* COMMON ISSUES GRID */
         .issues-section {
             padding: 0 0 4rem;
             border-top: 2px solid var(--hex-black);
@@ -628,13 +436,12 @@
         }
 
         @media (hover: hover) {
-            .issue-card:hover {
+        .issue-card:hover {
                 background: var(--hazard-stripe);
                 transform: translateY(-5px);
                 box-shadow: 8px 8px 0 #000;
             }
-
-            .issue-card:hover .issue-title,
+        .issue-card:hover .issue-title,
             .issue-card:hover .issue-description,
             .issue-card:hover .issue-symptoms li,
             .issue-card:hover .issue-price {
@@ -646,15 +453,14 @@
                 position: relative;
                 z-index: 2;
             }
-
-            .issue-card:hover .issue-icon {
+        .issue-card:hover .issue-icon {
                 color: var(--hex-white);
                 background: var(--hex-black);
                 padding: 10px;
                 display: inline-block;
                 box-shadow: 4px 4px 0 var(--hex-white);
             }
-        }
+    }
 
         .issue-header {
             display: flex;
@@ -758,13 +564,12 @@
         }
 
         @media (hover: hover) {
-            .issue-cta:hover {
+        .issue-cta:hover {
                 transform: translate(4px, 4px);
                 box-shadow: -4px -4px 0 var(--hex-black);
             }
-        }
+    }
 
-        /* WHY CHOOSE US */
         .why-section {
             padding: 0 0 4rem;
             border-top: 2px solid var(--hex-black);
@@ -869,7 +674,6 @@
             font-weight: 700;
         }
 
-        /* HOW IT WORKS */
         .process-section {
             padding: 4rem 0;
             background: var(--hex-concrete);
@@ -917,7 +721,6 @@
             line-height: 1.5;
         }
 
-        /* EMERGENCY CTA */
         .emergency-section {
             background: var(--hex-black);
             color: var(--hex-white);
@@ -960,13 +763,12 @@
         }
 
         @media (hover: hover) {
-            .emergency-btn:hover {
+        .emergency-btn:hover {
                 transform: translate(4px, 4px);
                 box-shadow: -4px -4px 0 var(--hex-white);
             }
-        }
+    }
 
-        /* FAQ SECTION */
         .faq-section {
             padding: 0 0 4rem;
             border-top: 2px solid var(--hex-black);
@@ -1001,10 +803,10 @@
         }
 
         @media (hover: hover) {
-            .faq-question:hover {
+        .faq-question:hover {
                 background: var(--hex-concrete);
             }
-        }
+    }
 
         .faq-question::after {
             content: "+";
@@ -1033,43 +835,6 @@
             padding-top: 1.5rem;
         }
 
-        /* FOOTER */
-        .footer {
-            background: var(--hex-black);
-            color: var(--hex-white);
-            padding: 4rem 0 6rem;
-            border-top: 10px solid;
-            border-image: var(--gradient-blue) 1;
-        }
-
-        .footer-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 3rem;
-            margin-bottom: 3rem;
-        }
-
-        .footer h4 {
-            font-size: 1.2rem;
-            text-transform: uppercase;
-            border-bottom: 1px solid #555;
-            padding-bottom: 1rem;
-            margin-bottom: 1.5rem;
-            background: var(--gradient-blue);
-            background-clip: text; -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            display: inline-block;
-        }
-
-        .footer-links {
-            list-style: none;
-            font-family: monospace;
-        }
-
-        .footer-links li {
-            margin-bottom: 0.5rem;
-        }
-
         .footer-links a {
             color: #aaa;
             text-decoration: none;
@@ -1078,493 +843,208 @@
             padding: 0.4rem 0;
         }
 
-        .footer-links a:hover {
-            color: var(--hex-white);
-            text-decoration: underline;
-        }
-
-        .copyright {
-            text-align: left;
-            font-family: monospace;
-            color: #555;
-            font-size: 0.7rem;
-            border-top: 1px solid #333;
-            padding-top: 2rem;
-        }
-
-        /* SCROLL HINT */
-        .scroll-hint {
-            display: none;
-            text-align: right;
-            font-size: 0.7rem;
-            color: var(--hex-accent);
-            margin-bottom: 0.5rem;
-            font-family: monospace;
-            text-transform: uppercase;
-            font-weight: 700;
-            animation: pulse-hint 2s infinite;
-        }
-
-        @keyframes pulse-hint {
-
-            0%,
-            100% {
-                opacity: 1;
-                transform: translateX(0);
-            }
-
-            50% {
-                opacity: 0.5;
-                transform: translateX(5px);
-            }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-
-            *,
-            *::before,
-            *::after {
-                animation-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: 0.01ms !important;
-                scroll-behavior: auto !important;
-            }
-
-            .scroll-hint {
-                animation: none;
-            }
-        }
-
         @media (max-width: 768px) {
-            .scroll-hint {
+        .scroll-hint {
                 display: none;
             }
-
-            /* NAV */
-            .navbar {
-                background: transparent;
-                border-bottom: none;
-            }
-
-            .nav-logo {
-                display: none;
-            }
-
-            .nav-container {
-                justify-content: flex-end;
-            }
-
-            .mobile-menu-toggle {
-                display: block;
-                background: transparent;
-                border: none;
-                font-size: 2rem;
-                padding: 1rem 1.5rem;
-                color: var(--hex-black);
-            }
-
-            .nav-menu {
-                display: none;
-                flex-direction: column;
-                position: absolute;
-                top: 70px;
-                left: 0;
-                right: 0;
-                background: var(--hex-white);
-                border-top: 2px solid var(--hex-black);
-                border-bottom: 2px solid var(--hex-black);
-                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-            }
-
-            .nav-menu.active {
-                display: flex;
-            }
-
-            .nav-link {
-                padding: 1.5rem;
-                border-left: none;
-                border-bottom: 1px solid #eee;
-                min-height: 48px;
-            }
-
-            .nav-cta {
-                padding: 1.5rem;
-                justify-content: center;
-                border-left: none;
-                min-height: 48px;
-            }
-
-            /* PAGE HEADER — prevent overflow */
-            .page-header-box {
-                padding: 1.5rem 1rem;
-                box-shadow: 6px 6px 0 var(--hex-black);
-            }
-
-            .page-title {
-                font-size: clamp(1.8rem, 7vw, 2.5rem);
-                letter-spacing: -1px;
-            }
-
-            .page-subtitle {
-                font-size: clamp(0.65rem, 2.5vw, 0.85rem);
-                word-break: break-word;
-                padding: 4px 6px;
-            }
-
-            .page-header::before {
-                display: none;
-            }
-
-            .page-header-content {
-                padding: 2.5rem 12px;
-            }
-
-            .section-title {
+        .section-title {
                 padding-top: 2rem;
                 margin-bottom: 0;
                 font-size: clamp(1.5rem, 5vw, 2.2rem);
             }
-
-            .section-subtitle {
+        .section-subtitle {
                 margin-bottom: 1.5rem;
                 font-size: 0.8rem;
             }
-
-            .container {
-                padding: 0 12px;
-            }
-
-            /* CONSOLES — 2-col compact grid */
-            .consoles-grid {
+        .consoles-grid {
                 display: grid;
                 grid-template-columns: repeat(2, 1fr);
                 border: 2px solid var(--hex-black);
             }
-
-            .console-item {
+        .console-item {
                 min-width: unset;
                 border-right: 2px solid var(--hex-black);
                 border-bottom: 2px solid var(--hex-black);
                 padding: 1.2rem 0.75rem;
             }
-
-            .console-item:nth-child(2n) {
+        .console-item:nth-child(2n) {
                 border-right: none;
             }
-
-            .console-item:nth-child(n+5) {
+        .console-item:nth-child(n+5) {
                 border-bottom: none;
             }
-
-            .console-icon {
+        .console-icon {
                 font-size: 1.5rem;
                 margin-bottom: 0.3rem;
             }
-
-            .console-name {
+        .console-name {
                 font-size: 0.75rem;
             }
-
-            /* ISSUES — stacked vertical */
-            .issues-grid {
+        .issues-grid {
                 display: grid;
                 grid-template-columns: 1fr;
                 gap: 12px;
                 padding-bottom: 1.5rem;
             }
-
-            .issue-card {
+        .issue-card {
                 min-width: unset;
                 padding: 1.5rem;
             }
-
-            .issue-title {
+        .issue-title {
                 font-size: clamp(1rem, 4vw, 1.3rem);
             }
-
-            .issue-header {
+        .issue-header {
                 gap: 0.75rem;
                 margin-bottom: 1rem;
             }
-
-            .issue-icon {
+        .issue-icon {
                 font-size: 1.6rem;
             }
-
-            .issue-description {
+        .issue-description {
                 font-size: 0.9rem;
                 line-height: 1.6;
                 margin-bottom: 1rem;
             }
-
-            .issue-symptoms li {
+        .issue-symptoms li {
                 font-size: 0.8rem;
                 padding: 0.3rem 0;
             }
-
-            .issue-pricing {
+        .issue-pricing {
                 padding: 0.75rem;
             }
-
-            .issue-price {
+        .issue-price {
                 font-size: 1.3rem;
             }
-
-            .issue-cta {
+        .issue-cta {
                 padding: 0.9rem;
                 font-size: 0.85rem;
                 min-height: 48px;
             }
-
-            /* WHY CHOOSE US — 2x2 grid */
-            .why-grid {
+        .why-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
-
-            .why-item:nth-child(2) {
+        .why-item:nth-child(2) {
                 border-right: none;
             }
-
-            .why-item:nth-child(1),
+        .why-item:nth-child(1),
             .why-item:nth-child(2) {
                 border-bottom: 2px solid var(--hex-black);
             }
-
-            .why-item:nth-child(4) {
+        .why-item:nth-child(4) {
                 border-right: none;
             }
-
-            .why-item {
+        .why-item {
                 padding: 1.5rem 1rem;
             }
-
-            .why-icon {
+        .why-icon {
                 font-size: 2rem;
                 margin-bottom: 0.5rem;
             }
-
-            .why-title {
+        .why-title {
                 font-size: 0.95rem;
             }
-
-            .why-description {
+        .why-description {
                 font-size: 0.8rem;
             }
-
-            /* Comparison table — stack vertically */
-            .why-vs {
+        .why-vs {
                 padding: 1.5rem 1rem;
             }
-
-            .why-vs-title {
+        .why-vs-title {
                 font-size: 1rem;
             }
-
-            .why-vs-row {
+        .why-vs-row {
                 flex-direction: column;
                 gap: 1.5rem;
             }
-
-            .why-vs-col {
+        .why-vs-col {
                 width: 100%;
                 padding: 1rem;
                 background: var(--hex-white);
                 border: 1px solid var(--hex-grid);
             }
-
-            .why-vs-label {
+        .why-vs-label {
                 font-size: 0.75rem;
                 margin-bottom: 0.5rem;
             }
-
-            .why-vs-value {
+        .why-vs-value {
                 font-size: 0.8rem;
                 line-height: 1.8;
             }
-
-            /* PROCESS — stacked */
-            .process-section {
+        .process-section {
                 padding: 2rem 0;
             }
-
-            .process-grid {
+        .process-grid {
                 grid-template-columns: 1fr;
             }
-
-            .process-item {
+        .process-item {
                 border-right: none;
                 border-bottom: 2px solid var(--hex-black);
                 padding: 1.5rem;
             }
-
-            .process-item:last-child {
+        .process-item:last-child {
                 border-bottom: none;
             }
-
-            .process-number {
+        .process-number {
                 font-size: clamp(2rem, 7vw, 3rem);
             }
-
-            .process-item h4 {
+        .process-item h4 {
                 font-size: 1rem;
             }
-
-            .process-item p {
+        .process-item p {
                 font-size: 0.8rem;
             }
-
-            /* EMERGENCY CTA */
-            .emergency-section {
+        .emergency-section {
                 padding: 2.5rem 0;
             }
-
-            .emergency-section h2 {
+        .emergency-section h2 {
                 font-size: clamp(1.3rem, 5vw, 2rem);
             }
-
-            .emergency-section p {
+        .emergency-section p {
                 font-size: 0.85rem;
                 padding: 0 0.5rem;
                 margin-bottom: 1.5rem;
             }
-
-            .emergency-btn {
+        .emergency-btn {
                 padding: 1rem 1.5rem;
                 font-size: 0.9rem;
                 min-height: 48px;
                 width: 100%;
                 justify-content: center;
             }
-
-            /* FAQ */
-            .faq-question {
-                font-size: 0.9rem;
-                padding: 1rem 1.2rem;
-                min-height: 48px;
-            }
-
-            .faq-answer {
-                padding: 0 1.2rem 1rem;
-                font-size: 0.85rem;
-            }
-
-            .faq-item.active .faq-answer {
+        .faq-item.active .faq-answer {
                 padding-top: 1rem;
             }
+    }
 
-            /* FOOTER */
-            .footer {
-                padding: 3rem 0 5rem;
-            }
-
-            .footer-grid {
-                gap: 2rem;
-                grid-template-columns: 1fr 1fr;
-            }
-
-            .footer-links a {
-                display: inline-block;
-                padding: 0.4rem 0;
-                min-height: 44px;
-                line-height: 2.2;
-            }
-
-            .copyright {
-                font-size: 0.7rem;
-            }
-        }
-
-        /* EXTRA SMALL SCREENS */
         @media (max-width: 400px) {
-            .page-header-box {
-                padding: 1.2rem 0.75rem;
-                box-shadow: 4px 4px 0 var(--hex-black);
-            }
-
-            .page-title {
-                font-size: clamp(1.5rem, 8vw, 2rem);
-            }
-
-            .page-subtitle {
-                font-size: 0.6rem;
-                letter-spacing: 0;
-            }
-
-            .section-title {
-                font-size: clamp(1.3rem, 6vw, 1.8rem);
-            }
-
-            .container {
-                padding: 0 8px;
-            }
-
-            .console-item {
+        .console-item {
                 padding: 1rem 0.5rem;
             }
-
-            .issue-card {
+        .issue-card {
                 padding: 1.2rem;
             }
-
-            .issue-description {
+        .issue-description {
                 font-size: 0.85rem;
             }
-
-            /* Why Choose Us → single column */
-            .why-grid {
+        .why-grid {
                 grid-template-columns: 1fr;
             }
-
-            .why-item {
+        .why-item {
                 border-right: none !important;
                 border-bottom: 2px solid var(--hex-black);
             }
-
-            .why-item:last-child {
+        .why-item:last-child {
                 border-bottom: none;
             }
-
-            .emergency-btn {
+        .emergency-btn {
                 font-size: 0.8rem;
                 padding: 0.9rem 1rem;
             }
-
-            .faq-question {
+        .faq-question {
                 font-size: 0.8rem;
                 padding: 0.9rem 1rem;
             }
-
-            .footer-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .fade-in {
-            opacity: 0;
-            transform: translateY(20px);
-            animation: appear 0.5s ease forwards;
-        }
-
-        @keyframes appear {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        ::-webkit-scrollbar {
-            width: 10px;
-            height: 6px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--hex-concrete);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--gradient-blue);
-            border-radius: 3px;
-        }
+    }
     </style>
 </head>
 
@@ -2052,85 +1532,13 @@
         </div>
     </footer>
 
-
     <!-- Font Awesome -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"
         integrity="sha512-fD9DI5bZwQxOi7MhYWnnNPlvXdp/2Pj3XSTRrFs5FQa4mizyGLnJcN6tuvUS6LbmgN1ut+XGSABKvjN0H6Aoow=="
         crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
 
-    <script>
-        // Mobile Navigation
-        const mobileToggle = document.getElementById('mobile-toggle');
-        const navMenu = document.getElementById('nav-menu');
-        mobileToggle.addEventListener('click', () => {
-            const isExpanded = navMenu.classList.toggle('active');
-            mobileToggle.setAttribute('aria-expanded', isExpanded.toString());
-            const icon = mobileToggle.querySelector('i');
-            icon.classList.toggle('fa-bars');
-            icon.classList.toggle('fa-times');
-        });
-        document.addEventListener('click', (e) => {
-            const isClickInsideMenu = navMenu.contains(e.target);
-            const isClickOnToggle = mobileToggle.contains(e.target);
-            const isLink = e.target.closest('.nav-link') || e.target.closest('.nav-cta');
-            if ((!isClickInsideMenu && !isClickOnToggle && navMenu.classList.contains('active')) ||
-                (isLink && navMenu.classList.contains('active'))) {
-                navMenu.classList.remove('active');
-                mobileToggle.setAttribute('aria-expanded', 'false');
-                const icon = mobileToggle.querySelector('i');
-                icon.classList.add('fa-bars');
-                icon.classList.remove('fa-times');
-            }
-        });
-
-        // FAQ Accordion
-        document.querySelectorAll('.faq-question').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const item = btn.parentElement;
-                const isActive = item.classList.contains('active');
-                document.querySelectorAll('.faq-item.active').forEach(i => {
-                    i.classList.remove('active');
-                    i.querySelector('.faq-question').setAttribute('aria-expanded', 'false');
-                });
-                if (!isActive) {
-                    item.classList.add('active');
-                    btn.setAttribute('aria-expanded', 'true');
-                }
-            });
-        });
-
-        // Fade-in Observer
-        const fadeObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.animationPlayState = 'running';
-                    fadeObserver.unobserve(entry.target);
-                }
-            });
-        }, { threshold: 0.1 });
-        document.querySelectorAll('.fade-in').forEach(el => {
-            el.style.animationPlayState = 'paused';
-            fadeObserver.observe(el);
-        });
-
-        // Mobile scroll nudge
-        if (window.innerWidth < 768) {
-            const scrollGrids = document.querySelectorAll('.issues-grid, .consoles-grid');
-            const nudgeObserver = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        const target = entry.target;
-                        setTimeout(() => {
-                            target.scrollBy({ left: 50, behavior: 'smooth' });
-                            setTimeout(() => { target.scrollBy({ left: -50, behavior: 'smooth' }); }, 800);
-                        }, 500);
-                        nudgeObserver.unobserve(target);
-                    }
-                });
-            }, { threshold: 0.6 });
-            scrollGrids.forEach(grid => nudgeObserver.observe(grid));
-        }
-    </script>
+    
+    <script src="/js/core.js" defer></script>
 </body>
 
 </html>

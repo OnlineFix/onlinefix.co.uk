@@ -32,7 +32,7 @@
     <meta property="og:site_name" content="OnlineFix Guildford">
     <meta property="og:title" content="Data Recovery Guildford | Hard Drive & SSD Recovery | No Data No Fee">
     <meta property="og:description" content="Lost data? No data, no fee. Professional hard drive, SSD, USB and phone data recovery in Guildford. Fully confidential service. Call to book a drop-off.">
-    <meta property="og:image" content="https://onlinefix.co.uk/images/onlinefix-og-image.jpg">
+    <meta property="og:image" content="https://onlinefix.co.uk/images/onlinefix-og-image.webp">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:image:alt" content="OnlineFix Data Recovery - Hard Drive SSD USB Phone Recovery Guildford">
@@ -42,14 +42,15 @@
     <meta name="twitter:url" content="https://onlinefix.co.uk/data-recovery.html">
     <meta name="twitter:title" content="Data Recovery Guildford | Hard Drive & SSD | No Data No Fee">
     <meta name="twitter:description" content="Hard drive, SSD, USB &amp; phone data recovery in Guildford. Confidential service. No data, no fee. By appointment only.">
-    <meta name="twitter:image" content="https://onlinefix.co.uk/images/onlinefix-og-image.jpg">
+    <meta name="twitter:image" content="https://onlinefix.co.uk/images/onlinefix-og-image.webp">
 
     <!-- Favicon -->
-    <link rel="icon" type="image/png" sizes="512x512" href="/favicon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="/favicon.png">
-    <link rel="shortcut icon" href="/favicon.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/favicon-512x512.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180x180.png">
+    <link rel="shortcut icon" href="/favicon.ico">
 
     <!-- Performance: DNS Prefetch and Preconnect -->
     <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
@@ -121,71 +122,125 @@
         "@type": "Service",
         "serviceType": "Data Recovery",
         "provider": {
-            "@type": "LocalBusiness",
-            "@id": "https://onlinefix.co.uk/#organization",
-            "name": "OnlineFix"
+                "@type": "LocalBusiness",
+                "@id": "https://onlinefix.co.uk/#organization",
+                "name": "OnlineFix"
         },
         "areaServed": [
-            {"@type": "City", "name": "Guildford"},
-            {"@type": "City", "name": "Woking"},
-            {"@type": "City", "name": "Godalming"},
-            {"@type": "City", "name": "Farnham"}
+                {
+                        "@type": "City",
+                        "name": "Guildford"
+                },
+                {
+                        "@type": "City",
+                        "name": "Woking"
+                },
+                {
+                        "@type": "City",
+                        "name": "Godalming"
+                },
+                {
+                        "@type": "City",
+                        "name": "Farnham"
+                }
         ],
         "hasOfferCatalog": {
-            "@type": "OfferCatalog",
-            "name": "Data Recovery Services",
-            "itemListElement": [
-                {
-                    "@type": "Offer",
-                    "itemOffered": {
-                        "@type": "Service",
-                        "name": "Accidental Deletion Recovery",
-                        "description": "Recovery of accidentally deleted files, emptied recycle bin contents, and formatted drive data from hard drives, SSDs, and USB devices"
-                    }
-                },
-                {
-                    "@type": "Offer",
-                    "itemOffered": {
-                        "@type": "Service",
-                        "name": "Hard Drive Failure Recovery",
-                        "description": "Data recovery from failed, clicking, or undetected hard drives including mechanical failure, head crashes, and motor seizure"
-                    }
-                },
-                {
-                    "@type": "Offer",
-                    "itemOffered": {
-                        "@type": "Service",
-                        "name": "SSD Data Recovery",
-                        "description": "Professional data recovery from dead or corrupted solid state drives including SATA, NVMe, and M.2 SSDs with firmware-level recovery"
-                    }
-                },
-                {
-                    "@type": "Offer",
-                    "itemOffered": {
-                        "@type": "Service",
-                        "name": "Water and Fire Damage Recovery",
-                        "description": "Data recovery from water-damaged, flood-damaged, or fire-damaged storage devices with specialist cleaning and component-level repair"
-                    }
-                },
-                {
-                    "@type": "Offer",
-                    "itemOffered": {
-                        "@type": "Service",
-                        "name": "Phone Data Recovery",
-                        "description": "Data retrieval from dead, broken, or water-damaged smartphones including iPhone and Android devices with broken screens or no power"
-                    }
-                },
-                {
-                    "@type": "Offer",
-                    "itemOffered": {
-                        "@type": "Service",
-                        "name": "RAID and Server Recovery",
-                        "description": "RAID array and NAS data recovery for failed server configurations including RAID 0, RAID 1, RAID 5, and RAID 6 rebuilds"
-                    }
-                }
-            ]
+                "@type": "OfferCatalog",
+                "name": "Data Recovery Services",
+                "itemListElement": [
+                        {
+                                "@type": "Offer",
+                                "itemOffered": {
+                                        "@type": "Service",
+                                        "name": "Accidental Deletion Recovery",
+                                        "description": "Recovery of accidentally deleted files, emptied recycle bin contents, and formatted drive data from hard drives, SSDs, and USB devices"
+                                },
+                                "priceSpecification": {
+                                        "@type": "UnitPriceSpecification",
+                                        "priceCurrency": "GBP",
+                                        "price": "45",
+                                        "unitText": "starts from"
+                                },
+                                "availability": "https://schema.org/InStock"
+                        },
+                        {
+                                "@type": "Offer",
+                                "itemOffered": {
+                                        "@type": "Service",
+                                        "name": "Hard Drive Failure Recovery",
+                                        "description": "Data recovery from failed, clicking, or undetected hard drives including mechanical failure, head crashes, and motor seizure"
+                                },
+                                "priceSpecification": {
+                                        "@type": "UnitPriceSpecification",
+                                        "priceCurrency": "GBP",
+                                        "price": "55",
+                                        "unitText": "starts from"
+                                },
+                                "availability": "https://schema.org/InStock"
+                        },
+                        {
+                                "@type": "Offer",
+                                "itemOffered": {
+                                        "@type": "Service",
+                                        "name": "SSD Data Recovery",
+                                        "description": "Professional data recovery from dead or corrupted solid state drives including SATA, NVMe, and M.2 SSDs with firmware-level recovery"
+                                },
+                                "priceSpecification": {
+                                        "@type": "UnitPriceSpecification",
+                                        "priceCurrency": "GBP",
+                                        "price": "65",
+                                        "unitText": "starts from"
+                                },
+                                "availability": "https://schema.org/InStock"
+                        },
+                        {
+                                "@type": "Offer",
+                                "itemOffered": {
+                                        "@type": "Service",
+                                        "name": "Water and Fire Damage Recovery",
+                                        "description": "Data recovery from water-damaged, flood-damaged, or fire-damaged storage devices with specialist cleaning and component-level repair"
+                                },
+                                "priceSpecification": {
+                                        "@type": "UnitPriceSpecification",
+                                        "priceCurrency": "GBP",
+                                        "price": "75",
+                                        "unitText": "starts from"
+                                },
+                                "availability": "https://schema.org/InStock"
+                        },
+                        {
+                                "@type": "Offer",
+                                "itemOffered": {
+                                        "@type": "Service",
+                                        "name": "Phone Data Recovery",
+                                        "description": "Data retrieval from dead, broken, or water-damaged smartphones including iPhone and Android devices with broken screens or no power"
+                                },
+                                "priceSpecification": {
+                                        "@type": "UnitPriceSpecification",
+                                        "priceCurrency": "GBP",
+                                        "price": "45",
+                                        "unitText": "starts from"
+                                },
+                                "availability": "https://schema.org/InStock"
+                        },
+                        {
+                                "@type": "Offer",
+                                "itemOffered": {
+                                        "@type": "Service",
+                                        "name": "RAID and Server Recovery",
+                                        "description": "RAID array and NAS data recovery for failed server configurations including RAID 0, RAID 1, RAID 5, and RAID 6 rebuilds"
+                                },
+                                "priceSpecification": {
+                                        "@type": "UnitPriceSpecification",
+                                        "priceCurrency": "GBP",
+                                        "price": "85",
+                                        "unitText": "starts from"
+                                },
+                                "availability": "https://schema.org/InStock"
+                        }
+                ]
         }
-    }
+}
     </script>
 
     <!-- FAQ Schema - Data Recovery -->
@@ -246,6 +301,7 @@
     }
     </script>
 
+    <link rel="stylesheet" href="/css/core.css">
     <style>
         :root {
             --hex-accent: #0033FF;
@@ -258,255 +314,215 @@
             --font-main: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             --safe-area-bottom: env(safe-area-inset-bottom);
         }
+
         html { scroll-behavior: smooth; overflow-x: hidden; }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: var(--font-main); background-color: var(--hex-concrete); color: var(--hex-black); line-height: 1.4; overflow-x: hidden; font-weight: 500; padding-bottom: calc(60px + var(--safe-area-bottom)); }
-        .skip-link { position: absolute; top: -40px; left: 0; background: var(--hex-black); color: var(--hex-white); padding: 8px 16px; z-index: 10000; transition: top 0.3s; text-decoration: none; font-weight: 700; text-transform: uppercase; font-size: 0.9rem; }
-        .skip-link:focus { top: 0; }
-        :focus-visible { outline: 3px solid var(--hex-accent); outline-offset: 2px; }
-        * { -webkit-tap-highlight-color: transparent; }
 
-        /* NAV */
-        .navbar { position: fixed; top: 0; left: 0; right: 0; background: var(--hex-white); z-index: 1000; border-bottom: 2px solid var(--hex-black); padding: 0; }
-        .nav-container { max-width: 100%; display: flex; justify-content: space-between; align-items: stretch; height: 60px; }
-        .nav-logo { font-size: 1.5rem; font-weight: 900; color: var(--hex-white); text-decoration: none; text-transform: uppercase; letter-spacing: -1px; padding: 0 1.5rem; display: flex; align-items: center; background: var(--gradient-blue); border-right: 2px solid var(--hex-black); position: relative; }
         .nav-logo::after { content: "\2122"; font-size: 0.4em; position: relative; top: -0.6em; margin-left: 2px; line-height: 0; }
-        .nav-menu { display: flex; list-style: none; gap: 0; align-items: stretch; flex-grow: 1; justify-content: flex-end; }
-        .nav-menu li { display: flex; align-items: stretch; }
-        .nav-link { text-decoration: none; color: var(--hex-black); font-weight: 700; text-transform: uppercase; font-size: 0.9rem; padding: 0 2rem; display: flex; align-items: center; border-left: 1px solid var(--hex-grid); position: relative; transition: all 0.2s; }
-        @media (hover: hover) { .nav-link:hover { background: var(--hazard-stripe); color: var(--hex-white); text-shadow: 2px 2px 0 #000; } }
-        .nav-link.active { text-decoration: line-through; }
-        .nav-cta { background: var(--hex-black); color: var(--hex-white); padding: 0 2rem; text-decoration: none; font-weight: 700; text-transform: uppercase; display: flex; align-items: center; gap: 10px; font-size: 0.8rem; border-left: 2px solid var(--hex-black); }
-        .nav-cta::before, .nav-cta::after { content: none; }
-        @media (hover: hover) { .nav-cta:hover { background: var(--gradient-blue); color: var(--hex-white); } }
-        .mobile-menu-toggle { display: none; background: transparent; border: none; font-size: 1.5rem; color: var(--hex-black); cursor: pointer; padding: 0 1.5rem; min-width: 60px; outline: none; }
 
-        .container { max-width: 1400px; margin: 0 auto; padding: 0 20px; position: relative; z-index: 2; width: 100%; }
-        .section-title { font-size: clamp(2rem, 5vw, 3rem); font-weight: 900; text-transform: uppercase; text-align: center; padding-top: 4rem; letter-spacing: -1px; margin-bottom: 0.5rem; }
-        .section-subtitle { text-align: center; font-family: monospace; text-transform: uppercase; margin-bottom: 3rem; color: #666; font-size: 0.9rem; }
-
-        /* PAGE HEADER */
-        .page-header { padding: 60px 0 0; background: linear-gradient(90deg, var(--hex-grid) 1px, transparent 1px) 0 0, linear-gradient(180deg, var(--hex-grid) 1px, transparent 1px) 0 0; background-size: 40px 40px; background-color: var(--hex-concrete); position: relative; overflow: hidden; }
         .page-header::before { content: "FIG. 12 — DATA RECOVERY PROTOCOL"; position: absolute; top: 80px; left: 20px; font-family: monospace; font-size: 0.7rem; color: var(--hex-black); opacity: 0.6; }
-        .page-header-content { max-width: 1400px; margin: 0 auto; padding: 4rem 20px; position: relative; z-index: 2; }
-        .page-header-box { text-align: center; border: 2px solid var(--hex-black); padding: 3rem 4rem; background: var(--hex-white); box-shadow: 15px 15px 0px var(--hex-black); }
-        .page-title { font-size: clamp(2rem, 6vw, 4rem); font-weight: 900; line-height: 0.9; text-transform: uppercase; letter-spacing: -2px; color: var(--hex-black); margin-bottom: 1rem; }
-        .page-title span { background: var(--gradient-blue); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: inline-block; }
-        .page-subtitle { font-family: 'Courier New', Courier, monospace; font-size: clamp(0.9rem, 2vw, 1.1rem); text-transform: uppercase; background: var(--hex-black); color: var(--hex-white); display: inline-block; padding: 5px 8px; }
 
-        /* DEVICES WE RECOVER */
         .models-section { padding: 0; border-top: 2px solid var(--hex-black); background: var(--hex-white); overflow: hidden; }
+
         .models-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; border: 2px solid var(--hex-black); }
+
         .model-item { padding: 2rem 1.5rem; text-align: center; border-right: 2px solid var(--hex-black); position: relative; transition: all 0.2s; }
+
         .model-item:last-child { border-right: none; }
+
         .model-item::before { content: "DEVICE"; font-family: monospace; font-size: 0.6rem; position: absolute; top: 8px; right: 8px; color: #ccc; }
+
         @media (hover: hover) {
-            .model-item:hover { background: var(--hazard-stripe); }
-            .model-item:hover .model-icon, .model-item:hover .model-name, .model-item:hover .model-years { background: var(--hex-white); color: var(--hex-black); box-shadow: 4px 4px 0 var(--hex-black); padding: 4px 8px; display: inline-block; position: relative; z-index: 2; }
-        }
+        .model-item:hover { background: var(--hazard-stripe); }
+        .model-item:hover .model-icon, .model-item:hover .model-name, .model-item:hover .model-years { background: var(--hex-white); color: var(--hex-black); box-shadow: 4px 4px 0 var(--hex-black); padding: 4px 8px; display: inline-block; position: relative; z-index: 2; }
+    }
+
         .model-icon { font-size: 2.5rem; color: var(--hex-black); margin-bottom: 1rem; transition: all 0.2s; }
+
         .model-name { font-size: 0.9rem; font-weight: 800; text-transform: uppercase; }
+
         .model-years { font-family: monospace; font-size: 0.8rem; color: #777; margin-top: 0.3rem; }
 
-        /* COMMON ISSUES GRID */
         .issues-section { padding: 0 0 4rem; border-top: 2px solid var(--hex-black); background: var(--hex-white); overflow: hidden; }
-        .issues-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; }
-        .issue-card { background: var(--hex-white); border: 2px solid var(--hex-black); padding: 2.5rem; position: relative; transition: all 0.2s; display: flex; flex-direction: column; }
-        .issue-card::before { content: attr(data-issue-num); font-family: monospace; font-size: 0.6rem; position: absolute; top: 10px; right: 10px; color: #ccc; }
-        @media (hover: hover) {
-            .issue-card:hover { background: var(--hazard-stripe); transform: translateY(-5px); box-shadow: 8px 8px 0 #000; }
-            .issue-card:hover .issue-title, .issue-card:hover .issue-description, .issue-card:hover .issue-symptoms li, .issue-card:hover .issue-price { background: var(--hex-white); color: var(--hex-black); box-shadow: 4px 4px 0 var(--hex-black); padding: 2px 5px; display: inline-block; position: relative; z-index: 2; }
-            .issue-card:hover .issue-icon { color: var(--hex-white); background: var(--hex-black); padding: 10px; display: inline-block; box-shadow: 4px 4px 0 var(--hex-white); }
-        }
-        .issue-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
-        .issue-icon { font-size: 2rem; color: var(--hex-black); transition: all 0.2s; }
-        .issue-title { font-size: 1.4rem; text-transform: uppercase; font-weight: 800; border-bottom: 4px solid; border-image: var(--gradient-blue) 1; display: inline-block; }
-        .issue-description { margin-bottom: 1.5rem; color: #555; line-height: 1.7; }
-        .issue-subtitle { font-weight: 800; text-transform: uppercase; font-size: 0.8rem; margin-bottom: 0.5rem; color: var(--hex-black); font-family: monospace; }
-        .issue-symptoms { list-style: none; margin-bottom: 1.5rem; }
-        .issue-symptoms li { padding: 0.4rem 0; display: flex; align-items: center; gap: 0.5rem; font-family: monospace; font-size: 0.9rem; }
-        .issue-symptoms li::before { content: "\26A0"; color: var(--hex-accent); font-weight: bold; }
-        .issue-bottom { margin-top: auto; }
-        .issue-pricing { background: var(--hex-concrete); padding: 1rem; border: 1px solid var(--hex-grid); margin-bottom: 1rem; text-align: center; }
-        .price-text { font-family: monospace; font-size: 0.8rem; color: #666; margin-bottom: 0.3rem; text-transform: uppercase; }
-        .issue-price { font-size: 1.5rem; font-weight: 900; color: var(--hex-black); }
-        .issue-cta { display: flex; align-items: center; justify-content: center; background: var(--gradient-blue); color: var(--hex-white); padding: 1rem; text-decoration: none; font-weight: 800; text-transform: uppercase; font-size: 0.9rem; border: 2px solid var(--hex-black); transition: all 0.1s; cursor: pointer; gap: 0.5rem; width: 100%; }
-        @media (hover: hover) { .issue-cta:hover { transform: translate(4px, 4px); box-shadow: -4px -4px 0 var(--hex-black); } }
 
-        /* WHY CHOOSE US */
+        .issues-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; }
+
+        .issue-card { background: var(--hex-white); border: 2px solid var(--hex-black); padding: 2.5rem; position: relative; transition: all 0.2s; display: flex; flex-direction: column; }
+
+        .issue-card::before { content: attr(data-issue-num); font-family: monospace; font-size: 0.6rem; position: absolute; top: 10px; right: 10px; color: #ccc; }
+
+        @media (hover: hover) {
+        .issue-card:hover { background: var(--hazard-stripe); transform: translateY(-5px); box-shadow: 8px 8px 0 #000; }
+        .issue-card:hover .issue-title, .issue-card:hover .issue-description, .issue-card:hover .issue-symptoms li, .issue-card:hover .issue-price { background: var(--hex-white); color: var(--hex-black); box-shadow: 4px 4px 0 var(--hex-black); padding: 2px 5px; display: inline-block; position: relative; z-index: 2; }
+        .issue-card:hover .issue-icon { color: var(--hex-white); background: var(--hex-black); padding: 10px; display: inline-block; box-shadow: 4px 4px 0 var(--hex-white); }
+    }
+
+        .issue-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+
+        .issue-icon { font-size: 2rem; color: var(--hex-black); transition: all 0.2s; }
+
+        .issue-title { font-size: 1.4rem; text-transform: uppercase; font-weight: 800; border-bottom: 4px solid; border-image: var(--gradient-blue) 1; display: inline-block; }
+
+        .issue-description { margin-bottom: 1.5rem; color: #555; line-height: 1.7; }
+
+        .issue-subtitle { font-weight: 800; text-transform: uppercase; font-size: 0.8rem; margin-bottom: 0.5rem; color: var(--hex-black); font-family: monospace; }
+
+        .issue-symptoms { list-style: none; margin-bottom: 1.5rem; }
+
+        .issue-symptoms li { padding: 0.4rem 0; display: flex; align-items: center; gap: 0.5rem; font-family: monospace; font-size: 0.9rem; }
+
+        .issue-symptoms li::before { content: "\26A0"; color: var(--hex-accent); font-weight: bold; }
+
+        .issue-bottom { margin-top: auto; }
+
+        .issue-pricing { background: var(--hex-concrete); padding: 1rem; border: 1px solid var(--hex-grid); margin-bottom: 1rem; text-align: center; }
+
+        .price-text { font-family: monospace; font-size: 0.8rem; color: #666; margin-bottom: 0.3rem; text-transform: uppercase; }
+
+        .issue-price { font-size: 1.5rem; font-weight: 900; color: var(--hex-black); }
+
+        .issue-cta { display: flex; align-items: center; justify-content: center; background: var(--gradient-blue); color: var(--hex-white); padding: 1rem; text-decoration: none; font-weight: 800; text-transform: uppercase; font-size: 0.9rem; border: 2px solid var(--hex-black); transition: all 0.1s; cursor: pointer; gap: 0.5rem; width: 100%; }
+
+        @media (hover: hover) {
+        .issue-cta:hover { transform: translate(4px, 4px); box-shadow: -4px -4px 0 var(--hex-black); }
+    }
+
         .why-section { padding: 0 0 4rem; border-top: 2px solid var(--hex-black); background: var(--hex-white); overflow: hidden; }
+
         .why-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; border: 2px solid var(--hex-black); }
+
         .why-item { padding: 2.5rem 2rem; text-align: center; border-right: 2px solid var(--hex-black); background: var(--hex-white); position: relative; }
+
         .why-item:last-child { border-right: none; }
+
         .why-item::before { content: "GUARANTEE"; font-family: monospace; font-size: 0.6rem; position: absolute; top: 8px; right: 8px; color: #ccc; }
+
         .why-icon { font-size: 2.5rem; color: var(--hex-black); margin-bottom: 1rem; }
+
         .why-title { font-size: 1.1rem; text-transform: uppercase; font-weight: 800; margin-bottom: 0.5rem; }
+
         .why-description { font-family: monospace; color: #666; font-size: 0.85rem; line-height: 1.5; }
+
         .why-vs { margin-top: 2rem; padding: 2rem; background: var(--hex-concrete); border: 2px solid var(--hex-black); font-family: monospace; text-align: center; }
+
         .why-vs-title { font-weight: 800; text-transform: uppercase; margin-bottom: 1rem; font-family: var(--font-main); font-size: 1.1rem; }
+
         .why-vs-row { display: flex; justify-content: center; gap: 3rem; flex-wrap: wrap; }
+
         .why-vs-col { text-align: center; }
+
         .why-vs-label { font-weight: 800; text-transform: uppercase; font-size: 0.8rem; margin-bottom: 0.5rem; color: var(--hex-black); font-family: var(--font-main); }
+
         .why-vs-value { font-size: 0.85rem; color: #666; line-height: 1.6; }
+
         .why-vs-value.highlight { color: var(--hex-accent); font-weight: 700; }
 
-        /* HOW IT WORKS */
         .process-section { padding: 4rem 0; background: var(--hex-concrete); }
+
         .process-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; border: 2px solid var(--hex-black); }
+
         .process-item { padding: 2rem; border-right: 2px solid var(--hex-black); position: relative; background: var(--hex-white); }
+
         .process-item:last-child { border-right: none; }
+
         .process-number { font-weight: 900; font-size: 3rem; background: var(--gradient-blue); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1; margin-bottom: 1rem; }
+
         .process-item h4 { font-size: 1.1rem; text-transform: uppercase; font-weight: 800; margin-bottom: 0.5rem; }
+
         .process-item p { font-family: monospace; color: #666; font-size: 0.85rem; line-height: 1.5; }
 
-        /* EMERGENCY CTA */
         .emergency-section { background: var(--hex-black); color: var(--hex-white); padding: 4rem 0; text-align: center; border-top: 10px solid; border-image: var(--gradient-blue) 1; }
-        .emergency-section h2 { font-size: clamp(1.5rem, 4vw, 2.5rem); text-transform: uppercase; font-weight: 900; margin-bottom: 1rem; }
-        .emergency-section p { font-family: monospace; color: #aaa; margin-bottom: 2rem; font-size: 1rem; max-width: 600px; margin-left: auto; margin-right: auto; }
-        .emergency-btn { display: inline-flex; align-items: center; gap: 10px; background: var(--gradient-blue); color: var(--hex-white); padding: 1rem 2rem; text-decoration: none; font-weight: 800; text-transform: uppercase; font-size: 1rem; border: 2px solid var(--hex-white); transition: all 0.1s; }
-        @media (hover: hover) { .emergency-btn:hover { transform: translate(4px, 4px); box-shadow: -4px -4px 0 var(--hex-white); } }
 
-        /* FAQ SECTION */
+        .emergency-section h2 { font-size: clamp(1.5rem, 4vw, 2.5rem); text-transform: uppercase; font-weight: 900; margin-bottom: 1rem; }
+
+        .emergency-section p { font-family: monospace; color: #aaa; margin-bottom: 2rem; font-size: 1rem; max-width: 600px; margin-left: auto; margin-right: auto; }
+
+        .emergency-btn { display: inline-flex; align-items: center; gap: 10px; background: var(--gradient-blue); color: var(--hex-white); padding: 1rem 2rem; text-decoration: none; font-weight: 800; text-transform: uppercase; font-size: 1rem; border: 2px solid var(--hex-white); transition: all 0.1s; }
+
+        @media (hover: hover) {
+        .emergency-btn:hover { transform: translate(4px, 4px); box-shadow: -4px -4px 0 var(--hex-white); }
+    }
+
         .faq-section { padding: 0 0 4rem; border-top: 2px solid var(--hex-black); background: var(--hex-white); }
+
         .faq-list { max-width: 900px; margin: 0 auto; }
+
         .faq-item { border: 2px solid var(--hex-black); margin-bottom: -2px; }
+
         .faq-question { width: 100%; background: var(--hex-white); border: none; padding: 1.5rem 2rem; text-align: left; font-size: 1.1rem; font-weight: 800; text-transform: uppercase; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-family: var(--font-main); transition: all 0.2s; }
-        @media (hover: hover) { .faq-question:hover { background: var(--hex-concrete); } }
+
+        @media (hover: hover) {
+        .faq-question:hover { background: var(--hex-concrete); }
+    }
+
         .faq-question::after { content: "+"; font-size: 1.5rem; font-weight: 900; color: var(--hex-accent); transition: transform 0.2s; }
+
         .faq-item.active .faq-question::after { content: "\2212"; }
+
         .faq-answer { display: none; padding: 0 2rem 1.5rem; font-family: monospace; color: #555; line-height: 1.7; font-size: 0.95rem; border-top: 1px solid var(--hex-grid); }
+
         .faq-item.active .faq-answer { display: block; padding-top: 1.5rem; }
 
-        /* FOOTER */
-        .footer { background: var(--hex-black); color: var(--hex-white); padding: 4rem 0 6rem; border-top: 10px solid; border-image: var(--gradient-blue) 1; }
-        .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 3rem; margin-bottom: 3rem; }
-        .footer h4 { font-size: 1.2rem; text-transform: uppercase; border-bottom: 1px solid #555; padding-bottom: 1rem; margin-bottom: 1.5rem; background: var(--gradient-blue); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: inline-block; }
-        .footer-links { list-style: none; font-family: monospace; }
-        .footer-links li { margin-bottom: 0.5rem; }
         .footer-links a { color: #aaa; text-decoration: none; text-transform: uppercase; display: inline-block; padding: 0.4rem 0; }
-        .footer-links a:hover { color: var(--hex-white); text-decoration: underline; }
-        .copyright { text-align: left; font-family: monospace; color: #555; font-size: 0.7rem; border-top: 1px solid #333; padding-top: 2rem; }
-
-
-        /* SCROLL HINT */
-        .scroll-hint { display: none; text-align: right; font-size: 0.7rem; color: var(--hex-accent); margin-bottom: 0.5rem; font-family: monospace; text-transform: uppercase; font-weight: 700; animation: pulse-hint 2s infinite; }
-        @keyframes pulse-hint { 0%, 100% { opacity: 1; transform: translateX(0); } 50% { opacity: 0.5; transform: translateX(5px); } }
-
-        @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; } .scroll-hint { animation: none; } }
 
         @media (max-width: 768px) {
-            .scroll-hint { display: none; }
+        .scroll-hint { display: none; }
+        .nav-menu { display: none; flex-direction: column; position: absolute; top: 70px; left: 0; right: 0; background: var(--hex-white); border-top: 2px solid var(--hex-black); border-bottom: 2px solid var(--hex-black); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .section-title { padding-top: 2rem; margin-bottom: 0; font-size: clamp(1.5rem, 5vw, 2.2rem); }
+        .section-subtitle { margin-bottom: 1.5rem; font-size: 0.8rem; }
+        .models-grid { display: grid; grid-template-columns: repeat(2, 1fr); border: 2px solid var(--hex-black); }
+        .model-item { min-width: unset; border-right: 2px solid var(--hex-black); border-bottom: 2px solid var(--hex-black); padding: 1.2rem 0.75rem; }
+        .model-item:nth-child(2n) { border-right: none; }
+        .model-item:nth-child(n+3) { border-bottom: none; }
+        .model-icon { font-size: 1.8rem; margin-bottom: 0.3rem; }
+        .model-name { font-size: 0.75rem; }
+        .issues-grid { display: grid; grid-template-columns: 1fr; gap: 12px; padding-bottom: 1.5rem; }
+        .issue-card { min-width: unset; padding: 1.5rem; }
+        .issue-title { font-size: clamp(1rem, 4vw, 1.3rem); }
+        .issue-header { gap: 0.75rem; margin-bottom: 1rem; }
+        .issue-icon { font-size: 1.6rem; }
+        .issue-description { font-size: 0.9rem; line-height: 1.6; margin-bottom: 1rem; }
+        .issue-symptoms li { font-size: 0.8rem; padding: 0.3rem 0; }
+        .issue-pricing { padding: 0.75rem; }
+        .issue-price { font-size: 1.3rem; }
+        .issue-cta { padding: 0.9rem; font-size: 0.85rem; min-height: 48px; }
+        .why-grid { grid-template-columns: repeat(2, 1fr); }
+        .why-item:nth-child(2) { border-right: none; }
+        .why-item:nth-child(1), .why-item:nth-child(2) { border-bottom: 2px solid var(--hex-black); }
+        .why-item:nth-child(4) { border-right: none; }
+        .why-item { padding: 1.5rem 1rem; }
+        .why-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+        .why-title { font-size: 0.95rem; }
+        .why-description { font-size: 0.8rem; }
+        .why-vs { padding: 1.5rem 1rem; }
+        .why-vs-title { font-size: 1rem; }
+        .why-vs-row { flex-direction: column; gap: 1.5rem; }
+        .why-vs-col { width: 100%; padding: 1rem; background: var(--hex-white); border: 1px solid var(--hex-grid); }
+        .why-vs-label { font-size: 0.75rem; margin-bottom: 0.5rem; }
+        .why-vs-value { font-size: 0.8rem; line-height: 1.8; }
+        .process-section { padding: 2rem 0; }
+        .process-grid { grid-template-columns: 1fr; }
+        .process-item { border-right: none; border-bottom: 2px solid var(--hex-black); padding: 1.5rem; }
+        .process-item:last-child { border-bottom: none; }
+        .process-number { font-size: clamp(2rem, 7vw, 3rem); }
+        .process-item h4 { font-size: 1rem; }
+        .process-item p { font-size: 0.8rem; }
+        .emergency-section { padding: 2.5rem 0; }
+        .emergency-section h2 { font-size: clamp(1.3rem, 5vw, 2rem); }
+        .emergency-section p { font-size: 0.85rem; padding: 0 0.5rem; margin-bottom: 1.5rem; }
+        .emergency-btn { padding: 1rem 1.5rem; font-size: 0.9rem; min-height: 48px; width: 100%; justify-content: center; }
+        .faq-item.active .faq-answer { padding-top: 1rem; }
+    }
 
-            /* NAV */
-            .navbar { background: transparent; border-bottom: none; }
-            .nav-logo { display: none; }
-            .nav-container { justify-content: flex-end; }
-            .mobile-menu-toggle { display: block; background: transparent; border: none; font-size: 2rem; padding: 1rem 1.5rem; color: var(--hex-black); }
-            .nav-menu { display: none; flex-direction: column; position: absolute; top: 70px; left: 0; right: 0; background: var(--hex-white); border-top: 2px solid var(--hex-black); border-bottom: 2px solid var(--hex-black); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
-            .nav-menu.active { display: flex; }
-            .nav-link { padding: 1.5rem; border-left: none; border-bottom: 1px solid #eee; min-height: 48px; }
-            .nav-cta { padding: 1.5rem; justify-content: center; border-left: none; min-height: 48px; }
-            /* PAGE HEADER */
-            .page-header-box { padding: 1.5rem 1rem; box-shadow: 6px 6px 0 var(--hex-black); }
-            .page-title { font-size: clamp(1.8rem, 7vw, 2.5rem); letter-spacing: -1px; }
-            .page-subtitle { font-size: clamp(0.65rem, 2.5vw, 0.85rem); word-break: break-word; padding: 4px 6px; }
-            .page-header::before { display: none; }
-            .page-header-content { padding: 2.5rem 12px; }
-
-            .section-title { padding-top: 2rem; margin-bottom: 0; font-size: clamp(1.5rem, 5vw, 2.2rem); }
-            .section-subtitle { margin-bottom: 1.5rem; font-size: 0.8rem; }
-            .container { padding: 0 12px; }
-
-            /* DEVICES — 2-col compact grid */
-            .models-grid { display: grid; grid-template-columns: repeat(2, 1fr); border: 2px solid var(--hex-black); }
-            .model-item { min-width: unset; border-right: 2px solid var(--hex-black); border-bottom: 2px solid var(--hex-black); padding: 1.2rem 0.75rem; }
-            .model-item:nth-child(2n) { border-right: none; }
-            .model-item:nth-child(n+3) { border-bottom: none; }
-            .model-icon { font-size: 1.8rem; margin-bottom: 0.3rem; }
-            .model-name { font-size: 0.75rem; }
-
-            /* ISSUES — stacked vertical */
-            .issues-grid { display: grid; grid-template-columns: 1fr; gap: 12px; padding-bottom: 1.5rem; }
-            .issue-card { min-width: unset; padding: 1.5rem; }
-            .issue-title { font-size: clamp(1rem, 4vw, 1.3rem); }
-            .issue-header { gap: 0.75rem; margin-bottom: 1rem; }
-            .issue-icon { font-size: 1.6rem; }
-            .issue-description { font-size: 0.9rem; line-height: 1.6; margin-bottom: 1rem; }
-            .issue-symptoms li { font-size: 0.8rem; padding: 0.3rem 0; }
-            .issue-pricing { padding: 0.75rem; }
-            .issue-price { font-size: 1.3rem; }
-            .issue-cta { padding: 0.9rem; font-size: 0.85rem; min-height: 48px; }
-
-            /* WHY CHOOSE US — 2x2 grid */
-            .why-grid { grid-template-columns: repeat(2, 1fr); }
-            .why-item:nth-child(2) { border-right: none; }
-            .why-item:nth-child(1), .why-item:nth-child(2) { border-bottom: 2px solid var(--hex-black); }
-            .why-item:nth-child(4) { border-right: none; }
-            .why-item { padding: 1.5rem 1rem; }
-            .why-icon { font-size: 2rem; margin-bottom: 0.5rem; }
-            .why-title { font-size: 0.95rem; }
-            .why-description { font-size: 0.8rem; }
-            .why-vs { padding: 1.5rem 1rem; }
-            .why-vs-title { font-size: 1rem; }
-            .why-vs-row { flex-direction: column; gap: 1.5rem; }
-            .why-vs-col { width: 100%; padding: 1rem; background: var(--hex-white); border: 1px solid var(--hex-grid); }
-            .why-vs-label { font-size: 0.75rem; margin-bottom: 0.5rem; }
-            .why-vs-value { font-size: 0.8rem; line-height: 1.8; }
-
-            /* PROCESS — stacked */
-            .process-section { padding: 2rem 0; }
-            .process-grid { grid-template-columns: 1fr; }
-            .process-item { border-right: none; border-bottom: 2px solid var(--hex-black); padding: 1.5rem; }
-            .process-item:last-child { border-bottom: none; }
-            .process-number { font-size: clamp(2rem, 7vw, 3rem); }
-            .process-item h4 { font-size: 1rem; }
-            .process-item p { font-size: 0.8rem; }
-
-            /* EMERGENCY CTA */
-            .emergency-section { padding: 2.5rem 0; }
-            .emergency-section h2 { font-size: clamp(1.3rem, 5vw, 2rem); }
-            .emergency-section p { font-size: 0.85rem; padding: 0 0.5rem; margin-bottom: 1.5rem; }
-            .emergency-btn { padding: 1rem 1.5rem; font-size: 0.9rem; min-height: 48px; width: 100%; justify-content: center; }
-
-            /* FAQ */
-            .faq-question { font-size: 0.9rem; padding: 1rem 1.2rem; min-height: 48px; }
-            .faq-answer { padding: 0 1.2rem 1rem; font-size: 0.85rem; }
-            .faq-item.active .faq-answer { padding-top: 1rem; }
-
-            /* FOOTER */
-            .footer { padding: 3rem 0 5rem; }
-            .footer-grid { gap: 2rem; grid-template-columns: 1fr 1fr; }
-            .footer-links a { display: inline-block; padding: 0.4rem 0; min-height: 44px; line-height: 2.2; }
-            .copyright { font-size: 0.7rem; }
-        }
-
-        /* EXTRA SMALL SCREENS */
         @media (max-width: 400px) {
-            .page-header-box { padding: 1.2rem 0.75rem; box-shadow: 4px 4px 0 var(--hex-black); }
-            .page-title { font-size: clamp(1.5rem, 8vw, 2rem); }
-            .page-subtitle { font-size: 0.6rem; letter-spacing: 0; }
-            .section-title { font-size: clamp(1.3rem, 6vw, 1.8rem); }
-            .container { padding: 0 8px; }
-
-            .model-item { padding: 1rem 0.5rem; }
-            .issue-card { padding: 1.2rem; }
-            .issue-description { font-size: 0.85rem; }
-
-            .why-grid { grid-template-columns: 1fr; }
-            .why-item { border-right: none !important; border-bottom: 2px solid var(--hex-black); }
-            .why-item:last-child { border-bottom: none; }
-
-            .emergency-btn { font-size: 0.8rem; padding: 0.9rem 1rem; }
-            .faq-question { font-size: 0.8rem; padding: 0.9rem 1rem; }
-
-            .footer-grid { grid-template-columns: 1fr; }
-        }
-
-        .fade-in { opacity: 0; transform: translateY(20px); animation: appear 0.5s ease forwards; }
-        @keyframes appear { to { opacity: 1; transform: translateY(0); } }
-        ::-webkit-scrollbar { width: 10px; height: 6px; }
-        ::-webkit-scrollbar-track { background: var(--hex-concrete); }
-        ::-webkit-scrollbar-thumb { background: var(--gradient-blue); border-radius: 3px; }
+        .model-item { padding: 1rem 0.5rem; }
+        .issue-card { padding: 1.2rem; }
+        .issue-description { font-size: 0.85rem; }
+        .why-grid { grid-template-columns: 1fr; }
+        .why-item { border-right: none !important; border-bottom: 2px solid var(--hex-black); }
+        .why-item:last-child { border-bottom: none; }
+        .emergency-btn { font-size: 0.8rem; padding: 0.9rem 1rem; }
+        .faq-question { font-size: 0.8rem; padding: 0.9rem 1rem; }
+    }
     </style>
 </head>
 <body>
@@ -913,64 +929,10 @@
         </div>
     </footer>
 
-
     <!-- Font Awesome -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" integrity="sha512-fD9DI5bZwQxOi7MhYWnnNPlvXdp/2Pj3XSTRrFs5FQa4mizyGLnJcN6tuvUS6LbmgN1ut+XGSABKvjN0H6Aoow==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
 
-    <script>
-        // Mobile Navigation
-        const mobileToggle = document.getElementById('mobile-toggle');
-        const navMenu = document.getElementById('nav-menu');
-        mobileToggle.addEventListener('click', () => {
-            const isExpanded = navMenu.classList.toggle('active');
-            mobileToggle.setAttribute('aria-expanded', isExpanded.toString());
-            const icon = mobileToggle.querySelector('i');
-            icon.classList.toggle('fa-bars');
-            icon.classList.toggle('fa-times');
-        });
-        document.addEventListener('click', (e) => {
-            const isClickInsideMenu = navMenu.contains(e.target);
-            const isClickOnToggle = mobileToggle.contains(e.target);
-            const isLink = e.target.closest('.nav-link') || e.target.closest('.nav-cta');
-            if ((!isClickInsideMenu && !isClickOnToggle && navMenu.classList.contains('active')) ||
-                (isLink && navMenu.classList.contains('active'))) {
-                navMenu.classList.remove('active');
-                mobileToggle.setAttribute('aria-expanded', 'false');
-                const icon = mobileToggle.querySelector('i');
-                icon.classList.add('fa-bars');
-                icon.classList.remove('fa-times');
-            }
-        });
-
-        // FAQ Accordion
-        document.querySelectorAll('.faq-question').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const item = btn.parentElement;
-                const isActive = item.classList.contains('active');
-                document.querySelectorAll('.faq-item.active').forEach(i => {
-                    i.classList.remove('active');
-                    i.querySelector('.faq-question').setAttribute('aria-expanded', 'false');
-                });
-                if (!isActive) {
-                    item.classList.add('active');
-                    btn.setAttribute('aria-expanded', 'true');
-                }
-            });
-        });
-
-        // Fade-in Observer
-        const fadeObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.animationPlayState = 'running';
-                    fadeObserver.unobserve(entry.target);
-                }
-            });
-        }, { threshold: 0.1 });
-        document.querySelectorAll('.fade-in').forEach(el => {
-            el.style.animationPlayState = 'paused';
-            fadeObserver.observe(el);
-        });
-    </script>
+    
+    <script src="/js/core.js" defer></script>
 </body>
 </html>
