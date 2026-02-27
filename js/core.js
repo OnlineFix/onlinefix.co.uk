@@ -63,9 +63,16 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!item) return;
             const wasActive = item.classList.contains('active');
             // Close all
-            document.querySelectorAll('.faq-item.active').forEach(a => a.classList.remove('active'));
+            document.querySelectorAll('.faq-item.active').forEach(a => {
+                a.classList.remove('active');
+                const q = a.querySelector('.faq-question');
+                if (q) q.setAttribute('aria-expanded', 'false');
+            });
             // Toggle clicked
-            if (!wasActive) item.classList.add('active');
+            if (!wasActive) {
+                item.classList.add('active');
+                btn.setAttribute('aria-expanded', 'true');
+            }
         });
     });
 });
