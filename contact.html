@@ -11,7 +11,7 @@
 
     <meta name="referrer" content="strict-origin-when-cross-origin">
 
-    <title>Contact OnlineFix - Electronics Repair in Guildford | Call 07940 730537</title>
+    <title>Contact OnlineFix | Guildford Repair Shop</title>
     <meta name="description"
         content="Contact OnlineFix for electronics repair in Guildford, Surrey. Call 07940 730537 or visit our workshop. Open 10 AM - 10 PM daily. Same-day repairs available.">
     <meta name="keywords"
@@ -33,19 +33,20 @@
     <meta property="og:title" content="Contact OnlineFix - Electronics Repair in Guildford">
     <meta property="og:description"
         content="Contact OnlineFix for professional electronics repair in Guildford, Surrey. Call 07940 730537 for same-day service.">
-    <meta property="og:image" content="https://onlinefix.co.uk/images/onlinefix-og-image.jpg">
+    <meta property="og:image" content="https://onlinefix.co.uk/images/onlinefix-og-image.webp">
 
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Contact OnlineFix - Electronics Repair in Guildford">
     <meta name="twitter:description"
         content="Contact OnlineFix for professional electronics repair in Guildford, Surrey. Call 07940 730537 for same-day service.">
-    <meta name="twitter:image" content="https://onlinefix.co.uk/images/onlinefix-og-image.jpg">
+    <meta name="twitter:image" content="https://onlinefix.co.uk/images/onlinefix-og-image.webp">
 
-    <link rel="icon" type="image/png" sizes="512x512" href="/favicon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="/favicon.png">
-    <link rel="shortcut icon" href="/favicon.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/favicon-512x512.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180x180.png">
+    <link rel="shortcut icon" href="/favicon.ico">
 
     <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
@@ -123,227 +124,8 @@
     }
     </script>
 
+    <link rel="stylesheet" href="/css/core.css">
     <style>
-        :root {
-            --hex-accent: #0033FF;
-            --gradient-blue: linear-gradient(135deg, #0033FF 0%, #00C6FF 100%);
-            --hex-black: #111111;
-            --hex-concrete: #F2F2F2;
-            --hex-white: #FFFFFF;
-            --hex-grid: #DCDCDC;
-            --hazard-stripe: repeating-linear-gradient(135deg, #111111, #111111 10px, #ffffff 10px, #ffffff 20px);
-            --font-main: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            --safe-area-bottom: env(safe-area-inset-bottom);
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: var(--font-main);
-            background-color: var(--hex-concrete);
-            color: var(--hex-black);
-            line-height: 1.4;
-            overflow-x: hidden;
-            font-weight: 500;
-            padding-bottom: calc(60px + var(--safe-area-bottom));
-        }
-
-        .skip-link {
-            position: absolute;
-            top: -40px;
-            left: 0;
-            background: var(--hex-black);
-            color: var(--hex-white);
-            padding: 8px 16px;
-            z-index: 10000;
-            transition: top 0.3s;
-            text-decoration: none;
-            font-weight: 700;
-            text-transform: uppercase;
-            font-size: 0.9rem;
-        }
-
-        .skip-link:focus {
-            top: 0;
-        }
-
-        :focus-visible {
-            outline: 3px solid var(--hex-accent);
-            outline-offset: 2px;
-        }
-
-        * {
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        /* NAV */
-        .navbar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: var(--hex-white);
-            z-index: 1000;
-            border-bottom: 2px solid var(--hex-black);
-            padding: 0;
-        }
-
-        .nav-container {
-            max-width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: stretch;
-            height: 60px;
-        }
-
-        .nav-logo {
-            font-size: 1.5rem;
-            font-weight: 900;
-            color: var(--hex-white);
-            text-decoration: none;
-            text-transform: uppercase;
-            letter-spacing: -1px;
-            padding: 0 1.5rem;
-            display: flex;
-            align-items: center;
-            background: var(--gradient-blue);
-            border-right: 2px solid var(--hex-black);
-            position: relative;
-        }
-
-        .nav-logo::after {
-            content: "\2122";
-            font-size: 0.4em;
-            position: relative;
-            top: -0.6em;
-            margin-left: 2px;
-            line-height: 0;
-        }
-
-        .nav-menu {
-            display: flex;
-            list-style: none;
-            gap: 0;
-            align-items: stretch;
-            flex-grow: 1;
-            justify-content: flex-end;
-        }
-
-        .nav-menu li {
-            display: flex;
-            align-items: stretch;
-        }
-
-        .nav-link {
-            text-decoration: none;
-            color: var(--hex-black);
-            font-weight: 700;
-            text-transform: uppercase;
-            font-size: 0.9rem;
-            padding: 0 2rem;
-            display: flex;
-            align-items: center;
-            border-left: 1px solid var(--hex-grid);
-            position: relative;
-            transition: all 0.2s;
-        }
-
-        @media (hover: hover) {
-            .nav-link:hover {
-                background: var(--hazard-stripe);
-                color: var(--hex-white);
-                text-shadow: 2px 2px 0 #000;
-            }
-        }
-
-        .nav-link.active {
-            text-decoration: line-through;
-        }
-
-        .nav-cta {
-            background: var(--hex-black);
-            color: var(--hex-white);
-            padding: 0 2rem;
-            text-decoration: none;
-            font-weight: 700;
-            text-transform: uppercase;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 0.8rem;
-            border-left: 2px solid var(--hex-black);
-        }
-
-        .nav-cta::before,
-        .nav-cta::after {
-            content: none;
-        }
-
-        @media (hover: hover) {
-            .nav-cta:hover {
-                background: var(--gradient-blue);
-                color: var(--hex-white);
-            }
-        }
-
-        .mobile-menu-toggle {
-            display: none;
-            background: transparent;
-            border: none;
-            font-size: 1.5rem;
-            color: var(--hex-black);
-            cursor: pointer;
-            padding: 0 1.5rem;
-            min-width: 60px;
-            outline: none;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 20px;
-            position: relative;
-            z-index: 2;
-            width: 100%;
-        }
-
-        .section-title {
-            font-size: clamp(2rem, 5vw, 3rem);
-            font-weight: 900;
-            text-transform: uppercase;
-            text-align: center;
-            padding-top: 4rem;
-            letter-spacing: -1px;
-            margin-bottom: 0.5rem;
-        }
-
-        .section-subtitle {
-            text-align: center;
-            font-family: monospace;
-            text-transform: uppercase;
-            margin-bottom: 3rem;
-            color: #666;
-            font-size: 0.9rem;
-        }
-
-        /* PAGE HEADER */
-        .page-header {
-            padding: 60px 0 0;
-            background: linear-gradient(90deg, var(--hex-grid) 1px, transparent 1px) 0 0, linear-gradient(180deg, var(--hex-grid) 1px, transparent 1px) 0 0;
-            background-size: 40px 40px;
-            background-color: var(--hex-concrete);
-            position: relative;
-            overflow: hidden;
-        }
-
         .page-header::before {
             content: "FIG. 05 — CONTACT PROTOCOL";
             position: absolute;
@@ -355,50 +137,6 @@
             opacity: 0.6;
         }
 
-        .page-header-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 4rem 20px;
-            position: relative;
-            z-index: 2;
-        }
-
-        .page-header-box {
-            text-align: center;
-            border: 2px solid var(--hex-black);
-            padding: 3rem 4rem;
-            background: var(--hex-white);
-            box-shadow: 15px 15px 0px var(--hex-black);
-        }
-
-        .page-title {
-            font-size: clamp(2rem, 6vw, 4rem);
-            font-weight: 900;
-            line-height: 0.9;
-            text-transform: uppercase;
-            letter-spacing: -2px;
-            color: var(--hex-black);
-            margin-bottom: 1rem;
-        }
-
-        .page-title span {
-            background: var(--gradient-blue);
-            background-clip: text; -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            display: inline-block;
-        }
-
-        .page-subtitle {
-            font-family: 'Courier New', Courier, monospace;
-            font-size: clamp(0.9rem, 2vw, 1.1rem);
-            text-transform: uppercase;
-            background: var(--hex-black);
-            color: var(--hex-white);
-            display: inline-block;
-            padding: 5px 8px;
-        }
-
-        /* CONTACT METHODS */
         .contact-section {
             padding: 0 0 4rem;
             border-top: 2px solid var(--hex-black);
@@ -435,11 +173,10 @@
         }
 
         @media (hover: hover) {
-            .contact-card:hover {
+        .contact-card:hover {
                 background: var(--hazard-stripe);
             }
-
-            .contact-card:hover .contact-title,
+        .contact-card:hover .contact-title,
             .contact-card:hover .contact-info,
             .contact-card:hover .contact-btn {
                 background: var(--hex-white);
@@ -450,15 +187,14 @@
                 position: relative;
                 z-index: 2;
             }
-
-            .contact-card:hover .contact-icon {
+        .contact-card:hover .contact-icon {
                 color: var(--hex-white);
                 background: var(--hex-black);
                 padding: 10px;
                 display: inline-block;
                 box-shadow: 4px 4px 0 var(--hex-white);
             }
-        }
+    }
 
         .contact-icon {
             font-size: 2.5rem;
@@ -509,13 +245,12 @@
         }
 
         @media (hover: hover) {
-            .contact-btn:hover {
+        .contact-btn:hover {
                 transform: translate(4px, 4px);
                 box-shadow: -4px -4px 0 var(--hex-black);
             }
-        }
+    }
 
-        /* LOCATION */
         .location-section {
             padding: 4rem 0;
             background: var(--hex-black);
@@ -627,13 +362,12 @@
         }
 
         @media (hover: hover) {
-            .directions-btn:hover {
+        .directions-btn:hover {
                 transform: translate(4px, 4px);
                 box-shadow: -4px -4px 0 var(--hex-white);
             }
-        }
+    }
 
-        /* CONTACT FORM */
         .form-section {
             padding: 0 0 4rem;
             border-top: 2px solid var(--hex-black);
@@ -720,13 +454,12 @@
         }
 
         @media (hover: hover) {
-            .form-submit:hover {
+        .form-submit:hover {
                 transform: translate(4px, 4px);
                 box-shadow: -4px -4px 0 var(--hex-black);
             }
-        }
+    }
 
-        /* SOCIAL */
         .social-section {
             padding: 4rem 0;
             background: var(--hex-concrete);
@@ -755,277 +488,89 @@
         }
 
         @media (hover: hover) {
-            .social-link:hover {
+        .social-link:hover {
                 background: var(--hazard-stripe);
                 color: var(--hex-white);
                 text-shadow: 2px 2px 0 #000;
                 transform: translateY(-5px);
                 box-shadow: 5px 5px 0 var(--hex-black);
             }
-        }
-
-        /* FOOTER */
-        .footer {
-            background: var(--hex-black);
-            color: var(--hex-white);
-            padding: 4rem 0 6rem;
-            border-top: 10px solid;
-            border-image: var(--gradient-blue) 1;
-        }
-
-        .footer-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 3rem;
-            margin-bottom: 3rem;
-        }
-
-        .footer h4 {
-            font-size: 1.2rem;
-            text-transform: uppercase;
-            border-bottom: 1px solid #555;
-            padding-bottom: 1rem;
-            margin-bottom: 1.5rem;
-            background: var(--gradient-blue);
-            background-clip: text; -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            display: inline-block;
-        }
-
-        .footer-links {
-            list-style: none;
-            font-family: monospace;
-        }
-
-        .footer-links li {
-            margin-bottom: 0.5rem;
-        }
-
-        .footer-links a {
-            color: #aaa;
-            text-decoration: none;
-            text-transform: uppercase;
-        }
-
-        .footer-links a:hover {
-            color: var(--hex-white);
-            text-decoration: underline;
-        }
-
-        .copyright {
-            text-align: left;
-            font-family: monospace;
-            color: #555;
-            font-size: 0.7rem;
-            border-top: 1px solid #333;
-            padding-top: 2rem;
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-
-            *,
-            *::before,
-            *::after {
-                animation-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: 0.01ms !important;
-                scroll-behavior: auto !important;
-            }
-        }
+    }
 
         @media (max-width: 768px) {
-            .navbar {
-                background: transparent;
-                border-bottom: none;
-            }
-
-            .nav-logo {
-                display: none;
-            }
-
-            .nav-container {
-                justify-content: flex-end;
-            }
-
-            .mobile-menu-toggle {
-                display: block;
-                background: transparent;
-                border: none;
-                font-size: 2rem;
-                padding: 1rem 1.5rem;
-                color: var(--hex-black);
-            }
-
-            .nav-menu {
-                display: none;
-                flex-direction: column;
-                position: absolute;
-                top: 70px;
-                left: 0;
-                right: 0;
-                background: var(--hex-white);
-                border-top: 2px solid var(--hex-black);
-                border-bottom: 2px solid var(--hex-black);
-                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-            }
-
-            .nav-menu.active {
-                display: flex;
-            }
-
-            .nav-link {
+        .nav-link {
                 padding: 1.5rem;
                 border-left: none;
                 border-bottom: 1px solid #eee;
             }
-
-            .nav-cta {
+        .nav-cta {
                 padding: 1.5rem;
                 justify-content: center;
                 border-left: none;
             }
-
-            .nav-link {
+        .nav-link {
                 min-height: 48px;
             }
-
-            .nav-cta {
+        .nav-cta {
                 min-height: 48px;
             }
-
-            .page-header-box {
-                padding: 1.5rem 1rem;
-                box-shadow: 6px 6px 0 var(--hex-black);
-            }
-
-            .page-title {
+        .page-title {
                 font-size: clamp(1.8rem, 7vw, 2.5rem);
             }
-
-            .section-title {
-                padding-top: 2rem;
-                margin-bottom: 0;
-            }
-
-            .section-subtitle {
-                margin-bottom: 2rem;
-            }
-
-            /* Contact grid stacked */
-            .contact-grid {
+        .contact-grid {
                 grid-template-columns: 1fr;
             }
-
-            .contact-card {
+        .contact-card {
                 border-right: none;
                 border-bottom: 2px solid var(--hex-black);
                 padding: 2rem 1.5rem;
             }
-
-            .contact-card:last-child {
+        .contact-card:last-child {
                 border-bottom: none;
             }
-
-            .contact-title {
+        .contact-title {
                 font-size: clamp(1.1rem, 4vw, 1.4rem);
             }
-
-            .contact-info {
+        .contact-info {
                 font-size: 0.95rem;
             }
-
-            .contact-btn {
+        .contact-btn {
                 padding: 1rem 1.5rem;
                 font-size: 0.9rem;
                 min-height: 48px;
             }
-
-            /* Location grid stacked */
-            .location-grid {
+        .location-grid {
                 grid-template-columns: 1fr;
             }
-
-            .location-details {
+        .location-details {
                 border-right: none;
                 border-bottom: 1px solid #333;
                 padding: 2rem 1.5rem;
             }
-
-            .location-map {
+        .location-map {
                 padding: 2rem 1.5rem;
             }
-
-            .detail-icon {
+        .detail-icon {
                 width: 44px;
                 height: 44px;
             }
-
-            /* Contact form */
-            .contact-form {
+        .contact-form {
                 padding: 2rem 1.5rem;
                 box-shadow: 5px 5px 0 var(--hex-black);
             }
-
-            .form-label {
+        .form-label {
                 font-size: 0.9rem;
             }
-
-            /* Social links responsive */
-            .social-links {
+        .social-links {
                 gap: clamp(10px, 3vw, 20px);
                 flex-wrap: wrap;
             }
-
-            .social-link {
+        .social-link {
                 width: 52px;
                 height: 52px;
                 font-size: 1.3rem;
             }
-
-            /* Footer mobile */
-            .footer-grid {
-                gap: 2rem;
-                grid-template-columns: 1fr 1fr;
-            }
-
-            .footer-links a {
-                display: inline-block;
-                padding: 0.4rem 0;
-                min-height: 44px;
-                line-height: 2.2;
-            }
-
-            .copyright {
-                font-size: 0.7rem;
-            }
-        }
-
-        .fade-in {
-            opacity: 0;
-            transform: translateY(20px);
-            animation: appear 0.5s ease forwards;
-        }
-
-        @keyframes appear {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        ::-webkit-scrollbar {
-            width: 10px;
-            height: 6px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--hex-concrete);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--gradient-blue);
-            border-radius: 3px;
-        }
+    }
     </style>
 </head>
 
@@ -1052,12 +597,11 @@
         </div>
     </nav>
 
-
     <main id="main">
         <section class="page-header" aria-label="Page header">
             <div class="page-header-content">
                 <div class="page-header-box fade-in">
-                    <div class="page-title">CONTACT <span>US</span></div>
+                    <h1 class="page-title">CONTACT <span>US</span></h1>
                     <p class="page-subtitle">GET IN TOUCH // GUILDFORD, UK</p>
                 </div>
             </div>
@@ -1152,7 +696,7 @@
                                 accessible location</div>
                             <a href="https://maps.app.goo.gl/zqbFNuYM2z7u8xux8" target="_blank"
                                 rel="noopener noreferrer" class="directions-btn">
-                                <i class="fas fa-directions" aria-hidden="true"></i> Get Directions
+                                <i class="fas fa-diamond-turn-right" aria-hidden="true"></i> Get Directions
                             </a>
                         </div>
                     </div>
@@ -1283,56 +827,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"
         integrity="sha512-fD9DI5bZwQxOi7MhYWnnNPlvXdp/2Pj3XSTRrFs5FQa4mizyGLnJcN6tuvUS6LbmgN1ut+XGSABKvjN0H6Aoow=="
         crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
-    <script>
-        const mobileToggle = document.getElementById('mobile-toggle');
-        const navMenu = document.getElementById('nav-menu');
-        if (mobileToggle && navMenu) {
-            mobileToggle.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const isExpanded = navMenu.classList.toggle('active');
-                mobileToggle.setAttribute('aria-expanded', isExpanded.toString());
-                const icon = mobileToggle.querySelector('i');
-                if (icon) { icon.classList.toggle('fa-bars'); icon.classList.toggle('fa-times'); }
-            });
-            document.addEventListener('click', (e) => {
-                const isClickInsideMenu = navMenu.contains(e.target);
-                const isClickOnToggle = mobileToggle.contains(e.target);
-                const isLink = e.target.tagName === 'A' || e.target.closest('a');
-                if ((!isClickInsideMenu && !isClickOnToggle && navMenu.classList.contains('active')) || (isLink && navMenu.classList.contains('active'))) {
-                    navMenu.classList.remove('active');
-                    mobileToggle.setAttribute('aria-expanded', 'false');
-                    const icon = mobileToggle.querySelector('i');
-                    if (icon) { icon.classList.add('fa-bars'); icon.classList.remove('fa-times'); }
-                }
-            });
-        }
-
-        // Contact form submission
-        const contactForm = document.getElementById('contact-form');
-        contactForm.addEventListener('submit', function (e) {
-            e.preventDefault();
-            const formData = new FormData(contactForm);
-            const data = Object.fromEntries(formData);
-            let message = `New Repair Request:\n\n`;
-            message += `Name: ${data.name}\n`;
-            message += `Phone: ${data.phone}\n`;
-            if (data.email) message += `Email: ${data.email}\n`;
-            message += `Device: ${data.device}\n`;
-            message += `Urgency: ${data.urgency}\n\n`;
-            message += `Issue Description:\n${data.issue}`;
-            const encodedMessage = encodeURIComponent(message);
-            const whatsappUrl = `https://wa.me/447940730537?text=${encodedMessage}`;
-            window.open(whatsappUrl, '_blank');
-            alert('Thank you! Your message has been prepared. Please send it via WhatsApp to complete your request.');
-            contactForm.reset();
-        });
-
-        const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -50px 0px' };
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('fade-in'); observer.unobserve(entry.target); } });
-        }, observerOptions);
-        document.addEventListener('DOMContentLoaded', () => { document.querySelectorAll('.fade-in').forEach(el => observer.observe(el)); });
-    </script>
+    
+    <script src="/js/core.js" defer></script>
 </body>
 
 </html>

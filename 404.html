@@ -10,57 +10,20 @@
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <title>404 — Page Not Found | OnlineFix</title>
     <meta name="robots" content="noindex, follow">
-    <link rel="icon" type="image/png" sizes="512x512" href="/favicon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="/favicon.png">
-    <link rel="shortcut icon" href="/favicon.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/favicon-512x512.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180x180.png">
+    <link rel="shortcut icon" href="/favicon.ico">
 
     <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer"></noscript>
 
+    <link rel="stylesheet" href="/css/core.css">
     <style>
-        :root {
-            --hex-accent: #0033FF;
-            --gradient-blue: linear-gradient(135deg, #0033FF 0%, #00C6FF 100%);
-            --hex-black: #111111;
-            --hex-concrete: #F2F2F2;
-            --hex-white: #FFFFFF;
-            --hex-grid: #DCDCDC;
-            --hazard-stripe: repeating-linear-gradient(135deg, #111111, #111111 10px, #ffffff 10px, #ffffff 20px);
-            --font-main: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            --safe-area-bottom: env(safe-area-inset-bottom);
-        }
-        html { scroll-behavior: smooth; }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: var(--font-main); background-color: var(--hex-concrete);
-            color: var(--hex-black); line-height: 1.4; overflow-x: hidden;
-            font-weight: 500; padding-bottom: calc(60px + var(--safe-area-bottom));
-        }
-        .skip-link { position: absolute; top: -40px; left: 0; background: var(--hex-black); color: var(--hex-white); padding: 8px 16px; z-index: 10000; transition: top 0.3s; text-decoration: none; font-weight: 700; text-transform: uppercase; font-size: 0.9rem; }
-        .skip-link:focus { top: 0; }
-        :focus-visible { outline: 3px solid var(--hex-accent); outline-offset: 2px; }
-        * { -webkit-tap-highlight-color: transparent; }
-
-        /* NAV */
-        .navbar { position: fixed; top: 0; left: 0; right: 0; background: var(--hex-white); z-index: 1000; border-bottom: 2px solid var(--hex-black); padding: 0; }
-        .nav-container { max-width: 100%; display: flex; justify-content: space-between; align-items: stretch; height: 60px; }
-        .nav-logo { font-size: 1.5rem; font-weight: 900; color: var(--hex-white); text-decoration: none; text-transform: uppercase; letter-spacing: -1px; padding: 0 1.5rem; display: flex; align-items: center; background: var(--gradient-blue); border-right: 2px solid var(--hex-black); position: relative; }
-        .nav-logo::after { content: "\2122"; font-size: 0.4em; position: relative; top: -0.6em; margin-left: 2px; line-height: 0; }
-        .nav-menu { display: flex; list-style: none; gap: 0; align-items: stretch; flex-grow: 1; justify-content: flex-end; }
-        .nav-menu li { display: flex; align-items: stretch; }
-        .nav-link { text-decoration: none; color: var(--hex-black); font-weight: 700; text-transform: uppercase; font-size: 0.9rem; padding: 0 2rem; display: flex; align-items: center; border-left: 1px solid var(--hex-grid); position: relative; transition: all 0.2s; }
-        @media (hover: hover) { .nav-link:hover { background: var(--hazard-stripe); color: var(--hex-white); text-shadow: 2px 2px 0 #000; } }
-        .nav-cta { background: var(--hex-black); color: var(--hex-white); padding: 0 2rem; text-decoration: none; font-weight: 700; text-transform: uppercase; display: flex; align-items: center; gap: 10px; font-size: 0.8rem; border-left: 2px solid var(--hex-black); }
-        @media (hover: hover) { .nav-cta:hover { background: var(--gradient-blue); color: var(--hex-white); } }
-        .mobile-menu-toggle { display: none; background: transparent; border: none; font-size: 1.5rem; color: var(--hex-black); cursor: pointer; padding: 0 1.5rem; min-width: 60px; outline: none; }
-
-        .container { max-width: 1400px; margin: 0 auto; padding: 0 20px; position: relative; z-index: 2; width: 100%; }
-
-        /* 404 HERO */
         .error-section {
             min-height: 100vh; display: flex; align-items: center; justify-content: center;
             padding: 80px 0 4rem;
@@ -68,55 +31,55 @@
             background-size: 40px 40px; background-color: var(--hex-concrete);
             position: relative; overflow: hidden;
         }
+
         .error-section::before { content: "ERR. 404 — FILE NOT FOUND"; position: absolute; top: 80px; left: 20px; font-family: monospace; font-size: 0.7rem; color: var(--hex-black); opacity: 0.6; }
+
         .error-box {
             text-align: center; border: 2px solid var(--hex-black); padding: 3rem 4rem;
             background: var(--hex-white); box-shadow: 15px 15px 0px var(--hex-black); max-width: 600px; width: 100%;
         }
+
         .error-code {
             font-size: clamp(5rem, 15vw, 10rem); font-weight: 900; line-height: 0.9;
             text-transform: uppercase; letter-spacing: -4px;
             background: var(--gradient-blue); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             margin-bottom: 1rem;
         }
+
         .error-label {
             font-family: 'Courier New', Courier, monospace; font-size: clamp(0.8rem, 2vw, 1rem);
             text-transform: uppercase; background: var(--hex-black); color: var(--hex-white);
             display: inline-block; padding: 5px 12px; margin-bottom: 2rem;
         }
+
         .error-message { color: #555; line-height: 1.7; margin-bottom: 2rem; font-size: 1rem; }
+
         .error-actions { display: flex; flex-direction: column; gap: 0.8rem; align-items: center; }
+
         .error-btn {
             display: inline-flex; align-items: center; justify-content: center; gap: 8px;
             padding: 1rem 2rem; text-decoration: none; font-weight: 800;
             text-transform: uppercase; font-size: 0.9rem; border: 2px solid var(--hex-black);
             transition: all 0.1s; width: 100%; max-width: 320px; min-height: 48px;
         }
+
         .error-btn-primary { background: var(--gradient-blue); color: var(--hex-white); border-color: var(--hex-white); }
+
         .error-btn-secondary { background: var(--hex-black); color: var(--hex-white); }
+
         .error-btn-call { background: var(--hex-white); color: var(--hex-black); }
-        @media (hover: hover) { .error-btn:hover { transform: translate(4px, 4px); box-shadow: -4px -4px 0 var(--hex-black); } }
+
+        @media (hover: hover) {
+        .error-btn:hover { transform: translate(4px, 4px); box-shadow: -4px -4px 0 var(--hex-black); }
+    }
+
         .error-hint { font-family: monospace; color: #999; font-size: 0.75rem; text-transform: uppercase; margin-top: 1.5rem; }
 
-
-        @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; } }
-
         @media (max-width: 768px) {
-            .navbar { background: transparent; border-bottom: none; }
-            .nav-logo { display: none; }
-            .nav-container { justify-content: flex-end; }
-            .mobile-menu-toggle { display: block; background: transparent; border: none; font-size: 2rem; padding: 1rem 1.5rem; color: var(--hex-black); }
-            .nav-menu { display: none; flex-direction: column; position: absolute; top: 70px; left: 0; right: 0; background: var(--hex-white); border-top: 2px solid var(--hex-black); border-bottom: 2px solid var(--hex-black); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
-            .nav-menu.active { display: flex; }
-            .nav-link { padding: 1.5rem; border-left: none; border-bottom: 1px solid #eee; min-height: 48px; }
-            .nav-cta { padding: 1.5rem; justify-content: center; border-left: none; min-height: 48px; }
-            .error-box { padding: 2rem 1.5rem; box-shadow: 6px 6px 0 var(--hex-black); margin: 0 1rem; }
-            .error-code { letter-spacing: -2px; }
-        }
-
-        ::-webkit-scrollbar { width: 10px; height: 6px; }
-        ::-webkit-scrollbar-track { background: var(--hex-concrete); }
-        ::-webkit-scrollbar-thumb { background: var(--gradient-blue); border-radius: 3px; }
+        .nav-menu { display: none; flex-direction: column; position: absolute; top: 70px; left: 0; right: 0; background: var(--hex-white); border-top: 2px solid var(--hex-black); border-bottom: 2px solid var(--hex-black); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .error-box { padding: 2rem 1.5rem; box-shadow: 6px 6px 0 var(--hex-black); margin: 0 1rem; }
+        .error-code { letter-spacing: -2px; }
+    }
     </style>
 </head>
 <body>
@@ -139,11 +102,10 @@
         </div>
     </nav>
 
-
     <main id="main">
         <section class="error-section" aria-label="Page not found">
             <div class="error-box">
-                <div class="error-code">404</div>
+                <h1 class="error-code">404</h1>
                 <p class="error-label">PAGE NOT FOUND</p>
                 <p class="error-message">The page you're looking for doesn't exist or has been moved. Let's get you back on track — or give us a call if you need help with a repair.</p>
                 <div class="error-actions">
@@ -157,29 +119,7 @@
     </main>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" integrity="sha512-fD9DI5bZwQxOi7MhYWnnNPlvXdp/2Pj3XSTRrFs5FQa4mizyGLnJcN6tuvUS6LbmgN1ut+XGSABKvjN0H6Aoow==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
-    <script>
-        const mobileToggle = document.getElementById('mobile-toggle');
-        const navMenu = document.getElementById('nav-menu');
-        if (mobileToggle && navMenu) {
-            mobileToggle.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const isExpanded = navMenu.classList.toggle('active');
-                mobileToggle.setAttribute('aria-expanded', isExpanded.toString());
-                const icon = mobileToggle.querySelector('i');
-                if (icon) { icon.classList.toggle('fa-bars'); icon.classList.toggle('fa-times'); }
-            });
-            document.addEventListener('click', (e) => {
-                const isClickInsideMenu = navMenu.contains(e.target);
-                const isClickOnToggle = mobileToggle.contains(e.target);
-                const isLink = e.target.tagName === 'A' || e.target.closest('a');
-                if ((!isClickInsideMenu && !isClickOnToggle && navMenu.classList.contains('active')) || (isLink && navMenu.classList.contains('active'))) {
-                    navMenu.classList.remove('active');
-                    mobileToggle.setAttribute('aria-expanded', 'false');
-                    const icon = mobileToggle.querySelector('i');
-                    if (icon) { icon.classList.add('fa-bars'); icon.classList.remove('fa-times'); }
-                }
-            });
-        }
-    </script>
+    
+    <script src="/js/core.js" defer></script>
 </body>
 </html>

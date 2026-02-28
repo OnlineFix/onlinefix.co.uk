@@ -1,9 +1,9 @@
 User-agent: *
 Allow: /
+Allow: /images/*.webp
+Allow: /images/*.jpg
 
 Disallow: /admin/
 Disallow: /track/
 Disallow: /new-repair/
-Disallow: /v2/
-
 Sitemap: https://onlinefix.co.uk/sitemap.xml
