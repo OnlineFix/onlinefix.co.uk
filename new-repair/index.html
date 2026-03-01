@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://firebasestorage.googleapis.com https://*.firebasestorage.app; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://api.emailjs.com; font-src 'self' https://cdnjs.cloudflare.com; object-src 'none'; frame-src 'none'; base-uri 'self'; form-action 'self';">
     <title>New Repair - OnlineFix</title>
 
     <!-- Firebase -->
@@ -575,19 +576,19 @@
                     <div class="form-grid">
                         <div class="form-group">
                             <label class="form-label">First Name</label>
-                            <input type="text" class="form-input" name="firstName" placeholder="John">
+                            <input type="text" class="form-input" name="firstName" placeholder="John" maxlength="100">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Last Name</label>
-                            <input type="text" class="form-input" name="lastName" placeholder="Doe">
+                            <input type="text" class="form-input" name="lastName" placeholder="Doe" maxlength="100">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Email</label>
-                            <input type="email" class="form-input" name="email" placeholder="customer@email.com">
+                            <input type="email" class="form-input" name="email" placeholder="customer@email.com" maxlength="254">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Phone Number</label>
-                            <input type="tel" class="form-input" name="phone" placeholder="+44 7940 730537">
+                            <input type="tel" class="form-input" name="phone" placeholder="+44 7940 730537" maxlength="30">
                         </div>
                     </div>
                 </div>
@@ -617,7 +618,7 @@
                         <div class="form-group">
                             <label class="form-label">Device</label>
                             <input type="text" class="form-input" name="device"
-                                placeholder="iPhone 13 Pro, Samsung S22, etc.">
+                                placeholder="iPhone 13 Pro, Samsung S22, etc." maxlength="200">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Price (£)</label>
@@ -627,7 +628,7 @@
                     <div class="form-group">
                         <label class="form-label">Issue Description</label>
                         <textarea class="form-input form-textarea" name="issue"
-                            placeholder="Describe the problem with the device..."></textarea>
+                            placeholder="Describe the problem with the device..." maxlength="2000"></textarea>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Device Photos</label>
@@ -831,16 +832,26 @@
         // Photo upload handling
         document.getElementById('photo-input').addEventListener('change', handlePhotoUpload);
 
+        const MAX_PHOTO_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB per file
+        const MAX_TOTAL_PHOTOS = 10;
+
         function handlePhotoUpload(e) {
             const files = Array.from(e.target.files);
             files.forEach(file => {
-                if (file.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        addPhotoPreview(e.target.result, file);
-                    };
-                    reader.readAsDataURL(file);
+                if (!file.type.startsWith('image/')) return;
+                if (file.size > MAX_PHOTO_SIZE_BYTES) {
+                    showAlert(`Photo "${file.name}" exceeds the 10 MB size limit and was not added.`, 'error');
+                    return;
                 }
+                if (uploadedPhotos.length >= MAX_TOTAL_PHOTOS) {
+                    showAlert('Maximum of 10 photos allowed per repair.', 'error');
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    addPhotoPreview(e.target.result, file);
+                };
+                reader.readAsDataURL(file);
             });
         }
 
@@ -887,13 +898,20 @@
 
             const files = Array.from(e.dataTransfer.files);
             files.forEach(file => {
-                if (file.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        addPhotoPreview(e.target.result, file);
-                    };
-                    reader.readAsDataURL(file);
+                if (!file.type.startsWith('image/')) return;
+                if (file.size > MAX_PHOTO_SIZE_BYTES) {
+                    showAlert(`Photo "${file.name}" exceeds the 10 MB size limit and was not added.`, 'error');
+                    return;
                 }
+                if (uploadedPhotos.length >= MAX_TOTAL_PHOTOS) {
+                    showAlert('Maximum of 10 photos allowed per repair.', 'error');
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    addPhotoPreview(e.target.result, file);
+                };
+                reader.readAsDataURL(file);
             });
         });
 
@@ -906,8 +924,9 @@
                 const formData = new FormData(document.getElementById('repair-form'));
                 const data = Object.fromEntries(formData);
 
-                // Generate repair ID
-                const repairId = 'REPAIR_' + Date.now().toString().slice(-6);
+                // Generate repair ID with sufficient entropy to prevent enumeration
+                const randomPart = Math.random().toString(36).substring(2, 7).toUpperCase();
+                const repairId = 'REPAIR_' + Date.now().toString().slice(-6) + randomPart;
 
                 // Upload photos if any
                 const photoUrls = [];
@@ -980,9 +999,7 @@
                 // Save to Firestore
                 const docRef = await db.collection('repairs').add(repairData);
 
-                console.log('Repair created successfully:', repairData);
-                console.log('Document ID:', docRef.id);
-                console.log('Tracking URL:', `${GITHUB_PAGES_BASE_URL}/track/?id=${repairId}`);
+                // Repair created — avoid logging customer PII to console
 
                 // Verify the repair was saved by reading it back
                 const savedDoc = await docRef.get();

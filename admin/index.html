@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://firebasestorage.googleapis.com https://*.firebasestorage.app; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com; font-src 'self' https://cdnjs.cloudflare.com; object-src 'none'; frame-src 'none'; base-uri 'self'; form-action 'self';">
     <title>Admin Dashboard - OnlineFix Repair Management</title>
 
     <!-- Firebase -->
@@ -1244,7 +1245,8 @@
             try {
                 await auth.signInWithEmailAndPassword(email, password);
             } catch (error) {
-                showLoginError(error.message);
+                // Show a generic message to prevent email/user enumeration
+                showLoginError('Invalid email or password. Please try again.');
             }
         });
 
@@ -1478,7 +1480,7 @@
                                         ${p.photos && p.photos.length > 0 ? `
                                             <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 0.5rem; margin-top: 0.5rem;">
                                                 ${p.photos.map(photo => `
-                                                    <img src="${photo}" alt="Progress photo" style="width: 100%; height: 80px; object-fit: cover; border-radius: 8px; cursor: pointer; border: 1px solid var(--border-color);" onclick="window.open('${photo}', '_blank')">
+                                                    <img src="${escapeHTML(photo)}" alt="Progress photo" style="width: 100%; height: 80px; object-fit: cover; border-radius: 8px; cursor: pointer; border: 1px solid var(--border-color);" onclick="window.open('${escapeHTML(photo)}', '_blank')">
                                                 `).join('')}
                                             </div>
                                         ` : ''}
@@ -1769,17 +1771,27 @@
             }
         }
 
+        const MAX_PHOTO_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB per file
+        const MAX_TOTAL_PHOTOS = 10;
+
         // Handle photo upload for updates
         function handleUpdatePhotos(event) {
             const files = Array.from(event.target.files);
             files.forEach(file => {
-                if (file.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        addUpdatePhotoPreview(e.target.result, file);
-                    };
-                    reader.readAsDataURL(file);
+                if (!file.type.startsWith('image/')) return;
+                if (file.size > MAX_PHOTO_SIZE_BYTES) {
+                    showAlert(`Photo "${file.name}" exceeds the 10 MB size limit and was not added.`, 'error');
+                    return;
                 }
+                if (updatePhotos.length >= MAX_TOTAL_PHOTOS) {
+                    showAlert('Maximum of 10 photos allowed per update.', 'error');
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    addUpdatePhotoPreview(e.target.result, file);
+                };
+                reader.readAsDataURL(file);
             });
         }
 
