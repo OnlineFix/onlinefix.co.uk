@@ -1410,13 +1410,13 @@
                 <td data-label="Status"><span class="status-badge ${status.class}">${status.label}</span></td>
                 <td data-label="Date">${date}</td>
                 <td data-label="">
-                    <button class="btn btn-secondary" style="padding: 0.5rem;" onclick="viewRepair('${repair.id}')">
+                    <button class="btn btn-secondary" style="padding: 0.5rem;" onclick="viewRepair('${escapeHTML(repair.id)}')">
                         <i class="fas fa-eye"></i>
                     </button>
-                    <button class="btn btn-primary" style="padding: 0.5rem;" onclick="editRepair('${repair.id}')">
+                    <button class="btn btn-primary" style="padding: 0.5rem;" onclick="editRepair('${escapeHTML(repair.id)}')">
                         <i class="fas fa-edit"></i>
                     </button>
-                    <button class="btn btn-danger" style="padding: 0.5rem;" onclick="deleteRepair('${repair.id}', '${repair.repairId}')">
+                    <button class="btn btn-danger" style="padding: 0.5rem;" onclick="deleteRepair('${escapeHTML(repair.id)}', '${escapeHTML(repair.repairId)}')">
                         <i class="fas fa-trash"></i>
                     </button>
                 </td>
@@ -1478,7 +1478,7 @@
                                         ${p.photos && p.photos.length > 0 ? `
                                             <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 0.5rem; margin-top: 0.5rem;">
                                                 ${p.photos.map(photo => `
-                                                    <img src="${photo}" alt="Progress photo" style="width: 100%; height: 80px; object-fit: cover; border-radius: 8px; cursor: pointer; border: 1px solid var(--border-color);" onclick="window.open('${photo}', '_blank')">
+                                                    <img src="${escapeHTML(photo)}" alt="Progress photo" style="width: 100%; height: 80px; object-fit: cover; border-radius: 8px; cursor: pointer; border: 1px solid var(--border-color);" onclick="window.open('${escapeHTML(photo)}', '_blank')">
                                                 `).join('')}
                                             </div>
                                         ` : ''}
@@ -1488,7 +1488,7 @@
                         ` : ''}
                     </div>
                     <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border-color);">
-                        <button class="btn btn-primary" onclick="editRepair('${repairId}'); this.closest('.modal').remove();">
+                        <button class="btn btn-primary" onclick="editRepair('${escapeHTML(repairId)}'); this.closest('.modal').remove();">
                             <i class="fas fa-edit"></i>
                             Edit Repair
                         </button>
@@ -1710,13 +1710,13 @@
                 <td data-label="Received">${dateReceived}</td>
                 <td data-label="Est. Completion">${estCompletion}</td>
                 <td data-label="">
-                    <button class="btn btn-secondary" style="padding: 0.5rem;" onclick="viewRepair('${repair.id}')">
+                    <button class="btn btn-secondary" style="padding: 0.5rem;" onclick="viewRepair('${escapeHTML(repair.id)}')">
                         <i class="fas fa-eye"></i>
                     </button>
-                    <button class="btn btn-primary" style="padding: 0.5rem;" onclick="editRepair('${repair.id}')">
+                    <button class="btn btn-primary" style="padding: 0.5rem;" onclick="editRepair('${escapeHTML(repair.id)}')">
                         <i class="fas fa-edit"></i>
                     </button>
-                    <button class="btn btn-danger" style="padding: 0.5rem;" onclick="deleteRepair('${repair.id}', '${repair.repairId}')">
+                    <button class="btn btn-danger" style="padding: 0.5rem;" onclick="deleteRepair('${escapeHTML(repair.id)}', '${escapeHTML(repair.repairId)}')">
                         <i class="fas fa-trash"></i>
                     </button>
                 </td>

@@ -1001,7 +1001,7 @@
                 if (completionText) {
                     completionText += `<br>`;
                 }
-                completionText += `Estimated cost: £${cost}`;
+                completionText += `Estimated cost: £${escapeHTML(String(cost))}`;
             }
 
             document.getElementById('estimatedCompletion').innerHTML = completionText;

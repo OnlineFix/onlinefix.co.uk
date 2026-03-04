@@ -575,19 +575,19 @@
                     <div class="form-grid">
                         <div class="form-group">
                             <label class="form-label">First Name</label>
-                            <input type="text" class="form-input" name="firstName" placeholder="John">
+                            <input type="text" class="form-input" name="firstName" placeholder="John" required maxlength="100">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Last Name</label>
-                            <input type="text" class="form-input" name="lastName" placeholder="Doe">
+                            <input type="text" class="form-input" name="lastName" placeholder="Doe" required maxlength="100">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Email</label>
-                            <input type="email" class="form-input" name="email" placeholder="customer@email.com">
+                            <input type="email" class="form-input" name="email" placeholder="customer@email.com" maxlength="254">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Phone Number</label>
-                            <input type="tel" class="form-input" name="phone" placeholder="+44 7940 730537">
+                            <input type="tel" class="form-input" name="phone" placeholder="+44 7940 730537" required maxlength="20">
                         </div>
                     </div>
                 </div>
@@ -617,16 +617,16 @@
                         <div class="form-group">
                             <label class="form-label">Device</label>
                             <input type="text" class="form-input" name="device"
-                                placeholder="iPhone 13 Pro, Samsung S22, etc.">
+                                placeholder="iPhone 13 Pro, Samsung S22, etc." required maxlength="200">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Price (£)</label>
-                            <input type="number" class="form-input" name="price" step="0.01" placeholder="0.00">
+                            <input type="number" class="form-input" name="price" step="0.01" min="0" max="99999" placeholder="0.00">
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Issue Description</label>
-                        <textarea class="form-input form-textarea" name="issue"
+                        <textarea class="form-input form-textarea" name="issue" required maxlength="2000"
                             placeholder="Describe the problem with the device..."></textarea>
                     </div>
                     <div class="form-group">
@@ -785,8 +785,11 @@
             if (user) {
                 currentUser = user;
                 document.getElementById('user-info').textContent = `Logged in as: ${user.email}`;
+                document.getElementById('repair-form').style.display = '';
             } else {
-                document.getElementById('user-info').textContent = 'Not logged in';
+                currentUser = null;
+                document.getElementById('user-info').textContent = 'Not logged in - please sign in to create repairs';
+                document.getElementById('repair-form').style.display = 'none';
             }
         });
 
@@ -899,6 +902,11 @@
 
         // Create repair
         async function createRepair() {
+            if (!currentUser) {
+                showAlert('You must be logged in to create a repair.', 'error');
+                return;
+            }
+
             document.getElementById('repair-form').style.display = 'none';
             document.getElementById('loading').style.display = 'block';
 
@@ -907,7 +915,7 @@
                 const data = Object.fromEntries(formData);
 
                 // Generate repair ID
-                const repairId = 'REPAIR_' + Date.now().toString().slice(-6);
+                const repairId = 'REPAIR_' + crypto.randomUUID().replace(/-/g, '').slice(0, 12).toUpperCase();
 
                 // Upload photos if any
                 const photoUrls = [];
@@ -973,7 +981,7 @@
                         notes: 'Device received and logged into system',
                         technician: currentUser ? currentUser.email : 'System'
                     }],
-                    createdBy: currentUser ? currentUser.email : 'Anonymous',
+                    createdBy: currentUser.email,
                     createdAt: firebase.firestore.Timestamp.now()
                 };
 
@@ -1001,7 +1009,8 @@
 
             } catch (error) {
                 console.error('Error creating repair:', error);
-                showAlert('Error creating repair: ' + error.message, 'error');
+                console.error('Error creating repair:', error);
+                showAlert('An error occurred while creating the repair. Please try again.', 'error');
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('repair-form').style.display = 'block';
             }
