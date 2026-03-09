@@ -52,12 +52,20 @@
 
     function showBanner() {
         var banner = document.getElementById('cookie-banner');
-        if (banner) banner.classList.add('visible');
+        if (banner) {
+            banner.style.display = 'block';
+            // Force reflow before adding class so transition works
+            banner.offsetHeight;
+            banner.classList.add('visible');
+        }
     }
 
     function hideBanner() {
         var banner = document.getElementById('cookie-banner');
-        if (banner) banner.classList.remove('visible');
+        if (banner) {
+            banner.classList.remove('visible');
+            setTimeout(function () { banner.style.display = ''; }, 300);
+        }
     }
 
     function acceptAll() {
@@ -90,9 +98,10 @@
         // If consent.analytics === false, do nothing (GA stays blocked)
     }
 
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
-    } else {
+    // Wait for DOM to be fully ready
+    if (document.readyState === 'complete') {
         init();
+    } else {
+        window.addEventListener('load', init);
     }
 })();
