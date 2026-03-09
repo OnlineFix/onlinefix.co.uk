@@ -1,9 +1,6 @@
 <!DOCTYPE html>
 <html lang="en-GB">
 <head>
-    <!-- Google Analytics (GA4) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q0PC3B1W31"></script>
-    <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-Q0PC3B1W31');</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#0033FF">
@@ -118,8 +115,24 @@
         </section>
     </main>
 
+
+    <!-- Cookie Consent Banner -->
+    <div class="cookie-banner" id="cookie-banner" role="dialog" aria-label="Cookie consent" aria-describedby="cookie-text">
+        <div class="cookie-banner-inner">
+            <p class="cookie-banner-text" id="cookie-text">
+                We use cookies to analyse site traffic via Google Analytics. Essential cookies are required for the site to function.
+                <a href="privacy.html">Privacy &amp; Cookie Policy</a>
+            </p>
+            <div class="cookie-banner-buttons">
+                <button class="cookie-btn cookie-btn-accept" onclick="cookieConsentAccept()">Accept All</button>
+                <button class="cookie-btn cookie-btn-reject" onclick="cookieConsentReject()">Reject Non-Essential</button>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" integrity="sha512-fD9DI5bZwQxOi7MhYWnnNPlvXdp/2Pj3XSTRrFs5FQa4mizyGLnJcN6tuvUS6LbmgN1ut+XGSABKvjN0H6Aoow==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
     
     <script src="/js/core.js" defer></script>
+    <script src="/js/cookies.js" defer></script>
 </body>
 </html>
