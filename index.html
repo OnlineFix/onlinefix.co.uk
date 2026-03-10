@@ -553,6 +553,12 @@
             padding: 2px 8px;
         }
 
+        @media (max-width: 900px) and (min-width: 769px) {
+            .features-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
         @media (max-width: 768px) {
         .hero {
                 align-items: center;
@@ -731,19 +737,16 @@
                 <div class="process-grid" role="list">
                     <div class="process-item fade-in" role="listitem">
                         <div class="process-number" aria-hidden="true">01</div>
-                        <div class="process-icon" aria-hidden="true"><i class="fas fa-phone-alt"></i></div>
                         <h3>Contact Us</h3>
                         <p>Call Tomas or send a message to get a free quote and arrange a drop-off time.</p>
                     </div>
                     <div class="process-item fade-in" role="listitem">
                         <div class="process-number" aria-hidden="true">02</div>
-                        <div class="process-icon" aria-hidden="true"><i class="fas fa-wrench"></i></div>
                         <h3>Diagnosis</h3>
                         <p>For unknown issues, we provide a diagnosis and quote within 2-24 hours.</p>
                     </div>
                     <div class="process-item fade-in" role="listitem">
                         <div class="process-number" aria-hidden="true">03</div>
-                        <div class="process-icon" aria-hidden="true"><i class="fas fa-check-circle"></i></div>
                         <h3>Collect</h3>
                         <p>Pick up your fully repaired device and pay only when you are 100% satisfied.</p>
                     </div>
