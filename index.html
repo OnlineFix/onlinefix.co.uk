@@ -301,11 +301,13 @@
         }
 
         .logo::after {
-            content: "™";
-            font-size: 0.25em;
-            vertical-align: super;
+            content: "\2122";
+            font-size: 0.4em;
+            position: relative;
+            top: -0.6em;
+            margin-left: 2px;
             line-height: 0;
-            margin-left: 4px;
+            vertical-align: baseline;
             color: var(--hex-black);
         }
 
@@ -369,11 +371,11 @@
         }
 
         .feature-title::before {
-            content: '"';
+            content: none;
         }
 
         .feature-title::after {
-            content: '"';
+            content: none;
         }
 
         .process-section {
@@ -701,7 +703,7 @@
         <!-- Features Section -->
         <section class="features" id="about" aria-labelledby="features-heading">
             <div class="container">
-                <h2 class="section-title fade-in" id="features-heading">"WHY CHOOSE US"</h2>
+                <h2 class="section-title fade-in" id="features-heading">WHY CHOOSE US</h2>
                 <p class="section-subtitle fade-in">Specifications & Standards</p>
                 <div class="scroll-hint" aria-hidden="true">SCROLL -></div>
                 <div class="features-grid" role="list" data-scroll-nudge>
@@ -800,7 +802,7 @@
                 </div>
                 <div style="text-align: center; margin-top: 2rem;">
                     <a href="services.html" class="cta-button">
-                        VIEW ALL "SERVICES"
+                        VIEW ALL SERVICES
                     </a>
                 </div>
             </div>
@@ -901,7 +903,7 @@
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-column">
-                    <h4>"ONLINEFIX"</h4>
+                    <h4>ONLINEFIX</h4>
                     <p style="font-family: monospace; color: #999;">Expert electronics repair in Guildford. Trusted,
                         fast, and reliable service by Tomas.</p>
                     <div class="social-links" style="margin-top: 1rem; font-size: 1.5rem;">
@@ -941,7 +943,7 @@
                 </div>
             </div>
             <div class="copyright">
-                <p>&copy; 2026 ONLINEFIX. ALL RIGHTS RESERVED. "DESIGN"</p>
+                <p>&copy; 2026 ONLINEFIX. ALL RIGHTS RESERVED.</p>
             </div>
         </div>
     </footer>
