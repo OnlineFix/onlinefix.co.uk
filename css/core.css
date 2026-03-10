@@ -43,7 +43,7 @@ body {
     color: var(--hex-black);
     line-height: 1.4;
     overflow-x: hidden;
-    font-weight: 500;
+    font-weight: 400;
     padding-bottom: calc(60px + var(--safe-area-bottom));
 }
 
@@ -58,7 +58,7 @@ body {
     z-index: 10000;
     transition: top 0.3s;
     text-decoration: none;
-    font-weight: 700;
+    font-weight: 500;
     text-transform: uppercase;
     font-size: 0.9rem;
 }
@@ -83,7 +83,7 @@ body {
 }
 
 .bold {
-    font-weight: 700;
+    font-weight: 600;
 }
 
 .scroll-hint {
@@ -94,7 +94,7 @@ body {
     margin-bottom: 0.5rem;
     font-family: monospace;
     text-transform: uppercase;
-    font-weight: 700;
+    font-weight: 500;
     animation: pulse-hint 2s infinite;
 }
 
@@ -142,7 +142,7 @@ body {
 
 .nav-logo {
     font-size: 1.5rem;
-    font-weight: 900;
+    font-weight: 700;
     color: var(--hex-white);
     text-decoration: none;
     text-transform: uppercase;
@@ -182,7 +182,7 @@ body {
 .nav-link {
     text-decoration: none;
     color: var(--hex-black);
-    font-weight: 700;
+    font-weight: 500;
     text-transform: uppercase;
     font-size: 0.9rem;
     padding: 0 2rem;
@@ -210,7 +210,7 @@ body {
     color: var(--hex-white);
     padding: 0 2rem;
     text-decoration: none;
-    font-weight: 700;
+    font-weight: 500;
     text-transform: uppercase;
     display: flex;
     align-items: center;
@@ -255,7 +255,7 @@ body {
 
 .section-title {
     font-size: clamp(2rem, 5vw, 3rem);
-    font-weight: 900;
+    font-weight: 700;
     text-transform: uppercase;
     text-align: center;
     padding-top: 4rem;
@@ -300,7 +300,7 @@ body {
 
 .page-title {
     font-size: clamp(2rem, 6vw, 4rem);
-    font-weight: 900;
+    font-weight: 700;
     line-height: 0.9;
     text-transform: uppercase;
     letter-spacing: -2px;
@@ -334,7 +334,7 @@ body {
     color: var(--hex-white);
     padding: 1rem 2rem;
     text-decoration: none;
-    font-weight: 800;
+    font-weight: 600;
     text-transform: uppercase;
     font-size: 0.9rem;
     border: 2px solid var(--hex-black);
@@ -381,7 +381,7 @@ body {
 .cta-section h2 {
     font-size: 3rem;
     text-transform: uppercase;
-    font-weight: 900;
+    font-weight: 700;
     margin-bottom: 2rem;
 }
 
@@ -409,7 +409,7 @@ body {
     padding: 1.5rem 2rem;
     text-align: left;
     font-size: 1rem;
-    font-weight: 800;
+    font-weight: 600;
     color: var(--hex-black);
     text-transform: uppercase;
     cursor: pointer;
@@ -429,7 +429,7 @@ body {
 .faq-question::after {
     content: "+";
     font-size: 1.5rem;
-    font-weight: 900;
+    font-weight: 700;
     color: var(--hex-accent);
     transition: transform 0.2s;
 }
@@ -510,7 +510,7 @@ body {
     gap: 12px;
     text-decoration: none;
     color: var(--hex-black);
-    font-weight: 700;
+    font-weight: 500;
     text-transform: uppercase;
     background: var(--hex-white);
 }
@@ -761,7 +761,7 @@ body {
 
 .cookie-btn {
     padding: 0.7rem 1.5rem;
-    font-weight: 800;
+    font-weight: 600;
     text-transform: uppercase;
     font-size: 0.8rem;
     font-family: var(--font-main);
