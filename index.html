@@ -378,65 +378,48 @@
 
         .process-section {
             padding: 4rem 0;
-            background: var(--hex-black);
-            color: var(--hex-white);
-        }
-
-        .process-section .section-title {
-            color: var(--hex-white);
-            border-bottom: 1px solid #333;
-            padding-bottom: 2rem;
-            margin-bottom: 4rem;
-            padding-top: 0;
-        }
-
-        .process-section .section-subtitle {
-            color: #999;
-            margin-top: -3rem;
+            background: var(--hex-white);
+            border-top: 5px solid var(--hex-black);
         }
 
         .process-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 0;
-            border: 1px solid #333;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
         }
 
         .process-item {
-            padding: 2.5rem;
-            border-right: 1px solid #333;
+            font-family: 'Courier New', Courier, monospace;
+            background: #fff;
+            padding: 1.5rem;
+            border: 1px dashed var(--hex-black);
+            box-shadow: 5px 5px 0 #ddd;
             position: relative;
-        }
-
-        .process-item:last-child {
-            border-right: none;
         }
 
         .process-number {
             font-family: 'Helvetica Neue';
             font-weight: 700;
-            font-size: 4rem;
+            font-size: 3rem;
             background: var(--gradient-blue);
             background-clip: text; -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            opacity: 1;
-            position: absolute;
-            top: 1rem;
-            left: 1.5rem;
             line-height: 1;
-        }
-
-        .process-item h3 {
-            margin-top: 3rem;
-            font-size: 1.3rem;
-            text-transform: uppercase;
             margin-bottom: 1rem;
         }
 
+        .process-item h3 {
+            font-size: 1.3rem;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+            color: var(--hex-black);
+        }
+
         .process-item p {
-            font-family: monospace;
-            color: #aaa;
+            font-family: 'Courier New', Courier, monospace;
+            color: var(--hex-black);
             font-size: 0.9rem;
+            line-height: 1.4;
         }
 
         .services-preview {
@@ -630,12 +613,10 @@
                 grid-template-columns: 1fr;
             }
         .process-item {
-                border-right: none;
-                border-bottom: 1px solid #333;
-                padding: 2rem;
+                padding: 1.2rem 1rem;
             }
         .process-number {
-                font-size: 3rem;
+                font-size: 2.5rem;
             }
         .logo {
                 font-size: 4rem;
