@@ -920,6 +920,297 @@
         .hidden {
             display: none !important;
         }
+
+        /* === UX IMPROVEMENTS === */
+
+        /* Search Bar */
+        .search-bar {
+            position: relative;
+            flex: 1;
+            max-width: 400px;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 0.7rem 1rem 0.7rem 2.5rem;
+            border: 1px solid var(--border-color);
+            background: var(--bg-base);
+            color: var(--text-main);
+            border-radius: var(--radius-md);
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(0, 51, 255, 0.2);
+        }
+
+        .search-bar i {
+            position: absolute;
+            left: 0.85rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-dark);
+            font-size: 0.9rem;
+            pointer-events: none;
+        }
+
+        .search-bar .search-clear {
+            position: absolute;
+            right: 0.6rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-dark);
+            cursor: pointer;
+            font-size: 0.85rem;
+            padding: 0.25rem;
+            display: none;
+            pointer-events: all;
+        }
+
+        .search-bar .search-clear:hover {
+            color: var(--text-main);
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 1.5rem;
+            right: 1.5rem;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            pointer-events: none;
+        }
+
+        .toast {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 1.25rem;
+            border-radius: var(--radius-md);
+            font-weight: 500;
+            font-size: 0.95rem;
+            pointer-events: all;
+            animation: toastSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            backdrop-filter: blur(12px);
+            box-shadow: var(--shadow-md);
+            max-width: 420px;
+        }
+
+        .toast.toast-removing {
+            animation: toastSlideOut 0.3s ease forwards;
+        }
+
+        .toast-success {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34D399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .toast-error {
+            background: rgba(239, 68, 68, 0.15);
+            color: #F87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .toast-info {
+            background: rgba(59, 130, 246, 0.15);
+            color: #60A5FA;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .toast-close {
+            background: none;
+            border: none;
+            color: inherit;
+            cursor: pointer;
+            opacity: 0.6;
+            font-size: 1.1rem;
+            margin-left: auto;
+            padding: 0 0.25rem;
+        }
+
+        .toast-close:hover {
+            opacity: 1;
+        }
+
+        @keyframes toastSlideIn {
+            from { opacity: 0; transform: translateX(100px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes toastSlideOut {
+            from { opacity: 1; transform: translateX(0); }
+            to { opacity: 0; transform: translateX(100px); }
+        }
+
+        /* Overdue Indicator */
+        .overdue-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            background: rgba(239, 68, 68, 0.15);
+            color: #F87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            animation: overduePulse 2s ease-in-out infinite;
+        }
+
+        @keyframes overduePulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        /* Copy Link Button */
+        .btn-copy {
+            background: rgba(0, 228, 255, 0.1);
+            color: var(--accent-cyan);
+            border: 1px solid rgba(0, 228, 255, 0.2);
+        }
+
+        .btn-copy:hover {
+            background: rgba(0, 228, 255, 0.2);
+        }
+
+        .btn-copy.copied {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34D399;
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        /* Sortable Table Headers */
+        th.sortable {
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+            padding-right: 1.5rem;
+        }
+
+        th.sortable:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        th.sortable::after {
+            content: '\f0dc';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            right: 0.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.7rem;
+            opacity: 0.3;
+        }
+
+        th.sortable.sort-asc::after {
+            content: '\f0de';
+            opacity: 0.8;
+            color: var(--accent-cyan);
+        }
+
+        th.sortable.sort-desc::after {
+            content: '\f0dd';
+            opacity: 0.8;
+            color: var(--accent-cyan);
+        }
+
+        /* Clickable Stat Cards */
+        .stat-card.clickable {
+            cursor: pointer;
+        }
+
+        .stat-card.clickable:hover {
+            border-color: var(--primary-blue);
+            box-shadow: var(--shadow-md), 0 0 15px var(--primary-glow);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: var(--text-muted);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+            display: block;
+        }
+
+        .empty-state p {
+            font-size: 1.05rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state small {
+            color: var(--text-dark);
+            font-size: 0.9rem;
+        }
+
+        /* Template buttons improved */
+        .template-btn-improved {
+            font-size: 0.8rem;
+            padding: 0.6rem 0.85rem;
+            margin: 0.25rem;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--text-muted);
+            text-align: left;
+            display: inline-block;
+            max-width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .template-btn-improved:hover {
+            background: var(--bg-elevated);
+            color: var(--text-main);
+            border-color: var(--primary-cyan);
+            box-shadow: inset 0 0 5px rgba(0, 228, 255, 0.2);
+            white-space: normal;
+            max-width: 100%;
+        }
+
+        /* Results count badge */
+        .results-count {
+            font-size: 0.85rem;
+            color: var(--text-dark);
+            font-weight: 400;
+            margin-left: 0.75rem;
+        }
+
+        @media (max-width: 768px) {
+            .toast-container {
+                right: 0.75rem;
+                left: 0.75rem;
+                top: 0.75rem;
+            }
+
+            .toast {
+                max-width: 100%;
+            }
+
+            .search-bar {
+                max-width: 100%;
+                width: 100%;
+            }
+        }
     </style>
 </head>
 
@@ -964,6 +1255,9 @@
             </div>
         </div>
     </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container"></div>
 
     <!-- Main Dashboard -->
     <div id="dashboard" class="admin-layout hidden">
@@ -1020,21 +1314,21 @@
             <div id="overview-section" class="content-section">
                 <!-- Stats -->
                 <div class="stats-grid">
-                    <div class="stat-card">
+                    <div class="stat-card clickable" onclick="showSection('repairs'); document.getElementById('status-filter').value=''; document.getElementById('common-repair-filter').value=''; loadAllRepairs();" title="View all repairs">
                         <div class="stat-icon" style="background: var(--primary-blue);">
                             <i class="fas fa-tools"></i>
                         </div>
                         <div class="stat-number" id="total-repairs">0</div>
                         <div class="stat-label">Total Repairs</div>
                     </div>
-                    <div class="stat-card">
+                    <div class="stat-card clickable" onclick="showSection('repairs'); document.getElementById('status-filter').value='in-repair'; document.getElementById('common-repair-filter').value=''; loadAllRepairs();" title="View active repairs">
                         <div class="stat-icon" style="background: var(--warning);">
                             <i class="fas fa-clock"></i>
                         </div>
                         <div class="stat-number" id="active-repairs">0</div>
                         <div class="stat-label">Active Repairs</div>
                     </div>
-                    <div class="stat-card">
+                    <div class="stat-card clickable" onclick="showSection('repairs'); document.getElementById('status-filter').value='ready'; document.getElementById('common-repair-filter').value=''; loadAllRepairs();" title="View ready for collection">
                         <div class="stat-icon" style="background: var(--success);">
                             <i class="fas fa-check-circle"></i>
                         </div>
@@ -1042,7 +1336,7 @@
                         <div class="stat-label">Ready for Collection</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-icon" style="background: var(--trust-teal);">
+                        <div class="stat-icon" style="background: rgba(0, 228, 255, 0.3);">
                             <i class="fas fa-users"></i>
                         </div>
                         <div class="stat-number" id="total-customers">0</div>
@@ -1080,11 +1374,16 @@
 
             <!-- All Repairs Section -->
             <div id="repairs-section" class="content-section hidden">
-                <div class="section-header">
-                    <h2 class="section-title">All Repairs</h2>
-                    <div>
+                <div class="section-header" style="flex-wrap: wrap; gap: 0.75rem;">
+                    <h2 class="section-title">All Repairs <span class="results-count" id="results-count"></span></h2>
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;">
+                        <div class="search-bar">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="repair-search" placeholder="Search by name, ID, device, phone..." oninput="loadAllRepairs()">
+                            <button class="search-clear" id="search-clear" onclick="document.getElementById('repair-search').value=''; this.style.display='none'; loadAllRepairs();">&times;</button>
+                        </div>
                         <select id="common-repair-filter" class="form-input"
-                            style="display: inline-block; width: auto; margin-right: 1rem;">
+                            style="display: inline-block; width: auto;">
                             <option value="">All Services</option>
                             <option value="hdmi">Console HDMI Port Replacement</option>
                             <option value="cleaning">Console Cleaning</option>
@@ -1092,7 +1391,7 @@
                             <option value="laptop-diag">Laptop Diagnostics</option>
                         </select>
                         <select id="status-filter" class="form-input"
-                            style="display: inline-block; width: auto; margin-right: 1rem;">
+                            style="display: inline-block; width: auto;">
                             <option value="">All Statuses</option>
                             <option value="received">Received</option>
                             <option value="diagnosing">Diagnosing</option>
@@ -1113,13 +1412,13 @@
                         <table id="all-repairs-table">
                             <thead>
                                 <tr>
-                                    <th>Repair ID</th>
-                                    <th>Customer</th>
-                                    <th>Device</th>
+                                    <th class="sortable" data-sort="repairId">Repair ID</th>
+                                    <th class="sortable" data-sort="customerName">Customer</th>
+                                    <th class="sortable" data-sort="device">Device</th>
                                     <th>Issue</th>
-                                    <th>Status</th>
-                                    <th>Date Received</th>
-                                    <th>Est. Completion</th>
+                                    <th class="sortable" data-sort="currentStatus">Status</th>
+                                    <th class="sortable sort-desc" data-sort="dateReceived">Date Received</th>
+                                    <th class="sortable" data-sort="estimatedCompletion">Est. Completion</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -1127,6 +1426,11 @@
                                 <!-- Populated by JavaScript -->
                             </tbody>
                         </table>
+                    </div>
+                    <div class="empty-state hidden" id="empty-state">
+                        <i class="fas fa-search"></i>
+                        <p>No repairs found</p>
+                        <small>Try adjusting your search or filters</small>
                     </div>
                 </div>
             </div>
@@ -1403,20 +1707,29 @@
             const status = statusConfig[repair.currentStatus] || statusConfig['received'];
             const date = repair.dateReceived ? new Date(repair.dateReceived.seconds * 1000).toLocaleDateString('en-GB') : 'N/A';
 
+            // Check if overdue
+            const isOverdue = repair.estimatedCompletion &&
+                !['completed', 'ready'].includes(repair.currentStatus) &&
+                new Date(repair.estimatedCompletion.seconds * 1000) < new Date();
+            const overdueTag = isOverdue ? ' <span class="overdue-badge"><i class="fas fa-exclamation-triangle"></i> Overdue</span>' : '';
+
             row.innerHTML = `
                 <td data-label="Repair ID"><strong>${escapeHTML(repair.repairId)}</strong></td>
                 <td data-label="Customer">${escapeHTML(repair.customerName)}</td>
                 <td data-label="Device">${escapeHTML(repair.brand)} ${escapeHTML(repair.model)}</td>
-                <td data-label="Status"><span class="status-badge ${status.class}">${status.label}</span></td>
+                <td data-label="Status"><span class="status-badge ${status.class}">${status.label}</span>${overdueTag}</td>
                 <td data-label="Date">${date}</td>
                 <td data-label="">
-                    <button class="btn btn-secondary" style="padding: 0.5rem;" onclick="viewRepair('${repair.id}')">
+                    <button class="btn btn-copy" style="padding: 0.5rem;" onclick="copyTrackingLink('${escapeHTML(repair.repairId)}', this)" title="Copy tracking link">
+                        <i class="fas fa-link"></i>
+                    </button>
+                    <button class="btn btn-secondary" style="padding: 0.5rem;" onclick="viewRepair('${repair.id}')" title="View details">
                         <i class="fas fa-eye"></i>
                     </button>
-                    <button class="btn btn-primary" style="padding: 0.5rem;" onclick="editRepair('${repair.id}')">
+                    <button class="btn btn-primary" style="padding: 0.5rem;" onclick="editRepair('${repair.id}')" title="Edit repair">
                         <i class="fas fa-edit"></i>
                     </button>
-                    <button class="btn btn-danger" style="padding: 0.5rem;" onclick="deleteRepair('${repair.id}', '${repair.repairId}')">
+                    <button class="btn btn-danger" style="padding: 0.5rem;" onclick="deleteRepair('${repair.id}', '${repair.repairId}')" title="Delete repair">
                         <i class="fas fa-trash"></i>
                     </button>
                 </td>
@@ -1651,12 +1964,48 @@
             }
         }
 
-        // Load all repairs with optional filter
+        // Sorting state
+        let currentSort = { field: 'dateReceived', direction: 'desc' };
+
+        // Column sorting click handler
+        document.querySelectorAll('th.sortable').forEach(th => {
+            th.addEventListener('click', () => {
+                const field = th.dataset.sort;
+                if (currentSort.field === field) {
+                    currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+                } else {
+                    currentSort.field = field;
+                    currentSort.direction = 'asc';
+                }
+                // Update sort indicators
+                document.querySelectorAll('th.sortable').forEach(h => {
+                    h.classList.remove('sort-asc', 'sort-desc');
+                });
+                th.classList.add(currentSort.direction === 'asc' ? 'sort-asc' : 'sort-desc');
+                loadAllRepairs();
+            });
+        });
+
+        // Show/hide search clear button
+        document.getElementById('repair-search').addEventListener('input', function () {
+            document.getElementById('search-clear').style.display = this.value ? 'block' : 'none';
+        });
+
+        // Load all repairs with search, filter, and sort
         function loadAllRepairs() {
             const statusFilter = document.getElementById('status-filter').value;
             const commonFilter = document.getElementById('common-repair-filter').value;
+            const searchQuery = (document.getElementById('repair-search')?.value || '').toLowerCase().trim();
 
             let filteredRepairs = allRepairs;
+
+            // Apply text search
+            if (searchQuery) {
+                filteredRepairs = filteredRepairs.filter(r => {
+                    const searchText = `${r.repairId || ''} ${r.customerName || ''} ${r.customerPhone || ''} ${r.customerEmail || ''} ${r.brand || ''} ${r.model || ''} ${r.deviceType || ''} ${r.issueDescription || ''}`.toLowerCase();
+                    return searchQuery.split(' ').every(term => searchText.includes(term));
+                });
+            }
 
             // Apply Status Filter
             if (statusFilter) {
@@ -1666,7 +2015,6 @@
             // Apply Common Repair Filter
             if (commonFilter) {
                 filteredRepairs = filteredRepairs.filter(r => {
-                    // Combine relevant fields for text search
                     const text = `${r.deviceType || ''} ${r.brand || ''} ${r.model || ''} ${r.issueDescription || ''}`.toLowerCase();
 
                     if (commonFilter === 'hdmi') {
@@ -1686,13 +2034,68 @@
                 });
             }
 
+            // Apply sorting
+            filteredRepairs.sort((a, b) => {
+                let valA, valB;
+                switch (currentSort.field) {
+                    case 'repairId':
+                        valA = (a.repairId || '').toLowerCase();
+                        valB = (b.repairId || '').toLowerCase();
+                        break;
+                    case 'customerName':
+                        valA = (a.customerName || '').toLowerCase();
+                        valB = (b.customerName || '').toLowerCase();
+                        break;
+                    case 'device':
+                        valA = `${a.brand || ''} ${a.model || ''}`.toLowerCase();
+                        valB = `${b.brand || ''} ${b.model || ''}`.toLowerCase();
+                        break;
+                    case 'currentStatus':
+                        const statusOrder = ['received', 'diagnosing', 'waiting-parts', 'in-repair', 'testing', 'ready', 'completed'];
+                        valA = statusOrder.indexOf(a.currentStatus);
+                        valB = statusOrder.indexOf(b.currentStatus);
+                        break;
+                    case 'dateReceived':
+                        valA = a.dateReceived?.seconds || 0;
+                        valB = b.dateReceived?.seconds || 0;
+                        break;
+                    case 'estimatedCompletion':
+                        valA = a.estimatedCompletion?.seconds || 0;
+                        valB = b.estimatedCompletion?.seconds || 0;
+                        break;
+                    default:
+                        valA = 0; valB = 0;
+                }
+                if (valA < valB) return currentSort.direction === 'asc' ? -1 : 1;
+                if (valA > valB) return currentSort.direction === 'asc' ? 1 : -1;
+                return 0;
+            });
+
             const tbody = document.querySelector('#all-repairs-table tbody');
+            const emptyState = document.getElementById('empty-state');
+            const table = document.getElementById('all-repairs-table');
+            const resultsCount = document.getElementById('results-count');
             tbody.innerHTML = '';
 
-            filteredRepairs.forEach(repair => {
-                const row = createDetailedRepairRow(repair);
-                tbody.appendChild(row);
-            });
+            // Update results count
+            if (searchQuery || statusFilter || commonFilter) {
+                resultsCount.textContent = `(${filteredRepairs.length} of ${allRepairs.length})`;
+            } else {
+                resultsCount.textContent = `(${allRepairs.length})`;
+            }
+
+            // Show empty state or table
+            if (filteredRepairs.length === 0) {
+                table.style.display = 'none';
+                emptyState.classList.remove('hidden');
+            } else {
+                table.style.display = '';
+                emptyState.classList.add('hidden');
+                filteredRepairs.forEach(repair => {
+                    const row = createDetailedRepairRow(repair);
+                    tbody.appendChild(row);
+                });
+            }
         }
 
         function createDetailedRepairRow(repair) {
@@ -1701,22 +2104,31 @@
             const dateReceived = repair.dateReceived ? new Date(repair.dateReceived.seconds * 1000).toLocaleDateString('en-GB') : 'N/A';
             const estCompletion = repair.estimatedCompletion ? new Date(repair.estimatedCompletion.seconds * 1000).toLocaleDateString('en-GB') : 'TBD';
 
+            // Check if overdue (past estimated completion and not completed/ready)
+            const isOverdue = repair.estimatedCompletion &&
+                !['completed', 'ready'].includes(repair.currentStatus) &&
+                new Date(repair.estimatedCompletion.seconds * 1000) < new Date();
+            const overdueTag = isOverdue ? ' <span class="overdue-badge"><i class="fas fa-exclamation-triangle"></i> Overdue</span>' : '';
+
             row.innerHTML = `
                 <td data-label="Repair ID"><strong>${escapeHTML(repair.repairId)}</strong></td>
-                <td data-label="Customer">${escapeHTML(repair.customerName)}<br><small>${escapeHTML(repair.customerPhone)}</small></td>
-                <td data-label="Device">${escapeHTML(repair.deviceType)}<br><small>${escapeHTML(repair.brand)} ${escapeHTML(repair.model)}</small></td>
-                <td data-label="Issue" title="${escapeHTML(repair.issueDescription)}">${escapeHTML(repair.issueDescription).substring(0, 50)}${repair.issueDescription.length > 50 ? '...' : ''}</td>
-                <td data-label="Status"><span class="status-badge ${status.class}">${status.label}</span></td>
+                <td data-label="Customer">${escapeHTML(repair.customerName)}<br><small style="color: var(--text-muted);">${escapeHTML(repair.customerPhone)}</small></td>
+                <td data-label="Device">${escapeHTML(repair.deviceType)}<br><small style="color: var(--text-muted);">${escapeHTML(repair.brand)} ${escapeHTML(repair.model)}</small></td>
+                <td data-label="Issue" title="${escapeHTML(repair.issueDescription)}">${escapeHTML(repair.issueDescription).substring(0, 50)}${(repair.issueDescription || '').length > 50 ? '...' : ''}</td>
+                <td data-label="Status"><span class="status-badge ${status.class}">${status.label}</span>${overdueTag}</td>
                 <td data-label="Received">${dateReceived}</td>
                 <td data-label="Est. Completion">${estCompletion}</td>
                 <td data-label="">
-                    <button class="btn btn-secondary" style="padding: 0.5rem;" onclick="viewRepair('${repair.id}')">
+                    <button class="btn btn-copy" style="padding: 0.5rem;" onclick="copyTrackingLink('${escapeHTML(repair.repairId)}', this)" title="Copy tracking link">
+                        <i class="fas fa-link"></i>
+                    </button>
+                    <button class="btn btn-secondary" style="padding: 0.5rem;" onclick="viewRepair('${repair.id}')" title="View details">
                         <i class="fas fa-eye"></i>
                     </button>
-                    <button class="btn btn-primary" style="padding: 0.5rem;" onclick="editRepair('${repair.id}')">
+                    <button class="btn btn-primary" style="padding: 0.5rem;" onclick="editRepair('${repair.id}')" title="Edit repair">
                         <i class="fas fa-edit"></i>
                     </button>
-                    <button class="btn btn-danger" style="padding: 0.5rem;" onclick="deleteRepair('${repair.id}', '${repair.repairId}')">
+                    <button class="btn btn-danger" style="padding: 0.5rem;" onclick="deleteRepair('${repair.id}', '${repair.repairId}')" title="Delete repair">
                         <i class="fas fa-trash"></i>
                     </button>
                 </td>
@@ -1724,27 +2136,68 @@
             return row;
         }
 
-        // Show alert
-        function showAlert(message, type) {
-            const alert = document.createElement('div');
-            alert.className = `alert alert-${type}`;
-            alert.textContent = message;
-
-            document.querySelector('.main-content').insertBefore(alert, document.querySelector('.header').nextSibling);
-
-            setTimeout(() => {
-                alert.remove();
-            }, 5000);
+        // Copy tracking link to clipboard
+        function copyTrackingLink(repairId, btn) {
+            const trackingUrl = `${window.location.origin}/track/?id=${repairId}`;
+            navigator.clipboard.writeText(trackingUrl).then(() => {
+                const icon = btn.querySelector('i');
+                icon.className = 'fas fa-check';
+                btn.classList.add('copied');
+                showAlert('Tracking link copied to clipboard!', 'info');
+                setTimeout(() => {
+                    icon.className = 'fas fa-link';
+                    btn.classList.remove('copied');
+                }, 2000);
+            }).catch(() => {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = trackingUrl;
+                textArea.style.position = 'fixed';
+                textArea.style.left = '-9999px';
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showAlert('Tracking link copied!', 'info');
+            });
         }
 
-        // Close modals when clicking outside
+        // Toast notification system
+        function showAlert(message, type) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const iconMap = { success: 'fa-check-circle', error: 'fa-exclamation-circle', info: 'fa-info-circle' };
+            toast.className = `toast toast-${type}`;
+            toast.innerHTML = `
+                <i class="fas ${iconMap[type] || iconMap.info}"></i>
+                <span>${escapeHTML(message)}</span>
+                <button class="toast-close" onclick="dismissToast(this.parentElement)">&times;</button>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => dismissToast(toast), 5000);
+        }
+
+        function dismissToast(toast) {
+            if (!toast || toast.classList.contains('toast-removing')) return;
+            toast.classList.add('toast-removing');
+            setTimeout(() => toast.remove(), 300);
+        }
+
+        // Close modals when clicking outside or pressing Escape
         document.addEventListener('click', (e) => {
             if (e.target.classList.contains('modal')) {
                 e.target.classList.remove('show');
             }
         });
 
-        // Show templates for selected status
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const modals = document.querySelectorAll('.modal.show');
+                modals.forEach(modal => modal.remove());
+            }
+        });
+
+        // Show templates for selected status with preview text
         function showTemplates(status) {
             const templates = statusTemplates[status];
             const selector = document.getElementById('template-selector');
@@ -1754,11 +2207,14 @@
                 selector.style.display = 'block';
                 buttonsContainer.innerHTML = '';
 
-                templates.forEach((template, index) => {
+                templates.forEach((template) => {
                     const btn = document.createElement('button');
                     btn.type = 'button';
-                    btn.className = 'template-btn';
-                    btn.textContent = `Template ${index + 1}`;
+                    btn.className = 'template-btn-improved';
+                    // Show first ~60 chars as preview
+                    const preview = template.length > 60 ? template.substring(0, 60) + '...' : template;
+                    btn.textContent = preview;
+                    btn.title = template;
                     btn.onclick = () => {
                         document.getElementById('progress-notes').value = template;
                     };
