@@ -1195,6 +1195,126 @@
             margin-left: 0.75rem;
         }
 
+        /* Quick Status Advance */
+        .status-badge.clickable-status {
+            cursor: pointer;
+            position: relative;
+        }
+
+        .status-badge.clickable-status:hover {
+            filter: brightness(1.3);
+            box-shadow: 0 0 8px currentColor;
+        }
+
+        .status-badge.clickable-status::after {
+            content: '\f054';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            font-size: 0.55rem;
+            margin-left: 0.3rem;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .status-badge.clickable-status:hover::after {
+            opacity: 0.8;
+        }
+
+        /* Bulk Actions */
+        .bulk-actions-bar {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 1.25rem;
+            background: linear-gradient(90deg, rgba(0, 51, 255, 0.12), rgba(0, 228, 255, 0.08));
+            border: 1px solid rgba(0, 51, 255, 0.25);
+            border-radius: var(--radius-md);
+            margin-bottom: 1rem;
+            animation: bulkBarSlide 0.3s ease;
+        }
+
+        @keyframes bulkBarSlide {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .bulk-actions-bar .bulk-count {
+            font-weight: 600;
+            color: var(--accent-cyan);
+            font-size: 0.95rem;
+            white-space: nowrap;
+        }
+
+        .bulk-checkbox {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary-blue);
+            cursor: pointer;
+        }
+
+        /* Repair Age */
+        .repair-age {
+            font-size: 0.75rem;
+            color: var(--text-dark);
+            display: block;
+            margin-top: 0.15rem;
+        }
+
+        .repair-age.age-warning {
+            color: var(--warning);
+        }
+
+        .repair-age.age-danger {
+            color: #F87171;
+        }
+
+        /* Overdue Counter Badge */
+        .overdue-nav-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 20px;
+            height: 20px;
+            padding: 0 6px;
+            border-radius: 10px;
+            background: var(--danger);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 700;
+            margin-left: auto;
+            animation: overduePulse 2s ease-in-out infinite;
+        }
+
+        .header-overdue-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.35rem 0.85rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            background: rgba(239, 68, 68, 0.15);
+            color: #F87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .header-overdue-badge:hover {
+            background: rgba(239, 68, 68, 0.25);
+        }
+
+        /* Export Button */
+        .btn-export {
+            background: rgba(16, 185, 129, 0.1);
+            color: #34D399;
+            border: 1px solid rgba(16, 185, 129, 0.25);
+        }
+
+        .btn-export:hover {
+            background: rgba(16, 185, 129, 0.2);
+        }
+
         @media (max-width: 768px) {
             .toast-container {
                 right: 0.75rem;
@@ -1281,6 +1401,7 @@
                     <a href="#" class="nav-link" data-section="repairs">
                         <i class="fas fa-tools"></i>
                         All Repairs
+                        <span class="overdue-nav-badge hidden" id="nav-overdue-badge">0</span>
                     </a>
                 </div>
                 <div class="nav-item">
@@ -1303,6 +1424,10 @@
                     <h1 class="header-title" id="page-title">Dashboard Overview</h1>
                 </div>
                 <div class="header-actions">
+                    <span class="header-overdue-badge hidden" id="header-overdue-badge" onclick="showSection('repairs'); document.getElementById('status-filter').value=''; document.getElementById('common-repair-filter').value=''; loadAllRepairs();" title="View overdue repairs">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span id="header-overdue-count">0</span> Overdue
+                    </span>
                     <a href="../new-repair/" class="btn btn-primary">
                         <i class="fas fa-plus"></i>
                         <span class="btn-label">New Repair</span>
@@ -1401,6 +1526,10 @@
                             <option value="ready">Ready</option>
                             <option value="completed">Completed</option>
                         </select>
+                        <button class="btn btn-export" onclick="exportToCSV()" title="Export to CSV">
+                            <i class="fas fa-file-csv"></i>
+                            <span class="btn-label">Export</span>
+                        </button>
                         <a href="../new-repair/" class="btn btn-primary">
                             <i class="fas fa-plus"></i>
                             New Repair
@@ -1408,10 +1537,31 @@
                     </div>
                 </div>
                 <div class="section-content">
+                    <!-- Bulk Actions Bar (hidden by default) -->
+                    <div class="bulk-actions-bar hidden" id="bulk-actions-bar">
+                        <span class="bulk-count"><span id="bulk-selected-count">0</span> selected</span>
+                        <select class="form-input" id="bulk-status-select" style="width: auto; padding: 0.5rem 0.75rem; font-size: 0.85rem;">
+                            <option value="">Change status to...</option>
+                            <option value="received">Received</option>
+                            <option value="diagnosing">Diagnosing</option>
+                            <option value="waiting-parts">Waiting for Parts</option>
+                            <option value="in-repair">In Repair</option>
+                            <option value="testing">Testing</option>
+                            <option value="ready">Ready for Collection</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                        <button class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.85rem;" onclick="applyBulkStatusUpdate()">
+                            <i class="fas fa-check"></i> Apply
+                        </button>
+                        <button class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.85rem;" onclick="clearBulkSelection()">
+                            Cancel
+                        </button>
+                    </div>
                     <div class="table-container">
                         <table id="all-repairs-table">
                             <thead>
                                 <tr>
+                                    <th style="width: 40px;"><input type="checkbox" class="bulk-checkbox" id="select-all-checkbox" onchange="toggleSelectAll(this)"></th>
                                     <th class="sortable" data-sort="repairId">Repair ID</th>
                                     <th class="sortable" data-sort="customerName">Customer</th>
                                     <th class="sortable" data-sort="device">Device</th>
@@ -1635,36 +1785,59 @@
             }
         }
 
-        // Load dashboard data
-        async function loadDashboardData() {
+        // Real-time dashboard data with Firestore onSnapshot
+        let unsubscribeRepairs = null;
+
+        function loadDashboardData() {
             document.getElementById('loading').style.display = 'block';
 
-            try {
-                // Load repairs
-                const repairsSnapshot = await db.collection('repairs').get();
-                allRepairs = repairsSnapshot.docs.map(doc => ({
+            // Unsubscribe previous listener if any
+            if (unsubscribeRepairs) unsubscribeRepairs();
+
+            // Set up real-time listener
+            unsubscribeRepairs = db.collection('repairs').onSnapshot((snapshot) => {
+                allRepairs = snapshot.docs.map(doc => ({
                     id: doc.id,
                     ...doc.data()
                 }));
 
-                // Update stats
+                // Update everything
                 updateStats();
-
-                // Load recent repairs
                 loadRecentRepairs();
-
-                // Keep 'All Repairs' table in sync
                 loadAllRepairs();
 
                 document.getElementById('loading').style.display = 'none';
-            } catch (error) {
-                console.error('Error loading dashboard data:', error);
+            }, (error) => {
+                console.error('Error listening to repairs:', error);
                 document.getElementById('loading').style.display = 'none';
                 showAlert('Error loading data: ' + error.message, 'error');
-            }
+            });
         }
 
-        // Update stats
+        // Utility: calculate time ago
+        function timeAgo(seconds) {
+            if (!seconds) return '';
+            const now = Date.now();
+            const diff = now - (seconds * 1000);
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            if (days === 0) return 'Today';
+            if (days === 1) return '1 day ago';
+            if (days < 7) return `${days} days ago`;
+            if (days < 14) return '1 week ago';
+            if (days < 30) return `${Math.floor(days / 7)} weeks ago`;
+            if (days < 60) return '1 month ago';
+            return `${Math.floor(days / 30)} months ago`;
+        }
+
+        function getAgeClass(seconds) {
+            if (!seconds) return '';
+            const days = Math.floor((Date.now() - seconds * 1000) / (1000 * 60 * 60 * 24));
+            if (days >= 14) return 'age-danger';
+            if (days >= 7) return 'age-warning';
+            return '';
+        }
+
+        // Update stats with overdue counter
         function updateStats() {
             const activeRepairs = allRepairs.filter(r =>
                 !['completed'].includes(r.currentStatus)
@@ -1674,12 +1847,33 @@
                 r.currentStatus === 'ready'
             ).length;
 
+            const overdueRepairs = allRepairs.filter(r =>
+                r.estimatedCompletion &&
+                !['completed', 'ready'].includes(r.currentStatus) &&
+                new Date(r.estimatedCompletion.seconds * 1000) < new Date()
+            ).length;
+
             const customers = new Set(allRepairs.map(r => r.customerEmail || r.customerPhone)).size;
 
             document.getElementById('total-repairs').textContent = allRepairs.length;
             document.getElementById('active-repairs').textContent = activeRepairs;
             document.getElementById('ready-repairs').textContent = readyRepairs;
             document.getElementById('total-customers').textContent = customers;
+
+            // Update overdue badges
+            const navBadge = document.getElementById('nav-overdue-badge');
+            const headerBadge = document.getElementById('header-overdue-badge');
+            const headerCount = document.getElementById('header-overdue-count');
+
+            if (overdueRepairs > 0) {
+                navBadge.textContent = overdueRepairs;
+                navBadge.classList.remove('hidden');
+                headerCount.textContent = overdueRepairs;
+                headerBadge.classList.remove('hidden');
+            } else {
+                navBadge.classList.add('hidden');
+                headerBadge.classList.add('hidden');
+            }
         }
 
         // Load recent repairs
@@ -1701,11 +1895,58 @@
             });
         }
 
+        // Status progression order
+        const statusOrder = ['received', 'diagnosing', 'waiting-parts', 'in-repair', 'testing', 'ready', 'completed'];
+
+        function getNextStatus(currentStatus) {
+            const idx = statusOrder.indexOf(currentStatus);
+            if (idx === -1 || idx >= statusOrder.length - 1) return null;
+            return statusOrder[idx + 1];
+        }
+
+        // Quick status advance
+        async function quickAdvanceStatus(repairId, e) {
+            e.stopPropagation();
+            const repair = allRepairs.find(r => r.id === repairId);
+            if (!repair) return;
+
+            const nextStatus = getNextStatus(repair.currentStatus);
+            if (!nextStatus) {
+                showAlert('This repair is already completed.', 'info');
+                return;
+            }
+
+            const nextLabel = statusConfig[nextStatus]?.label || nextStatus;
+            if (!confirm(`Advance status to "${nextLabel}"?`)) return;
+
+            try {
+                const progressEntry = {
+                    status: nextStatus,
+                    timestamp: firebase.firestore.Timestamp.now(),
+                    notes: `Status advanced to ${nextLabel}`,
+                    technician: currentUser.email,
+                    photos: []
+                };
+
+                await db.collection('repairs').doc(repairId).update({
+                    currentStatus: nextStatus,
+                    progress: firebase.firestore.FieldValue.arrayUnion(progressEntry)
+                });
+
+                showAlert(`Status advanced to "${nextLabel}"`, 'success');
+            } catch (error) {
+                console.error('Error advancing status:', error);
+                showAlert('Error updating status: ' + error.message, 'error');
+            }
+        }
+
         // Create repair table row
         function createRepairRow(repair) {
             const row = document.createElement('tr');
             const status = statusConfig[repair.currentStatus] || statusConfig['received'];
             const date = repair.dateReceived ? new Date(repair.dateReceived.seconds * 1000).toLocaleDateString('en-GB') : 'N/A';
+            const age = timeAgo(repair.dateReceived?.seconds);
+            const ageClass = getAgeClass(repair.dateReceived?.seconds);
 
             // Check if overdue
             const isOverdue = repair.estimatedCompletion &&
@@ -1713,12 +1954,17 @@
                 new Date(repair.estimatedCompletion.seconds * 1000) < new Date();
             const overdueTag = isOverdue ? ' <span class="overdue-badge"><i class="fas fa-exclamation-triangle"></i> Overdue</span>' : '';
 
+            const canAdvance = repair.currentStatus !== 'completed';
+            const statusClickable = canAdvance ? 'clickable-status' : '';
+            const statusOnclick = canAdvance ? `onclick="quickAdvanceStatus('${repair.id}', event)"` : '';
+            const statusTitle = canAdvance ? `title="Click to advance to ${statusConfig[getNextStatus(repair.currentStatus)]?.label || 'next'}"` : '';
+
             row.innerHTML = `
                 <td data-label="Repair ID"><strong>${escapeHTML(repair.repairId)}</strong></td>
                 <td data-label="Customer">${escapeHTML(repair.customerName)}</td>
                 <td data-label="Device">${escapeHTML(repair.brand)} ${escapeHTML(repair.model)}</td>
-                <td data-label="Status"><span class="status-badge ${status.class}">${status.label}</span>${overdueTag}</td>
-                <td data-label="Date">${date}</td>
+                <td data-label="Status"><span class="status-badge ${status.class} ${statusClickable}" ${statusOnclick} ${statusTitle}>${status.label}</span>${overdueTag}</td>
+                <td data-label="Date">${date}<span class="repair-age ${ageClass}">${age}</span></td>
                 <td data-label="">
                     <button class="btn btn-copy" style="padding: 0.5rem;" onclick="copyTrackingLink('${escapeHTML(repair.repairId)}', this)" title="Copy tracking link">
                         <i class="fas fa-link"></i>
@@ -2103,20 +2349,28 @@
             const status = statusConfig[repair.currentStatus] || statusConfig['received'];
             const dateReceived = repair.dateReceived ? new Date(repair.dateReceived.seconds * 1000).toLocaleDateString('en-GB') : 'N/A';
             const estCompletion = repair.estimatedCompletion ? new Date(repair.estimatedCompletion.seconds * 1000).toLocaleDateString('en-GB') : 'TBD';
+            const age = timeAgo(repair.dateReceived?.seconds);
+            const ageClass = getAgeClass(repair.dateReceived?.seconds);
 
-            // Check if overdue (past estimated completion and not completed/ready)
+            // Check if overdue
             const isOverdue = repair.estimatedCompletion &&
                 !['completed', 'ready'].includes(repair.currentStatus) &&
                 new Date(repair.estimatedCompletion.seconds * 1000) < new Date();
             const overdueTag = isOverdue ? ' <span class="overdue-badge"><i class="fas fa-exclamation-triangle"></i> Overdue</span>' : '';
 
+            const canAdvance = repair.currentStatus !== 'completed';
+            const statusClickable = canAdvance ? 'clickable-status' : '';
+            const statusOnclick = canAdvance ? `onclick="quickAdvanceStatus('${repair.id}', event)"` : '';
+            const statusTitle = canAdvance ? `title="Click to advance to ${statusConfig[getNextStatus(repair.currentStatus)]?.label || 'next'}"` : '';
+
             row.innerHTML = `
+                <td><input type="checkbox" class="bulk-checkbox row-checkbox" data-repair-id="${repair.id}" onchange="updateBulkSelection()"></td>
                 <td data-label="Repair ID"><strong>${escapeHTML(repair.repairId)}</strong></td>
                 <td data-label="Customer">${escapeHTML(repair.customerName)}<br><small style="color: var(--text-muted);">${escapeHTML(repair.customerPhone)}</small></td>
                 <td data-label="Device">${escapeHTML(repair.deviceType)}<br><small style="color: var(--text-muted);">${escapeHTML(repair.brand)} ${escapeHTML(repair.model)}</small></td>
                 <td data-label="Issue" title="${escapeHTML(repair.issueDescription)}">${escapeHTML(repair.issueDescription).substring(0, 50)}${(repair.issueDescription || '').length > 50 ? '...' : ''}</td>
-                <td data-label="Status"><span class="status-badge ${status.class}">${status.label}</span>${overdueTag}</td>
-                <td data-label="Received">${dateReceived}</td>
+                <td data-label="Status"><span class="status-badge ${status.class} ${statusClickable}" ${statusOnclick} ${statusTitle}>${status.label}</span>${overdueTag}</td>
+                <td data-label="Received">${dateReceived}<span class="repair-age ${ageClass}">${age}</span></td>
                 <td data-label="Est. Completion">${estCompletion}</td>
                 <td data-label="">
                     <button class="btn btn-copy" style="padding: 0.5rem;" onclick="copyTrackingLink('${escapeHTML(repair.repairId)}', this)" title="Copy tracking link">
@@ -2262,6 +2516,146 @@
                 photoElement.remove();
             }
             updatePhotos = updatePhotos.filter(photo => photo.id !== photoId);
+        }
+
+        // Bulk selection management
+        function toggleSelectAll(masterCheckbox) {
+            const checkboxes = document.querySelectorAll('.row-checkbox');
+            checkboxes.forEach(cb => cb.checked = masterCheckbox.checked);
+            updateBulkSelection();
+        }
+
+        function updateBulkSelection() {
+            const checked = document.querySelectorAll('.row-checkbox:checked');
+            const bulkBar = document.getElementById('bulk-actions-bar');
+            const countEl = document.getElementById('bulk-selected-count');
+
+            if (checked.length > 0) {
+                bulkBar.classList.remove('hidden');
+                countEl.textContent = checked.length;
+            } else {
+                bulkBar.classList.add('hidden');
+            }
+
+            // Update master checkbox state
+            const allCheckboxes = document.querySelectorAll('.row-checkbox');
+            const masterCb = document.getElementById('select-all-checkbox');
+            if (masterCb) {
+                masterCb.checked = allCheckboxes.length > 0 && checked.length === allCheckboxes.length;
+                masterCb.indeterminate = checked.length > 0 && checked.length < allCheckboxes.length;
+            }
+        }
+
+        function clearBulkSelection() {
+            document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = false);
+            const masterCb = document.getElementById('select-all-checkbox');
+            if (masterCb) masterCb.checked = false;
+            document.getElementById('bulk-actions-bar').classList.add('hidden');
+            document.getElementById('bulk-status-select').value = '';
+        }
+
+        async function applyBulkStatusUpdate() {
+            const newStatus = document.getElementById('bulk-status-select').value;
+            if (!newStatus) {
+                showAlert('Please select a status first.', 'error');
+                return;
+            }
+
+            const selectedIds = Array.from(document.querySelectorAll('.row-checkbox:checked'))
+                .map(cb => cb.dataset.repairId);
+
+            if (selectedIds.length === 0) return;
+
+            const statusLabel = statusConfig[newStatus]?.label || newStatus;
+            if (!confirm(`Update ${selectedIds.length} repair(s) to "${statusLabel}"?`)) return;
+
+            try {
+                const batch = db.batch();
+                selectedIds.forEach(id => {
+                    const ref = db.collection('repairs').doc(id);
+                    const progressEntry = {
+                        status: newStatus,
+                        timestamp: firebase.firestore.Timestamp.now(),
+                        notes: `Bulk status update to ${statusLabel}`,
+                        technician: currentUser.email,
+                        photos: []
+                    };
+                    batch.update(ref, {
+                        currentStatus: newStatus,
+                        progress: firebase.firestore.FieldValue.arrayUnion(progressEntry)
+                    });
+                });
+
+                await batch.commit();
+                showAlert(`${selectedIds.length} repair(s) updated to "${statusLabel}"`, 'success');
+                clearBulkSelection();
+            } catch (error) {
+                console.error('Bulk update error:', error);
+                showAlert('Error updating repairs: ' + error.message, 'error');
+            }
+        }
+
+        // CSV Export
+        function exportToCSV() {
+            const statusFilter = document.getElementById('status-filter').value;
+            const commonFilter = document.getElementById('common-repair-filter').value;
+            const searchQuery = (document.getElementById('repair-search')?.value || '').toLowerCase().trim();
+
+            // Get currently filtered repairs (reuse filter logic)
+            let data = allRepairs;
+
+            if (searchQuery) {
+                data = data.filter(r => {
+                    const searchText = `${r.repairId || ''} ${r.customerName || ''} ${r.customerPhone || ''} ${r.customerEmail || ''} ${r.brand || ''} ${r.model || ''} ${r.deviceType || ''} ${r.issueDescription || ''}`.toLowerCase();
+                    return searchQuery.split(' ').every(term => searchText.includes(term));
+                });
+            }
+            if (statusFilter) data = data.filter(r => r.currentStatus === statusFilter);
+            if (commonFilter) {
+                data = data.filter(r => {
+                    const text = `${r.deviceType || ''} ${r.brand || ''} ${r.model || ''} ${r.issueDescription || ''}`.toLowerCase();
+                    if (commonFilter === 'hdmi') return text.includes('hdmi');
+                    if (commonFilter === 'cleaning') return text.includes('clean') || text.includes('dust');
+                    if (commonFilter === 'pc-rebuild') return text.includes('rebuild') || text.includes('build') || text.includes('assembly');
+                    if (commonFilter === 'laptop-diag') return (text.includes('laptop') || text.includes('macbook')) && (text.includes('diag') || text.includes('check') || text.includes('inspect'));
+                    return true;
+                });
+            }
+
+            if (data.length === 0) {
+                showAlert('No repairs to export.', 'info');
+                return;
+            }
+
+            const csvHeader = ['Repair ID', 'Customer Name', 'Phone', 'Email', 'Device Type', 'Brand', 'Model', 'Issue', 'Status', 'Date Received', 'Est. Completion', 'Est. Cost'];
+            const csvRows = data.map(r => [
+                r.repairId || '',
+                r.customerName || '',
+                r.customerPhone || '',
+                r.customerEmail || '',
+                r.deviceType || '',
+                r.brand || '',
+                r.model || '',
+                (r.issueDescription || '').replace(/"/g, '""'),
+                statusConfig[r.currentStatus]?.label || r.currentStatus || '',
+                r.dateReceived ? new Date(r.dateReceived.seconds * 1000).toLocaleDateString('en-GB') : '',
+                r.estimatedCompletion ? new Date(r.estimatedCompletion.seconds * 1000).toLocaleDateString('en-GB') : '',
+                r.estimatedCost ? `£${r.estimatedCost}` : ''
+            ]);
+
+            const csvContent = [csvHeader, ...csvRows]
+                .map(row => row.map(cell => `"${cell}"`).join(','))
+                .join('\n');
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            const dateStr = new Date().toISOString().split('T')[0];
+            link.download = `onlinefix-repairs-${dateStr}.csv`;
+            link.click();
+            URL.revokeObjectURL(link.href);
+
+            showAlert(`Exported ${data.length} repairs to CSV`, 'success');
         }
 
         // Delete repair
