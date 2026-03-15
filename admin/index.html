@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://cdnjs.cloudflare.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.firebasestorage.app https://firebasestorage.googleapis.com; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebasestorage.app wss://*.firebaseio.com https://www.google-analytics.com; font-src 'self' data: https://cdnjs.cloudflare.com; frame-ancestors 'none';">
     <title>Admin Dashboard - OnlineFix Repair Management</title>
 
     <!-- Firebase -->
@@ -2317,6 +2319,25 @@
                 .replace(/'/g, '&#039;');
         }
 
+        // Escape for JavaScript string context (inside onclick attributes)
+        function escapeJSStr(str) {
+            if (str === null || str === undefined) return '';
+            return String(str)
+                .replace(/\\/g, '\\\\')
+                .replace(/'/g, "\\'")
+                .replace(/"/g, '\\"')
+                .replace(/\n/g, '\\n')
+                .replace(/\r/g, '\\r')
+                .replace(/</g, '\\x3c')
+                .replace(/>/g, '\\x3e');
+        }
+
+        // Safe window.open - prevents tabnabbing by nullifying opener
+        function safeOpen(url) {
+            const win = window.open(url, '_blank', 'noopener,noreferrer');
+            if (win) win.opener = null;
+        }
+
         // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyCKBlO4aHTVSjwyevg1OYZ0NWy3Y62HJuU",
@@ -2666,10 +2687,12 @@
                 new Date(repair.estimatedCompletion.seconds * 1000) < new Date();
             const overdueTag = isOverdue ? ' <span class="overdue-badge"><i class="fas fa-exclamation-triangle"></i> Overdue</span>' : '';
 
+            const safeId = escapeJSStr(repair.id);
+            const safeRepairId = escapeJSStr(repair.repairId);
             const canAdvance = repair.currentStatus !== 'completed';
             const statusClickable = canAdvance ? 'clickable-status' : '';
-            const statusOnclick = canAdvance ? `onclick="quickAdvanceStatus('${repair.id}', event)"` : '';
-            const statusTitle = canAdvance ? `title="Click to advance to ${statusConfig[getNextStatus(repair.currentStatus)]?.label || 'next'}"` : '';
+            const statusOnclick = canAdvance ? `onclick="quickAdvanceStatus('${safeId}', event)"` : '';
+            const statusTitle = canAdvance ? `title="Click to advance to ${escapeHTML(statusConfig[getNextStatus(repair.currentStatus)]?.label || 'next')}"` : '';
 
             row.innerHTML = `
                 <td data-label="Repair ID"><strong>${escapeHTML(repair.repairId)}</strong></td>
@@ -2678,16 +2701,16 @@
                 <td data-label="Status"><span class="status-badge ${status.class} ${statusClickable}" ${statusOnclick} ${statusTitle}>${status.label}</span>${overdueTag}</td>
                 <td data-label="Date">${date}<span class="repair-age ${ageClass}">${age}</span></td>
                 <td data-label="">
-                    <button class="btn btn-copy" style="padding: 0.5rem;" onclick="copyTrackingLink('${escapeHTML(repair.repairId)}', this)" title="Copy tracking link">
+                    <button class="btn btn-copy" style="padding: 0.5rem;" onclick="copyTrackingLink('${safeRepairId}', this)" title="Copy tracking link">
                         <i class="fas fa-link"></i>
                     </button>
-                    <button class="btn btn-secondary" style="padding: 0.5rem;" onclick="viewRepair('${repair.id}')" title="View details">
+                    <button class="btn btn-secondary" style="padding: 0.5rem;" onclick="viewRepair('${safeId}')" title="View details">
                         <i class="fas fa-eye"></i>
                     </button>
-                    <button class="btn btn-primary" style="padding: 0.5rem;" onclick="editRepair('${repair.id}')" title="Edit repair">
+                    <button class="btn btn-primary" style="padding: 0.5rem;" onclick="editRepair('${safeId}')" title="Edit repair">
                         <i class="fas fa-edit"></i>
                     </button>
-                    <button class="btn btn-danger" style="padding: 0.5rem;" onclick="deleteRepair('${repair.id}', '${repair.repairId}')" title="Delete repair">
+                    <button class="btn btn-danger" style="padding: 0.5rem;" onclick="deleteRepair('${safeId}', '${safeRepairId}')" title="Delete repair">
                         <i class="fas fa-trash"></i>
                     </button>
                 </td>
@@ -2749,7 +2772,7 @@
                                         ${p.photos && p.photos.length > 0 ? `
                                             <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 0.5rem; margin-top: 0.5rem;">
                                                 ${p.photos.map(photo => `
-                                                    <img src="${photo}" alt="Progress photo" style="width: 100%; height: 80px; object-fit: cover; border-radius: 8px; cursor: pointer; border: 1px solid var(--border-color);" onclick="window.open('${photo}', '_blank')">
+                                                    <img src="${escapeHTML(photo)}" alt="Progress photo" style="width: 100%; height: 80px; object-fit: cover; border-radius: 8px; cursor: pointer; border: 1px solid var(--border-color);" onclick="safeOpen('${escapeJSStr(photo)}')">
                                                 `).join('')}
                                             </div>
                                         ` : ''}
@@ -2759,7 +2782,7 @@
                         ` : ''}
                     </div>
                     <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border-color);">
-                        <button class="btn btn-primary" onclick="editRepair('${repairId}'); this.closest('.modal').remove();">
+                        <button class="btn btn-primary" onclick="editRepair('${escapeJSStr(repairId)}'); this.closest('.modal').remove();">
                             <i class="fas fa-edit"></i>
                             Edit Repair
                         </button>
@@ -2849,10 +2872,10 @@
                         </div>
                         <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; justify-content: space-between; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
                             <div style="display: flex; gap: 0.5rem;">
-                                <button type="button" class="btn btn-whatsapp" onclick="sendWhatsApp('${repair.id}')" title="Send WhatsApp update to customer">
+                                <button type="button" class="btn btn-whatsapp" onclick="sendWhatsApp('${escapeJSStr(repair.id)}')" title="Send WhatsApp update to customer">
                                     <i class="fab fa-whatsapp"></i> WhatsApp
                                 </button>
-                                <button type="button" class="btn btn-email" onclick="sendEmailUpdate('${repair.id}')" title="Send email update to customer">
+                                <button type="button" class="btn btn-email" onclick="sendEmailUpdate('${escapeJSStr(repair.id)}')" title="Send email update to customer">
                                     <i class="fas fa-envelope"></i> Email
                                 </button>
                             </div>
@@ -2897,7 +2920,12 @@
                     updateData.estimatedCompletion = firebase.firestore.Timestamp.fromDate(new Date(data.estimatedCompletion));
                 }
                 if (data.estimatedCost) {
-                    updateData.estimatedCost = parseFloat(data.estimatedCost);
+                    const cost = parseFloat(data.estimatedCost);
+                    if (isNaN(cost) || cost < 0 || cost > 50000) {
+                        showAlert('Invalid cost: must be between £0 and £50,000', 'error');
+                        return;
+                    }
+                    updateData.estimatedCost = cost;
                 }
                 if (data.priority) {
                     updateData.priority = data.priority;
@@ -3143,37 +3171,40 @@
                 new Date(repair.estimatedCompletion.seconds * 1000) < new Date();
             const overdueTag = isOverdue ? ' <span class="overdue-badge"><i class="fas fa-exclamation-triangle"></i> Overdue</span>' : '';
 
+            const safeId = escapeJSStr(repair.id);
+            const safeRepairId = escapeJSStr(repair.repairId);
+            const safeCustomerKey = escapeJSStr(repair.customerEmail || repair.customerPhone);
             const canAdvance = repair.currentStatus !== 'completed';
             const statusClickable = canAdvance ? 'clickable-status' : '';
-            const statusOnclick = canAdvance ? `onclick="quickAdvanceStatus('${repair.id}', event)"` : '';
-            const statusTitle = canAdvance ? `title="Click to advance to ${statusConfig[getNextStatus(repair.currentStatus)]?.label || 'next'}"` : '';
+            const statusOnclick = canAdvance ? `onclick="quickAdvanceStatus('${safeId}', event)"` : '';
+            const statusTitle = canAdvance ? `title="Click to advance to ${escapeHTML(statusConfig[getNextStatus(repair.currentStatus)]?.label || 'next')}"` : '';
 
             row.innerHTML = `
-                <td><input type="checkbox" class="bulk-checkbox row-checkbox" data-repair-id="${repair.id}" onchange="updateBulkSelection()"></td>
+                <td><input type="checkbox" class="bulk-checkbox row-checkbox" data-repair-id="${escapeHTML(repair.id)}" onchange="updateBulkSelection()"></td>
                 <td data-label="Repair ID"><strong>${escapeHTML(repair.repairId)}</strong>${priorityBadge}</td>
-                <td data-label="Customer"><a href="#" onclick="showCustomerHistory('${escapeHTML(repair.customerEmail || repair.customerPhone)}', event)" style="color: var(--text-main); text-decoration: none; border-bottom: 1px dashed var(--text-dark);">${escapeHTML(repair.customerName)}</a><br><small style="color: var(--text-muted);">${escapeHTML(repair.customerPhone)}</small></td>
+                <td data-label="Customer"><a href="#" onclick="showCustomerHistory('${safeCustomerKey}', event)" style="color: var(--text-main); text-decoration: none; border-bottom: 1px dashed var(--text-dark);">${escapeHTML(repair.customerName)}</a><br><small style="color: var(--text-muted);">${escapeHTML(repair.customerPhone)}</small></td>
                 <td data-label="Device">${escapeHTML(repair.deviceType)}<br><small style="color: var(--text-muted);">${escapeHTML(repair.brand)} ${escapeHTML(repair.model)}</small></td>
                 <td data-label="Issue" title="${escapeHTML(repair.issueDescription)}">${escapeHTML(repair.issueDescription).substring(0, 50)}${(repair.issueDescription || '').length > 50 ? '...' : ''}</td>
                 <td data-label="Status"><span class="status-badge ${status.class} ${statusClickable}" ${statusOnclick} ${statusTitle}>${status.label}</span>${overdueTag}${warrantyTag}</td>
                 <td data-label="Received">${dateReceived}<span class="repair-age ${ageClass}">${age}</span>${timerHTML}</td>
                 <td data-label="Est. Completion">${estCompletion}</td>
                 <td data-label="">
-                    <button class="btn btn-copy" style="padding: 0.5rem;" onclick="copyTrackingLink('${escapeHTML(repair.repairId)}', this)" title="Copy tracking link">
+                    <button class="btn btn-copy" style="padding: 0.5rem;" onclick="copyTrackingLink('${safeRepairId}', this)" title="Copy tracking link">
                         <i class="fas fa-link"></i>
                     </button>
-                    <button class="btn btn-secondary" style="padding: 0.5rem;" onclick="viewRepair('${repair.id}')" title="View details">
+                    <button class="btn btn-secondary" style="padding: 0.5rem;" onclick="viewRepair('${safeId}')" title="View details">
                         <i class="fas fa-eye"></i>
                     </button>
-                    <button class="btn btn-primary" style="padding: 0.5rem;" onclick="editRepair('${repair.id}')" title="Edit repair">
+                    <button class="btn btn-primary" style="padding: 0.5rem;" onclick="editRepair('${safeId}')" title="Edit repair">
                         <i class="fas fa-edit"></i>
                     </button>
-                    <button class="btn btn-secondary" style="padding: 0.5rem;" onclick="generateInvoice('${repair.id}')" title="Generate invoice">
+                    <button class="btn btn-secondary" style="padding: 0.5rem;" onclick="generateInvoice('${safeId}')" title="Generate invoice">
                         <i class="fas fa-file-invoice"></i>
                     </button>
-                    <button class="btn btn-secondary" style="padding: 0.5rem;" onclick="reprintLabel('${repair.id}')" title="Print label">
+                    <button class="btn btn-secondary" style="padding: 0.5rem;" onclick="reprintLabel('${safeId}')" title="Print label">
                         <i class="fas fa-tag"></i>
                     </button>
-                    <button class="btn btn-danger" style="padding: 0.5rem;" onclick="deleteRepair('${repair.id}', '${repair.repairId}')" title="Delete repair">
+                    <button class="btn btn-danger" style="padding: 0.5rem;" onclick="deleteRepair('${safeId}', '${safeRepairId}')" title="Delete repair">
                         <i class="fas fa-trash"></i>
                     </button>
                 </td>
@@ -3268,14 +3299,23 @@
         // Handle photo upload for updates
         function handleUpdatePhotos(event) {
             const files = Array.from(event.target.files);
+            const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+            const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/heic'];
+
             files.forEach(file => {
-                if (file.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        addUpdatePhotoPreview(e.target.result, file);
-                    };
-                    reader.readAsDataURL(file);
+                if (!file.type.startsWith('image/') || !ALLOWED_TYPES.some(t => file.type === t || file.type.startsWith('image/'))) {
+                    showAlert(`Skipped "${file.name}": not a valid image type`, 'error');
+                    return;
                 }
+                if (file.size > MAX_FILE_SIZE) {
+                    showAlert(`Skipped "${file.name}": exceeds 10MB limit (${(file.size / 1024 / 1024).toFixed(1)}MB)`, 'error');
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    addUpdatePhotoPreview(e.target.result, file);
+                };
+                reader.readAsDataURL(file);
             });
         }
 
@@ -3355,10 +3395,10 @@
                                  priority === 'low' ? '<span class="priority-badge priority-low"><i class="fas fa-arrow-down"></i></span>' : '';
 
             return `
-                <div class="kanban-card" draggable="true" data-id="${repair.id}"
-                     ondragstart="event.dataTransfer.setData('text/plain', '${repair.id}'); this.classList.add('dragging')"
+                <div class="kanban-card" draggable="true" data-id="${escapeHTML(repair.id)}"
+                     ondragstart="event.dataTransfer.setData('text/plain', '${escapeJSStr(repair.id)}'); this.classList.add('dragging')"
                      ondragend="this.classList.remove('dragging')"
-                     onclick="editRepair('${repair.id}')">
+                     onclick="editRepair('${escapeJSStr(repair.id)}')">
                     <div class="kanban-card-id">${escapeHTML(repair.repairId)} ${priorityHTML}</div>
                     <div class="kanban-card-customer">${escapeHTML(repair.customerName)}</div>
                     <div class="kanban-card-device">${escapeHTML(repair.brand)} ${escapeHTML(repair.model)}</div>
@@ -3445,7 +3485,7 @@
                                 const status = statusConfig[r.currentStatus] || statusConfig['received'];
                                 const date = r.dateReceived ? new Date(r.dateReceived.seconds * 1000).toLocaleDateString('en-GB') : 'N/A';
                                 return `
-                                    <div class="customer-history-item" onclick="this.closest('.modal').remove(); editRepair('${r.id}')">
+                                    <div class="customer-history-item" onclick="this.closest('.modal').remove(); editRepair('${escapeJSStr(r.id)}')">
                                         <div style="flex: 1;">
                                             <strong style="color: var(--accent-cyan); font-size: 0.8rem;">${escapeHTML(r.repairId)}</strong>
                                             <div style="font-size: 0.9rem; color: var(--text-main);">${escapeHTML(r.brand)} ${escapeHTML(r.model)}</div>
@@ -3735,8 +3775,6 @@
             if (typeof gtag === 'function') {
                 gtag('event', eventName, params);
             }
-            // Also log to console in dev
-            console.log('[GA4 Event]', eventName, params);
         }
 
         // === WHATSAPP NOTIFICATION ===
@@ -3765,7 +3803,7 @@
                 formattedPhone = '44' + formattedPhone;
             }
 
-            window.open(`https://wa.me/${formattedPhone}?text=${encodeURIComponent(message)}`, '_blank');
+            safeOpen(`https://wa.me/${formattedPhone}?text=${encodeURIComponent(message)}`);
             trackEvent('whatsapp_notification_sent', { repair_id: repair.repairId, status: currentStatus });
             showAlert('WhatsApp opened with pre-filled message', 'info');
         }
@@ -3790,7 +3828,7 @@
             const body = `Hi ${repair.firstName || repair.customerName},\n\nThis is an update from OnlineFix regarding your repair.\n\nRepair ID: ${repair.repairId}\nDevice: ${repair.brand} ${repair.model}\nStatus: ${statusLabel}\n\nTrack your repair online: ${window.location.origin}/track/?id=${repair.repairId}\n\nThank you for choosing OnlineFix!\nOnlineFix - Device Repair Specialists\nPhone: 07940 730537`;
 
             // Use mailto as fallback (works without EmailJS setup)
-            window.open(`mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`, '_blank');
+            safeOpen(`mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
             trackEvent('email_notification_sent', { repair_id: repair.repairId, status: currentStatus });
             showAlert('Email client opened with pre-filled message', 'info');
         }
