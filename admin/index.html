@@ -1315,6 +1315,191 @@
             background: rgba(16, 185, 129, 0.2);
         }
 
+        /* === ANALYTICS PANEL === */
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .analytics-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+        }
+
+        .analytics-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .analytics-card-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .analytics-card-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .analytics-card-subtitle {
+            font-size: 0.8rem;
+            color: var(--text-dark);
+            margin-top: 0.25rem;
+        }
+
+        /* Simple bar chart */
+        .bar-chart {
+            display: flex;
+            align-items: flex-end;
+            gap: 6px;
+            height: 120px;
+            padding-top: 0.5rem;
+        }
+
+        .bar-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            min-width: 0;
+        }
+
+        .bar {
+            width: 100%;
+            max-width: 40px;
+            border-radius: 4px 4px 0 0;
+            transition: height 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            min-height: 2px;
+            position: relative;
+        }
+
+        .bar:hover {
+            filter: brightness(1.3);
+        }
+
+        .bar-label {
+            font-size: 0.65rem;
+            color: var(--text-dark);
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+        }
+
+        .bar-value {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        /* Horizontal bar chart */
+        .h-bar-chart {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .h-bar-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .h-bar-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            min-width: 100px;
+            text-align: right;
+        }
+
+        .h-bar-track {
+            flex: 1;
+            height: 22px;
+            background: var(--bg-base);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .h-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            align-items: center;
+            padding-left: 8px;
+        }
+
+        .h-bar-fill span {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: white;
+            white-space: nowrap;
+        }
+
+        /* Status distribution dots */
+        .status-distribution {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            margin-top: 0.5rem;
+        }
+
+        .status-dot-group {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .status-dot-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .status-dot-count {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        /* WhatsApp button */
+        .btn-whatsapp {
+            background: rgba(37, 211, 102, 0.15);
+            color: #25D366;
+            border: 1px solid rgba(37, 211, 102, 0.3);
+        }
+
+        .btn-whatsapp:hover {
+            background: rgba(37, 211, 102, 0.25);
+        }
+
+        /* Email button */
+        .btn-email {
+            background: rgba(59, 130, 246, 0.12);
+            color: #60A5FA;
+            border: 1px solid rgba(59, 130, 246, 0.25);
+        }
+
+        .btn-email:hover {
+            background: rgba(59, 130, 246, 0.2);
+        }
+
         @media (max-width: 768px) {
             .toast-container {
                 right: 0.75rem;
@@ -1402,6 +1587,12 @@
                         <i class="fas fa-tools"></i>
                         All Repairs
                         <span class="overdue-nav-badge hidden" id="nav-overdue-badge">0</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link" data-section="analytics">
+                        <i class="fas fa-chart-bar"></i>
+                        Analytics
                     </a>
                 </div>
                 <div class="nav-item">
@@ -1581,6 +1772,89 @@
                         <i class="fas fa-search"></i>
                         <p>No repairs found</p>
                         <small>Try adjusting your search or filters</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics Section -->
+            <div id="analytics-section" class="content-section hidden">
+                <div class="section-header">
+                    <h2 class="section-title">Business Analytics</h2>
+                </div>
+                <div class="section-content">
+                    <!-- Top row: key metrics -->
+                    <div class="stats-grid" style="margin-bottom: 1.5rem;">
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: rgba(139, 92, 246, 0.3);">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="stat-number" id="avg-repair-time">--</div>
+                            <div class="stat-label">Avg Repair Time (days)</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: rgba(16, 185, 129, 0.3);">
+                                <i class="fas fa-pound-sign"></i>
+                            </div>
+                            <div class="stat-number" id="total-revenue">£0</div>
+                            <div class="stat-label">Total Revenue (Est.)</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: rgba(245, 158, 11, 0.3);">
+                                <i class="fas fa-trophy"></i>
+                            </div>
+                            <div class="stat-number" id="completion-rate">0%</div>
+                            <div class="stat-label">Completion Rate</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: rgba(0, 228, 255, 0.3);">
+                                <i class="fas fa-redo"></i>
+                            </div>
+                            <div class="stat-number" id="this-month-count">0</div>
+                            <div class="stat-label">Repairs This Month</div>
+                        </div>
+                    </div>
+
+                    <!-- Charts row -->
+                    <div class="analytics-grid">
+                        <!-- Repairs per month trend -->
+                        <div class="analytics-card">
+                            <div class="analytics-card-header">
+                                <span class="analytics-card-title"><i class="fas fa-chart-line" style="margin-right: 0.5rem; color: var(--accent-cyan);"></i>Repairs per Month</span>
+                            </div>
+                            <div class="bar-chart" id="monthly-chart">
+                                <!-- Populated by JS -->
+                            </div>
+                        </div>
+
+                        <!-- Revenue per month -->
+                        <div class="analytics-card">
+                            <div class="analytics-card-header">
+                                <span class="analytics-card-title"><i class="fas fa-pound-sign" style="margin-right: 0.5rem; color: #34D399;"></i>Revenue per Month</span>
+                            </div>
+                            <div class="bar-chart" id="revenue-chart">
+                                <!-- Populated by JS -->
+                            </div>
+                        </div>
+
+                        <!-- Most common device types -->
+                        <div class="analytics-card">
+                            <div class="analytics-card-header">
+                                <span class="analytics-card-title"><i class="fas fa-mobile-alt" style="margin-right: 0.5rem; color: #A78BFA;"></i>Top Device Types</span>
+                            </div>
+                            <div class="h-bar-chart" id="device-chart">
+                                <!-- Populated by JS -->
+                            </div>
+                        </div>
+
+                        <!-- Status distribution -->
+                        <div class="analytics-card">
+                            <div class="analytics-card-header">
+                                <span class="analytics-card-title"><i class="fas fa-pie-chart" style="margin-right: 0.5rem; color: #FBBF24;"></i>Current Status Distribution</span>
+                            </div>
+                            <div id="status-chart">
+                                <!-- Populated by JS -->
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1772,7 +2046,8 @@
             // Update page title
             const titles = {
                 'overview': 'Dashboard Overview',
-                'repairs': 'All Repairs'
+                'repairs': 'All Repairs',
+                'analytics': 'Business Analytics'
             };
             document.getElementById('page-title').textContent = titles[sectionName] || 'Dashboard';
 
@@ -1782,6 +2057,8 @@
             } else if (sectionName === 'overview') {
                 updateStats();
                 loadRecentRepairs();
+            } else if (sectionName === 'analytics') {
+                renderAnalytics();
             }
         }
 
@@ -2120,12 +2397,22 @@
                                     value="${repair.estimatedCost || ''}">
                             </div>
                         </div>
-                        <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
-                            <button type="button" class="btn btn-secondary" onclick="this.closest('.modal').remove()">Cancel</button>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save"></i>
-                                Update Repair
-                            </button>
+                        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; justify-content: space-between; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
+                            <div style="display: flex; gap: 0.5rem;">
+                                <button type="button" class="btn btn-whatsapp" onclick="sendWhatsApp('${repair.id}')" title="Send WhatsApp update to customer">
+                                    <i class="fab fa-whatsapp"></i> WhatsApp
+                                </button>
+                                <button type="button" class="btn btn-email" onclick="sendEmailUpdate('${repair.id}')" title="Send email update to customer">
+                                    <i class="fas fa-envelope"></i> Email
+                                </button>
+                            </div>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <button type="button" class="btn btn-secondary" onclick="this.closest('.modal').remove()">Cancel</button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i>
+                                    Update Repair
+                                </button>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -2197,9 +2484,11 @@
                 await db.collection('repairs').doc(repairId).update(updateData);
 
                 showAlert('Repair updated successfully!', 'success');
-
-                // Reload data
-                loadDashboardData();
+                trackEvent('repair_status_updated', {
+                    repair_id: allRepairs.find(r => r.id === repairId)?.repairId,
+                    new_status: data.newStatus,
+                    has_photos: photoUrls.length > 0
+                });
 
                 // Reset update photos
                 updatePhotos = [];
@@ -2516,6 +2805,246 @@
                 photoElement.remove();
             }
             updatePhotos = updatePhotos.filter(photo => photo.id !== photoId);
+        }
+
+        // === GA4 CUSTOM EVENT TRACKING ===
+        function trackEvent(eventName, params) {
+            if (typeof gtag === 'function') {
+                gtag('event', eventName, params);
+            }
+            // Also log to console in dev
+            console.log('[GA4 Event]', eventName, params);
+        }
+
+        // === WHATSAPP NOTIFICATION ===
+        function sendWhatsApp(repairId) {
+            const repair = allRepairs.find(r => r.id === repairId);
+            if (!repair) return;
+
+            const phone = (repair.customerPhone || '').replace(/\D/g, '');
+            if (!phone) {
+                showAlert('No phone number found for this customer.', 'error');
+                return;
+            }
+
+            // Get the currently selected status from the modal (if open)
+            const statusSelect = document.getElementById('status-select');
+            const currentStatus = statusSelect ? statusSelect.value : repair.currentStatus;
+            const statusLabel = statusConfig[currentStatus]?.label || currentStatus;
+
+            const message = `Hi ${repair.firstName || repair.customerName},\n\nThis is an update from OnlineFix regarding your repair (${repair.repairId}).\n\nStatus: ${statusLabel}\nDevice: ${repair.brand} ${repair.model}\n\nTracking link: ${window.location.origin}/track/?id=${repair.repairId}\n\nThank you for choosing OnlineFix!`;
+
+            // UK phone format: ensure starts with country code
+            let formattedPhone = phone;
+            if (formattedPhone.startsWith('0')) {
+                formattedPhone = '44' + formattedPhone.substring(1);
+            } else if (!formattedPhone.startsWith('44')) {
+                formattedPhone = '44' + formattedPhone;
+            }
+
+            window.open(`https://wa.me/${formattedPhone}?text=${encodeURIComponent(message)}`, '_blank');
+            trackEvent('whatsapp_notification_sent', { repair_id: repair.repairId, status: currentStatus });
+            showAlert('WhatsApp opened with pre-filled message', 'info');
+        }
+
+        // === EMAIL NOTIFICATION ===
+        function sendEmailUpdate(repairId) {
+            const repair = allRepairs.find(r => r.id === repairId);
+            if (!repair) return;
+
+            const email = repair.customerEmail;
+            if (!email) {
+                showAlert('No email address found for this customer.', 'error');
+                return;
+            }
+
+            // Get the currently selected status from the modal (if open)
+            const statusSelect = document.getElementById('status-select');
+            const currentStatus = statusSelect ? statusSelect.value : repair.currentStatus;
+            const statusLabel = statusConfig[currentStatus]?.label || currentStatus;
+
+            const subject = `Repair Update: ${repair.repairId} - ${statusLabel}`;
+            const body = `Hi ${repair.firstName || repair.customerName},\n\nThis is an update from OnlineFix regarding your repair.\n\nRepair ID: ${repair.repairId}\nDevice: ${repair.brand} ${repair.model}\nStatus: ${statusLabel}\n\nTrack your repair online: ${window.location.origin}/track/?id=${repair.repairId}\n\nThank you for choosing OnlineFix!\nOnlineFix - Device Repair Specialists\nPhone: 07940 730537`;
+
+            // Use mailto as fallback (works without EmailJS setup)
+            window.open(`mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`, '_blank');
+            trackEvent('email_notification_sent', { repair_id: repair.repairId, status: currentStatus });
+            showAlert('Email client opened with pre-filled message', 'info');
+        }
+
+        // === ANALYTICS PANEL ===
+        function renderAnalytics() {
+            if (allRepairs.length === 0) return;
+
+            // --- Key metrics ---
+            // Average repair time (for completed repairs)
+            const completedRepairs = allRepairs.filter(r => r.currentStatus === 'completed' && r.dateReceived);
+            let avgDays = '--';
+            if (completedRepairs.length > 0) {
+                const totalDays = completedRepairs.reduce((sum, r) => {
+                    const lastProgress = r.progress?.slice().reverse().find(p => p.status === 'completed');
+                    if (lastProgress && r.dateReceived) {
+                        const completed = lastProgress.timestamp?.seconds || 0;
+                        const received = r.dateReceived.seconds || 0;
+                        return sum + (completed - received) / 86400;
+                    }
+                    return sum;
+                }, 0);
+                avgDays = Math.round(totalDays / completedRepairs.length * 10) / 10;
+            }
+            document.getElementById('avg-repair-time').textContent = avgDays;
+
+            // Total estimated revenue
+            const totalRev = allRepairs.reduce((sum, r) => sum + (r.estimatedCost || 0), 0);
+            document.getElementById('total-revenue').textContent = '£' + totalRev.toLocaleString('en-GB', { minimumFractionDigits: 0 });
+
+            // Completion rate
+            const completionRate = allRepairs.length > 0 ? Math.round((completedRepairs.length / allRepairs.length) * 100) : 0;
+            document.getElementById('completion-rate').textContent = completionRate + '%';
+
+            // Repairs this month
+            const now = new Date();
+            const thisMonth = allRepairs.filter(r => {
+                if (!r.dateReceived) return false;
+                const d = new Date(r.dateReceived.seconds * 1000);
+                return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+            }).length;
+            document.getElementById('this-month-count').textContent = thisMonth;
+
+            // --- Monthly repairs chart (last 6 months) ---
+            renderMonthlyChart();
+
+            // --- Revenue per month chart ---
+            renderRevenueChart();
+
+            // --- Device type chart ---
+            renderDeviceChart();
+
+            // --- Status distribution ---
+            renderStatusChart();
+        }
+
+        function renderMonthlyChart() {
+            const chart = document.getElementById('monthly-chart');
+            const months = [];
+            const now = new Date();
+
+            for (let i = 5; i >= 0; i--) {
+                const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                const count = allRepairs.filter(r => {
+                    if (!r.dateReceived) return false;
+                    const rd = new Date(r.dateReceived.seconds * 1000);
+                    return rd.getMonth() === d.getMonth() && rd.getFullYear() === d.getFullYear();
+                }).length;
+                months.push({
+                    label: d.toLocaleDateString('en-GB', { month: 'short' }),
+                    value: count
+                });
+            }
+
+            const maxVal = Math.max(...months.map(m => m.value), 1);
+            chart.innerHTML = months.map(m => `
+                <div class="bar-group">
+                    <div class="bar-value">${m.value}</div>
+                    <div class="bar" style="height: ${Math.max((m.value / maxVal) * 100, 3)}%; background: linear-gradient(180deg, var(--accent-cyan), var(--primary-blue));"></div>
+                    <div class="bar-label">${m.label}</div>
+                </div>
+            `).join('');
+        }
+
+        function renderRevenueChart() {
+            const chart = document.getElementById('revenue-chart');
+            const months = [];
+            const now = new Date();
+
+            for (let i = 5; i >= 0; i--) {
+                const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                const revenue = allRepairs.filter(r => {
+                    if (!r.dateReceived) return false;
+                    const rd = new Date(r.dateReceived.seconds * 1000);
+                    return rd.getMonth() === d.getMonth() && rd.getFullYear() === d.getFullYear();
+                }).reduce((sum, r) => sum + (r.estimatedCost || 0), 0);
+                months.push({
+                    label: d.toLocaleDateString('en-GB', { month: 'short' }),
+                    value: revenue
+                });
+            }
+
+            const maxVal = Math.max(...months.map(m => m.value), 1);
+            chart.innerHTML = months.map(m => `
+                <div class="bar-group">
+                    <div class="bar-value">£${m.value}</div>
+                    <div class="bar" style="height: ${Math.max((m.value / maxVal) * 100, 3)}%; background: linear-gradient(180deg, #34D399, #059669);"></div>
+                    <div class="bar-label">${m.label}</div>
+                </div>
+            `).join('');
+        }
+
+        function renderDeviceChart() {
+            const chart = document.getElementById('device-chart');
+            const deviceCounts = {};
+            allRepairs.forEach(r => {
+                const type = r.deviceType || 'Other';
+                deviceCounts[type] = (deviceCounts[type] || 0) + 1;
+            });
+
+            const sorted = Object.entries(deviceCounts).sort((a, b) => b[1] - a[1]).slice(0, 6);
+            const maxVal = sorted.length > 0 ? sorted[0][1] : 1;
+            const colors = ['#60A5FA', '#A78BFA', '#FBBF24', '#34D399', '#F87171', '#38BDF8'];
+
+            chart.innerHTML = sorted.map(([type, count], i) => `
+                <div class="h-bar-row">
+                    <div class="h-bar-label">${escapeHTML(type)}</div>
+                    <div class="h-bar-track">
+                        <div class="h-bar-fill" style="width: ${(count / maxVal) * 100}%; background: ${colors[i % colors.length]};">
+                            <span>${count}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderStatusChart() {
+            const chart = document.getElementById('status-chart');
+            const statusCounts = {};
+            allRepairs.forEach(r => {
+                const status = r.currentStatus || 'received';
+                statusCounts[status] = (statusCounts[status] || 0) + 1;
+            });
+
+            const statusColors = {
+                'received': '#60A5FA',
+                'diagnosing': '#FBBF24',
+                'waiting-parts': '#F87171',
+                'in-repair': '#A78BFA',
+                'testing': '#38BDF8',
+                'ready': '#34D399',
+                'completed': '#94A3B8'
+            };
+
+            // Visual bar showing proportions
+            const total = allRepairs.length || 1;
+            let barHTML = '<div style="display: flex; border-radius: 8px; overflow: hidden; height: 28px; margin-bottom: 1rem;">';
+            Object.entries(statusCounts).forEach(([status, count]) => {
+                const pct = (count / total) * 100;
+                barHTML += `<div style="width: ${pct}%; background: ${statusColors[status] || '#64748B'};" title="${statusConfig[status]?.label || status}: ${count}"></div>`;
+            });
+            barHTML += '</div>';
+
+            // Legend
+            let legendHTML = '<div class="status-distribution">';
+            Object.entries(statusCounts).forEach(([status, count]) => {
+                legendHTML += `
+                    <div class="status-dot-group">
+                        <div class="status-dot" style="background: ${statusColors[status] || '#64748B'};"></div>
+                        <span class="status-dot-label">${statusConfig[status]?.label || status}</span>
+                        <span class="status-dot-count">${count}</span>
+                    </div>
+                `;
+            });
+            legendHTML += '</div>';
+
+            chart.innerHTML = barHTML + legendHTML;
         }
 
         // Bulk selection management

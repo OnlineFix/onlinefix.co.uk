@@ -944,6 +944,15 @@
                 const data = doc.data();
                 displayRepairData(data);
 
+                // GA4: Track customer viewing their repair
+                if (typeof gtag === 'function') {
+                    gtag('event', 'repair_tracking_viewed', {
+                        repair_id: data.repairId || repairId,
+                        repair_status: data.currentStatus,
+                        device_type: data.deviceType || 'unknown'
+                    });
+                }
+
             } catch (error) {
                 console.error('Error loading repair data:', error);
                 showError();
