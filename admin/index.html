@@ -1500,6 +1500,386 @@
             background: rgba(59, 130, 246, 0.2);
         }
 
+        /* === KANBAN BOARD === */
+        .kanban-container {
+            display: flex;
+            gap: 1rem;
+            overflow-x: auto;
+            padding-bottom: 1rem;
+            min-height: 400px;
+        }
+
+        .kanban-column {
+            min-width: 220px;
+            flex: 1;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .kanban-column-header {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .kanban-column-count {
+            background: var(--bg-elevated);
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            padding: 0.15rem 0.5rem;
+            border-radius: 10px;
+            font-weight: 700;
+        }
+
+        .kanban-cards {
+            padding: 0.5rem;
+            flex: 1;
+            overflow-y: auto;
+            max-height: 500px;
+            min-height: 60px;
+        }
+
+        .kanban-cards.drag-over {
+            background: rgba(0, 51, 255, 0.08);
+            border: 2px dashed var(--primary-blue);
+            border-radius: 8px;
+        }
+
+        .kanban-card {
+            background: var(--bg-base);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            cursor: grab;
+            transition: all 0.2s ease;
+        }
+
+        .kanban-card:active {
+            cursor: grabbing;
+        }
+
+        .kanban-card:hover {
+            border-color: var(--primary-blue);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .kanban-card.dragging {
+            opacity: 0.5;
+            transform: rotate(2deg);
+        }
+
+        .kanban-card-id {
+            font-size: 0.7rem;
+            color: var(--accent-cyan);
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+        }
+
+        .kanban-card-customer {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 0.2rem;
+        }
+
+        .kanban-card-device {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 0.4rem;
+        }
+
+        .kanban-card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+        }
+
+        .kanban-card-age {
+            font-size: 0.7rem;
+            color: var(--text-dark);
+        }
+
+        /* Priority badges */
+        .priority-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.15rem 0.5rem;
+            border-radius: 10px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .priority-urgent {
+            background: rgba(239, 68, 68, 0.2);
+            color: #F87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            animation: overduePulse 2s ease-in-out infinite;
+        }
+
+        .priority-normal {
+            background: rgba(59, 130, 246, 0.15);
+            color: #60A5FA;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .priority-low {
+            background: rgba(100, 116, 139, 0.15);
+            color: #94A3B8;
+            border: 1px solid rgba(100, 116, 139, 0.2);
+        }
+
+        /* Customer History Modal */
+        .customer-history-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .customer-history-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .customer-history-item:hover {
+            background: var(--bg-elevated);
+        }
+
+        .customer-history-item:last-child {
+            border-bottom: none;
+        }
+
+        .customer-stat {
+            text-align: center;
+            padding: 0.75rem;
+            background: var(--bg-base);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .customer-stat-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .customer-stat-label {
+            font-size: 0.75rem;
+            color: var(--text-dark);
+            margin-top: 0.2rem;
+        }
+
+        /* Invoice */
+        .invoice-container {
+            background: white;
+            color: #1a1a1a;
+            padding: 2.5rem;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        @media print {
+            body * { visibility: hidden; }
+            .invoice-print-area, .invoice-print-area * { visibility: visible; }
+            .invoice-print-area { position: absolute; left: 0; top: 0; width: 100%; }
+            .no-print { display: none !important; }
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.25rem;
+            margin-top: 1rem;
+            padding: 0.5rem 0;
+        }
+
+        .pagination-btn {
+            padding: 0.4rem 0.75rem;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .pagination-btn:hover:not(.active):not(:disabled) {
+            background: var(--bg-elevated);
+            color: var(--text-main);
+        }
+
+        .pagination-btn.active {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .pagination-info {
+            font-size: 0.8rem;
+            color: var(--text-dark);
+            margin: 0 0.5rem;
+        }
+
+        /* Keyboard shortcut hints */
+        .kbd-hint {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            z-index: 100;
+        }
+
+        .kbd-hint-toggle {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-color);
+            color: var(--text-dark);
+            padding: 0.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .kbd-hint-toggle:hover {
+            color: var(--text-main);
+            border-color: var(--primary-blue);
+        }
+
+        .kbd-hint-panel {
+            position: absolute;
+            bottom: 100%;
+            right: 0;
+            margin-bottom: 0.5rem;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 1rem 1.25rem;
+            min-width: 220px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .kbd-hint-panel h4 {
+            font-size: 0.8rem;
+            color: var(--text-dark);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.75rem;
+        }
+
+        .kbd-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.3rem 0;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        kbd {
+            display: inline-block;
+            padding: 0.15rem 0.45rem;
+            font-family: monospace;
+            font-size: 0.8rem;
+            background: var(--bg-base);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            color: var(--accent-cyan);
+        }
+
+        /* Repair timer */
+        .repair-timer {
+            font-family: monospace;
+            font-size: 0.75rem;
+            color: var(--accent-cyan);
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .repair-timer i {
+            font-size: 0.65rem;
+        }
+
+        /* Warranty badge */
+        .warranty-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.15rem 0.5rem;
+            border-radius: 10px;
+            font-size: 0.65rem;
+            font-weight: 600;
+        }
+
+        .warranty-active {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34D399;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .warranty-expired {
+            background: rgba(100, 116, 139, 0.1);
+            color: #64748B;
+            border: 1px solid rgba(100, 116, 139, 0.15);
+        }
+
+        /* Date range filter */
+        .date-range-filter {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .date-range-filter input[type="date"] {
+            padding: 0.4rem 0.6rem;
+            background: var(--bg-base);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            border-radius: 6px;
+            font-size: 0.85rem;
+        }
+
+        .date-range-btn {
+            padding: 0.35rem 0.7rem;
+            background: var(--bg-base);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+
+        .date-range-btn:hover, .date-range-btn.active {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+        }
+
         @media (max-width: 768px) {
             .toast-container {
                 right: 0.75rem;
@@ -1587,6 +1967,12 @@
                         <i class="fas fa-tools"></i>
                         All Repairs
                         <span class="overdue-nav-badge hidden" id="nav-overdue-badge">0</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link" data-section="kanban">
+                        <i class="fas fa-columns"></i>
+                        Kanban Board
                     </a>
                 </div>
                 <div class="nav-item">
@@ -1717,6 +2103,13 @@
                             <option value="ready">Ready</option>
                             <option value="completed">Completed</option>
                         </select>
+                        <select id="priority-filter" class="form-input"
+                            style="display: inline-block; width: auto;" onchange="loadAllRepairs()">
+                            <option value="">All Priorities</option>
+                            <option value="urgent">Urgent</option>
+                            <option value="normal">Normal</option>
+                            <option value="low">Low</option>
+                        </select>
                         <button class="btn btn-export" onclick="exportToCSV()" title="Export to CSV">
                             <i class="fas fa-file-csv"></i>
                             <span class="btn-label">Export</span>
@@ -1773,13 +2166,35 @@
                         <p>No repairs found</p>
                         <small>Try adjusting your search or filters</small>
                     </div>
+                    <div class="pagination" id="pagination"></div>
+                </div>
+            </div>
+
+            <!-- Kanban Board Section -->
+            <div id="kanban-section" class="content-section hidden">
+                <div class="section-header">
+                    <h2 class="section-title">Kanban Board</h2>
+                </div>
+                <div class="section-content">
+                    <div class="kanban-container" id="kanban-container">
+                        <!-- Populated by JS -->
+                    </div>
                 </div>
             </div>
 
             <!-- Analytics Section -->
             <div id="analytics-section" class="content-section hidden">
-                <div class="section-header">
+                <div class="section-header" style="flex-wrap: wrap; gap: 0.75rem;">
                     <h2 class="section-title">Business Analytics</h2>
+                    <div class="date-range-filter">
+                        <button class="date-range-btn active" onclick="setAnalyticsRange('all', this)">All Time</button>
+                        <button class="date-range-btn" onclick="setAnalyticsRange('7d', this)">7 Days</button>
+                        <button class="date-range-btn" onclick="setAnalyticsRange('30d', this)">30 Days</button>
+                        <button class="date-range-btn" onclick="setAnalyticsRange('90d', this)">90 Days</button>
+                        <input type="date" id="analytics-date-from" onchange="setAnalyticsRange('custom', null)" title="From">
+                        <span style="color: var(--text-dark);">-</span>
+                        <input type="date" id="analytics-date-to" onchange="setAnalyticsRange('custom', null)" title="To">
+                    </div>
                 </div>
                 <div class="section-content">
                     <!-- Top row: key metrics -->
@@ -1865,6 +2280,23 @@
                 <p>Loading dashboard data...</p>
             </div>
         </main>
+
+        <!-- Keyboard Shortcuts Hint -->
+        <div class="kbd-hint" id="kbd-hint">
+            <div class="kbd-hint-panel hidden" id="kbd-panel">
+                <h4>Keyboard Shortcuts</h4>
+                <div class="kbd-row"><span>New repair</span> <kbd>N</kbd></div>
+                <div class="kbd-row"><span>Search</span> <kbd>/</kbd></div>
+                <div class="kbd-row"><span>Navigate rows</span> <kbd>J</kbd> <kbd>K</kbd></div>
+                <div class="kbd-row"><span>Edit selected</span> <kbd>E</kbd></div>
+                <div class="kbd-row"><span>View selected</span> <kbd>V</kbd></div>
+                <div class="kbd-row"><span>Kanban view</span> <kbd>B</kbd></div>
+                <div class="kbd-row"><span>Close modal</span> <kbd>Esc</kbd></div>
+            </div>
+            <button class="kbd-hint-toggle" onclick="document.getElementById('kbd-panel').classList.toggle('hidden')" title="Keyboard shortcuts">
+                <i class="fas fa-keyboard"></i>
+            </button>
+        </div>
     </div>
 
     <script>
@@ -2047,6 +2479,7 @@
             const titles = {
                 'overview': 'Dashboard Overview',
                 'repairs': 'All Repairs',
+                'kanban': 'Kanban Board',
                 'analytics': 'Business Analytics'
             };
             document.getElementById('page-title').textContent = titles[sectionName] || 'Dashboard';
@@ -2057,6 +2490,8 @@
             } else if (sectionName === 'overview') {
                 updateStats();
                 loadRecentRepairs();
+            } else if (sectionName === 'kanban') {
+                renderKanban();
             } else if (sectionName === 'analytics') {
                 renderAnalytics();
             }
@@ -2388,13 +2823,28 @@
                         <div class="form-grid">
                             <div class="form-group">
                                 <label class="form-label">Estimated Completion Date</label>
-                                <input type="date" class="form-input" name="estimatedCompletion" 
+                                <input type="date" class="form-input" name="estimatedCompletion"
                                     value="${repair.estimatedCompletion ? new Date(repair.estimatedCompletion.seconds * 1000).toISOString().split('T')[0] : ''}">
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Estimated Cost (£)</label>
-                                <input type="number" class="form-input" name="estimatedCost" step="0.01" 
+                                <input type="number" class="form-input" name="estimatedCost" step="0.01"
                                     value="${repair.estimatedCost || ''}">
+                            </div>
+                        </div>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">Priority</label>
+                                <select class="form-input" name="priority">
+                                    <option value="normal" ${(repair.priority || 'normal') === 'normal' ? 'selected' : ''}>Normal</option>
+                                    <option value="urgent" ${repair.priority === 'urgent' ? 'selected' : ''}>Urgent</option>
+                                    <option value="low" ${repair.priority === 'low' ? 'selected' : ''}>Low</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Warranty (days from completion)</label>
+                                <input type="number" class="form-input" name="warrantyDays" min="0"
+                                    value="${repair.warrantyDays || 30}" placeholder="30">
                             </div>
                         </div>
                         <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; justify-content: space-between; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
@@ -2448,6 +2898,12 @@
                 }
                 if (data.estimatedCost) {
                     updateData.estimatedCost = parseFloat(data.estimatedCost);
+                }
+                if (data.priority) {
+                    updateData.priority = data.priority;
+                }
+                if (data.warrantyDays !== undefined) {
+                    updateData.warrantyDays = parseInt(data.warrantyDays) || 30;
                 }
 
                 // Upload photos if any
@@ -2526,10 +2982,16 @@
             document.getElementById('search-clear').style.display = this.value ? 'block' : 'none';
         });
 
-        // Load all repairs with search, filter, and sort
-        function loadAllRepairs() {
+        // Pagination state
+        let currentPage = 1;
+        const ITEMS_PER_PAGE = 20;
+        let lastFilteredRepairs = [];
+
+        // Get filtered repairs (shared logic for table + export)
+        function getFilteredRepairs() {
             const statusFilter = document.getElementById('status-filter').value;
             const commonFilter = document.getElementById('common-repair-filter').value;
+            const priorityFilter = document.getElementById('priority-filter')?.value || '';
             const searchQuery = (document.getElementById('repair-search')?.value || '').toLowerCase().trim();
 
             let filteredRepairs = allRepairs;
@@ -2542,29 +3004,16 @@
                 });
             }
 
-            // Apply Status Filter
-            if (statusFilter) {
-                filteredRepairs = filteredRepairs.filter(r => r.currentStatus === statusFilter);
-            }
+            if (statusFilter) filteredRepairs = filteredRepairs.filter(r => r.currentStatus === statusFilter);
+            if (priorityFilter) filteredRepairs = filteredRepairs.filter(r => (r.priority || 'normal') === priorityFilter);
 
-            // Apply Common Repair Filter
             if (commonFilter) {
                 filteredRepairs = filteredRepairs.filter(r => {
                     const text = `${r.deviceType || ''} ${r.brand || ''} ${r.model || ''} ${r.issueDescription || ''}`.toLowerCase();
-
-                    if (commonFilter === 'hdmi') {
-                        return text.includes('hdmi');
-                    }
-                    if (commonFilter === 'cleaning') {
-                        return text.includes('clean') || text.includes('dust');
-                    }
-                    if (commonFilter === 'pc-rebuild') {
-                        return text.includes('rebuild') || text.includes('build') || text.includes('assembly');
-                    }
-                    if (commonFilter === 'laptop-diag') {
-                        return (text.includes('laptop') || text.includes('macbook')) &&
-                            (text.includes('diag') || text.includes('check') || text.includes('inspect'));
-                    }
+                    if (commonFilter === 'hdmi') return text.includes('hdmi');
+                    if (commonFilter === 'cleaning') return text.includes('clean') || text.includes('dust');
+                    if (commonFilter === 'pc-rebuild') return text.includes('rebuild') || text.includes('build') || text.includes('assembly');
+                    if (commonFilter === 'laptop-diag') return (text.includes('laptop') || text.includes('macbook')) && (text.includes('diag') || text.includes('check') || text.includes('inspect'));
                     return true;
                 });
             }
@@ -2573,38 +3022,27 @@
             filteredRepairs.sort((a, b) => {
                 let valA, valB;
                 switch (currentSort.field) {
-                    case 'repairId':
-                        valA = (a.repairId || '').toLowerCase();
-                        valB = (b.repairId || '').toLowerCase();
-                        break;
-                    case 'customerName':
-                        valA = (a.customerName || '').toLowerCase();
-                        valB = (b.customerName || '').toLowerCase();
-                        break;
-                    case 'device':
-                        valA = `${a.brand || ''} ${a.model || ''}`.toLowerCase();
-                        valB = `${b.brand || ''} ${b.model || ''}`.toLowerCase();
-                        break;
+                    case 'repairId': valA = (a.repairId || '').toLowerCase(); valB = (b.repairId || '').toLowerCase(); break;
+                    case 'customerName': valA = (a.customerName || '').toLowerCase(); valB = (b.customerName || '').toLowerCase(); break;
+                    case 'device': valA = `${a.brand || ''} ${a.model || ''}`.toLowerCase(); valB = `${b.brand || ''} ${b.model || ''}`.toLowerCase(); break;
                     case 'currentStatus':
-                        const statusOrder = ['received', 'diagnosing', 'waiting-parts', 'in-repair', 'testing', 'ready', 'completed'];
-                        valA = statusOrder.indexOf(a.currentStatus);
-                        valB = statusOrder.indexOf(b.currentStatus);
-                        break;
-                    case 'dateReceived':
-                        valA = a.dateReceived?.seconds || 0;
-                        valB = b.dateReceived?.seconds || 0;
-                        break;
-                    case 'estimatedCompletion':
-                        valA = a.estimatedCompletion?.seconds || 0;
-                        valB = b.estimatedCompletion?.seconds || 0;
-                        break;
-                    default:
-                        valA = 0; valB = 0;
+                        valA = statusOrder.indexOf(a.currentStatus); valB = statusOrder.indexOf(b.currentStatus); break;
+                    case 'dateReceived': valA = a.dateReceived?.seconds || 0; valB = b.dateReceived?.seconds || 0; break;
+                    case 'estimatedCompletion': valA = a.estimatedCompletion?.seconds || 0; valB = b.estimatedCompletion?.seconds || 0; break;
+                    default: valA = 0; valB = 0;
                 }
                 if (valA < valB) return currentSort.direction === 'asc' ? -1 : 1;
                 if (valA > valB) return currentSort.direction === 'asc' ? 1 : -1;
                 return 0;
             });
+
+            return filteredRepairs;
+        }
+
+        // Load all repairs with search, filter, sort, and pagination
+        function loadAllRepairs() {
+            const filteredRepairs = getFilteredRepairs();
+            lastFilteredRepairs = filteredRepairs;
 
             const tbody = document.querySelector('#all-repairs-table tbody');
             const emptyState = document.getElementById('empty-state');
@@ -2612,34 +3050,91 @@
             const resultsCount = document.getElementById('results-count');
             tbody.innerHTML = '';
 
-            // Update results count
-            if (searchQuery || statusFilter || commonFilter) {
-                resultsCount.textContent = `(${filteredRepairs.length} of ${allRepairs.length})`;
-            } else {
-                resultsCount.textContent = `(${allRepairs.length})`;
-            }
+            const hasFilters = document.getElementById('status-filter').value || document.getElementById('common-repair-filter').value || (document.getElementById('repair-search')?.value || '').trim() || (document.getElementById('priority-filter')?.value || '');
+            resultsCount.textContent = hasFilters ? `(${filteredRepairs.length} of ${allRepairs.length})` : `(${allRepairs.length})`;
 
-            // Show empty state or table
             if (filteredRepairs.length === 0) {
                 table.style.display = 'none';
                 emptyState.classList.remove('hidden');
+                document.getElementById('pagination').innerHTML = '';
             } else {
                 table.style.display = '';
                 emptyState.classList.add('hidden');
-                filteredRepairs.forEach(repair => {
+
+                // Pagination
+                const totalPages = Math.ceil(filteredRepairs.length / ITEMS_PER_PAGE);
+                if (currentPage > totalPages) currentPage = totalPages;
+                const start = (currentPage - 1) * ITEMS_PER_PAGE;
+                const paged = filteredRepairs.slice(start, start + ITEMS_PER_PAGE);
+
+                paged.forEach(repair => {
                     const row = createDetailedRepairRow(repair);
                     tbody.appendChild(row);
                 });
+
+                renderPagination(totalPages, filteredRepairs.length);
             }
+        }
+
+        function renderPagination(totalPages, totalItems) {
+            const pag = document.getElementById('pagination');
+            if (totalPages <= 1) { pag.innerHTML = ''; return; }
+
+            let html = `<button class="pagination-btn" onclick="goToPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}><i class="fas fa-chevron-left"></i></button>`;
+
+            const maxVisible = 5;
+            let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+            let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+            if (endPage - startPage < maxVisible - 1) startPage = Math.max(1, endPage - maxVisible + 1);
+
+            if (startPage > 1) html += `<button class="pagination-btn" onclick="goToPage(1)">1</button><span class="pagination-info">...</span>`;
+
+            for (let i = startPage; i <= endPage; i++) {
+                html += `<button class="pagination-btn ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+            }
+
+            if (endPage < totalPages) html += `<span class="pagination-info">...</span><button class="pagination-btn" onclick="goToPage(${totalPages})">${totalPages}</button>`;
+
+            html += `<button class="pagination-btn" onclick="goToPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}><i class="fas fa-chevron-right"></i></button>`;
+            html += `<span class="pagination-info">${totalItems} repairs</span>`;
+            pag.innerHTML = html;
+        }
+
+        function goToPage(page) {
+            currentPage = page;
+            loadAllRepairs();
         }
 
         function createDetailedRepairRow(repair) {
             const row = document.createElement('tr');
+            row.dataset.repairId = repair.id;
             const status = statusConfig[repair.currentStatus] || statusConfig['received'];
             const dateReceived = repair.dateReceived ? new Date(repair.dateReceived.seconds * 1000).toLocaleDateString('en-GB') : 'N/A';
             const estCompletion = repair.estimatedCompletion ? new Date(repair.estimatedCompletion.seconds * 1000).toLocaleDateString('en-GB') : 'TBD';
             const age = timeAgo(repair.dateReceived?.seconds);
             const ageClass = getAgeClass(repair.dateReceived?.seconds);
+
+            // Priority badge
+            const priority = repair.priority || 'normal';
+            const priorityBadge = priority !== 'normal' ? ` <span class="priority-badge priority-${priority}"><i class="fas ${priority === 'urgent' ? 'fa-bolt' : 'fa-arrow-down'}"></i> ${priority}</span>` : '';
+
+            // Warranty badge for completed repairs
+            let warrantyTag = '';
+            if (repair.currentStatus === 'completed' && repair.warrantyDays) {
+                const completedProgress = repair.progress?.slice().reverse().find(p => p.status === 'completed');
+                if (completedProgress?.timestamp) {
+                    const warrantyEnd = new Date(completedProgress.timestamp.seconds * 1000 + repair.warrantyDays * 86400000);
+                    const isActive = warrantyEnd > new Date();
+                    warrantyTag = ` <span class="warranty-badge ${isActive ? 'warranty-active' : 'warranty-expired'}"><i class="fas fa-shield-alt"></i> ${isActive ? 'Warranty' : 'Expired'}</span>`;
+                }
+            }
+
+            // Repair timer
+            let timerHTML = '';
+            if (!['completed', 'ready'].includes(repair.currentStatus) && repair.dateReceived) {
+                const elapsed = getElapsedTime(repair.dateReceived.seconds);
+                timerHTML = `<span class="repair-timer"><i class="fas fa-stopwatch"></i> ${elapsed}</span>`;
+            }
 
             // Check if overdue
             const isOverdue = repair.estimatedCompletion &&
@@ -2654,12 +3149,12 @@
 
             row.innerHTML = `
                 <td><input type="checkbox" class="bulk-checkbox row-checkbox" data-repair-id="${repair.id}" onchange="updateBulkSelection()"></td>
-                <td data-label="Repair ID"><strong>${escapeHTML(repair.repairId)}</strong></td>
-                <td data-label="Customer">${escapeHTML(repair.customerName)}<br><small style="color: var(--text-muted);">${escapeHTML(repair.customerPhone)}</small></td>
+                <td data-label="Repair ID"><strong>${escapeHTML(repair.repairId)}</strong>${priorityBadge}</td>
+                <td data-label="Customer"><a href="#" onclick="showCustomerHistory('${escapeHTML(repair.customerEmail || repair.customerPhone)}', event)" style="color: var(--text-main); text-decoration: none; border-bottom: 1px dashed var(--text-dark);">${escapeHTML(repair.customerName)}</a><br><small style="color: var(--text-muted);">${escapeHTML(repair.customerPhone)}</small></td>
                 <td data-label="Device">${escapeHTML(repair.deviceType)}<br><small style="color: var(--text-muted);">${escapeHTML(repair.brand)} ${escapeHTML(repair.model)}</small></td>
                 <td data-label="Issue" title="${escapeHTML(repair.issueDescription)}">${escapeHTML(repair.issueDescription).substring(0, 50)}${(repair.issueDescription || '').length > 50 ? '...' : ''}</td>
-                <td data-label="Status"><span class="status-badge ${status.class} ${statusClickable}" ${statusOnclick} ${statusTitle}>${status.label}</span>${overdueTag}</td>
-                <td data-label="Received">${dateReceived}<span class="repair-age ${ageClass}">${age}</span></td>
+                <td data-label="Status"><span class="status-badge ${status.class} ${statusClickable}" ${statusOnclick} ${statusTitle}>${status.label}</span>${overdueTag}${warrantyTag}</td>
+                <td data-label="Received">${dateReceived}<span class="repair-age ${ageClass}">${age}</span>${timerHTML}</td>
                 <td data-label="Est. Completion">${estCompletion}</td>
                 <td data-label="">
                     <button class="btn btn-copy" style="padding: 0.5rem;" onclick="copyTrackingLink('${escapeHTML(repair.repairId)}', this)" title="Copy tracking link">
@@ -2670,6 +3165,12 @@
                     </button>
                     <button class="btn btn-primary" style="padding: 0.5rem;" onclick="editRepair('${repair.id}')" title="Edit repair">
                         <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-secondary" style="padding: 0.5rem;" onclick="generateInvoice('${repair.id}')" title="Generate invoice">
+                        <i class="fas fa-file-invoice"></i>
+                    </button>
+                    <button class="btn btn-secondary" style="padding: 0.5rem;" onclick="reprintLabel('${repair.id}')" title="Print label">
+                        <i class="fas fa-tag"></i>
                     </button>
                     <button class="btn btn-danger" style="padding: 0.5rem;" onclick="deleteRepair('${repair.id}', '${repair.repairId}')" title="Delete repair">
                         <i class="fas fa-trash"></i>
@@ -2733,12 +3234,7 @@
             }
         });
 
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                const modals = document.querySelectorAll('.modal.show');
-                modals.forEach(modal => modal.remove());
-            }
-        });
+        // Keyboard shortcuts handled in dedicated section below
 
         // Show templates for selected status with preview text
         function showTemplates(status) {
@@ -2805,6 +3301,432 @@
                 photoElement.remove();
             }
             updatePhotos = updatePhotos.filter(photo => photo.id !== photoId);
+        }
+
+        // === ELAPSED TIME / REPAIR TIMER ===
+        function getElapsedTime(receivedSeconds) {
+            if (!receivedSeconds) return '';
+            const diff = Date.now() - receivedSeconds * 1000;
+            const hours = Math.floor(diff / 3600000);
+            const days = Math.floor(hours / 24);
+            const h = hours % 24;
+            if (days > 0) return `${days}d ${h}h`;
+            return `${hours}h`;
+        }
+
+        // === KANBAN BOARD ===
+        function renderKanban() {
+            const container = document.getElementById('kanban-container');
+            const columns = ['received', 'diagnosing', 'waiting-parts', 'in-repair', 'testing', 'ready'];
+
+            container.innerHTML = columns.map(status => {
+                const repairs = allRepairs.filter(r => r.currentStatus === status);
+                const config = statusConfig[status];
+                return `
+                    <div class="kanban-column">
+                        <div class="kanban-column-header">
+                            <span style="color: ${getStatusColor(status)};">${config.label}</span>
+                            <span class="kanban-column-count">${repairs.length}</span>
+                        </div>
+                        <div class="kanban-cards" data-status="${status}"
+                             ondragover="event.preventDefault(); this.classList.add('drag-over')"
+                             ondragleave="this.classList.remove('drag-over')"
+                             ondrop="handleKanbanDrop(event, '${status}')">
+                            ${repairs.map(r => renderKanbanCard(r)).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getStatusColor(status) {
+            const colors = {
+                'received': '#60A5FA', 'diagnosing': '#FBBF24', 'waiting-parts': '#F87171',
+                'in-repair': '#A78BFA', 'testing': '#38BDF8', 'ready': '#34D399', 'completed': '#94A3B8'
+            };
+            return colors[status] || '#94A3B8';
+        }
+
+        function renderKanbanCard(repair) {
+            const age = timeAgo(repair.dateReceived?.seconds);
+            const priority = repair.priority || 'normal';
+            const priorityHTML = priority === 'urgent' ? '<span class="priority-badge priority-urgent"><i class="fas fa-bolt"></i></span>' :
+                                 priority === 'low' ? '<span class="priority-badge priority-low"><i class="fas fa-arrow-down"></i></span>' : '';
+
+            return `
+                <div class="kanban-card" draggable="true" data-id="${repair.id}"
+                     ondragstart="event.dataTransfer.setData('text/plain', '${repair.id}'); this.classList.add('dragging')"
+                     ondragend="this.classList.remove('dragging')"
+                     onclick="editRepair('${repair.id}')">
+                    <div class="kanban-card-id">${escapeHTML(repair.repairId)} ${priorityHTML}</div>
+                    <div class="kanban-card-customer">${escapeHTML(repair.customerName)}</div>
+                    <div class="kanban-card-device">${escapeHTML(repair.brand)} ${escapeHTML(repair.model)}</div>
+                    <div class="kanban-card-footer">
+                        <span class="kanban-card-age">${age}</span>
+                        ${!['completed', 'ready'].includes(repair.currentStatus) && repair.dateReceived ?
+                            `<span class="repair-timer"><i class="fas fa-stopwatch"></i> ${getElapsedTime(repair.dateReceived.seconds)}</span>` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        async function handleKanbanDrop(event, newStatus) {
+            event.preventDefault();
+            event.currentTarget.classList.remove('drag-over');
+            const repairId = event.dataTransfer.getData('text/plain');
+            const repair = allRepairs.find(r => r.id === repairId);
+            if (!repair || repair.currentStatus === newStatus) return;
+
+            try {
+                const progressEntry = {
+                    status: newStatus,
+                    timestamp: firebase.firestore.Timestamp.now(),
+                    notes: `Moved to ${statusConfig[newStatus]?.label || newStatus} via Kanban board`,
+                    technician: currentUser.email,
+                    photos: []
+                };
+                await db.collection('repairs').doc(repairId).update({
+                    currentStatus: newStatus,
+                    progress: firebase.firestore.FieldValue.arrayUnion(progressEntry)
+                });
+                showAlert(`Moved to ${statusConfig[newStatus]?.label}`, 'success');
+                trackEvent('kanban_status_change', { repair_id: repair.repairId, new_status: newStatus });
+            } catch (error) {
+                showAlert('Error moving repair: ' + error.message, 'error');
+            }
+        }
+
+        // === CUSTOMER HISTORY ===
+        function showCustomerHistory(identifier, event) {
+            if (event) event.preventDefault();
+            const customerRepairs = allRepairs.filter(r =>
+                (r.customerEmail && r.customerEmail === identifier) ||
+                (r.customerPhone && r.customerPhone === identifier)
+            );
+
+            if (customerRepairs.length === 0) return;
+
+            const customer = customerRepairs[0];
+            const totalSpend = customerRepairs.reduce((sum, r) => sum + (r.estimatedCost || 0), 0);
+            const completedCount = customerRepairs.filter(r => r.currentStatus === 'completed').length;
+
+            const modal = document.createElement('div');
+            modal.className = 'modal show';
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width: 650px;">
+                    <div class="modal-header">
+                        <h2 class="modal-title"><i class="fas fa-user" style="margin-right: 0.5rem;"></i>${escapeHTML(customer.customerName)}</h2>
+                        <button class="close-btn" onclick="this.closest('.modal').remove()">&times;</button>
+                    </div>
+                    <div style="padding: 1.5rem;">
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-bottom: 1.5rem;">
+                            <div class="customer-stat">
+                                <div class="customer-stat-value">${customerRepairs.length}</div>
+                                <div class="customer-stat-label">Total Repairs</div>
+                            </div>
+                            <div class="customer-stat">
+                                <div class="customer-stat-value">£${totalSpend.toLocaleString()}</div>
+                                <div class="customer-stat-label">Total Spend</div>
+                            </div>
+                            <div class="customer-stat">
+                                <div class="customer-stat-value">${completedCount}</div>
+                                <div class="customer-stat-label">Completed</div>
+                            </div>
+                        </div>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+                            <i class="fas fa-phone" style="margin-right: 0.5rem;"></i>${escapeHTML(customer.customerPhone || 'N/A')}
+                            <span style="margin: 0 0.75rem;">|</span>
+                            <i class="fas fa-envelope" style="margin-right: 0.5rem;"></i>${escapeHTML(customer.customerEmail || 'N/A')}
+                        </p>
+                        <h3 style="font-size: 0.9rem; color: var(--text-dark); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.75rem;">Repair History</h3>
+                        <div class="customer-history-list">
+                            ${customerRepairs.sort((a, b) => (b.dateReceived?.seconds || 0) - (a.dateReceived?.seconds || 0)).map(r => {
+                                const status = statusConfig[r.currentStatus] || statusConfig['received'];
+                                const date = r.dateReceived ? new Date(r.dateReceived.seconds * 1000).toLocaleDateString('en-GB') : 'N/A';
+                                return `
+                                    <div class="customer-history-item" onclick="this.closest('.modal').remove(); editRepair('${r.id}')">
+                                        <div style="flex: 1;">
+                                            <strong style="color: var(--accent-cyan); font-size: 0.8rem;">${escapeHTML(r.repairId)}</strong>
+                                            <div style="font-size: 0.9rem; color: var(--text-main);">${escapeHTML(r.brand)} ${escapeHTML(r.model)}</div>
+                                            <div style="font-size: 0.75rem; color: var(--text-dark);">${date}</div>
+                                        </div>
+                                        <span class="status-badge ${status.class}" style="font-size: 0.7rem; padding: 0.2rem 0.6rem;">${status.label}</span>
+                                        ${r.estimatedCost ? `<span style="color: var(--text-muted); font-size: 0.85rem;">£${r.estimatedCost}</span>` : ''}
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        // === INVOICE GENERATION ===
+        function generateInvoice(repairId) {
+            const repair = allRepairs.find(r => r.id === repairId);
+            if (!repair) return;
+
+            const date = repair.dateReceived ? new Date(repair.dateReceived.seconds * 1000).toLocaleDateString('en-GB') : 'N/A';
+            const statusLabel = statusConfig[repair.currentStatus]?.label || repair.currentStatus;
+
+            const invoiceWindow = window.open('', '_blank');
+            invoiceWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Invoice - ${repair.repairId}</title>
+                    <style>
+                        * { margin: 0; padding: 0; box-sizing: border-box; }
+                        body { font-family: 'Segoe UI', Tahoma, sans-serif; padding: 2rem; color: #1a1a1a; max-width: 800px; margin: 0 auto; }
+                        .invoice-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 3px solid #0033FF; }
+                        .company-name { font-size: 2rem; font-weight: 800; color: #0033FF; letter-spacing: -1px; }
+                        .company-details { font-size: 0.85rem; color: #666; line-height: 1.6; text-align: right; }
+                        .invoice-title { font-size: 1.5rem; font-weight: 700; color: #333; margin-bottom: 0.5rem; }
+                        .invoice-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem; }
+                        .meta-group h3 { font-size: 0.8rem; color: #999; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem; }
+                        .meta-group p { font-size: 0.95rem; line-height: 1.6; }
+                        table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; }
+                        th { background: #f8f9fa; padding: 0.75rem 1rem; text-align: left; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: #666; border-bottom: 2px solid #e9ecef; }
+                        td { padding: 0.75rem 1rem; border-bottom: 1px solid #e9ecef; font-size: 0.95rem; }
+                        .total-row { font-weight: 700; font-size: 1.1rem; background: #f0f4ff; }
+                        .total-row td { border-bottom: 3px solid #0033FF; }
+                        .footer { text-align: center; margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid #e9ecef; color: #999; font-size: 0.85rem; }
+                        .status-tag { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600; background: #e8f5e9; color: #2e7d32; }
+                        .print-btn { position: fixed; top: 1rem; right: 1rem; padding: 0.5rem 1.5rem; background: #0033FF; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.9rem; }
+                        @media print { .print-btn { display: none; } }
+                    </style>
+                </head>
+                <body>
+                    <button class="print-btn" onclick="window.print()">Print Invoice</button>
+                    <div class="invoice-header">
+                        <div>
+                            <div class="company-name">OnlineFix</div>
+                            <div style="color: #666; font-size: 0.9rem;">Device Repair Specialists</div>
+                        </div>
+                        <div class="company-details">
+                            OnlineFix<br>
+                            Guildford, Surrey GU1 4PD<br>
+                            07940 730537<br>
+                            hello@onlinefix.uk
+                        </div>
+                    </div>
+                    <div class="invoice-title">INVOICE</div>
+                    <p style="color: #666; margin-bottom: 1.5rem;">Repair ID: <strong>${repair.repairId}</strong> &nbsp; | &nbsp; Status: <span class="status-tag">${statusLabel}</span></p>
+                    <div class="invoice-meta">
+                        <div class="meta-group">
+                            <h3>Bill To</h3>
+                            <p><strong>${escapeHTML(repair.customerName)}</strong><br>
+                            ${escapeHTML(repair.customerPhone || '')}<br>
+                            ${escapeHTML(repair.customerEmail || '')}<br>
+                            ${escapeHTML(repair.customerAddress || '')}</p>
+                        </div>
+                        <div class="meta-group" style="text-align: right;">
+                            <h3>Invoice Details</h3>
+                            <p>Date: ${date}<br>
+                            Invoice #: INV-${repair.repairId.replace('REPAIR_', '')}</p>
+                        </div>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr><th>Description</th><th>Details</th><th style="text-align: right;">Amount</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Device Repair Service</strong></td>
+                                <td>${escapeHTML(repair.brand)} ${escapeHTML(repair.model)} (${escapeHTML(repair.deviceType)})</td>
+                                <td style="text-align: right;">£${(repair.estimatedCost || 0).toFixed(2)}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" style="color: #666;">${escapeHTML(repair.issueDescription || 'Repair service')}</td>
+                                <td></td>
+                            </tr>
+                            <tr class="total-row">
+                                <td colspan="2" style="text-align: right;"><strong>TOTAL</strong></td>
+                                <td style="text-align: right;"><strong>£${(repair.estimatedCost || 0).toFixed(2)}</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="footer">
+                        <p>Thank you for choosing OnlineFix!</p>
+                        <p style="margin-top: 0.5rem;">onlinefix.co.uk &nbsp; | &nbsp; hello@onlinefix.uk &nbsp; | &nbsp; 07940 730537</p>
+                    </div>
+                </body>
+                </html>
+            `);
+            invoiceWindow.document.close();
+            trackEvent('invoice_generated', { repair_id: repair.repairId });
+        }
+
+        // === PRINT LABEL FROM ADMIN ===
+        function reprintLabel(repairId) {
+            const repair = allRepairs.find(r => r.id === repairId);
+            if (!repair) return;
+
+            const labelWindow = window.open('', '_blank', 'width=400,height=300');
+            labelWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Label - ${repair.repairId}</title>
+                    <style>
+                        * { margin: 0; padding: 0; box-sizing: border-box; }
+                        body { font-family: 'Arial', sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; background: #f5f5f5; }
+                        .label { width: 2.25in; height: 1.25in; background: white; padding: 0.15in; border: 1px solid #ccc; display: flex; flex-direction: column; justify-content: center; }
+                        .label-header { font-size: 10pt; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #000; padding-bottom: 2px; margin-bottom: 3px; }
+                        .label-id { font-size: 9pt; font-weight: 700; }
+                        .label-customer { font-size: 7pt; margin-top: 2px; }
+                        .label-device { font-size: 7pt; color: #333; }
+                        .label-date { font-size: 6pt; color: #666; margin-top: 3px; }
+                        .print-btn { position: fixed; bottom: 1rem; right: 1rem; padding: 0.5rem 1.5rem; background: #0033FF; color: white; border: none; border-radius: 6px; cursor: pointer; }
+                        @media print { .print-btn { display: none; } body { background: white; } }
+                    </style>
+                </head>
+                <body>
+                    <button class="print-btn" onclick="window.print()">Print Label</button>
+                    <div class="label">
+                        <div class="label-header">OnlineFix</div>
+                        <div class="label-id">${repair.repairId}</div>
+                        <div class="label-customer">${escapeHTML(repair.customerName)}</div>
+                        <div class="label-device">${escapeHTML(repair.brand)} ${escapeHTML(repair.model)}</div>
+                        <div class="label-date">${repair.dateReceived ? new Date(repair.dateReceived.seconds * 1000).toLocaleDateString('en-GB') : ''}</div>
+                    </div>
+                </body>
+                </html>
+            `);
+            labelWindow.document.close();
+        }
+
+        // === DATE RANGE FILTER FOR ANALYTICS ===
+        let analyticsDateRange = 'all';
+
+        function setAnalyticsRange(range, btn) {
+            analyticsDateRange = range;
+            // Update active button
+            if (btn) {
+                document.querySelectorAll('.date-range-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            }
+            renderAnalytics();
+        }
+
+        function getAnalyticsRepairs() {
+            if (analyticsDateRange === 'all') return allRepairs;
+
+            let fromDate;
+            const now = new Date();
+
+            if (analyticsDateRange === 'custom') {
+                const from = document.getElementById('analytics-date-from').value;
+                const to = document.getElementById('analytics-date-to').value;
+                if (!from) return allRepairs;
+                fromDate = new Date(from);
+                const toDate = to ? new Date(to + 'T23:59:59') : now;
+                return allRepairs.filter(r => {
+                    if (!r.dateReceived) return false;
+                    const d = new Date(r.dateReceived.seconds * 1000);
+                    return d >= fromDate && d <= toDate;
+                });
+            }
+
+            const daysMap = { '7d': 7, '30d': 30, '90d': 90 };
+            const days = daysMap[analyticsDateRange] || 0;
+            fromDate = new Date(now.getTime() - days * 86400000);
+
+            return allRepairs.filter(r => {
+                if (!r.dateReceived) return false;
+                return new Date(r.dateReceived.seconds * 1000) >= fromDate;
+            });
+        }
+
+        // === KEYBOARD SHORTCUTS ===
+        let selectedRowIndex = -1;
+
+        document.addEventListener('keydown', (e) => {
+            // Don't trigger shortcuts when typing in inputs
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+                if (e.key === 'Escape') {
+                    e.target.blur();
+                }
+                return;
+            }
+
+            // Don't trigger when modal is open (except Escape)
+            const modalOpen = document.querySelector('.modal.show');
+            if (modalOpen && e.key !== 'Escape') return;
+
+            switch (e.key) {
+                case 'n':
+                case 'N':
+                    e.preventDefault();
+                    window.location.href = '../new-repair/';
+                    break;
+                case '/':
+                    e.preventDefault();
+                    showSection('repairs');
+                    setTimeout(() => document.getElementById('repair-search')?.focus(), 100);
+                    break;
+                case 'j':
+                case 'J':
+                    e.preventDefault();
+                    navigateRow(1);
+                    break;
+                case 'k':
+                case 'K':
+                    e.preventDefault();
+                    navigateRow(-1);
+                    break;
+                case 'e':
+                case 'E':
+                    e.preventDefault();
+                    if (selectedRowIndex >= 0) {
+                        const rows = document.querySelectorAll('#all-repairs-table tbody tr');
+                        const row = rows[selectedRowIndex];
+                        if (row) {
+                            const id = row.dataset.repairId;
+                            if (id) editRepair(id);
+                        }
+                    }
+                    break;
+                case 'v':
+                case 'V':
+                    e.preventDefault();
+                    if (selectedRowIndex >= 0) {
+                        const rows = document.querySelectorAll('#all-repairs-table tbody tr');
+                        const row = rows[selectedRowIndex];
+                        if (row) {
+                            const id = row.dataset.repairId;
+                            if (id) viewRepair(id);
+                        }
+                    }
+                    break;
+                case 'b':
+                case 'B':
+                    e.preventDefault();
+                    showSection('kanban');
+                    break;
+                case 'Escape':
+                    const modals = document.querySelectorAll('.modal.show');
+                    modals.forEach(modal => modal.remove());
+                    break;
+            }
+        });
+
+        function navigateRow(direction) {
+            const rows = document.querySelectorAll('#all-repairs-table tbody tr');
+            if (rows.length === 0) return;
+
+            // Remove previous selection
+            rows.forEach(r => r.style.outline = '');
+
+            selectedRowIndex += direction;
+            if (selectedRowIndex < 0) selectedRowIndex = 0;
+            if (selectedRowIndex >= rows.length) selectedRowIndex = rows.length - 1;
+
+            const row = rows[selectedRowIndex];
+            row.style.outline = '2px solid var(--accent-cyan)';
+            row.style.outlineOffset = '-2px';
+            row.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
         }
 
         // === GA4 CUSTOM EVENT TRACKING ===
@@ -2876,9 +3798,11 @@
         function renderAnalytics() {
             if (allRepairs.length === 0) return;
 
+            const analyticsData = getAnalyticsRepairs();
+
             // --- Key metrics ---
             // Average repair time (for completed repairs)
-            const completedRepairs = allRepairs.filter(r => r.currentStatus === 'completed' && r.dateReceived);
+            const completedRepairs = analyticsData.filter(r => r.currentStatus === 'completed' && r.dateReceived);
             let avgDays = '--';
             if (completedRepairs.length > 0) {
                 const totalDays = completedRepairs.reduce((sum, r) => {
@@ -2895,16 +3819,16 @@
             document.getElementById('avg-repair-time').textContent = avgDays;
 
             // Total estimated revenue
-            const totalRev = allRepairs.reduce((sum, r) => sum + (r.estimatedCost || 0), 0);
+            const totalRev = analyticsData.reduce((sum, r) => sum + (r.estimatedCost || 0), 0);
             document.getElementById('total-revenue').textContent = '£' + totalRev.toLocaleString('en-GB', { minimumFractionDigits: 0 });
 
             // Completion rate
-            const completionRate = allRepairs.length > 0 ? Math.round((completedRepairs.length / allRepairs.length) * 100) : 0;
+            const completionRate = analyticsData.length > 0 ? Math.round((completedRepairs.length / analyticsData.length) * 100) : 0;
             document.getElementById('completion-rate').textContent = completionRate + '%';
 
             // Repairs this month
             const now = new Date();
-            const thisMonth = allRepairs.filter(r => {
+            const thisMonth = analyticsData.filter(r => {
                 if (!r.dateReceived) return false;
                 const d = new Date(r.dateReceived.seconds * 1000);
                 return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
