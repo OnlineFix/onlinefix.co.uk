@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://cdn.jsdelivr.net https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.firebasestorage.app https://firebasestorage.googleapis.com; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebasestorage.app wss://*.firebaseio.com https://www.google-analytics.com; font-src 'self' data:; frame-ancestors 'none';">
     <title>New Repair - OnlineFix</title>
 
     <!-- Firebase -->
@@ -980,9 +982,7 @@
                 // Save to Firestore
                 const docRef = await db.collection('repairs').add(repairData);
 
-                console.log('Repair created successfully:', repairData);
-                console.log('Document ID:', docRef.id);
-                console.log('Tracking URL:', `${GITHUB_PAGES_BASE_URL}/track/?id=${repairId}`);
+                // Repair created successfully
 
                 // Verify the repair was saved by reading it back
                 const savedDoc = await docRef.get();
@@ -1034,7 +1034,7 @@
                 // Uncomment this line when EmailJS is configured:
                 // await emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', templateParams);
 
-                console.log('Email notification ready to send:', templateParams);
+                // Email notification ready to send (enable EmailJS above)
 
                 // Always use mailto as fallback for now
                 sendEmailViaMailto(repairData);
@@ -1133,7 +1133,8 @@
         // Test tracking link
         function testTrackingLink() {
             const nfcUrl = document.getElementById('nfc-url').textContent.trim();
-            window.open(nfcUrl, '_blank');
+            const win = window.open(nfcUrl, '_blank', 'noopener,noreferrer');
+            if (win) win.opener = null;
         }
 
         // Alternative email sending using mailto (fallback if EmailJS not configured)
@@ -1156,7 +1157,8 @@ Date: ${new Date().toLocaleString('en-GB')}
             `;
 
             const mailtoLink = `mailto:onlinerepairbooking@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-            window.open(mailtoLink);
+            const win = window.open(mailtoLink, '_self');
+            if (win && win !== window) win.opener = null;
         }
 
         // Copy NFC link to clipboard

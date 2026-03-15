@@ -3511,7 +3511,9 @@
             const date = repair.dateReceived ? new Date(repair.dateReceived.seconds * 1000).toLocaleDateString('en-GB') : 'N/A';
             const statusLabel = statusConfig[repair.currentStatus]?.label || repair.currentStatus;
 
-            const invoiceWindow = window.open('', '_blank');
+            const invoiceWindow = window.open('', '_blank', 'noopener');
+            if (!invoiceWindow) { showAlert('Pop-up blocked. Please allow pop-ups for this site.', 'error'); return; }
+            invoiceWindow.opener = null;
             invoiceWindow.document.write(`
                 <!DOCTYPE html>
                 <html>
@@ -3604,7 +3606,9 @@
             const repair = allRepairs.find(r => r.id === repairId);
             if (!repair) return;
 
-            const labelWindow = window.open('', '_blank', 'width=400,height=300');
+            const labelWindow = window.open('', '_blank', 'width=400,height=300,noopener');
+            if (!labelWindow) { showAlert('Pop-up blocked. Please allow pop-ups for this site.', 'error'); return; }
+            labelWindow.opener = null;
             labelWindow.document.write(`
                 <!DOCTYPE html>
                 <html>
