@@ -3040,7 +3040,8 @@
         }
 
         // Load all repairs with search, filter, sort, and pagination
-        function loadAllRepairs() {
+        function loadAllRepairs(resetPage) {
+            if (resetPage !== false) currentPage = 1;
             const filteredRepairs = getFilteredRepairs();
             lastFilteredRepairs = filteredRepairs;
 
@@ -3102,7 +3103,7 @@
 
         function goToPage(page) {
             currentPage = page;
-            loadAllRepairs();
+            loadAllRepairs(false);
         }
 
         function createDetailedRepairRow(repair) {
@@ -3850,12 +3851,13 @@
 
         function renderMonthlyChart() {
             const chart = document.getElementById('monthly-chart');
+            const data = getAnalyticsRepairs();
             const months = [];
             const now = new Date();
 
             for (let i = 5; i >= 0; i--) {
                 const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-                const count = allRepairs.filter(r => {
+                const count = data.filter(r => {
                     if (!r.dateReceived) return false;
                     const rd = new Date(r.dateReceived.seconds * 1000);
                     return rd.getMonth() === d.getMonth() && rd.getFullYear() === d.getFullYear();
@@ -3878,12 +3880,13 @@
 
         function renderRevenueChart() {
             const chart = document.getElementById('revenue-chart');
+            const data = getAnalyticsRepairs();
             const months = [];
             const now = new Date();
 
             for (let i = 5; i >= 0; i--) {
                 const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-                const revenue = allRepairs.filter(r => {
+                const revenue = data.filter(r => {
                     if (!r.dateReceived) return false;
                     const rd = new Date(r.dateReceived.seconds * 1000);
                     return rd.getMonth() === d.getMonth() && rd.getFullYear() === d.getFullYear();
@@ -3906,8 +3909,9 @@
 
         function renderDeviceChart() {
             const chart = document.getElementById('device-chart');
+            const data = getAnalyticsRepairs();
             const deviceCounts = {};
-            allRepairs.forEach(r => {
+            data.forEach(r => {
                 const type = r.deviceType || 'Other';
                 deviceCounts[type] = (deviceCounts[type] || 0) + 1;
             });
@@ -3930,8 +3934,9 @@
 
         function renderStatusChart() {
             const chart = document.getElementById('status-chart');
+            const data = getAnalyticsRepairs();
             const statusCounts = {};
-            allRepairs.forEach(r => {
+            data.forEach(r => {
                 const status = r.currentStatus || 'received';
                 statusCounts[status] = (statusCounts[status] || 0) + 1;
             });
@@ -3947,7 +3952,7 @@
             };
 
             // Visual bar showing proportions
-            const total = allRepairs.length || 1;
+            const total = data.length || 1;
             let barHTML = '<div style="display: flex; border-radius: 8px; overflow: hidden; height: 28px; margin-bottom: 1rem;">';
             Object.entries(statusCounts).forEach(([status, count]) => {
                 const pct = (count / total) * 100;
@@ -4050,30 +4055,7 @@
 
         // CSV Export
         function exportToCSV() {
-            const statusFilter = document.getElementById('status-filter').value;
-            const commonFilter = document.getElementById('common-repair-filter').value;
-            const searchQuery = (document.getElementById('repair-search')?.value || '').toLowerCase().trim();
-
-            // Get currently filtered repairs (reuse filter logic)
-            let data = allRepairs;
-
-            if (searchQuery) {
-                data = data.filter(r => {
-                    const searchText = `${r.repairId || ''} ${r.customerName || ''} ${r.customerPhone || ''} ${r.customerEmail || ''} ${r.brand || ''} ${r.model || ''} ${r.deviceType || ''} ${r.issueDescription || ''}`.toLowerCase();
-                    return searchQuery.split(' ').every(term => searchText.includes(term));
-                });
-            }
-            if (statusFilter) data = data.filter(r => r.currentStatus === statusFilter);
-            if (commonFilter) {
-                data = data.filter(r => {
-                    const text = `${r.deviceType || ''} ${r.brand || ''} ${r.model || ''} ${r.issueDescription || ''}`.toLowerCase();
-                    if (commonFilter === 'hdmi') return text.includes('hdmi');
-                    if (commonFilter === 'cleaning') return text.includes('clean') || text.includes('dust');
-                    if (commonFilter === 'pc-rebuild') return text.includes('rebuild') || text.includes('build') || text.includes('assembly');
-                    if (commonFilter === 'laptop-diag') return (text.includes('laptop') || text.includes('macbook')) && (text.includes('diag') || text.includes('check') || text.includes('inspect'));
-                    return true;
-                });
-            }
+            const data = getFilteredRepairs();
 
             if (data.length === 0) {
                 showAlert('No repairs to export.', 'info');
