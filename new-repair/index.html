@@ -5,6 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://cdn.jsdelivr.net https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.firebasestorage.app https://firebasestorage.googleapis.com; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebasestorage.app wss://*.firebaseio.com https://www.google-analytics.com; font-src 'self' data:; frame-ancestors 'none';">
     <title>New Repair - OnlineFix</title>
 
     <!-- Firebase -->
@@ -12,6 +15,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-check-compat.js"></script>
 
     <!-- EmailJS for sending emails -->
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
@@ -60,6 +64,10 @@
             /* Utilities */
             --radius-md: 12px;
             --radius-lg: 20px;
+            --white: #FFFFFF;
+            --gray-400: #9CA3AF;
+            --gray-600: #4B5563;
+            --primary-cyan: #00E4FF;
         }
 
         body {
@@ -575,11 +583,11 @@
                     <div class="form-grid">
                         <div class="form-group">
                             <label class="form-label">First Name</label>
-                            <input type="text" class="form-input" name="firstName" placeholder="John">
+                            <input type="text" class="form-input" name="firstName" placeholder="John" required maxlength="100">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Last Name</label>
-                            <input type="text" class="form-input" name="lastName" placeholder="Doe">
+                            <input type="text" class="form-input" name="lastName" placeholder="Doe" required maxlength="100">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Email</label>
@@ -587,7 +595,7 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">Phone Number</label>
-                            <input type="tel" class="form-input" name="phone" placeholder="+44 7940 730537">
+                            <input type="tel" class="form-input" name="phone" placeholder="+44 7940 730537" required maxlength="20">
                         </div>
                     </div>
                 </div>
@@ -617,7 +625,7 @@
                         <div class="form-group">
                             <label class="form-label">Device</label>
                             <input type="text" class="form-input" name="device"
-                                placeholder="iPhone 13 Pro, Samsung S22, etc.">
+                                placeholder="iPhone 13 Pro, Samsung S22, etc." required maxlength="200">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Price (£)</label>
@@ -627,7 +635,7 @@
                     <div class="form-group">
                         <label class="form-label">Issue Description</label>
                         <textarea class="form-input form-textarea" name="issue"
-                            placeholder="Describe the problem with the device..."></textarea>
+                            placeholder="Describe the problem with the device..." required maxlength="2000"></textarea>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Device Photos</label>
@@ -746,7 +754,7 @@
         // 4. Get your Public Key, Service ID, and Template ID
         // 5. Replace YOUR_EMAILJS_PUBLIC_KEY below with your actual public key
         // 6. Update the emailjs.send() call with your Service ID and Template ID
-        emailjs.init("YOUR_EMAILJS_PUBLIC_KEY"); // Replace with your EmailJS public key
+        // emailjs.init("YOUR_EMAILJS_PUBLIC_KEY"); // Replace with your EmailJS public key when ready
 
         // Utility for escaping HTML to prevent XSS
         function escapeHTML(str) {
@@ -771,6 +779,8 @@
 
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
+        const appCheck = firebase.appCheck();
+        appCheck.activate('6LdZJRIsAAAAAOx4EZqupxMVvX4B3u3YlK5ez-3r', true);
         const db = firebase.firestore();
         const storage = firebase.storage();
         const auth = firebase.auth();
@@ -832,15 +842,23 @@
         document.getElementById('photo-input').addEventListener('change', handlePhotoUpload);
 
         function handlePhotoUpload(e) {
+            const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+            const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/heic'];
             const files = Array.from(e.target.files);
             files.forEach(file => {
-                if (file.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        addPhotoPreview(e.target.result, file);
-                    };
-                    reader.readAsDataURL(file);
+                if (!file.type.startsWith('image/') || !ALLOWED_TYPES.some(t => file.type === t)) {
+                    alert(`Skipped "${file.name}": not a valid image type.`);
+                    return;
                 }
+                if (file.size > MAX_FILE_SIZE) {
+                    alert(`Skipped "${file.name}": exceeds 10MB limit.`);
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    addPhotoPreview(e.target.result, file);
+                };
+                reader.readAsDataURL(file);
             });
         }
 
@@ -907,7 +925,9 @@
                 const data = Object.fromEntries(formData);
 
                 // Generate repair ID
-                const repairId = 'REPAIR_' + Date.now().toString().slice(-6);
+                const randomPart = crypto.getRandomValues(new Uint32Array(1))[0].toString(36).toUpperCase();
+                const timePart = Date.now().toString(36).slice(-4).toUpperCase();
+                const repairId = 'REP_' + timePart + randomPart.slice(0, 4);
 
                 // Upload photos if any
                 const photoUrls = [];
@@ -980,9 +1000,7 @@
                 // Save to Firestore
                 const docRef = await db.collection('repairs').add(repairData);
 
-                console.log('Repair created successfully:', repairData);
-                console.log('Document ID:', docRef.id);
-                console.log('Tracking URL:', `${GITHUB_PAGES_BASE_URL}/track/?id=${repairId}`);
+                // Repair created successfully
 
                 // Verify the repair was saved by reading it back
                 const savedDoc = await docRef.get();
@@ -1034,7 +1052,7 @@
                 // Uncomment this line when EmailJS is configured:
                 // await emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', templateParams);
 
-                console.log('Email notification ready to send:', templateParams);
+                // Email notification ready to send (enable EmailJS above)
 
                 // Always use mailto as fallback for now
                 sendEmailViaMailto(repairData);
@@ -1133,7 +1151,8 @@
         // Test tracking link
         function testTrackingLink() {
             const nfcUrl = document.getElementById('nfc-url').textContent.trim();
-            window.open(nfcUrl, '_blank');
+            const win = window.open(nfcUrl, '_blank', 'noopener,noreferrer');
+            if (win) win.opener = null;
         }
 
         // Alternative email sending using mailto (fallback if EmailJS not configured)
@@ -1156,7 +1175,8 @@ Date: ${new Date().toLocaleString('en-GB')}
             `;
 
             const mailtoLink = `mailto:onlinerepairbooking@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-            window.open(mailtoLink);
+            const win = window.open(mailtoLink, '_blank');
+            if (win && win !== window) win.opener = null;
         }
 
         // Copy NFC link to clipboard

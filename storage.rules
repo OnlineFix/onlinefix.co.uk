@@ -1,0 +1,21 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // Repair photos
+    match /repairs/{repairId}/{allPaths=**} {
+      // Only authenticated users can upload
+      allow write: if request.auth != null
+                   && request.resource.size < 10 * 1024 * 1024  // 10MB max
+                   && request.resource.contentType.matches('image/.*');
+
+      // Anyone can read photos (for tracking page)
+      allow read: if true;
+    }
+
+    // Deny all other access
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
