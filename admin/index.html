@@ -7,7 +7,7 @@
     <meta name="robots" content="noindex, nofollow">
     <meta http-equiv="X-Frame-Options" content="DENY">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://cdnjs.cloudflare.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.firebasestorage.app https://firebasestorage.googleapis.com; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebasestorage.app wss://*.firebaseio.com https://www.google-analytics.com; font-src 'self' data: https://cdnjs.cloudflare.com; frame-ancestors 'none';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://cdnjs.cloudflare.com https://www.googletagmanager.com https://www.google.com https://www.recaptcha.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.firebasestorage.app https://firebasestorage.googleapis.com; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebasestorage.app wss://*.firebaseio.com https://www.google-analytics.com https://www.google.com; font-src 'self' data: https://cdnjs.cloudflare.com; frame-src https://www.google.com https://www.recaptcha.net; frame-ancestors 'none';">
     <title>Admin Dashboard - OnlineFix Repair Management</title>
 
     <!-- Firebase -->
@@ -15,6 +15,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-check-compat.js"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"
         integrity="sha512-fD9DI5bZwQxOi7MhYWnnNPlvXdp/2Pj3XSTRrFs5FQa4mizyGLnJcN6tuvUS6LbmgN1ut+XGSABKvjN0H6Aoow=="
@@ -2356,6 +2357,8 @@
 
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
+        const appCheck = firebase.appCheck();
+        appCheck.activate('6LdZJRIsAAAAAOx4EZqupxMVvX4B3u3YlK5ez-3r', true);
         const db = firebase.firestore();
         const auth = firebase.auth();
         const storage = firebase.storage();
