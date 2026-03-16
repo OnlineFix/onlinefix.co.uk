@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://cdn.jsdelivr.net https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.firebasestorage.app https://firebasestorage.googleapis.com; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebasestorage.app wss://*.firebaseio.com https://www.google-analytics.com; font-src 'self' data:; frame-ancestors 'none';">
     <title>New Repair - OnlineFix</title>
 
@@ -581,11 +582,11 @@
                     <div class="form-grid">
                         <div class="form-group">
                             <label class="form-label">First Name</label>
-                            <input type="text" class="form-input" name="firstName" placeholder="John">
+                            <input type="text" class="form-input" name="firstName" placeholder="John" required maxlength="100">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Last Name</label>
-                            <input type="text" class="form-input" name="lastName" placeholder="Doe">
+                            <input type="text" class="form-input" name="lastName" placeholder="Doe" required maxlength="100">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Email</label>
@@ -593,7 +594,7 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">Phone Number</label>
-                            <input type="tel" class="form-input" name="phone" placeholder="+44 7940 730537">
+                            <input type="tel" class="form-input" name="phone" placeholder="+44 7940 730537" required maxlength="20">
                         </div>
                     </div>
                 </div>
@@ -623,7 +624,7 @@
                         <div class="form-group">
                             <label class="form-label">Device</label>
                             <input type="text" class="form-input" name="device"
-                                placeholder="iPhone 13 Pro, Samsung S22, etc.">
+                                placeholder="iPhone 13 Pro, Samsung S22, etc." required maxlength="200">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Price (£)</label>
@@ -633,7 +634,7 @@
                     <div class="form-group">
                         <label class="form-label">Issue Description</label>
                         <textarea class="form-input form-textarea" name="issue"
-                            placeholder="Describe the problem with the device..."></textarea>
+                            placeholder="Describe the problem with the device..." required maxlength="2000"></textarea>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Device Photos</label>
@@ -838,15 +839,23 @@
         document.getElementById('photo-input').addEventListener('change', handlePhotoUpload);
 
         function handlePhotoUpload(e) {
+            const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+            const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/heic'];
             const files = Array.from(e.target.files);
             files.forEach(file => {
-                if (file.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        addPhotoPreview(e.target.result, file);
-                    };
-                    reader.readAsDataURL(file);
+                if (!file.type.startsWith('image/') || !ALLOWED_TYPES.some(t => file.type === t)) {
+                    alert(`Skipped "${file.name}": not a valid image type.`);
+                    return;
                 }
+                if (file.size > MAX_FILE_SIZE) {
+                    alert(`Skipped "${file.name}": exceeds 10MB limit.`);
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    addPhotoPreview(e.target.result, file);
+                };
+                reader.readAsDataURL(file);
             });
         }
 
@@ -913,7 +922,9 @@
                 const data = Object.fromEntries(formData);
 
                 // Generate repair ID
-                const repairId = 'REPAIR_' + Date.now().toString().slice(-6);
+                const randomPart = crypto.getRandomValues(new Uint32Array(1))[0].toString(36).toUpperCase();
+                const timePart = Date.now().toString(36).slice(-4).toUpperCase();
+                const repairId = 'REP_' + timePart + randomPart.slice(0, 4);
 
                 // Upload photos if any
                 const photoUrls = [];

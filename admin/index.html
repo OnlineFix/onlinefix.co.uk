@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <meta http-equiv="X-Frame-Options" content="DENY">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://cdnjs.cloudflare.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.firebasestorage.app https://firebasestorage.googleapis.com; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebasestorage.app wss://*.firebaseio.com https://www.google-analytics.com; font-src 'self' data: https://cdnjs.cloudflare.com; frame-ancestors 'none';">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://cdnjs.cloudflare.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.firebasestorage.app https://firebasestorage.googleapis.com; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebasestorage.app wss://*.firebaseio.com https://www.google-analytics.com; font-src 'self' data: https://cdnjs.cloudflare.com; frame-ancestors 'none';">
     <title>Admin Dashboard - OnlineFix Repair Management</title>
 
     <!-- Firebase -->
@@ -2757,7 +2758,7 @@
                         <div style="background: var(--bg-surface); border: 1px solid var(--border-color); padding: 1.5rem; border-radius: var(--radius-lg); margin-bottom: 2rem;">
                             <h3 style="color: var(--text-main); margin-bottom: 1rem;">Repair Details</h3>
                             <p><strong>Issue:</strong> <span style="color: var(--text-muted);">${escapeHTML(repair.issueDescription)}</span></p>
-                            <p><strong>Current Status:</strong> <span class="status-badge ${statusConfig[repair.currentStatus]?.class || 'status-received'}">${statusConfig[repair.currentStatus]?.label || 'Received'}</span></p>
+                            <p><strong>Current Status:</strong> <span class="status-badge ${statusConfig[repair.currentStatus]?.class || 'status-received'}">${escapeHTML(statusConfig[repair.currentStatus]?.label || 'Received')}</span></p>
                             <p><strong>Date Received:</strong> <span style="color: var(--text-muted);">${repair.dateReceived ? new Date(repair.dateReceived.seconds * 1000).toLocaleString('en-GB') : 'N/A'}</span></p>
                             ${repair.estimatedCompletion ? `<p><strong>Est. Completion:</strong> <span style="color: var(--text-muted);">${new Date(repair.estimatedCompletion.seconds * 1000).toLocaleDateString('en-GB')}</span></p>` : ''}
                             ${repair.estimatedCost ? `<p><strong>Est. Cost:</strong> <span style="color: var(--text-muted);">£${escapeHTML(repair.estimatedCost)}</span></p>` : ''}
@@ -2769,7 +2770,7 @@
                                 ${repair.progress.map(p => `
                                     <div style="padding: 1rem; background: var(--bg-base); border: 1px solid var(--border-color); border-radius: var(--radius-md); margin-bottom: 1rem;">
                                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                                            <strong style="color: var(--text-main);">${statusConfig[p.status]?.label || p.status}</strong>
+                                            <strong style="color: var(--text-main);">${escapeHTML(statusConfig[p.status]?.label || p.status)}</strong>
                                             <small style="color: var(--text-muted);">${p.timestamp ? new Date(p.timestamp.seconds * 1000).toLocaleString('en-GB') : 'N/A'}</small>
                                         </div>
                                         ${p.notes ? `<p style="color: var(--text-muted); margin: 0;">${escapeHTML(p.notes)}</p>` : ''}
@@ -3527,6 +3528,7 @@
                 <!DOCTYPE html>
                 <html>
                 <head>
+                    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline';">
                     <title>Invoice - ${escapeHTML(repair.repairId)}</title>
                     <style>
                         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -3622,6 +3624,7 @@
                 <!DOCTYPE html>
                 <html>
                 <head>
+                    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline';">
                     <title>Label - ${escapeHTML(repair.repairId)}</title>
                     <style>
                         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -4007,7 +4010,7 @@
             let barHTML = '<div style="display: flex; border-radius: 8px; overflow: hidden; height: 28px; margin-bottom: 1rem;">';
             Object.entries(statusCounts).forEach(([status, count]) => {
                 const pct = (count / total) * 100;
-                barHTML += `<div style="width: ${pct}%; background: ${statusColors[status] || '#64748B'};" title="${statusConfig[status]?.label || status}: ${count}"></div>`;
+                barHTML += `<div style="width: ${pct}%; background: ${statusColors[status] || '#64748B'};" title="${escapeHTML(statusConfig[status]?.label || status)}: ${count}"></div>`;
             });
             barHTML += '</div>';
 
@@ -4017,7 +4020,7 @@
                 legendHTML += `
                     <div class="status-dot-group">
                         <div class="status-dot" style="background: ${statusColors[status] || '#64748B'};"></div>
-                        <span class="status-dot-label">${statusConfig[status]?.label || status}</span>
+                        <span class="status-dot-label">${escapeHTML(statusConfig[status]?.label || status)}</span>
                         <span class="status-dot-count">${count}</span>
                     </div>
                 `;
