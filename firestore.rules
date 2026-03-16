@@ -2,22 +2,31 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Repairs collection
-    match /repairs/{repairId} {
-      // Only specific admin emails can read and write
-      // Add your admin email addresses to this list
-      allow read, write: if request.auth != null
-        && request.auth.token.email in [
-          'onlinerepairbooking@gmail.com',
-          'hello@onlinefix.uk'
-        ];
-
-      // Public read-only access for tracking page (by repair ID query)
-      // Limited to get (single doc) and list (query) - no write access
-      allow get, list: if true;
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email in ['onlinerepairbooking@gmail.com'];
     }
 
-    // Deny all other access by default
+    match /repairs/{repairDoc} {
+
+      // CREATE: Only admins can create repair tickets
+      allow create: if isAdmin()
+                    && request.resource.data.keys().hasAll(['repairId', 'customerName', 'device', 'issueDescription', 'currentStatus'])
+                    && request.resource.data.currentStatus == 'received';
+
+      // READ: Admins can read everything
+      allow read: if isAdmin();
+
+      // Public tracking page - single repair lookup only
+      allow list: if request.query.limit <= 1
+                  && request.query.filters[0].op == '=='
+                  && request.query.filters[0].field == 'repairId';
+
+      // UPDATE/DELETE: Only admins
+      allow update, delete: if isAdmin();
+    }
+
+    // Block everything else
     match /{document=**} {
       allow read, write: if false;
     }
