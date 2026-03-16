@@ -59,6 +59,11 @@
             /* Utilities */
             --radius-md: 12px;
             --radius-lg: 20px;
+            --white: #FFFFFF;
+            --gray-300: #D1D5DB;
+            --gray-400: #9CA3AF;
+            --gray-600: #4B5563;
+            --primary-cyan: #00E4FF;
         }
 
         body {
@@ -538,7 +543,7 @@
         .form-select {
             cursor: pointer;
             appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394A3B8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path মুক্তির%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394A3B8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
             background-repeat: no-repeat;
             background-position: right 0.75rem center;
             background-size: 1.2rem;
@@ -2049,7 +2054,7 @@
                 </div>
 
                 <!-- Recent Repairs -->
-                <div class="content-section">
+                <div class="recent-repairs-section">
                     <div class="section-header">
                         <h2 class="section-title">Recent Repairs</h2>
                         <button class="btn btn-secondary" onclick="showSection('repairs')">View All</button>
@@ -3262,7 +3267,11 @@
         // Close modals when clicking outside or pressing Escape
         document.addEventListener('click', (e) => {
             if (e.target.classList.contains('modal')) {
-                e.target.classList.remove('show');
+                if (e.target.id) {
+                    e.target.classList.remove('show');
+                } else {
+                    e.target.remove();
+                }
             }
         });
 
@@ -3303,7 +3312,7 @@
             const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/heic'];
 
             files.forEach(file => {
-                if (!file.type.startsWith('image/') || !ALLOWED_TYPES.some(t => file.type === t || file.type.startsWith('image/'))) {
+                if (!file.type.startsWith('image/') || !ALLOWED_TYPES.some(t => file.type === t)) {
                     showAlert(`Skipped "${file.name}": not a valid image type`, 'error');
                     return;
                 }
@@ -3327,7 +3336,7 @@
             const photoId = 'photo_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
             photoItem.innerHTML = `
                 <img src="${escapeHTML(src)}" alt="Update photo">
-                <button type="button" class="photo-remove-small" onclick="removeUpdatePhoto('${escapeHTML(photoId)}')">×</button>
+                <button type="button" class="photo-remove-small" onclick="removeUpdatePhoto('${escapeJSStr(photoId)}')">×</button>
             `;
 
             photoItem.dataset.photoId = photoId;
@@ -3518,7 +3527,7 @@
                 <!DOCTYPE html>
                 <html>
                 <head>
-                    <title>Invoice - ${repair.repairId}</title>
+                    <title>Invoice - ${escapeHTML(repair.repairId)}</title>
                     <style>
                         * { margin: 0; padding: 0; box-sizing: border-box; }
                         body { font-family: 'Segoe UI', Tahoma, sans-serif; padding: 2rem; color: #1a1a1a; max-width: 800px; margin: 0 auto; }
@@ -3555,7 +3564,7 @@
                         </div>
                     </div>
                     <div class="invoice-title">INVOICE</div>
-                    <p style="color: #666; margin-bottom: 1.5rem;">Repair ID: <strong>${repair.repairId}</strong> &nbsp; | &nbsp; Status: <span class="status-tag">${statusLabel}</span></p>
+                    <p style="color: #666; margin-bottom: 1.5rem;">Repair ID: <strong>${escapeHTML(repair.repairId)}</strong> &nbsp; | &nbsp; Status: <span class="status-tag">${escapeHTML(statusLabel)}</span></p>
                     <div class="invoice-meta">
                         <div class="meta-group">
                             <h3>Bill To</h3>
@@ -3567,7 +3576,7 @@
                         <div class="meta-group" style="text-align: right;">
                             <h3>Invoice Details</h3>
                             <p>Date: ${date}<br>
-                            Invoice #: INV-${repair.repairId.replace('REPAIR_', '')}</p>
+                            Invoice #: INV-${escapeHTML(repair.repairId.replace('REPAIR_', ''))}</p>
                         </div>
                     </div>
                     <table>
@@ -3613,7 +3622,7 @@
                 <!DOCTYPE html>
                 <html>
                 <head>
-                    <title>Label - ${repair.repairId}</title>
+                    <title>Label - ${escapeHTML(repair.repairId)}</title>
                     <style>
                         * { margin: 0; padding: 0; box-sizing: border-box; }
                         body { font-family: 'Arial', sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; background: #f5f5f5; }
@@ -3631,7 +3640,7 @@
                     <button class="print-btn" onclick="window.print()">Print Label</button>
                     <div class="label">
                         <div class="label-header">OnlineFix</div>
-                        <div class="label-id">${repair.repairId}</div>
+                        <div class="label-id">${escapeHTML(repair.repairId)}</div>
                         <div class="label-customer">${escapeHTML(repair.customerName)}</div>
                         <div class="label-device">${escapeHTML(repair.brand)} ${escapeHTML(repair.model)}</div>
                         <div class="label-date">${repair.dateReceived ? new Date(repair.dateReceived.seconds * 1000).toLocaleDateString('en-GB') : ''}</div>

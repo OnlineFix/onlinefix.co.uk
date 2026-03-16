@@ -62,6 +62,10 @@
             /* Utilities */
             --radius-md: 12px;
             --radius-lg: 20px;
+            --white: #FFFFFF;
+            --gray-400: #9CA3AF;
+            --gray-600: #4B5563;
+            --primary-cyan: #00E4FF;
         }
 
         body {
@@ -748,7 +752,7 @@
         // 4. Get your Public Key, Service ID, and Template ID
         // 5. Replace YOUR_EMAILJS_PUBLIC_KEY below with your actual public key
         // 6. Update the emailjs.send() call with your Service ID and Template ID
-        emailjs.init("YOUR_EMAILJS_PUBLIC_KEY"); // Replace with your EmailJS public key
+        // emailjs.init("YOUR_EMAILJS_PUBLIC_KEY"); // Replace with your EmailJS public key when ready
 
         // Utility for escaping HTML to prevent XSS
         function escapeHTML(str) {
@@ -1157,7 +1161,7 @@ Date: ${new Date().toLocaleString('en-GB')}
             `;
 
             const mailtoLink = `mailto:onlinerepairbooking@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-            const win = window.open(mailtoLink, '_self');
+            const win = window.open(mailtoLink, '_blank');
             if (win && win !== window) win.opener = null;
         }
 

@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <meta http-equiv="X-Frame-Options" content="DENY">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.firebasestorage.app https://firebasestorage.googleapis.com; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebasestorage.app wss://*.firebaseio.com https://www.google-analytics.com; font-src 'self' data:; frame-ancestors 'none';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://cdnjs.cloudflare.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.firebasestorage.app https://firebasestorage.googleapis.com; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebasestorage.app wss://*.firebaseio.com https://www.google-analytics.com; font-src 'self' data: https://cdnjs.cloudflare.com; frame-ancestors 'none';">
     <title>Track Your Repair - OnlineFix</title>
     <meta name="description"
         content="Track your device repair status with OnlineFix. Real-time updates on your smartphone, laptop, or tablet repair progress.">
@@ -59,6 +59,9 @@
             /* Utilities */
             --radius-md: 12px;
             --radius-lg: 20px;
+            --white: #FFFFFF;
+            --gray-300: #D1D5DB;
+            --primary-cyan: #00E4FF;
         }
 
         body {
@@ -852,6 +855,16 @@
                 .replace(/'/g, '&#039;');
         }
 
+        function escapeJSStr(str) {
+            if (str === null || str === undefined) return '';
+            return String(str)
+                .replace(/\\/g, '\\\\')
+                .replace(/'/g, "\\'")
+                .replace(/"/g, '\\"')
+                .replace(/</g, '\\x3c')
+                .replace(/>/g, '\\x3e');
+        }
+
         // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyCKBlO4aHTVSjwyevg1OYZ0NWy3Y62HJuU",
@@ -1012,7 +1025,7 @@
                 if (completionText) {
                     completionText += `<br>`;
                 }
-                completionText += `Estimated cost: £${cost}`;
+                completionText += `Estimated cost: £${escapeHTML(String(cost))}`;
             }
 
             document.getElementById('estimatedCompletion').innerHTML = completionText;
@@ -1136,7 +1149,7 @@
                         ${photos.length > 0 ? `
                             <div class="timeline-photos">
                                 ${photos.map(photo => `
-                                    <div class="timeline-photo" onclick="showPhotoModal('${escapeHTML(photo)}')">
+                                    <div class="timeline-photo" onclick="showPhotoModal('${escapeJSStr(photo)}')">
                                         <img src="${escapeHTML(photo)}" alt="Progress photo">
                                     </div>
                                 `).join('')}
