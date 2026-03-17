@@ -2358,18 +2358,7 @@
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const appCheck = firebase.appCheck();
-        try {
-            appCheck.activate(new firebase.appCheck.ReCaptchaEnterpriseProvider('6LdZJRIsAAAAAOx4EZqupxMVvX4B3u3YlK5ez-3r'), true);
-            console.log('App Check activated successfully with ReCaptchaEnterpriseProvider');
-            // Verify token generation
-            appCheck.getToken(true).then(token => {
-                console.log('App Check token obtained successfully');
-            }).catch(err => {
-                console.error('App Check token error:', err.code, err.message);
-            });
-        } catch (e) {
-            console.error('App Check activation failed:', e);
-        }
+        appCheck.activate('6LdZJRIsAAAAAOx4EZqupxMVvX4B3u3YlK5ez-3r', true);
         const db = firebase.firestore();
         const auth = firebase.auth();
         const storage = firebase.storage();
