@@ -780,7 +780,7 @@
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const appCheck = firebase.appCheck();
-        appCheck.activate('6LdZJRIsAAAAAOx4EZqupxMVvX4B3u3YlK5ez-3r', true);
+        appCheck.activate(new firebase.appCheck.ReCaptchaEnterpriseProvider('6LdZJRIsAAAAAOx4EZqupxMVvX4B3u3YlK5ez-3r'), true);
         const db = firebase.firestore();
         const storage = firebase.storage();
         const auth = firebase.auth();
