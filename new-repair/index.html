@@ -15,7 +15,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-check-compat.js"></script>
 
     <!-- EmailJS for sending emails -->
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
@@ -779,8 +778,6 @@
 
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
-        const appCheck = firebase.appCheck();
-        appCheck.activate('6LdZJRIsAAAAAOx4EZqupxMVvX4B3u3YlK5ez-3r', true);
         const db = firebase.firestore();
         const storage = firebase.storage();
         const auth = firebase.auth();
