@@ -319,6 +319,65 @@
     }
     </script>
 
+    <!-- Speakable Schema for Voice Assistants & AI -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "name": "Laptop, PC & Computer Repair Guildford — Same-Day Fix",
+        "speakable": {
+            "@type": "SpeakableSpecification",
+            "cssSelector": [".page-subtitle", ".faq-answer", ".ai-summary"]
+        },
+        "url": "https://onlinefix.co.uk/pc-repair.html",
+        "mainEntity": {
+            "@id": "https://onlinefix.co.uk/#organization"
+        }
+    }
+    </script>
+
+    <!-- HowTo Schema for AI & Rich Results -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        "name": "How to get your laptop or PC repaired at OnlineFix Guildford",
+        "description": "Step-by-step process for getting your laptop, desktop PC, or gaming PC repaired at OnlineFix in Guildford, Surrey.",
+        "totalTime": "PT24H",
+        "estimatedCost": {
+            "@type": "MonetaryAmount",
+            "currency": "GBP",
+            "value": "30"
+        },
+        "step": [
+            {
+                "@type": "HowToStep",
+                "position": 1,
+                "name": "Contact and Book",
+                "text": "Call OnlineFix on 07940 730537 or send a message describing your laptop or PC issue. Book a convenient drop-off time. Open 7 days a week, 10am to 10pm."
+            },
+            {
+                "@type": "HowToStep",
+                "position": 2,
+                "name": "Drop Off and Diagnosis",
+                "text": "Bring your laptop or PC to our Guildford workshop. We diagnose the fault using professional testing equipment and provide a transparent quote. A small diagnostic fee applies and is credited towards your repair."
+            },
+            {
+                "@type": "HowToStep",
+                "position": 3,
+                "name": "Expert Repair",
+                "text": "Professional repair using quality replacement parts. Screen replacements, SSD upgrades, and virus removal are typically completed same-day. Your data stays completely safe."
+            },
+            {
+                "@type": "HowToStep",
+                "position": 4,
+                "name": "Testing and Collection",
+                "text": "Every repair is fully stress-tested — hardware, software, thermals, and stability — before collection. All repairs include a 90-day warranty."
+            }
+        ]
+    }
+    </script>
+
     <link rel="stylesheet" href="/css/core.css">
     <style>
         html {
@@ -1090,6 +1149,22 @@
     </header>
 
     <main id="main">
+        <!-- AI-Friendly Summary for AEO/GEO -->
+        <section class="ai-summary" style="padding: 2rem 0; border-top: 2px solid var(--hex-black); background: var(--hex-white);">
+            <div class="container" style="max-width: 900px; margin: 0 auto;">
+                <p style="font-family: monospace; font-size: 0.95rem; line-height: 1.8; color: #333;">
+                    <strong>OnlineFix</strong> is a laptop, PC, and computer repair shop in <strong>Guildford, Surrey</strong>,
+                    run by Tomas, an experienced electronics repair technician since 2018. We repair <strong>all laptop brands</strong>
+                    including HP, Dell, Lenovo, ASUS, and Acer, plus <strong>gaming PCs, custom builds, and desktop computers</strong>.
+                    Common repairs include laptop screen replacement (from &pound;60), SSD upgrades (from &pound;40), virus removal
+                    (from &pound;35), hardware diagnosis (from &pound;30), battery replacement, and keyboard repair. Most repairs
+                    are completed <strong>same-day</strong>. All work includes a <strong>90-day warranty</strong> and <strong>no fix,
+                    no fee</strong> policy. Appointment only &mdash; call <strong>07940 730537</strong> to book. Serving Guildford,
+                    Woking, Godalming, Farnham, and surrounding Surrey areas.
+                </p>
+            </div>
+        </section>
+
         <!-- Models We Repair -->
         <section class="models-section" aria-labelledby="models-heading">
             <div class="container">
