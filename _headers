@@ -1,11 +1,16 @@
-# HTTP Response Headers
+# HTTP Security Headers
 # Works with: Cloudflare Pages, Netlify
-# For GitHub Pages: configure these via Cloudflare proxy or server config
+# For GitHub Pages: configure via Cloudflare proxy Transform Rules
 
 /*
   X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
+  Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+  Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=(), usb=()
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Resource-Policy: same-origin
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://www.googletagmanager.com https://www.google-analytics.com https://www.google.com https://www.recaptcha.net https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://*.googleapis.com https://*.firebaseio.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' data: https://firebasestorage.googleapis.com https://*.firebasestorage.app https://www.googletagmanager.com https://www.google-analytics.com; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebasestorage.app https://www.google-analytics.com https://www.googletagmanager.com https://api.emailjs.com; frame-src 'self' https://www.google.com https://www.recaptcha.net; object-src 'none'; base-uri 'self'; form-action 'self'
 
 /css/*
   Cache-Control: public, max-age=31536000, immutable
