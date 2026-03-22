@@ -17,6 +17,7 @@
         content="OnlineFix — Guildford's 5-star rated repair shop. Phone, laptop, PC &amp; console repair from £30. Same-day service, 90-day warranty, no fix no fee. Call 07940 730537.">
     <meta name="author" content="OnlineFix - Tomas">
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="keywords" content="phone repair Guildford, laptop repair Guildford, PC repair Guildford, console repair Guildford, computer repair Guildford, iPhone repair Guildford, MacBook repair Guildford, electronics repair near me, PS5 repair near me, same day repair Guildford, data recovery Guildford, tablet repair Guildford, no fix no fee Guildford">
     <link rel="canonical" href="https://onlinefix.co.uk/">
     <link rel="sitemap" type="application/xml" href="/sitemap.xml">
 
@@ -191,7 +192,7 @@
         "name": "OnlineFix — Electronics Repair in Guildford, Surrey",
         "speakable": {
             "@type": "SpeakableSpecification",
-            "cssSelector": [".seo-hidden", ".faq-answer", ".feature-title"]
+            "cssSelector": [".hero-description", ".faq-answer", ".feature-title"]
         },
         "url": "https://onlinefix.co.uk/",
         "mainEntity": {
@@ -379,13 +380,23 @@
 
         .tagline {
             font-family: 'Courier New', Courier, monospace;
-            font-size: clamp(0.9rem, 3vw, 1.2rem);
+            font-size: clamp(0.8rem, 2.5vw, 1rem);
             text-transform: uppercase;
-            margin-bottom: 2rem;
+            margin-bottom: 1rem;
             background: var(--hex-black);
             color: var(--hex-white);
             display: inline-block;
             padding: 5px 8px;
+        }
+
+        .hero-description {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: clamp(0.8rem, 2vw, 0.95rem);
+            color: var(--hex-black);
+            max-width: 500px;
+            margin: 0 auto 2rem;
+            line-height: 1.5;
+            opacity: 0.8;
         }
 
         .features {
@@ -701,9 +712,6 @@
     <!-- Accessibility: Skip Link -->
     <a href="#main" class="skip-link">Skip to main content</a>
 
-    <!-- SEO: Hidden but crawlable H1 for search engines -->
-    <h1 class="seo-hidden">OnlineFix — Phone, Laptop, PC, Tablet &amp; Console Repair in Guildford, Surrey — Same-Day Service, 90-Day Warranty, No Fix No Fee</h1>
-
     <!-- Navigation -->
     <nav class="navbar" id="navbar" aria-label="Main navigation">
         <div class="nav-container">
@@ -730,10 +738,9 @@
         <section class="hero" aria-label="Hero">
             <div class="container">
                 <header class="header fade-in">
-                    <div class="logo">ONLINE<span>FIX</span></div>
-                    <p class="tagline">GUILDFORD, UK // TECH REPAIR ATELIER</p>
-                    <!-- SEO: Hidden descriptive text for crawlers and AI engines -->
-                    <p class="seo-hidden">OnlineFix is a 5-star rated electronics repair shop in Guildford, Surrey, founded by Tomas in 2018. We specialise in same-day phone repair, laptop repair, PC repair, tablet repair, and gaming console repair. Services include iPhone screen replacement from £45, laptop screen replacement from £60, PS5 HDMI port repair from £65, data recovery, virus removal, SSD upgrades, and board-level micro-soldering. All repairs come with a 90-day warranty and no fix, no fee guarantee. We serve Guildford, Woking, Godalming, Farnham, and surrounding Surrey areas. Appointment only — open 7 days a week, 10am to 10pm. Call 07940 730537 to book.</p>
+                    <h1 class="logo">ONLINE<span>FIX</span></h1>
+                    <p class="tagline">PHONE, LAPTOP, PC &amp; CONSOLE REPAIR — GUILDFORD, SURREY</p>
+                    <p class="hero-description">Same-day repairs, 90-day warranty, no fix no fee. Trusted by 150+ 5-star customers across Guildford &amp; Surrey.</p>
                     <div>
                         <a href="tel:+447940730537" class="cta-button">
                             CALL NOW
