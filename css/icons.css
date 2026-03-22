@@ -1,0 +1,101 @@
+/* OnlineFix Icon System — Minimal Font Awesome 6.4.0 subset
+   Only includes the ~55 icons actually used across the site.
+   Replaces all.min.css (80KB) with ~3KB. */
+
+/* Font Faces — with font-display: swap for performance */
+@font-face {
+    font-family: 'Font Awesome 6 Free';
+    font-style: normal;
+    font-weight: 900;
+    font-display: swap;
+    src: url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-solid-900.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Font Awesome 6 Brands';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-brands-400.woff2') format('woff2');
+}
+
+/* Base icon styles */
+.fas, .fab,
+.fa-solid, .fa-brands {
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    display: inline-block;
+    font-style: normal;
+    font-variant: normal;
+    line-height: 1;
+    text-rendering: auto;
+}
+
+.fas, .fa-solid {
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+}
+
+.fab, .fa-brands {
+    font-family: 'Font Awesome 6 Brands';
+    font-weight: 400;
+}
+
+/* Solid icons (fas) */
+.fa-bars::before { content: "\f0c9"; }
+.fa-battery-quarter::before { content: "\f243"; }
+.fa-bolt::before { content: "\f0e7"; }
+.fa-calendar-check::before { content: "\f274"; }
+.fa-camera::before { content: "\f030"; }
+.fa-car::before { content: "\f1b9"; }
+.fa-certificate::before { content: "\f0a3"; }
+.fa-clock::before { content: "\f017"; }
+.fa-cog::before { content: "\f013"; }
+.fa-compact-disc::before { content: "\f51f"; }
+.fa-desktop::before { content: "\f108"; }
+.fa-diamond-turn-right::before { content: "\f5eb"; }
+.fa-envelope::before { content: "\f0e0"; }
+.fa-exclamation-triangle::before { content: "\f071"; }
+.fa-gamepad::before { content: "\f11b"; }
+.fa-handshake::before { content: "\f2b5"; }
+.fa-hdd::before { content: "\f0a0"; }
+.fa-heart::before { content: "\f004"; }
+.fa-home::before { content: "\f015"; }
+.fa-keyboard::before { content: "\f11c"; }
+.fa-laptop::before { content: "\f109"; }
+.fa-lock::before { content: "\f023"; }
+.fa-map-marked-alt::before { content: "\f5a0"; }
+.fa-map-marker-alt::before { content: "\f3c5"; }
+.fa-memory::before { content: "\f538"; }
+.fa-microchip::before { content: "\f2db"; }
+.fa-mobile-alt::before { content: "\f3cd"; }
+.fa-paper-plane::before { content: "\f1d8"; }
+.fa-phone::before { content: "\f095"; }
+.fa-phone-alt::before { content: "\f879"; }
+.fa-plug::before { content: "\f1e6"; }
+.fa-pound-sign::before { content: "\f154"; }
+.fa-power-off::before { content: "\f011"; }
+.fa-server::before { content: "\f233"; }
+.fa-shield-alt::before { content: "\f3ed"; }
+.fa-star::before { content: "\f005"; }
+.fa-tablet-alt::before { content: "\f3fa"; }
+.fa-temperature-high::before { content: "\f769"; }
+.fa-th-large::before { content: "\f009"; }
+.fa-thermometer-full::before { content: "\f2c7"; }
+.fa-tint::before { content: "\f043"; }
+.fa-tools::before { content: "\f7d9"; }
+.fa-trash-restore::before { content: "\f829"; }
+.fa-tv::before { content: "\f26c"; }
+.fa-user-cog::before { content: "\f4fe"; }
+.fa-volume-up::before { content: "\f028"; }
+.fa-wrench::before { content: "\f0ad"; }
+
+/* Brand icons (fab) */
+.fa-android::before { content: "\f17b"; }
+.fa-apple::before { content: "\f179"; }
+.fa-google::before { content: "\f1a0"; }
+.fa-instagram::before { content: "\f16d"; }
+.fa-tiktok::before { content: "\e07b"; }
+.fa-usb::before { content: "\f287"; }
+.fa-whatsapp::before { content: "\f232"; }
+.fa-windows::before { content: "\f17a"; }
