@@ -107,7 +107,7 @@ body {
     }
 
     50% {
-        opacity: 0.5;
+        opacity: 0.85;
         transform: translateX(5px);
     }
 }
@@ -280,7 +280,7 @@ body {
 /* Ensure subtitle contrast on both dark and light backgrounds */
 .process-section .section-subtitle {
     color: inherit;
-    opacity: 0.7;
+    opacity: 0.85;
 }
 
 /* PAGE HEADER (shared on all sub-pages) */
