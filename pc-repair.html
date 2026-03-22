@@ -8,7 +8,6 @@
 
     <!-- Security & Privacy -->
     <meta name="referrer" content="strict-origin-when-cross-origin">
-    <meta http-equiv="X-Frame-Options" content="DENY">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
 
     <!-- SEO Meta Tags - PC REPAIR LANDING PAGE -->
@@ -378,7 +377,8 @@
     }
     </script>
 
-    <link rel="stylesheet" href="/css/core.css">
+    <link rel="preload" href="/css/core.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/css/core.css"></noscript>
     <style>
         html {
             overflow-x: hidden;
@@ -1603,8 +1603,8 @@
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-column">
-                    <h4>ONLINEFIX</h4>
-                    <p style="font-family: monospace; color: #999;">Expert electronics &amp; PC repair in Guildford.
+                    <p class="footer-heading">ONLINEFIX</p>
+                    <p style="font-family: monospace; color: #ccc;">Expert electronics &amp; PC repair in Guildford.
                         Trusted, fast, and reliable service by Tomas.</p>
                     <div class="social-links" style="margin-top: 1rem; font-size: 1.5rem;">
                         <a href="https://www.instagram.com/onlinefixrepairs" target="_blank" rel="noopener noreferrer"
@@ -1616,7 +1616,7 @@
                     </div>
                 </div>
                 <div class="footer-column">
-                    <h4>LINKS</h4>
+                    <p class="footer-heading">LINKS</p>
                     <ul class="footer-links">
                         <li><a href="/">Home</a></li>
                         <li><a href="services.html">Services</a></li>
@@ -1633,12 +1633,12 @@
                     </ul>
                 </div>
                 <div class="footer-column">
-                    <h4>CONTACT</h4>
+                    <p class="footer-heading">CONTACT</p>
                     <ul class="footer-links">
                         <li><a href="tel:+447940730537">07940 730537</a></li>
                         <li><a href="mailto:hello@onlinefix.uk">hello@onlinefix.uk</a></li>
                         <li>GUILDFORD, SURREY</li>
-                        <li style="margin-top: 1rem; color: #999;">MON-SUN: 10AM - 10PM</li>
+                        <li style="margin-top: 1rem; color: #ccc;">MON-SUN: 10AM - 10PM</li>
                     </ul>
                 </div>
             </div>
