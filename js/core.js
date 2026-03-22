@@ -78,7 +78,8 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Mobile scroll nudge (for pages with horizontal-scrolling grids)
-if (window.innerWidth < 768) {
+// Use matchMedia instead of innerWidth to avoid forced reflow
+if (window.matchMedia('(max-width: 767px)').matches) {
     document.addEventListener('DOMContentLoaded', () => {
         const scrollGrids = document.querySelectorAll('[data-scroll-nudge]');
         if (scrollGrids.length === 0) return;

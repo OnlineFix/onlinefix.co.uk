@@ -54,9 +54,12 @@
         var banner = document.getElementById('cookie-banner');
         if (banner) {
             banner.style.display = 'block';
-            // Force reflow before adding class so transition works
-            banner.offsetHeight;
-            banner.classList.add('visible');
+            // Use rAF to trigger transition without forced reflow
+            requestAnimationFrame(function () {
+                requestAnimationFrame(function () {
+                    banner.classList.add('visible');
+                });
+            });
         }
     }
 
