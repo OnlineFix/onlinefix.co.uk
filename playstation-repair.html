@@ -150,7 +150,7 @@
 
         .consoles-grid {
             display: grid;
-            grid-template-columns: repeat(6, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 0;
             border: 2px solid var(--hex-black);
         }
@@ -179,17 +179,10 @@
 
         @media (hover: hover) {
         .console-item:hover {
-                background: var(--hazard-stripe);
+                background: var(--hex-concrete);
             }
-        .console-item:hover .console-icon,
-            .console-item:hover .console-name {
-                background: var(--hex-white);
-                color: var(--hex-black);
-                box-shadow: 4px 4px 0 var(--hex-black);
-                padding: 4px 8px;
-                display: inline-block;
-                position: relative;
-                z-index: 2;
+        .console-item:hover .console-icon {
+                color: var(--hex-accent);
             }
     }
 
@@ -241,28 +234,12 @@
 
         @media (hover: hover) {
         .issue-card:hover {
-                background: var(--hazard-stripe);
-                transform: translateY(-5px);
-                box-shadow: 8px 8px 0 #000;
-            }
-        .issue-card:hover .issue-title,
-            .issue-card:hover .issue-description,
-            .issue-card:hover .issue-symptoms li,
-            .issue-card:hover .issue-price {
-                background: var(--hex-white);
-                color: var(--hex-black);
-                box-shadow: 4px 4px 0 var(--hex-black);
-                padding: 2px 5px;
-                display: inline-block;
-                position: relative;
-                z-index: 2;
+                background: var(--hex-concrete);
+                transform: translateY(-3px);
+                box-shadow: 6px 6px 0 rgba(0,0,0,0.15);
             }
         .issue-card:hover .issue-icon {
-                color: var(--hex-white);
-                background: var(--hex-black);
-                padding: 10px;
-                display: inline-block;
-                box-shadow: 4px 4px 0 var(--hex-white);
+                color: var(--hex-accent);
             }
     }
 
@@ -674,7 +651,7 @@
         .console-item:nth-child(2n) {
                 border-right: none;
             }
-        .console-item:nth-child(n+5) {
+        .console-item:nth-child(n+3) {
                 border-bottom: none;
             }
         .console-icon {
