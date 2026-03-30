@@ -86,6 +86,9 @@
     // Expose functions globally for button onclick handlers
     window.cookieConsentAccept = acceptAll;
     window.cookieConsentReject = rejectNonEssential;
+    window.cookieManage = function () {
+        showBanner();
+    };
 
     // Initialise on DOM ready
     function init() {
