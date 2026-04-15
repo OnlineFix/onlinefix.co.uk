@@ -539,6 +539,30 @@ a[aria-label] > i[class*="fa-"]:only-child,
     text-decoration: underline;
 }
 
+/* PWA install button — only visible when the browser fires beforeinstallprompt.
+   Kept subtle: outline style, monospace, matches the footer aesthetic. */
+.install-app-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    background: transparent;
+    border: 1px solid #555;
+    color: #ccc;
+    font-family: monospace;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    cursor: pointer;
+    min-height: 44px;
+}
+
+.install-app-btn:hover,
+.install-app-btn:focus-visible {
+    color: var(--hex-white);
+    border-color: var(--hex-white);
+}
+
 .google-btn {
     border: 1px solid var(--hex-black);
     padding: 1rem 2rem;
