@@ -1,0 +1,52 @@
+name: Sync Google Business Profile reviews
+
+# Pulls the latest rating + review count from the Places API (New) and
+# writes it into every aggregateRating JSON-LD block in the repo, so the
+# stars Google shows in SERP stay in lockstep with the real GBP numbers.
+#
+# Required repo secrets (Settings → Secrets and variables → Actions):
+#   GOOGLE_PLACES_API_KEY  - Places API (New) key, Places API enabled
+#   GOOGLE_PLACE_ID        - Canonical Place ID (starts with "ChIJ...")
+#                            Find it: https://developers.google.com/maps/documentation/places/web-service/place-id
+
+on:
+  schedule:
+    # Daily at 04:00 UTC (low-traffic window). GitHub may delay scheduled
+    # runs on busy periods — that's fine, we're not time-critical.
+    - cron: '0 4 * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-gbp-reviews
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run sync script
+        env:
+          GOOGLE_PLACES_API_KEY: ${{ secrets.GOOGLE_PLACES_API_KEY }}
+          GOOGLE_PLACE_ID: ${{ secrets.GOOGLE_PLACE_ID }}
+        run: node scripts/sync-gbp-reviews.mjs
+
+      - name: Commit changes
+        run: |
+          if [[ -z "$(git status --porcelain)" ]]; then
+            echo "No changes — GBP numbers already in sync."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Sync aggregateRating from Google Business Profile"
+          git push

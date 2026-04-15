@@ -29,3 +29,13 @@
 
 /favicon*
   Cache-Control: public, max-age=31536000, immutable
+
+# Service worker — must refresh quickly so clients pick up new cache versions
+/sw.js
+  Cache-Control: public, max-age=0, must-revalidate
+  Service-Worker-Allowed: /
+
+# Web app manifest — short cache, explicit content-type
+/manifest.webmanifest
+  Content-Type: application/manifest+json; charset=utf-8
+  Cache-Control: public, max-age=3600, must-revalidate

@@ -77,6 +77,44 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+// Service Worker registration — PWA / offline shell
+// Registered after load so it never competes with LCP.
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(() => {
+            // Silently ignore — SW is a progressive enhancement
+        });
+    });
+}
+
+// PWA install prompt — surface an "Install app" button when the browser offers one.
+// Buttons with [data-install-app] opt in to this behaviour; if none exist, we do nothing.
+let deferredInstallPrompt = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredInstallPrompt = e;
+    document.querySelectorAll('[data-install-app]').forEach((btn) => {
+        btn.hidden = false;
+        btn.setAttribute('aria-hidden', 'false');
+    });
+});
+
+document.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-install-app]');
+    if (!btn || !deferredInstallPrompt) return;
+    e.preventDefault();
+    deferredInstallPrompt.prompt();
+    deferredInstallPrompt.userChoice.finally(() => {
+        deferredInstallPrompt = null;
+        document.querySelectorAll('[data-install-app]').forEach((b) => { b.hidden = true; });
+    });
+});
+
+window.addEventListener('appinstalled', () => {
+    deferredInstallPrompt = null;
+    document.querySelectorAll('[data-install-app]').forEach((b) => { b.hidden = true; });
+});
+
 // Mobile scroll nudge (for pages with horizontal-scrolling grids)
 // Use matchMedia instead of innerWidth to avoid forced reflow
 if (window.matchMedia('(max-width: 767px)').matches) {

@@ -56,6 +56,14 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon-180x180.png">
     <link rel="shortcut icon" href="/favicon.ico">
 
+    <!-- PWA / Installable -->
+    <link rel="manifest" href="/manifest.webmanifest">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="OnlineFix">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="application-name" content="OnlineFix">
+
     <!-- Performance: DNS Prefetch and Preconnect -->
     <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
@@ -242,6 +250,13 @@
                                 "availability": "https://schema.org/InStock"
                         }
                 ]
+        },
+        "aggregateRating": {
+                "@type": "AggregateRating",
+                "ratingValue": "5.0",
+                "reviewCount": "150",
+                "bestRating": "5",
+                "worstRating": "1"
         }
 }
     </script>
