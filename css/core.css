@@ -30,6 +30,8 @@
 
 html {
     scroll-behavior: smooth;
+    /* WCAG 2.2 - 2.4.11 Focus Not Obscured: keep anchor/focus targets clear of the 60px sticky navbar */
+    scroll-padding-top: 80px;
 }
 
 * {
@@ -68,14 +70,37 @@ body {
     top: 0;
 }
 
-/* ACCESSIBILITY: Focus Indicators */
+/* ACCESSIBILITY: Focus Indicators (WCAG 2.2 - 2.4.7 + 2.4.11) */
 :focus-visible {
     outline: 3px solid var(--hex-accent);
     outline-offset: 2px;
+    /* Inner white halo so the outline stays visible on both light and dark backgrounds */
+    box-shadow: 0 0 0 5px var(--hex-white);
+}
+
+/* Forced-colors (Windows high-contrast) mode: fall back to system colours */
+@media (forced-colors: active) {
+    :focus-visible {
+        outline: 3px solid CanvasText;
+        box-shadow: none;
+    }
 }
 
 * {
     -webkit-tap-highlight-color: transparent;
+}
+
+/* WCAG 2.2 - 2.5.8 Target Size (Minimum): 24×24 CSS px for interactive controls.
+   Inline icon links (footer socials, inline links wrapping <i>) can be smaller than
+   this without explicit sizing — guarantee the minimum clickable area. */
+a[aria-label] > i[class*="fa-"]:only-child,
+.footer a[aria-label],
+.social-links a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 24px;
+    min-height: 24px;
 }
 
 /* UTILITY */

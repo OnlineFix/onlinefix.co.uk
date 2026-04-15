@@ -1,0 +1,60 @@
+{
+    "name": "OnlineFix — Electronics Repair Guildford",
+    "short_name": "OnlineFix",
+    "id": "/?pwa=1",
+    "start_url": "/?utm_source=pwa",
+    "scope": "/",
+    "display": "standalone",
+    "display_override": ["standalone", "minimal-ui", "browser"],
+    "orientation": "portrait",
+    "theme_color": "#0033FF",
+    "background_color": "#F2F2F2",
+    "lang": "en-GB",
+    "dir": "ltr",
+    "categories": ["utilities", "business", "productivity"],
+    "description": "Professional electronics repair in Guildford, Surrey. Phone, laptop, tablet, console and PC repair with same-day service and 90-day warranty.",
+    "icons": [
+        {
+            "src": "/favicon-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/favicon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/favicon-180x180.png",
+            "sizes": "180x180",
+            "type": "image/png",
+            "purpose": "any"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "Book a Repair",
+            "short_name": "Book",
+            "description": "Contact us to arrange a repair",
+            "url": "/contact.html?utm_source=pwa_shortcut",
+            "icons": [{ "src": "/favicon-192x192.png", "sizes": "192x192" }]
+        },
+        {
+            "name": "Track Repair",
+            "short_name": "Track",
+            "description": "Track your repair status",
+            "url": "/track/?utm_source=pwa_shortcut",
+            "icons": [{ "src": "/favicon-192x192.png", "sizes": "192x192" }]
+        },
+        {
+            "name": "Reviews",
+            "short_name": "Reviews",
+            "description": "Read customer reviews",
+            "url": "/reviews.html?utm_source=pwa_shortcut",
+            "icons": [{ "src": "/favicon-192x192.png", "sizes": "192x192" }]
+        }
+    ],
+    "prefer_related_applications": false
+}
