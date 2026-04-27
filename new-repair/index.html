@@ -867,7 +867,9 @@
             const photoItem = document.createElement('div');
             photoItem.className = 'photo-item';
 
-            const photoId = 'photo_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            const photoSuffixBytes = new Uint8Array(8);
+            crypto.getRandomValues(photoSuffixBytes);
+            const photoId = 'photo_' + Date.now() + '_' + Array.from(photoSuffixBytes, b => b.toString(16).padStart(2, '0')).join('');
             photoItem.innerHTML = `
                 <img src="${escapeHTML(src)}" alt="Device photo">
                 <button type="button" class="photo-remove" onclick="removePhoto('${escapeHTML(photoId)}')">×</button>
@@ -924,10 +926,12 @@
                 const formData = new FormData(document.getElementById('repair-form'));
                 const data = Object.fromEntries(formData);
 
-                // Generate repair ID
-                const randomPart = crypto.getRandomValues(new Uint32Array(1))[0].toString(36).toUpperCase();
-                const timePart = Date.now().toString(36).slice(-4).toUpperCase();
-                const repairId = 'REP_' + timePart + randomPart.slice(0, 4);
+                // Generate repair ID. The ID is the only access token guarding
+                // ticket data (see firestore.rules / storage.rules), so it must be
+                // unguessable: 128 bits of CSPRNG output rendered as 32 hex chars.
+                const idBytes = new Uint8Array(16);
+                crypto.getRandomValues(idBytes);
+                const repairId = 'REP_' + Array.from(idBytes, b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
 
                 // Upload photos if any
                 const photoUrls = [];
