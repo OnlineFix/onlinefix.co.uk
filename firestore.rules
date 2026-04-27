@@ -2,9 +2,15 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // Admin access is granted via a custom claim (admin == true) set with the
+    // Firebase Admin SDK, with the email allow-list kept as a transitional
+    // fallback. Once the custom claim is provisioned on the admin account,
+    // remove the email branch so admin status no longer depends on a
+    // user-controllable token field.
     function isAdmin() {
       return request.auth != null
-        && request.auth.token.email in ['onlinerepairbooking@gmail.com'];
+        && (request.auth.token.admin == true
+            || request.auth.token.email in ['onlinerepairbooking@gmail.com']);
     }
 
     match /repairs/{repairDoc} {
