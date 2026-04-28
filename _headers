@@ -1,6 +1,12 @@
 # HTTP Security Headers
 # Works with: Cloudflare Pages, Netlify
 # For GitHub Pages: configure via Cloudflare proxy Transform Rules
+#
+# NOTE: Production onlinefix.co.uk serves Content-Security-Policy from a
+# Cloudflare Transform Rule on the zone, which overrides this file. When
+# updating CSP, edit BOTH this file AND the Transform Rule (Cloudflare
+# dashboard -> onlinefix.co.uk zone -> Rules -> Transform Rules ->
+# Modify Response Header), or the change will not reach production.
 
 /*
   X-Frame-Options: DENY
