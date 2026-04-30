@@ -15,7 +15,6 @@
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-check-compat.js"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"
         integrity="sha512-fD9DI5bZwQxOi7MhYWnnNPlvXdp/2Pj3XSTRrFs5FQa4mizyGLnJcN6tuvUS6LbmgN1ut+XGSABKvjN0H6Aoow=="
@@ -877,10 +876,15 @@
             appId: "1:382934797751:web:5ac8a9c87d68a17b4cec32"
         };
 
-        // Initialize Firebase
+        // Initialize Firebase. App Check intentionally not used here:
+        // the tracking page is a single-doc lookup by an unguessable
+        // random repair ID, and firestore.rules already restricts public
+        // list queries to limit <= 1. App Check kept tripping the
+        // production CSP (no www.google.com/recaptcha.net in connect-src
+        // from the Cloudflare Transform Rule), then getting throttled
+        // for 24h, which broke every customer tracking link. See
+        // commit 9aa300b for the same fix on admin/index.html.
         firebase.initializeApp(firebaseConfig);
-        const appCheck = firebase.appCheck();
-        appCheck.activate(new firebase.appCheck.ReCaptchaEnterpriseProvider('6LdZJRIsAAAAAOx4EZqupxMVvX4B3u3YlK5ez-3r'), true);
         const db = firebase.firestore();
 
         // Status definitions
