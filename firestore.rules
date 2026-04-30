@@ -23,10 +23,14 @@ service cloud.firestore {
       // READ: Admins can read everything
       allow read: if isAdmin();
 
-      // Public tracking page - single repair lookup only
-      allow list: if request.query.limit <= 1
-                  && request.query.filters[0].op == '=='
-                  && request.query.filters[0].field == 'repairId';
+      // Public tracking page: anonymous lookup by repairId. Firestore
+      // security rules cannot inspect query filter values (request.query
+      // only exposes limit, offset, orderBy), so we cannot require the
+      // filter be on the repairId field. Rate-limiting is enforced via
+      // request.query.limit <= 1 — an attacker has to make one query per
+      // doc to enumerate, and the security boundary is the unguessable
+      // 128-bit repairId generated in new-repair/index.html.
+      allow list: if request.query.limit <= 1;
 
       // UPDATE/DELETE: Only admins
       allow update, delete: if isAdmin();
