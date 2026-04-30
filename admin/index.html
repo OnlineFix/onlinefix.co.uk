@@ -240,9 +240,16 @@
         /* Stats Cards */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(4, 1fr);
             gap: 1.5rem;
             margin-bottom: 2rem;
+        }
+
+        /* Drop to 2x2 on tablets where four 250px cards no longer fit. */
+        @media (max-width: 1100px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
 
         .stat-card {
@@ -2813,11 +2820,16 @@
                         ${repair.progress && repair.progress.length > 0 ? `
                             <div style="background: var(--bg-surface); border: 1px solid var(--border-color); padding: 1.5rem; border-radius: var(--radius-lg); margin-bottom: 2rem;">
                                 <h3 style="color: var(--text-main); margin-bottom: 1rem;">Progress History</h3>
-                                ${repair.progress.map(p => `
+                                ${repair.progress.map((p, i) => `
                                     <div style="padding: 1rem; background: var(--bg-base); border: 1px solid var(--border-color); border-radius: var(--radius-md); margin-bottom: 1rem;">
-                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; gap: 0.5rem;">
                                             <strong style="color: var(--text-main);">${escapeHTML(statusConfig[p.status]?.label || p.status)}</strong>
-                                            <small style="color: var(--text-muted);">${p.timestamp ? new Date(p.timestamp.seconds * 1000).toLocaleString('en-GB') : 'N/A'}</small>
+                                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                                <small style="color: var(--text-muted);">${p.timestamp ? new Date(p.timestamp.seconds * 1000).toLocaleString('en-GB') : 'N/A'}</small>
+                                                <button class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;" onclick="removeProgressEntry('${escapeJSStr(repairId)}', ${i})" title="Remove this status entry">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
                                         </div>
                                         ${p.notes ? `<p style="color: var(--text-muted); margin: 0;">${escapeHTML(p.notes)}</p>` : ''}
                                         ${p.technician ? `<p style="color: var(--text-dark); font-size: 0.9rem; margin: 0.5rem 0 0 0;">By: ${escapeHTML(p.technician)}</p>` : ''}
@@ -2843,6 +2855,32 @@
                 </div>
             `;
             document.body.appendChild(modal);
+        }
+
+        // Remove a single entry from a repair's progress history.
+        // Index-based so the snapshotted Timestamp doesn't have to round-trip
+        // through arrayRemove, which compares by deep-equality.
+        async function removeProgressEntry(repairId, index) {
+            const repair = allRepairs.find(r => r.id === repairId);
+            if (!repair || !Array.isArray(repair.progress) || !repair.progress[index]) return;
+
+            const entry = repair.progress[index];
+            const label = statusConfig[entry.status]?.label || entry.status;
+            if (!confirm(`Remove the "${label}" entry from this repair's history?`)) return;
+
+            try {
+                const newProgress = repair.progress.slice();
+                newProgress.splice(index, 1);
+                await db.collection('repairs').doc(repairId).update({ progress: newProgress });
+                showAlert('Status entry removed', 'success');
+
+                // Re-open the view modal so it shows the updated history.
+                const modal = document.querySelector('.modal.show');
+                if (modal) modal.remove();
+                viewRepair(repairId);
+            } catch (error) {
+                showAlert('Error removing entry: ' + error.message, 'error');
+            }
         }
 
         // Edit repair - show status update modal
