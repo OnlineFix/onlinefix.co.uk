@@ -1908,8 +1908,15 @@
 </head>
 
 <body>
+    <!-- Auth loading splash (shown until Firebase resolves persisted session) -->
+    <div id="auth-loading" style="position: fixed; inset: 0; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(circle at center, var(--bg-surface), var(--bg-base));">
+        <div class="logo" style="font-size: 2rem; margin-bottom: 1rem; letter-spacing: -1px;">OnlineFix</div>
+        <div style="width: 36px; height: 36px; border: 3px solid var(--border-color); border-top-color: var(--primary-cyan, #00E4FF); border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+        <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+    </div>
+
     <!-- Login Screen -->
-    <div id="login-screen">
+    <div id="login-screen" class="hidden">
         <div
             style="min-height: 100vh; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at center, var(--bg-surface), var(--bg-base)); position: relative; overflow: hidden;">
             <!-- Subtle background elements -->
@@ -2023,7 +2030,7 @@
             <!-- Overview Section -->
             <div id="overview-section" class="content-section">
                 <!-- Stats -->
-                <div class="stats-grid">
+                <div class="stats-grid" id="overview-stats-grid">
                     <div class="stat-card clickable" onclick="showSection('repairs'); document.getElementById('status-filter').value=''; document.getElementById('common-repair-filter').value=''; loadAllRepairs();" title="View all repairs">
                         <div class="stat-icon" style="background: var(--primary-blue);">
                             <i class="fas fa-tools"></i>
@@ -2051,6 +2058,19 @@
                         </div>
                         <div class="stat-number" id="total-customers">0</div>
                         <div class="stat-label">Total Customers</div>
+                    </div>
+                </div>
+
+                <!-- Workflow Kanban (at-a-glance) -->
+                <div class="recent-repairs-section" style="margin-bottom: 1.5rem;">
+                    <div class="section-header">
+                        <h2 class="section-title">Workflow</h2>
+                        <button class="btn btn-secondary" onclick="showSection('kanban')">Open Kanban</button>
+                    </div>
+                    <div class="section-content" style="padding: 0.75rem;">
+                        <div class="kanban-container" id="overview-kanban-container">
+                            <!-- Populated by JS -->
+                        </div>
                     </div>
                 </div>
 
@@ -2360,6 +2380,12 @@
         const auth = firebase.auth();
         const storage = firebase.storage();
 
+        // Persist auth across reloads/navigations so users don't have to re-login
+        // when bouncing between admin pages or refreshing.
+        auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch((err) => {
+            console.warn('Auth persistence set failed:', err);
+        });
+
         // Global variables
         let currentUser = null;
         let allRepairs = [];
@@ -2412,6 +2438,10 @@
 
         // Authentication state observer
         auth.onAuthStateChanged((user) => {
+            // Hide loading splash once Firebase has resolved persisted session.
+            const splash = document.getElementById('auth-loading');
+            if (splash) splash.style.display = 'none';
+
             if (user) {
                 currentUser = user;
                 document.getElementById('user-email').textContent = user.email;
@@ -2517,8 +2547,9 @@
             } else if (sectionName === 'overview') {
                 updateStats();
                 loadRecentRepairs();
+                renderKanban('overview-kanban-container');
             } else if (sectionName === 'kanban') {
-                renderKanban();
+                renderKanban('kanban-container');
             } else if (sectionName === 'analytics') {
                 renderAnalytics();
             }
@@ -2544,6 +2575,15 @@
                 updateStats();
                 loadRecentRepairs();
                 loadAllRepairs();
+
+                // Re-render any visible kanban so drag-drop and status changes
+                // reflect immediately without manual section switching.
+                if (document.getElementById('overview-kanban-container')?.offsetParent) {
+                    renderKanban('overview-kanban-container');
+                }
+                if (document.getElementById('kanban-container')?.offsetParent) {
+                    renderKanban('kanban-container');
+                }
 
                 document.getElementById('loading').style.display = 'none';
             }, (error) => {
@@ -3366,8 +3406,9 @@
         }
 
         // === KANBAN BOARD ===
-        function renderKanban() {
-            const container = document.getElementById('kanban-container');
+        function renderKanban(containerId = 'kanban-container') {
+            const container = document.getElementById(containerId);
+            if (!container) return;
             const columns = ['received', 'diagnosing', 'waiting-parts', 'in-repair', 'testing', 'ready'];
 
             container.innerHTML = columns.map(status => {
