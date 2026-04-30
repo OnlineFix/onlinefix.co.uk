@@ -2460,6 +2460,12 @@
 
             try {
                 await auth.signInWithEmailAndPassword(email, password);
+                // Force ID token refresh so any newly-set custom claims
+                // (e.g. {admin: true} from set-admin-claim.mjs) are picked
+                // up immediately, instead of after a stale-token expiry.
+                if (auth.currentUser) {
+                    try { await auth.currentUser.getIdToken(true); } catch (_) {}
+                }
             } catch (error) {
                 showLoginError(error.message);
             }
