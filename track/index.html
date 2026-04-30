@@ -950,8 +950,13 @@
         // Load repair data
         async function loadRepairData(repairId) {
             try {
-                // Query by repairId field instead of document ID
-                const querySnapshot = await db.collection('repairs').where('repairId', '==', repairId).get();
+                // Query by repairId field instead of document ID.
+                // .limit(1) is required: firestore.rules allows public list
+                // queries only when request.query.limit <= 1.
+                const querySnapshot = await db.collection('repairs')
+                    .where('repairId', '==', repairId)
+                    .limit(1)
+                    .get();
 
                 if (querySnapshot.empty) {
                     showError();
