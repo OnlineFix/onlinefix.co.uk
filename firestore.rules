@@ -36,6 +36,53 @@ service cloud.firestore {
       allow update, delete: if isAdmin();
     }
 
+    // Public booking requests. Anyone can submit one (the page is the
+    // public-facing /book/ form), but reads and mutations are admin-only.
+    // App Check + the validation below are the only things between the
+    // open create endpoint and the database.
+    match /bookings/{bookingId} {
+
+      function isValidBookingCreate() {
+        let d = request.resource.data;
+        return d.status == 'pending'
+          && d.createdAt == request.time
+          && d.respondedAt == null
+          && d.linkedRepairId == null
+          && d.adminNotes == ''
+          && d.deleted == false
+          && d.tempId is string && d.tempId.size() > 0 && d.tempId.size() < 100
+          && d.customer.name is string && d.customer.name.size() > 0 && d.customer.name.size() < 100
+          && d.customer.email is string && d.customer.email.matches('.*@.*\\..*') && d.customer.email.size() < 200
+          && d.customer.phone is string && d.customer.phone.size() > 5 && d.customer.phone.size() < 30
+          && d.device.category in ['phone', 'laptop', 'console', 'tablet', 'desktop', 'other']
+          && d.device.brand is string && d.device.brand.size() < 50
+          && d.device.model is string && d.device.model.size() < 100
+          && d.issue is string && d.issue.size() > 0 && d.issue.size() < 1000
+          && d.preferredAt is timestamp
+          && d.photos is list && d.photos.size() <= 3
+          && d.photoPaths is list && d.photoPaths.size() <= 3;
+      }
+
+      allow create: if isValidBookingCreate();
+      allow read, update, delete: if isAdmin();
+    }
+
+    // Availability settings (working hours, blocked dates). Public read so
+    // the booking form can disable unavailable slots; admin write only.
+    match /availability/{document} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Mail collection consumed by the "Trigger Email from Firestore"
+    // extension. The extension uses the Admin SDK and bypasses rules
+    // entirely; these rules just keep direct client access locked down.
+    // The Cloud Function that fires on bookings/{id} create also writes
+    // here via Admin SDK so it is unaffected by these rules.
+    match /mail/{mailId} {
+      allow read, write: if isAdmin();
+    }
+
     // Block everything else
     match /{document=**} {
       allow read, write: if false;
