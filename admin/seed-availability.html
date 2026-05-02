@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com https://www.gstatic.com https://cdnjs.cloudflare.com https://www.googletagmanager.com https://www.google.com https://www.recaptcha.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.firebasestorage.app https://firebasestorage.googleapis.com; connect-src 'self' https://cloudflareinsights.com https://*.googleapis.com https://*.firebaseio.com https://*.firebasestorage.app wss://*.firebaseio.com https://*.google-analytics.com https://www.google.com https://www.recaptcha.net; font-src 'self' data: https://cdnjs.cloudflare.com; frame-src https://www.google.com https://www.recaptcha.net; frame-ancestors 'none';">
+    <title>Seed Availability - OnlineFix Admin</title>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-base: #0B0E14;
+            --bg-surface: #151A23;
+            --bg-elevated: #1F2735;
+            --primary-blue: #0033FF;
+            --primary-glow: rgba(0, 51, 255, 0.4);
+            --accent-cyan: #00E4FF;
+            --text-main: #FFFFFF;
+            --text-muted: #94A3B8;
+            --text-dark: #64748B;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+            --radius-md: 12px;
+            --radius-lg: 20px;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            color: var(--text-main);
+            background: var(--bg-base);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+        }
+
+        .card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 560px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 0.4rem;
+        }
+
+        .sub {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+        }
+
+        label {
+            display: block;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin: 0.8rem 0 0.4rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input[type=email],
+        input[type=password] {
+            width: 100%;
+            padding: 0.85rem 1rem;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            color: var(--text-main);
+            font-size: 1rem;
+            font-family: inherit;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 0.9rem 1rem;
+            margin-top: 1rem;
+            border: none;
+            border-radius: var(--radius-md);
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.15s;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        button.primary {
+            background: var(--primary-blue);
+            color: var(--text-main);
+        }
+
+        button.secondary {
+            background: var(--bg-elevated);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+        }
+
+        button.danger {
+            background: var(--danger);
+            color: var(--text-main);
+        }
+
+        .status {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            border-radius: var(--radius-md);
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+            font-size: 0.85rem;
+            white-space: pre-wrap;
+            word-break: break-word;
+            border: 1px solid var(--border-color);
+            background: var(--bg-elevated);
+            display: none;
+        }
+
+        .status.show { display: block; }
+        .status.ok { border-color: var(--success); color: var(--success); }
+        .status.warn { border-color: var(--warning); color: var(--warning); }
+        .status.err { border-color: var(--danger); color: var(--danger); }
+
+        .signed-in {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .signed-in strong { color: var(--text-main); }
+
+        .footer-links {
+            margin-top: 1.5rem;
+            text-align: center;
+            font-size: 0.8rem;
+        }
+
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+        }
+
+        .footer-links a:hover { color: var(--text-main); }
+
+        .hidden { display: none !important; }
+
+        .checkbox-row {
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="card">
+        <h1>Seed Availability Defaults</h1>
+        <p class="sub">One-off helper to create the <code>availability/settings</code> document used by the booking page. Sign in with the admin account, then click Write Defaults.</p>
+
+        <!-- Login state -->
+        <div id="login-view">
+            <form id="login-form">
+                <label for="email">Email</label>
+                <input type="email" id="email" required autocomplete="email">
+                <label for="password">Password</label>
+                <input type="password" id="password" required autocomplete="current-password">
+                <button type="submit" class="primary" id="login-btn">Sign in</button>
+            </form>
+        </div>
+
+        <!-- Authenticated state -->
+        <div id="auth-view" class="hidden">
+            <div class="signed-in">Signed in as <strong id="user-email"></strong></div>
+
+            <button type="button" class="secondary" id="read-btn">Read Current Doc</button>
+            <button type="button" class="primary" id="seed-btn">Write Defaults</button>
+
+            <div class="checkbox-row">
+                <input type="checkbox" id="overwrite">
+                <label for="overwrite" style="margin: 0; text-transform: none; letter-spacing: 0;">Overwrite if doc already exists</label>
+            </div>
+
+            <button type="button" class="secondary" id="signout-btn" style="margin-top: 2rem;">Sign out</button>
+        </div>
+
+        <div id="status" class="status"></div>
+
+        <div class="footer-links">
+            <a href="/admin/">&larr; Back to admin dashboard</a>
+        </div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCKBlO4aHTVSjwyevg1OYZ0NWy3Y62HJuU",
+            authDomain: "onlinefix-repair.firebaseapp.com",
+            projectId: "onlinefix-repair",
+            storageBucket: "onlinefix-repair.firebasestorage.app",
+            messagingSenderId: "382934797751",
+            appId: "1:382934797751:web:5ac8a9c87d68a17b4cec32"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+        auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(() => {});
+
+        const $ = (id) => document.getElementById(id);
+
+        function showStatus(message, kind) {
+            const el = $('status');
+            el.className = 'status show' + (kind ? ' ' + kind : '');
+            el.textContent = message;
+        }
+
+        function clearStatus() {
+            $('status').className = 'status';
+            $('status').textContent = '';
+        }
+
+        const DEFAULTS = {
+            workingHours: {
+                mon: { open: '10:00', close: '18:00', closed: false },
+                tue: { open: '10:00', close: '18:00', closed: false },
+                wed: { open: '10:00', close: '18:00', closed: false },
+                thu: { open: '10:00', close: '18:00', closed: false },
+                fri: { open: '10:00', close: '18:00', closed: false },
+                sat: { open: '11:00', close: '16:00', closed: false },
+                sun: { open: '00:00', close: '00:00', closed: true }
+            },
+            blockedDates: [],
+            minNoticeHours: 4,
+            maxFutureDays: 60,
+            slotIntervalMinutes: 30
+        };
+
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                try { await user.getIdToken(true); } catch (_) {}
+                $('user-email').textContent = user.email || '(no email)';
+                $('login-view').classList.add('hidden');
+                $('auth-view').classList.remove('hidden');
+            } else {
+                $('login-view').classList.remove('hidden');
+                $('auth-view').classList.add('hidden');
+            }
+        });
+
+        $('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            clearStatus();
+            $('login-btn').disabled = true;
+            try {
+                await auth.signInWithEmailAndPassword($('email').value, $('password').value);
+            } catch (err) {
+                showStatus('Sign-in failed: ' + err.message, 'err');
+            } finally {
+                $('login-btn').disabled = false;
+            }
+        });
+
+        $('signout-btn').addEventListener('click', async () => {
+            await auth.signOut();
+            clearStatus();
+        });
+
+        $('read-btn').addEventListener('click', async () => {
+            clearStatus();
+            try {
+                const snap = await db.collection('availability').doc('settings').get();
+                if (!snap.exists) {
+                    showStatus('Doc does not exist yet. Click "Write Defaults" to create it.', 'warn');
+                    return;
+                }
+                const data = snap.data();
+                showStatus('Current availability/settings:\n\n' + JSON.stringify(data, null, 2), 'ok');
+            } catch (err) {
+                showStatus('Read failed: ' + err.message, 'err');
+            }
+        });
+
+        $('seed-btn').addEventListener('click', async () => {
+            clearStatus();
+            const overwrite = $('overwrite').checked;
+            $('seed-btn').disabled = true;
+            try {
+                const ref = db.collection('availability').doc('settings');
+                const snap = await ref.get();
+                if (snap.exists && !overwrite) {
+                    showStatus('Doc already exists. Tick "Overwrite" and click again to replace it, or click "Read Current Doc" to see what is there.', 'warn');
+                    return;
+                }
+                const payload = Object.assign({}, DEFAULTS, {
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                await ref.set(payload);
+                showStatus((snap.exists ? 'Overwrote' : 'Created') + ' availability/settings. You can close this page now.', 'ok');
+            } catch (err) {
+                showStatus('Write failed: ' + err.message + '\n\nCheck that the deployed Firestore rules include the availability/* match block, and that you are signed in with the admin account.', 'err');
+            } finally {
+                $('seed-btn').disabled = false;
+            }
+        });
+    </script>
+</body>
+
+</html>

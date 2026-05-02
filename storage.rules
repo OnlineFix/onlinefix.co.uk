@@ -18,6 +18,20 @@ service firebase.storage {
       allow read: if true;
     }
 
+    // Public booking photos. The /book/ page is open to anonymous visitors,
+    // so create must work without auth, but reads and deletes are gated to
+    // the admin account so customers can't enumerate other bookings'
+    // photos. App Check + the size/content-type checks are the only abuse
+    // controls on the create path.
+    match /bookings/{tempId}/{filename} {
+      allow create: if request.resource.size < 5 * 1024 * 1024
+                    && request.resource.contentType.matches('image/.*');
+
+      allow read, delete: if request.auth != null
+                          && (request.auth.token.admin == true
+                              || request.auth.token.email in ['onlinerepairbooking@gmail.com']);
+    }
+
     // Deny all other access
     match /{allPaths=**} {
       allow read, write: if false;
