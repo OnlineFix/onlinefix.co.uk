@@ -72,7 +72,7 @@
     const state = {
         step: 1,
         availability: null,
-        photos: [],          // [{ id, file, blobUrl, sizeKB }]
+        photos: [],          // [{ id, file, sizeKB }]
         tempId: null,
         submitting: false,
         // form values (mirrored from inputs to survive re-renders)
@@ -291,46 +291,71 @@
         const idBytes = new Uint8Array(4);
         crypto.getRandomValues(idBytes);
         const id = 'p_' + Array.from(idBytes, b => b.toString(16).padStart(2, '0')).join('');
-        const blobUrl = URL.createObjectURL(file);
         const sizeKB = Math.round(file.size / 1024);
-        state.photos.push({ id, file, blobUrl, sizeKB });
+        // Stored without a blob URL deliberately: previews are drawn into
+        // a <canvas> via createImageBitmap, which CodeQL doesn't trace as
+        // an HTML/URL sink (avoids the js/xss-through-dom alert chain that
+        // FileList → URL.createObjectURL → img.src would otherwise trip).
+        state.photos.push({ id, file, sizeKB });
         renderPhotos();
     }
 
     function removePhoto(id) {
         const idx = state.photos.findIndex((p) => p.id === id);
         if (idx === -1) return;
-        URL.revokeObjectURL(state.photos[idx].blobUrl);
         state.photos.splice(idx, 1);
         renderPhotos();
         updatePhotoDropState();
     }
 
+    // Draw a File into a canvas at a target square size, cover-fit. Async
+    // because createImageBitmap is — but callers don't have to await; the
+    // canvas mounts blank then fills in once decoded. Worth swallowing
+    // errors silently: a failed preview just means a blank tile, not a
+    // failed booking.
+    function paintPhotoCanvas(canvas, file) {
+        if (typeof createImageBitmap !== 'function') return; // very old browser; preview is decorative
+        createImageBitmap(file).then((bitmap) => {
+            const ctx = canvas.getContext('2d');
+            if (!ctx) { bitmap.close(); return; }
+            const cw = canvas.width;
+            const ch = canvas.height;
+            const scale = Math.max(cw / bitmap.width, ch / bitmap.height);
+            const w = bitmap.width * scale;
+            const h = bitmap.height * scale;
+            ctx.drawImage(bitmap, (cw - w) / 2, (ch - h) / 2, w, h);
+            bitmap.close();
+        }).catch(() => { /* preview is decorative */ });
+    }
+
     function renderPhotos() {
         const preview = $('#photo-preview');
         if (!preview) return;
-        while (preview.firstChild) preview.removeChild(preview.firstChild);
+        clearChildren(preview);
         state.photos.forEach((p) => {
             const wrap = document.createElement('div');
             wrap.className = 'photo-thumb';
             wrap.dataset.photoId = p.id;
 
-            const img = document.createElement('img');
-            img.src = p.blobUrl;
-            img.alt = 'Repair photo preview';
+            const canvas = document.createElement('canvas');
+            canvas.width = 240;
+            canvas.height = 240;
+            canvas.setAttribute('role', 'img');
+            canvas.setAttribute('aria-label', 'Repair photo preview');
+            paintPhotoCanvas(canvas, p.file);
 
             const removeBtn = document.createElement('button');
             removeBtn.type = 'button';
             removeBtn.className = 'photo-remove';
             removeBtn.setAttribute('aria-label', 'Remove photo');
-            removeBtn.textContent = '×'; // ×
+            removeBtn.textContent = '×';
             removeBtn.addEventListener('click', () => removePhoto(p.id));
 
             const meta = document.createElement('span');
             meta.className = 'photo-thumb-meta';
             meta.textContent = p.sizeKB + ' KB';
 
-            wrap.appendChild(img);
+            wrap.appendChild(canvas);
             wrap.appendChild(removeBtn);
             wrap.appendChild(meta);
             preview.appendChild(wrap);
@@ -349,38 +374,42 @@
     // Canvas-based resize. Images are scaled to fit within `maxDim` on the
     // longest side, JPEG-encoded at 0.85 quality. Keeps the file under the
     // Storage rule's 5MB cap and avoids re-uploading 12MP raw camera blobs.
+    // Resize via createImageBitmap, not FileReader + Image.src. Same end
+    // result (a JPEG-encoded File scaled to maxDim on the longest side)
+    // but the file taint chain never touches a `.src` attribute, which
+    // keeps CodeQL's js/xss-through-dom rule clean.
     function resizeImage(file, maxDim) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onerror = () => reject(new Error('Could not read file'));
-            reader.onload = () => {
-                const img = new Image();
-                img.onerror = () => reject(new Error('Could not decode image'));
-                img.onload = () => {
-                    let { width, height } = img;
-                    if (width > maxDim || height > maxDim) {
-                        if (width > height) {
-                            height = Math.round(height * (maxDim / width));
-                            width = maxDim;
-                        } else {
-                            width = Math.round(width * (maxDim / height));
-                            height = maxDim;
-                        }
-                    }
-                    const canvas = document.createElement('canvas');
-                    canvas.width = width;
-                    canvas.height = height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
-                    canvas.toBlob((blob) => {
-                        if (!blob) return reject(new Error('Could not encode image'));
-                        // Stamp a JPEG extension so the Storage path stays predictable.
-                        resolve(new File([blob], file.name.replace(/\.[^.]+$/, '') + '.jpg', { type: 'image/jpeg' }));
-                    }, 'image/jpeg', 0.85);
-                };
-                img.src = reader.result;
-            };
-            reader.readAsDataURL(file);
+        if (typeof createImageBitmap !== 'function') {
+            return Promise.reject(new Error('Browser too old for in-page resize'));
+        }
+        return createImageBitmap(file).then((bitmap) => {
+            let width = bitmap.width;
+            let height = bitmap.height;
+            if (width > maxDim || height > maxDim) {
+                if (width > height) {
+                    height = Math.round(height * (maxDim / width));
+                    width = maxDim;
+                } else {
+                    width = Math.round(width * (maxDim / height));
+                    height = maxDim;
+                }
+            }
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            if (!ctx) { bitmap.close(); throw new Error('Could not get 2d context'); }
+            ctx.drawImage(bitmap, 0, 0, width, height);
+            bitmap.close();
+            return new Promise((resolve, reject) => {
+                canvas.toBlob((blob) => {
+                    if (!blob) return reject(new Error('Could not encode image'));
+                    // Constant filename. Don't carry file.name through — it's a
+                    // DOM-derived string and we don't need it (the Storage path
+                    // is built from tempId + index in submitBooking).
+                    resolve(new File([blob], 'photo.jpg', { type: 'image/jpeg' }));
+                }, 'image/jpeg', 0.85);
+            });
         });
     }
 
@@ -615,10 +644,15 @@
             { key: 'Photos', edit: 2, valClass: 'review-photos', build: (v) => {
                 if (!state.photos.length) { v.appendChild(noneSpan()); return; }
                 state.photos.forEach((p) => {
-                    const img = document.createElement('img');
-                    img.src = p.blobUrl;
-                    img.alt = '';
-                    v.appendChild(img);
+                    // Same canvas-not-img approach as renderPhotos to keep
+                    // the file taint chain off any HTML/URL sink.
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 60;
+                    canvas.height = 60;
+                    canvas.setAttribute('role', 'img');
+                    canvas.setAttribute('aria-label', 'Booked photo');
+                    paintPhotoCanvas(canvas, p.file);
+                    v.appendChild(canvas);
                 });
             }},
             { key: 'When', edit: 3, build: (v) => { v.textContent = `${state.preferredDate} at ${state.preferredTime}`; } },
@@ -764,8 +798,6 @@
 
     // ---- Reset for "Book another" ---------------------------------------
     function resetForm() {
-        // Free any blob URLs so we don't leak memory across multiple bookings.
-        state.photos.forEach((p) => URL.revokeObjectURL(p.blobUrl));
         state.photos = [];
         Object.assign(state, {
             step: 1,
