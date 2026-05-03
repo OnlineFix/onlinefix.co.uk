@@ -66,9 +66,7 @@
     // ---- DOM helpers -----------------------------------------------------
     const $  = (sel, root = document) => root.querySelector(sel);
     const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
-    const escapeHTML = (s) => String(s == null ? '' : s)
-        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    const clearChildren = (el) => { while (el.firstChild) el.removeChild(el.firstChild); };
 
     // ---- State -----------------------------------------------------------
     const state = {
@@ -186,14 +184,23 @@
     function populateBrands(category) {
         const sel = $('#brand');
         if (!sel) return;
-        sel.innerHTML = '';
+        // Empty out via DOM to avoid innerHTML round-trip flagged by CodeQL
+        // (js/xss-through-dom). This is a defense-in-depth choice — BRANDS
+        // is hard-coded — but keeping every render path on createElement
+        // means new contributors can't accidentally drop tainted data into
+        // an HTML string here.
+        while (sel.firstChild) sel.removeChild(sel.firstChild);
         const list = BRANDS[category] || [];
-        if (!list.length) {
-            sel.innerHTML = '<option value="">Pick category first&hellip;</option>';
-            return;
-        }
-        sel.innerHTML = '<option value="">Choose&hellip;</option>' +
-            list.map((b) => `<option value="${escapeHTML(b)}">${escapeHTML(b)}</option>`).join('');
+        const placeholder = document.createElement('option');
+        placeholder.value = '';
+        placeholder.textContent = list.length ? 'Choose…' : 'Pick category first…';
+        sel.appendChild(placeholder);
+        list.forEach((b) => {
+            const opt = document.createElement('option');
+            opt.value = b;
+            opt.textContent = b;
+            sel.appendChild(opt);
+        });
     }
 
     function wireBrandSelect() {
@@ -302,15 +309,31 @@
     function renderPhotos() {
         const preview = $('#photo-preview');
         if (!preview) return;
-        preview.innerHTML = state.photos.map((p) => `
-            <div class="photo-thumb" data-photo-id="${escapeHTML(p.id)}">
-                <img src="${escapeHTML(p.blobUrl)}" alt="Repair photo preview">
-                <button type="button" class="photo-remove" aria-label="Remove photo" data-remove="${escapeHTML(p.id)}">&times;</button>
-                <span class="photo-thumb-meta">${p.sizeKB} KB</span>
-            </div>
-        `).join('');
-        $$('button[data-remove]', preview).forEach((btn) => {
-            btn.addEventListener('click', () => removePhoto(btn.dataset.remove));
+        while (preview.firstChild) preview.removeChild(preview.firstChild);
+        state.photos.forEach((p) => {
+            const wrap = document.createElement('div');
+            wrap.className = 'photo-thumb';
+            wrap.dataset.photoId = p.id;
+
+            const img = document.createElement('img');
+            img.src = p.blobUrl;
+            img.alt = 'Repair photo preview';
+
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'photo-remove';
+            removeBtn.setAttribute('aria-label', 'Remove photo');
+            removeBtn.textContent = '×'; // ×
+            removeBtn.addEventListener('click', () => removePhoto(p.id));
+
+            const meta = document.createElement('span');
+            meta.className = 'photo-thumb-meta';
+            meta.textContent = p.sizeKB + ' KB';
+
+            wrap.appendChild(img);
+            wrap.appendChild(removeBtn);
+            wrap.appendChild(meta);
+            preview.appendChild(wrap);
         });
     }
 
@@ -397,66 +420,69 @@
     function renderTimeSlots(dateStr) {
         const container = $('#time-slots');
         if (!container) return;
-        if (!state.availability) {
-            container.innerHTML = '<p class="time-slots-empty">Loading availability&hellip;</p>';
-            return;
-        }
-        if (!dateStr) {
-            container.innerHTML = '<p class="time-slots-empty">Pick a date first.</p>';
-            return;
-        }
+        clearChildren(container);
+
+        const renderEmpty = (msg) => {
+            const p = document.createElement('p');
+            p.className = 'time-slots-empty';
+            p.textContent = msg;
+            container.appendChild(p);
+        };
+
+        if (!state.availability) return renderEmpty('Loading availability…');
+        if (!dateStr) return renderEmpty('Pick a date first.');
 
         const a = state.availability;
         // Compare on dates only (ignore time component) — JS Date parsing is
         // a minefield, so build it from the YYYY-MM-DD parts directly.
         const [y, m, d] = dateStr.split('-').map((n) => parseInt(n, 10));
         const date = new Date(y, m - 1, d);
-        if (isNaN(date.getTime())) {
-            container.innerHTML = '<p class="time-slots-empty">Invalid date.</p>';
-            return;
-        }
+        if (isNaN(date.getTime())) return renderEmpty('Invalid date.');
 
         if ((a.blockedDates || []).includes(dateStr)) {
-            container.innerHTML = '<p class="time-slots-empty">We\'re closed that day. Pick another.</p>';
-            return;
+            return renderEmpty("We're closed that day. Pick another.");
         }
 
         const dayKey = DAY_KEYS[date.getDay()];
         const hours = (a.workingHours || {})[dayKey];
         if (!hours || hours.closed) {
-            container.innerHTML = '<p class="time-slots-empty">We\'re closed that day. Pick another.</p>';
-            return;
+            return renderEmpty("We're closed that day. Pick another.");
         }
 
         const slots = generateSlots(hours.open, hours.close, a.slotIntervalMinutes || 30);
-        if (!slots.length) {
-            container.innerHTML = '<p class="time-slots-empty">No slots available.</p>';
-            return;
-        }
+        if (!slots.length) return renderEmpty('No slots available.');
 
         const minNoticeMs = (a.minNoticeHours || 0) * 60 * 60 * 1000;
         const earliest = new Date(Date.now() + minNoticeMs);
 
-        const html = slots.map((slot) => {
+        slots.forEach((slot) => {
             const slotDate = new Date(y, m - 1, d, slot.h, slot.min, 0, 0);
             const disabled = slotDate < earliest;
-            const cls = ['time-slot'];
-            if (disabled) cls.push('disabled');
-            if (state.preferredTime === slot.label) cls.push('selected');
-            return `<label class="${cls.join(' ')}" data-slot="${escapeHTML(slot.label)}">
-                <input type="radio" name="preferred-time" value="${escapeHTML(slot.label)}" ${disabled ? 'disabled' : ''} ${state.preferredTime === slot.label ? 'checked' : ''}>
-                ${escapeHTML(slot.label)}
-            </label>`;
-        }).join('');
-        container.innerHTML = html;
+            const isSelected = state.preferredTime === slot.label;
 
-        $$('label.time-slot:not(.disabled)', container).forEach((el) => {
-            el.addEventListener('click', () => {
-                state.preferredTime = el.dataset.slot;
-                $$('label.time-slot', container).forEach((s) => s.classList.remove('selected'));
-                el.classList.add('selected');
-                clearError('preferred-time');
-            });
+            const label = document.createElement('label');
+            label.className = 'time-slot' + (disabled ? ' disabled' : '') + (isSelected ? ' selected' : '');
+            label.dataset.slot = slot.label;
+
+            const input = document.createElement('input');
+            input.type = 'radio';
+            input.name = 'preferred-time';
+            input.value = slot.label;
+            if (disabled) input.disabled = true;
+            if (isSelected) input.checked = true;
+
+            label.appendChild(input);
+            label.appendChild(document.createTextNode(slot.label));
+
+            if (!disabled) {
+                label.addEventListener('click', () => {
+                    state.preferredTime = slot.label;
+                    $$('label.time-slot', container).forEach((s) => s.classList.remove('selected'));
+                    label.classList.add('selected');
+                    clearError('preferred-time');
+                });
+            }
+            container.appendChild(label);
         });
     }
 
@@ -570,28 +596,64 @@
     function renderReview() {
         const root = $('#review-summary');
         if (!root) return;
-        const photoHtml = state.photos.length
-            ? state.photos.map((p) => `<img src="${escapeHTML(p.blobUrl)}" alt="">`).join('')
-            : '<span style="font-family:monospace;color:#777;">None</span>';
+        clearChildren(root);
+
+        // Each row is { key, edit, build(valEl) } so we can either set
+        // textContent for plain values or append DOM children for the
+        // photo grid — never building HTML strings.
+        const noneSpan = () => {
+            const span = document.createElement('span');
+            span.style.fontFamily = 'monospace';
+            span.style.color = '#777';
+            span.textContent = 'None';
+            return span;
+        };
 
         const rows = [
-            { key: 'Device', val: `${escapeHTML(capitalize(state.category))} - ${escapeHTML(state.brand)} ${escapeHTML(state.model)}`, edit: 1 },
-            { key: 'Issue', val: escapeHTML(state.issue), edit: 2 },
-            { key: 'Photos', val: photoHtml, valClass: 'review-photos', edit: 2 },
-            { key: 'When', val: `${escapeHTML(state.preferredDate)} at ${escapeHTML(state.preferredTime)}`, edit: 3 },
-            { key: 'Notes', val: state.extraNotes ? escapeHTML(state.extraNotes) : '<span style="font-family:monospace;color:#777;">None</span>', edit: 3 },
-            { key: 'Name', val: escapeHTML(state.customerName), edit: 4 },
-            { key: 'Email', val: escapeHTML(state.customerEmail), edit: 4 },
-            { key: 'Phone', val: escapeHTML(state.customerPhone), edit: 4 }
+            { key: 'Device', edit: 1, build: (v) => { v.textContent = `${capitalize(state.category)} - ${state.brand} ${state.model}`; } },
+            { key: 'Issue', edit: 2, build: (v) => { v.textContent = state.issue; } },
+            { key: 'Photos', edit: 2, valClass: 'review-photos', build: (v) => {
+                if (!state.photos.length) { v.appendChild(noneSpan()); return; }
+                state.photos.forEach((p) => {
+                    const img = document.createElement('img');
+                    img.src = p.blobUrl;
+                    img.alt = '';
+                    v.appendChild(img);
+                });
+            }},
+            { key: 'When', edit: 3, build: (v) => { v.textContent = `${state.preferredDate} at ${state.preferredTime}`; } },
+            { key: 'Notes', edit: 3, build: (v) => {
+                if (state.extraNotes) v.textContent = state.extraNotes;
+                else v.appendChild(noneSpan());
+            }},
+            { key: 'Name', edit: 4, build: (v) => { v.textContent = state.customerName; } },
+            { key: 'Email', edit: 4, build: (v) => { v.textContent = state.customerEmail; } },
+            { key: 'Phone', edit: 4, build: (v) => { v.textContent = state.customerPhone; } }
         ];
 
-        root.innerHTML = rows.map((r) => `
-            <div class="review-row">
-                <span class="review-key">${escapeHTML(r.key)}</span>
-                <span class="review-val ${r.valClass || ''}">${r.val}</span>
-                <button type="button" class="review-edit" data-edit-step="${r.edit}">Edit</button>
-            </div>
-        `).join('');
+        rows.forEach((r) => {
+            const row = document.createElement('div');
+            row.className = 'review-row';
+
+            const keyEl = document.createElement('span');
+            keyEl.className = 'review-key';
+            keyEl.textContent = r.key;
+
+            const valEl = document.createElement('span');
+            valEl.className = 'review-val' + (r.valClass ? ' ' + r.valClass : '');
+            r.build(valEl);
+
+            const editBtn = document.createElement('button');
+            editBtn.type = 'button';
+            editBtn.className = 'review-edit';
+            editBtn.dataset.editStep = String(r.edit);
+            editBtn.textContent = 'Edit';
+
+            row.appendChild(keyEl);
+            row.appendChild(valEl);
+            row.appendChild(editBtn);
+            root.appendChild(row);
+        });
     }
 
     function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
@@ -732,7 +794,13 @@
         const counter = $('#issue-count');
         if (counter) counter.textContent = '0';
         const slots = $('#time-slots');
-        if (slots) slots.innerHTML = '<p class="time-slots-empty">Pick a date first.</p>';
+        if (slots) {
+            clearChildren(slots);
+            const empty = document.createElement('p');
+            empty.className = 'time-slots-empty';
+            empty.textContent = 'Pick a date first.';
+            slots.appendChild(empty);
+        }
         clearAllErrors();
         showStep(1);
     }
