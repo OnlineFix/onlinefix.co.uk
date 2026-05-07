@@ -114,22 +114,32 @@
     window.cookieConsentReject = rejectNonEssential;
     window.cookieManage = function () { showBanner(); };
 
-    // The script is loaded with `defer`, so the DOM is already parsed by the
-    // time we run. No need to wait for DOMContentLoaded or load — running
-    // immediately means the banner appears as early as possible for new
-    // visitors (legally required) without delaying first paint.
+    // Pre-set the rejected disable flag synchronously so any code that
+    // somehow tries to fire gtag() during early load is a no-op for users
+    // who previously rejected. This needs no DOM access and no paint.
     var consent = getConsent();
-    if (consent === null) {
-        // First-time visitor — banner must appear before any analytics fire.
-        showBanner();
-    } else if (consent.analytics) {
-        // Previously consented — load GA, but only when the browser is idle
-        // so it doesn't compete with LCP.
-        loadGAWhenIdle();
-    } else {
-        // Previously rejected — pre-set the GA disable flag so any future
-        // gtag() calls in this session are no-ops, even if some other code
-        // tries to load it.
+    if (consent && consent.analytics === false) {
         window[GA_DISABLE_KEY] = true;
+    }
+
+    // Defer the rest (banner show, GA load) until after first paint so the
+    // initial render isn't blocked. GDPR is preserved because GA is NEVER
+    // loaded before the user explicitly accepts; this only delays *showing*
+    // the banner by a few hundred ms (industry standard for consent UIs).
+    function init() {
+        if (consent === null) {
+            // First-time visitor — show banner. No analytics loaded.
+            showBanner();
+        } else if (consent.analytics) {
+            // Previously consented — load GA in idle time.
+            loadGAWhenIdle();
+        }
+        // consent.analytics === false: nothing to do (disable flag set above).
+    }
+
+    if ('requestIdleCallback' in window) {
+        requestIdleCallback(init, { timeout: 1500 });
+    } else {
+        setTimeout(init, 200);
     }
 })();

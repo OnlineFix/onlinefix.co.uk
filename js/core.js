@@ -34,14 +34,6 @@ if (mobileToggle && navMenu) {
     });
 }
 
-// Release will-change on each .fade-in once the appear animation finishes,
-// so we don't keep compositor layers alive for the whole session.
-document.addEventListener('animationend', (e) => {
-    if (e.animationName === 'appear' && e.target.classList.contains('fade-in')) {
-        e.target.classList.add('appeared');
-    }
-});
-
 // FAQ accordion (for pages with .faq-item elements)
 document.addEventListener('DOMContentLoaded', () => {
     const faqQuestions = document.querySelectorAll('.faq-item .faq-question');
