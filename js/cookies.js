@@ -1,11 +1,19 @@
 /* Cookie Consent - OnlineFix
-   GDPR & PECR compliant cookie management */
+   GDPR & PECR compliant cookie management.
+
+   Order of operations on every page load:
+     1. Read stored consent from localStorage.
+     2. If no choice yet -> show banner. Do NOT load any analytics.
+     3. If previously accepted -> load GA in idle time (non-blocking).
+     4. If previously rejected -> stay silent. No GA, no cookies.
+   Analytics never load before the user has explicitly opted in. */
 
 (function () {
     'use strict';
 
     var CONSENT_KEY = 'onlinefix_cookie_consent';
     var GA_ID = 'G-Q0PC3B1W31';
+    var GA_DISABLE_KEY = 'ga-disable-' + GA_ID;
 
     function getConsent() {
         try {
@@ -22,11 +30,17 @@
             analytics: analytics,
             timestamp: new Date().toISOString()
         };
-        localStorage.setItem(CONSENT_KEY, JSON.stringify(consent));
+        try {
+            localStorage.setItem(CONSENT_KEY, JSON.stringify(consent));
+        } catch (e) {
+            // Storage may be blocked (private mode etc.) — fail silently.
+        }
     }
 
     function loadGA() {
         if (document.getElementById('ga-script')) return;
+        // Honour any prior opt-out flag set during this session
+        if (window[GA_DISABLE_KEY]) return;
         var script = document.createElement('script');
         script.id = 'ga-script';
         script.async = true;
@@ -36,6 +50,16 @@
         function gtag() { window.dataLayer.push(arguments); }
         gtag('js', new Date());
         gtag('config', GA_ID, { anonymize_ip: true });
+    }
+
+    // Defer GA loading to idle time so the script doesn't compete with first paint.
+    // Only ever called AFTER consent has been given.
+    function loadGAWhenIdle() {
+        if ('requestIdleCallback' in window) {
+            requestIdleCallback(loadGA, { timeout: 3000 });
+        } else {
+            setTimeout(loadGA, 1500);
+        }
     }
 
     function removeGACookies() {
@@ -52,62 +76,60 @@
 
     function showBanner() {
         var banner = document.getElementById('cookie-banner');
-        if (banner) {
-            banner.style.display = 'block';
-            // Use rAF to trigger transition without forced reflow
+        if (!banner) return;
+        banner.style.display = 'block';
+        // Double rAF avoids forced reflow when toggling the transition class
+        requestAnimationFrame(function () {
             requestAnimationFrame(function () {
-                requestAnimationFrame(function () {
-                    banner.classList.add('visible');
-                });
+                banner.classList.add('visible');
             });
-        }
+        });
     }
 
     function hideBanner() {
         var banner = document.getElementById('cookie-banner');
-        if (banner) {
-            banner.classList.remove('visible');
-            setTimeout(function () { banner.style.display = ''; }, 300);
-        }
+        if (!banner) return;
+        banner.classList.remove('visible');
+        setTimeout(function () { banner.style.display = ''; }, 300);
     }
 
     function acceptAll() {
         saveConsent(true);
-        loadGA();
+        // Clear any prior opt-out from this session before (re)loading
+        window[GA_DISABLE_KEY] = false;
+        loadGAWhenIdle();
         hideBanner();
     }
 
     function rejectNonEssential() {
         saveConsent(false);
+        // Disable any GA already loaded in this session so no further hits fire
+        window[GA_DISABLE_KEY] = true;
         removeGACookies();
         hideBanner();
     }
 
-    // Expose functions globally for button onclick handlers
+    // Expose for the banner buttons and the "Manage Cookies" footer link
     window.cookieConsentAccept = acceptAll;
     window.cookieConsentReject = rejectNonEssential;
-    window.cookieManage = function () {
+    window.cookieManage = function () { showBanner(); };
+
+    // The script is loaded with `defer`, so the DOM is already parsed by the
+    // time we run. No need to wait for DOMContentLoaded or load — running
+    // immediately means the banner appears as early as possible for new
+    // visitors (legally required) without delaying first paint.
+    var consent = getConsent();
+    if (consent === null) {
+        // First-time visitor — banner must appear before any analytics fire.
         showBanner();
-    };
-
-    // Initialise on DOM ready
-    function init() {
-        var consent = getConsent();
-
-        if (consent === null) {
-            // No choice made yet - show banner, don't load GA
-            showBanner();
-        } else if (consent.analytics) {
-            // User accepted analytics
-            loadGA();
-        }
-        // If consent.analytics === false, do nothing (GA stays blocked)
-    }
-
-    // Wait for DOM to be fully ready
-    if (document.readyState === 'complete') {
-        init();
+    } else if (consent.analytics) {
+        // Previously consented — load GA, but only when the browser is idle
+        // so it doesn't compete with LCP.
+        loadGAWhenIdle();
     } else {
-        window.addEventListener('load', init);
+        // Previously rejected — pre-set the GA disable flag so any future
+        // gtag() calls in this session are no-ops, even if some other code
+        // tries to load it.
+        window[GA_DISABLE_KEY] = true;
     }
 })();

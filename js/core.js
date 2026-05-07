@@ -34,24 +34,12 @@ if (mobileToggle && navMenu) {
     });
 }
 
-// Intersection Observer for fade-in animations
-const observerOptions = {
-    threshold: 0.1,
-    rootMargin: '0px 0px -50px 0px'
-};
-
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('fade-in');
-            observer.unobserve(entry.target);
-        }
-    });
-}, observerOptions);
-
-document.addEventListener('DOMContentLoaded', () => {
-    const fadeElements = document.querySelectorAll('.fade-in');
-    fadeElements.forEach(el => observer.observe(el));
+// Release will-change on each .fade-in once the appear animation finishes,
+// so we don't keep compositor layers alive for the whole session.
+document.addEventListener('animationend', (e) => {
+    if (e.animationName === 'appear' && e.target.classList.contains('fade-in')) {
+        e.target.classList.add('appeared');
+    }
 });
 
 // FAQ accordion (for pages with .faq-item elements)
