@@ -81,6 +81,30 @@
     <priority>0.8</priority>
   </url>
 
+  <!-- Woking service-area landing page - Local SEO -->
+  <url>
+    <loc>https://onlinefix.co.uk/woking-repair.html</loc>
+    <lastmod>2026-05-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Farnham service-area landing page - Local SEO -->
+  <url>
+    <loc>https://onlinefix.co.uk/farnham-repair.html</loc>
+    <lastmod>2026-05-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Godalming service-area landing page - Local SEO -->
+  <url>
+    <loc>https://onlinefix.co.uk/godalming-repair.html</loc>
+    <lastmod>2026-05-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
   <!-- Contact page - High priority, rarely changes -->
   <url>
     <loc>https://onlinefix.co.uk/contact.html</loc>
