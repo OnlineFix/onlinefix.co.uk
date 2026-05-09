@@ -6,4 +6,6 @@ Allow: /images/*.jpg
 Disallow: /admin/
 Disallow: /track/
 Disallow: /new-repair/
+Disallow: /book/
+Disallow: /booking-terms.html
 Sitemap: https://onlinefix.co.uk/sitemap.xml
