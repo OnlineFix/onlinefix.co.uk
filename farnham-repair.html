@@ -100,7 +100,28 @@
                 "longitude": -0.7986
             }
         },
-        "url": "https://onlinefix.co.uk/farnham-repair.html"
+        "url": "https://onlinefix.co.uk/farnham-repair.html",
+        "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "5.0",
+            "reviewCount": "168",
+            "bestRating": "5",
+            "worstRating": "1"
+        },
+        "review": [
+            {
+                "@type": "Review",
+                "reviewRating": {"@type": "Rating", "ratingValue": "5", "bestRating": "5"},
+                "author": {"@type": "Person", "name": "James Lancaster"},
+                "reviewBody": "Amazing work on my phone water damage repair. Thought it was completely dead but Tomas brought it back to life. Top quality service!"
+            },
+            {
+                "@type": "Review",
+                "reviewRating": {"@type": "Rating", "ratingValue": "5", "bestRating": "5"},
+                "author": {"@type": "Person", "name": "David Chen"},
+                "reviewBody": "Had my desktop PC completely upgraded and optimized. Tomas knows his stuff and provided excellent advice on the best components for my budget. Couldn't be happier!"
+            }
+        ]
     }
     </script>
 
@@ -204,6 +225,14 @@
         .cta-row h2::before { content: "// "; color: var(--hex-accent); }
         .cta-row a { color: var(--hex-white); }
         .cta-button-inline { display: inline-block; background: var(--gradient-blue); color: var(--hex-white); padding: 0.9rem 2rem; text-decoration: none; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-top: 0.8rem; }
+        .reviews-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; margin: 1rem 0; }
+        .review-quote { border-left: 3px solid var(--hex-accent); padding: 0.5rem 1.25rem; background: var(--hex-concrete); }
+        .review-quote .stars { color: #f5a623; font-size: 1.1rem; letter-spacing: 2px; margin-bottom: 0.5rem; }
+        .review-quote p { font-style: italic; color: #333; margin-bottom: 0.6rem; line-height: 1.6; }
+        .review-attribution { font-style: normal !important; font-size: 0.85rem; color: #666 !important; }
+        .review-summary { margin-top: 1rem; font-size: 0.95rem; color: #444; }
+        .review-summary a { color: var(--hex-accent); text-decoration: none; font-weight: 600; }
+        .review-summary a:hover { text-decoration: underline; }
         @media (max-width: 768px) { .area-block { padding: 1.5rem 1.2rem; } .cta-row { padding: 1.5rem 1.2rem; } }
     </style>
 </head>
@@ -299,6 +328,23 @@
                         <p>Almost always for out-of-warranty devices. Apple and most retailers will quote a flat-rate replacement; we quote an actual component-level repair. On older MacBooks and iPhones the saving can be hundreds of pounds.</p>
                         <p><strong>What about water damage from the River Wey or a swimming-pool drop?</strong></p>
                         <p>Water damage is one of our specialist areas. The sooner the device gets to us — ideally within 24 hours, powered off — the better the recovery odds. We strip, ultrasonic-clean, and rebuild boards in-house.</p>
+                    </div>
+
+                    <div class="area-block">
+                        <h2>What Surrey customers say</h2>
+                        <div class="reviews-row">
+                            <div class="review-quote">
+                                <div class="stars" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                                <p>"Amazing work on my phone water damage repair. Thought it was completely dead but Tomas brought it back to life. Top quality service!"</p>
+                                <p class="review-attribution"><strong>James Lancaster</strong> &mdash; iPhone Water Damage Recovery</p>
+                            </div>
+                            <div class="review-quote">
+                                <div class="stars" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                                <p>"Had my desktop PC completely upgraded and optimized. Tomas knows his stuff and provided excellent advice on the best components for my budget. Couldn't be happier!"</p>
+                                <p class="review-attribution"><strong>David Chen</strong> &mdash; Desktop PC Upgrade</p>
+                            </div>
+                        </div>
+                        <p class="review-summary">Rated <strong>5.0</strong> from <strong>168</strong> Surrey customers. <a href="/reviews.html">Read all reviews &rarr;</a></p>
                     </div>
 
                     <div class="cta-row">

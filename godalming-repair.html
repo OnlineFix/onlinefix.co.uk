@@ -100,7 +100,28 @@
                 "longitude": -0.6147
             }
         },
-        "url": "https://onlinefix.co.uk/godalming-repair.html"
+        "url": "https://onlinefix.co.uk/godalming-repair.html",
+        "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "5.0",
+            "reviewCount": "168",
+            "bestRating": "5",
+            "worstRating": "1"
+        },
+        "review": [
+            {
+                "@type": "Review",
+                "reviewRating": {"@type": "Rating", "ratingValue": "5", "bestRating": "5"},
+                "author": {"@type": "Person", "name": "Emma Wilson"},
+                "reviewBody": "Fantastic service from start to finish. My tablet screen was completely shattered and Tomas had it looking brand new within the same day. Great communication and fair pricing."
+            },
+            {
+                "@type": "Review",
+                "reviewRating": {"@type": "Rating", "ratingValue": "5", "bestRating": "5"},
+                "author": {"@type": "Person", "name": "Rachel Cooper"},
+                "reviewBody": "Brought in my Nintendo Switch with a drifting joystick and broken charging port. Tomas fixed both issues same day and it works perfectly now. Very reasonable prices compared to sending it off to Nintendo. Highly recommend!"
+            }
+        ]
     }
     </script>
 
@@ -204,6 +225,14 @@
         .cta-row h2::before { content: "// "; color: var(--hex-accent); }
         .cta-row a { color: var(--hex-white); }
         .cta-button-inline { display: inline-block; background: var(--gradient-blue); color: var(--hex-white); padding: 0.9rem 2rem; text-decoration: none; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-top: 0.8rem; }
+        .reviews-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; margin: 1rem 0; }
+        .review-quote { border-left: 3px solid var(--hex-accent); padding: 0.5rem 1.25rem; background: var(--hex-concrete); }
+        .review-quote .stars { color: #f5a623; font-size: 1.1rem; letter-spacing: 2px; margin-bottom: 0.5rem; }
+        .review-quote p { font-style: italic; color: #333; margin-bottom: 0.6rem; line-height: 1.6; }
+        .review-attribution { font-style: normal !important; font-size: 0.85rem; color: #666 !important; }
+        .review-summary { margin-top: 1rem; font-size: 0.95rem; color: #444; }
+        .review-summary a { color: var(--hex-accent); text-decoration: none; font-weight: 600; }
+        .review-summary a:hover { text-decoration: underline; }
         @media (max-width: 768px) { .area-block { padding: 1.5rem 1.2rem; } .cta-row { padding: 1.5rem 1.2rem; } }
     </style>
 </head>
@@ -299,6 +328,23 @@
                         <p>We can repair the hardware regardless of the message on screen — Face ID dot-projector faults, "True Tone after non-genuine display" warnings, Touch ID issues, and so on. Activation-locked devices need proof of ownership and we may need you to remove the lock as part of testing the repair.</p>
                         <p><strong>Are repairs cheaper than going to Apple direct?</strong></p>
                         <p>Almost always for out-of-warranty devices. Apple quotes a flat-rate replacement; we quote a component-level repair. On older iPhones and MacBooks the saving can be £100–£800.</p>
+                    </div>
+
+                    <div class="area-block">
+                        <h2>What Surrey customers say</h2>
+                        <div class="reviews-row">
+                            <div class="review-quote">
+                                <div class="stars" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                                <p>"Fantastic service from start to finish. My tablet screen was completely shattered and Tomas had it looking brand new within the same day. Great communication and fair pricing."</p>
+                                <p class="review-attribution"><strong>Emma Wilson</strong> &mdash; iPad Screen Replacement</p>
+                            </div>
+                            <div class="review-quote">
+                                <div class="stars" aria-label="5 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                                <p>"Brought in my Nintendo Switch with a drifting joystick and broken charging port. Tomas fixed both issues same day and it works perfectly now. Very reasonable prices compared to sending it off to Nintendo."</p>
+                                <p class="review-attribution"><strong>Rachel Cooper</strong> &mdash; Nintendo Switch Repair</p>
+                            </div>
+                        </div>
+                        <p class="review-summary">Rated <strong>5.0</strong> from <strong>168</strong> Surrey customers. <a href="/reviews.html">Read all reviews &rarr;</a></p>
                     </div>
 
                     <div class="cta-row">
