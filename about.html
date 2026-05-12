@@ -469,19 +469,38 @@
         .page-title {
                 font-size: clamp(1.8rem, 7vw, 2.5rem);
             }
+        .about-section,
+            .values-section {
+                padding: 0 0 2rem;
+            }
         .about-grid {
                 grid-template-columns: 1fr;
             }
         .about-text {
                 border-right: none;
                 border-bottom: 2px solid var(--hex-black);
-                padding: 2rem 1.5rem;
+                padding: 1.5rem;
             }
         .about-text h2 {
                 font-size: clamp(1.3rem, 5vw, 1.8rem);
+                margin-bottom: 1rem;
+            }
+        .about-text p {
+                margin-bottom: 1rem;
             }
         .about-profile {
-                padding: 2rem 1.5rem;
+                padding: 1.5rem;
+            }
+        .timeline-section,
+            .cert-section {
+                padding: 2.5rem 0;
+            }
+        .timeline-section .section-title {
+                padding-bottom: 1rem;
+                margin-bottom: 2rem;
+            }
+        .timeline-section .section-subtitle {
+                margin-top: -1.5rem;
             }
         .timeline-grid {
                 display: grid;
@@ -494,21 +513,28 @@
                 min-width: unset;
                 border-right: none;
                 border-bottom: 1px solid #333;
+                padding: 1.5rem;
             }
         .timeline-item:last-child {
                 border-bottom: none;
+            }
+        .timeline-year {
+                font-size: 1.6rem;
+                margin-bottom: 0.5rem;
             }
         .values-grid {
                 grid-template-columns: 1fr 1fr;
             }
         .value-item {
-                padding: 2rem 1.5rem;
+                padding: 1.5rem 1rem;
             }
         .value-title {
                 font-size: clamp(1.1rem, 4vw, 1.4rem);
+                margin-bottom: 0.5rem;
             }
         .value-icon {
                 font-size: 2rem;
+                margin-bottom: 0.75rem;
             }
         .cert-grid {
                 grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
