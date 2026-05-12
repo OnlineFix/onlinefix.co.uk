@@ -95,6 +95,54 @@ window.addEventListener('appinstalled', () => {
     document.querySelectorAll('[data-install-app]').forEach((b) => { b.hidden = true; });
 });
 
+// Animated stat counters (e.g. reviews page: 1000+, 5.0, 90%, 150+)
+document.addEventListener('DOMContentLoaded', () => {
+    const counters = document.querySelectorAll('.stat-number[data-target]');
+    if (counters.length === 0) return;
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const format = (value, isDecimal, suffix) =>
+        (isDecimal ? value.toFixed(1) : Math.round(value).toLocaleString()) + suffix;
+
+    const animate = (el) => {
+        const target = parseFloat(el.dataset.target);
+        if (Number.isNaN(target)) return;
+        const suffix = el.dataset.suffix || '';
+        const isDecimal = el.dataset.decimal === 'true';
+
+        if (reduceMotion) {
+            el.textContent = format(target, isDecimal, suffix);
+            return;
+        }
+
+        const duration = 1500;
+        const start = performance.now();
+        const tick = (now) => {
+            const progress = Math.min((now - start) / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            el.textContent = format(target * eased, isDecimal, suffix);
+            if (progress < 1) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+    };
+
+    if (!('IntersectionObserver' in window)) {
+        counters.forEach(animate);
+        return;
+    }
+
+    const obs = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                animate(entry.target);
+                obs.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.3 });
+    counters.forEach(c => obs.observe(c));
+});
+
 // Mobile scroll nudge (for pages with horizontal-scrolling grids)
 // Use matchMedia instead of innerWidth to avoid forced reflow
 if (window.matchMedia('(max-width: 767px)').matches) {

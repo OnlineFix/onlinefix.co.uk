@@ -652,6 +652,58 @@
             </div>
         </section>
 
+        <section class="form-section" aria-labelledby="form-heading">
+            <div class="container">
+                <h2 class="section-title fade-in" id="form-heading">SEND MESSAGE</h2>
+                <p class="section-subtitle fade-in">Input Your Request</p>
+                <div class="form-container">
+                    <form class="contact-form fade-in" id="contact-form">
+                        <div class="form-group">
+                            <label for="name" class="form-label">Your Name *</label>
+                            <input type="text" id="name" name="name" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone" class="form-label">Phone Number *</label>
+                            <input type="tel" id="phone" name="phone" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email" class="form-label">Email Address</label>
+                            <input type="email" id="email" name="email" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label for="device" class="form-label">Device Type *</label>
+                            <select id="device" name="device" class="form-select" required>
+                                <option value="">Select device type</option>
+                                <option value="smartphone">Smartphone</option>
+                                <option value="laptop">Laptop</option>
+                                <option value="tablet">Tablet</option>
+                                <option value="gaming-console">Gaming Console</option>
+                                <option value="desktop">Desktop PC</option>
+                                <option value="data-recovery">Data Recovery</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="issue" class="form-label">Describe the Issue *</label>
+                            <textarea id="issue" name="issue" class="form-textarea"
+                                placeholder="Please describe what's wrong with your device..." required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="urgency" class="form-label">Urgency Level</label>
+                            <select id="urgency" name="urgency" class="form-select">
+                                <option value="normal">Normal - Within a few days</option>
+                                <option value="urgent">Urgent - Within 24 hours</option>
+                                <option value="emergency">Emergency - Same day</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="form-submit">
+                            <i class="fas fa-paper-plane" aria-hidden="true"></i> Send Message
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
         <section class="contact-section" aria-labelledby="contact-heading">
             <div class="container">
                 <h2 class="section-title fade-in" id="contact-heading">REACH OUT</h2>
@@ -749,58 +801,6 @@
             </div>
         </section>
 
-        <section class="form-section" aria-labelledby="form-heading">
-            <div class="container">
-                <h2 class="section-title fade-in" id="form-heading">SEND MESSAGE</h2>
-                <p class="section-subtitle fade-in">Input Your Request</p>
-                <div class="form-container">
-                    <form class="contact-form fade-in" id="contact-form">
-                        <div class="form-group">
-                            <label for="name" class="form-label">Your Name *</label>
-                            <input type="text" id="name" name="name" class="form-input" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="phone" class="form-label">Phone Number *</label>
-                            <input type="tel" id="phone" name="phone" class="form-input" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="email" class="form-label">Email Address</label>
-                            <input type="email" id="email" name="email" class="form-input">
-                        </div>
-                        <div class="form-group">
-                            <label for="device" class="form-label">Device Type *</label>
-                            <select id="device" name="device" class="form-select" required>
-                                <option value="">Select device type</option>
-                                <option value="smartphone">Smartphone</option>
-                                <option value="laptop">Laptop</option>
-                                <option value="tablet">Tablet</option>
-                                <option value="gaming-console">Gaming Console</option>
-                                <option value="desktop">Desktop PC</option>
-                                <option value="data-recovery">Data Recovery</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="issue" class="form-label">Describe the Issue *</label>
-                            <textarea id="issue" name="issue" class="form-textarea"
-                                placeholder="Please describe what's wrong with your device..." required></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label for="urgency" class="form-label">Urgency Level</label>
-                            <select id="urgency" name="urgency" class="form-select">
-                                <option value="normal">Normal - Within a few days</option>
-                                <option value="urgent">Urgent - Within 24 hours</option>
-                                <option value="emergency">Emergency - Same day</option>
-                            </select>
-                        </div>
-                        <button type="submit" class="form-submit">
-                            <i class="fas fa-paper-plane" aria-hidden="true"></i> Send Message
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </section>
-
         <section class="social-section" aria-labelledby="social-heading">
             <div class="container">
                 <h2 class="section-title fade-in" id="social-heading" style="padding-top: 0;">FOLLOW US</h2>
@@ -811,11 +811,6 @@
                     <a href="https://www.tiktok.com/@onlinefix" class="social-link" target="_blank"
                         rel="noopener noreferrer" aria-label="TikTok"><i class="fab fa-tiktok"
                             aria-hidden="true"></i></a>
-                    <a href="https://maps.app.goo.gl/zqbFNuYM2z7u8xux8" class="social-link" target="_blank"
-                        rel="noopener noreferrer" aria-label="Google"><i class="fab fa-google"
-                            aria-hidden="true"></i></a>
-                    <a href="https://wa.me/447940730537" class="social-link" target="_blank" rel="noopener noreferrer"
-                        aria-label="WhatsApp"><i class="fab fa-whatsapp" aria-hidden="true"></i></a>
                 </div>
             </div>
         </section>
