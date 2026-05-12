@@ -685,20 +685,25 @@ a[aria-label] > i[class*="fa-"]:only-child,
     }
 
     .section-title {
-        padding-top: 2rem;
+        padding-top: 1.5rem;
         margin-bottom: 0;
     }
 
     .section-subtitle {
-        margin-bottom: 2rem;
+        margin-bottom: 1.5rem;
     }
 
     .container {
         padding: 0 12px;
     }
 
+    .cta-section {
+        padding: 2.5rem 0;
+    }
+
     .cta-section h2 {
         font-size: 2rem;
+        margin-bottom: 1.2rem;
     }
 
     .cta-button {
@@ -709,6 +714,10 @@ a[aria-label] > i[class*="fa-"]:only-child,
     .cta-box {
         padding: 1.5rem;
         display: block;
+    }
+
+    .faq-section {
+        padding-bottom: 2.5rem;
     }
 
     .faq-question {
@@ -723,23 +732,37 @@ a[aria-label] > i[class*="fa-"]:only-child,
     }
 
     .footer {
-        padding: 3rem 0 5rem;
+        padding: 2rem 0 4rem;
     }
 
     .footer-grid {
-        gap: 2rem;
+        gap: 1.5rem;
         grid-template-columns: 1fr 1fr;
+        margin-bottom: 1.5rem;
+    }
+
+    .footer h4,
+    .footer-heading {
+        padding-bottom: 0.5rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .footer-links li {
+        margin-bottom: 0;
     }
 
     .footer-links a {
-        display: inline-block;
-        padding: 0.4rem 0;
-        min-height: 44px;
-        line-height: 2.2;
+        display: inline-flex;
+        align-items: center;
+        padding: 0.15rem 0;
+        min-height: 32px;
+        line-height: 1.5;
+        font-size: 0.85rem;
     }
 
     .copyright {
         font-size: 0.7rem;
+        padding-top: 1.25rem;
     }
 }
 
@@ -769,6 +792,7 @@ a[aria-label] > i[class*="fa-"]:only-child,
 
     .footer-grid {
         grid-template-columns: 1fr;
+        gap: 1rem;
     }
 }
 

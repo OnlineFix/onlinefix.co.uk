@@ -547,13 +547,16 @@
         .page-title {
                 font-size: clamp(1.8rem, 7vw, 2.5rem);
             }
+        .contact-section {
+                padding: 0 0 2rem;
+            }
         .contact-grid {
                 grid-template-columns: 1fr;
             }
         .contact-card {
                 border-right: none;
                 border-bottom: 2px solid var(--hex-black);
-                padding: 2rem 1.5rem;
+                padding: 1.5rem;
             }
         .contact-card:last-child {
                 border-bottom: none;
@@ -569,23 +572,34 @@
                 font-size: 0.9rem;
                 min-height: 48px;
             }
+        .location-section,
+            .social-section {
+                padding: 2.5rem 0;
+            }
+        .location-section .section-title {
+                padding-bottom: 1rem;
+                margin-bottom: 2rem;
+            }
+        .location-section .section-subtitle {
+                margin-top: -1.5rem;
+            }
         .location-grid {
                 grid-template-columns: 1fr;
             }
         .location-details {
                 border-right: none;
                 border-bottom: 1px solid #333;
-                padding: 2rem 1.5rem;
+                padding: 1.5rem;
             }
         .location-map {
-                padding: 2rem 1.5rem;
+                padding: 1.5rem;
             }
         .detail-icon {
                 width: 44px;
                 height: 44px;
             }
         .contact-form {
-                padding: 2rem 1.5rem;
+                padding: 1.5rem;
                 box-shadow: 5px 5px 0 var(--hex-black);
             }
         .form-label {
@@ -594,6 +608,7 @@
         .social-links {
                 gap: clamp(10px, 3vw, 20px);
                 flex-wrap: wrap;
+                margin-top: 1rem;
             }
         .social-link {
                 width: 52px;

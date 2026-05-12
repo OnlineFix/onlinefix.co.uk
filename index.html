@@ -735,12 +735,20 @@
                 justify-content: center;
                 text-align: center;
                 padding-top: 0;
+                min-height: 80vh;
+                min-height: 80svh;
             }
         .header {
                 padding: 1.5rem 1rem;
                 box-shadow: 6px 6px 0 var(--hex-black);
                 width: 92%;
                 margin: 0 auto;
+            }
+        .features,
+            .process-section,
+            .services-preview,
+            .testimonials-section {
+                padding: 2rem 0;
             }
         .features-grid,
             .services-grid,
@@ -798,12 +806,18 @@
             }
         .process-grid {
                 grid-template-columns: 1fr;
+                gap: 1rem;
             }
         .process-item {
-                padding: 1.2rem 1rem;
+                padding: 1rem;
             }
         .process-number {
-                font-size: 2.5rem;
+                font-size: 2.2rem;
+                margin-bottom: 0.5rem;
+            }
+        .process-item h3 {
+                font-size: 1.1rem;
+                margin-bottom: 0.5rem;
             }
         .logo {
                 font-size: 4rem;
