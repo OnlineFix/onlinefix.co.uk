@@ -226,12 +226,63 @@
             }
 
             .cookie-table {
-                font-size: 0.75rem;
+                font-size: 0.85rem;
+                border: 0;
+                display: block;
             }
 
-            .cookie-table th,
+            .cookie-table thead {
+                position: absolute;
+                width: 1px;
+                height: 1px;
+                padding: 0;
+                margin: -1px;
+                overflow: hidden;
+                clip: rect(0, 0, 0, 0);
+                white-space: nowrap;
+                border: 0;
+            }
+
+            .cookie-table tbody,
+            .cookie-table tr {
+                display: block;
+                width: 100%;
+            }
+
+            .cookie-table tr {
+                border: 2px solid var(--hex-black);
+                margin-bottom: 0.75rem;
+                background: var(--hex-white);
+            }
+
             .cookie-table td {
-                padding: 0.5rem;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: 0.75rem;
+                padding: 0.6rem 0.75rem;
+                border: 0;
+                border-bottom: 1px solid var(--hex-grid);
+                text-align: right;
+                word-break: break-word;
+                font-size: 0.8rem;
+            }
+
+            .cookie-table tr td:last-child {
+                border-bottom: 0;
+            }
+
+            .cookie-table td::before {
+                content: attr(data-label);
+                font-family: var(--font-main);
+                font-weight: 800;
+                text-transform: uppercase;
+                font-size: 0.7rem;
+                color: var(--hex-black);
+                letter-spacing: 0.5px;
+                margin-right: 0.5rem;
+                flex-shrink: 0;
+                text-align: left;
             }
         }
     </style>
@@ -325,28 +376,28 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td>onlinefix_cookie_consent</td>
-                                    <td>Stores your cookie preferences</td>
-                                    <td><span class="cookie-type-tag tag-necessary">Necessary</span></td>
-                                    <td>Persistent</td>
+                                    <td data-label="Cookie">onlinefix_cookie_consent</td>
+                                    <td data-label="Purpose">Stores your cookie preferences</td>
+                                    <td data-label="Type"><span class="cookie-type-tag tag-necessary">Necessary</span></td>
+                                    <td data-label="Duration">Persistent</td>
                                 </tr>
                                 <tr>
-                                    <td>_ga</td>
-                                    <td>Google Analytics — distinguishes unique users</td>
-                                    <td><span class="cookie-type-tag tag-analytics">Analytics</span></td>
-                                    <td>2 years</td>
+                                    <td data-label="Cookie">_ga</td>
+                                    <td data-label="Purpose">Google Analytics — distinguishes unique users</td>
+                                    <td data-label="Type"><span class="cookie-type-tag tag-analytics">Analytics</span></td>
+                                    <td data-label="Duration">2 years</td>
                                 </tr>
                                 <tr>
-                                    <td>_ga_*</td>
-                                    <td>Google Analytics — maintains session state</td>
-                                    <td><span class="cookie-type-tag tag-analytics">Analytics</span></td>
-                                    <td>2 years</td>
+                                    <td data-label="Cookie">_ga_*</td>
+                                    <td data-label="Purpose">Google Analytics — maintains session state</td>
+                                    <td data-label="Type"><span class="cookie-type-tag tag-analytics">Analytics</span></td>
+                                    <td data-label="Duration">2 years</td>
                                 </tr>
                                 <tr>
-                                    <td>_gid</td>
-                                    <td>Google Analytics — distinguishes users</td>
-                                    <td><span class="cookie-type-tag tag-analytics">Analytics</span></td>
-                                    <td>24 hours</td>
+                                    <td data-label="Cookie">_gid</td>
+                                    <td data-label="Purpose">Google Analytics — distinguishes users</td>
+                                    <td data-label="Type"><span class="cookie-type-tag tag-analytics">Analytics</span></td>
+                                    <td data-label="Duration">24 hours</td>
                                 </tr>
                             </tbody>
                         </table>
