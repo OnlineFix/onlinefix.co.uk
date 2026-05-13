@@ -127,20 +127,39 @@ document.addEventListener('DOMContentLoaded', () => {
         requestAnimationFrame(tick);
     };
 
-    if (!('IntersectionObserver' in window)) {
-        counters.forEach(animate);
-        return;
-    }
+    const inViewport = (el) => {
+        const rect = el.getBoundingClientRect();
+        return rect.top < (window.innerHeight || document.documentElement.clientHeight) && rect.bottom > 0;
+    };
 
-    const obs = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                animate(entry.target);
-                obs.unobserve(entry.target);
-            }
-        });
-    }, { threshold: 0.3 });
-    counters.forEach(c => obs.observe(c));
+    const triggered = new WeakSet();
+    const fire = (el) => {
+        if (triggered.has(el)) return;
+        triggered.add(el);
+        animate(el);
+    };
+
+    // Fire immediately for any counter already in view (covers the common case
+    // where the stats section is above the fold). iOS Safari has historically
+    // been unreliable about firing IntersectionObserver for already-visible
+    // elements, so this is the primary trigger.
+    counters.forEach(c => { if (inViewport(c)) fire(c); });
+
+    // For anything still below the fold, observe and fire on scroll-in.
+    if ('IntersectionObserver' in window) {
+        const obs = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    fire(entry.target);
+                    obs.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.2 });
+        counters.forEach(c => { if (!triggered.has(c)) obs.observe(c); });
+    } else {
+        // No IO support — just fire everything.
+        counters.forEach(fire);
+    }
 });
 
 // Mobile scroll nudge (for pages with horizontal-scrolling grids)
