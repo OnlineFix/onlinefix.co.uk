@@ -626,6 +626,10 @@
             position: relative;
             height: 100%;
             font-family: 'Courier New', Courier, monospace;
+            display: block;
+            text-decoration: none;
+            color: inherit;
+            cursor: pointer;
         }
 
         .service-card p {
@@ -641,6 +645,7 @@
         }
 
         .service-title {
+            font-family: var(--font-main);
             font-size: 1.6rem;
             text-transform: uppercase;
             font-weight: 600;
@@ -648,12 +653,6 @@
             border-bottom: 4px solid;
             border-image: var(--gradient-blue) 1;
             display: inline-block;
-        }
-
-        .service-link {
-            color: var(--hex-black);
-            font-weight: 500;
-            text-decoration: underline;
         }
 
         .testimonials-section {
@@ -910,42 +909,36 @@
                 </h2>
                 <div class="scroll-hint" aria-hidden="true">SCROLL -></div>
                 <div class="services-grid" role="list" data-scroll-nudge>
-                    <div class="service-card fade-in" role="listitem">
+                    <a class="service-card fade-in" href="console-repair.html" role="listitem">
                         <div class="service-icon" aria-hidden="true"><i class="fas fa-gamepad"></i></div>
                         <h3 class="service-title">Consoles</h3>
-                        <p>Professional <a href="console-repair.html" class="service-link">PlayStation, Xbox &amp; Switch
-                                repair</a>. HDMI ports, overheating &amp; disc drives.</p>
-                    </div>
-                    <div class="service-card fade-in" role="listitem">
+                        <p>Professional PlayStation, Xbox &amp; Switch repair. HDMI ports, overheating &amp; disc drives.</p>
+                    </a>
+                    <a class="service-card fade-in" href="iphone-repair.html" role="listitem">
                         <div class="service-icon" aria-hidden="true"><i class="fas fa-mobile-alt"></i></div>
                         <h3 class="service-title">Phones</h3>
-                        <p>Specializing in <a href="iphone-repair.html" class="service-link">iPhone repair</a>, screen
-                            fixes, and battery replacements for all brands.</p>
-                    </div>
-                    <div class="service-card fade-in" role="listitem">
+                        <p>Specializing in iPhone repair, screen fixes, and battery replacements for all brands.</p>
+                    </a>
+                    <a class="service-card fade-in" href="macbook-repair.html" role="listitem">
                         <div class="service-icon" aria-hidden="true"><i class="fas fa-laptop"></i></div>
                         <h3 class="service-title">Laptops</h3>
-                        <p>Expert <a href="macbook-repair.html" class="service-link">MacBook repair</a>, hardware
-                            cleaning, and SSD performance upgrades.</p>
-                    </div>
-                    <div class="service-card fade-in" role="listitem">
+                        <p>Expert MacBook repair, hardware cleaning, and SSD performance upgrades.</p>
+                    </a>
+                    <a class="service-card fade-in" href="pc-repair.html" role="listitem">
                         <div class="service-icon" aria-hidden="true"><i class="fas fa-desktop"></i></div>
                         <h3 class="service-title">PCs</h3>
-                        <p>Complete <a href="pc-repair.html" class="service-link">desktop and gaming PC repair</a>,
-                            upgrades, and virus removal.</p>
-                    </div>
-                    <div class="service-card fade-in" role="listitem">
+                        <p>Complete desktop and gaming PC repair, upgrades, and virus removal.</p>
+                    </a>
+                    <a class="service-card fade-in" href="tablet-repair.html" role="listitem">
                         <div class="service-icon" aria-hidden="true"><i class="fas fa-tablet-alt"></i></div>
                         <h3 class="service-title">Tablets</h3>
-                        <p>Expert <a href="tablet-repair.html" class="service-link">iPad and tablet repair</a>, screen
-                            replacement, and battery fixes.</p>
-                    </div>
-                    <div class="service-card fade-in" role="listitem">
+                        <p>Expert iPad and tablet repair, screen replacement, and battery fixes.</p>
+                    </a>
+                    <a class="service-card fade-in" href="data-recovery.html" role="listitem">
                         <div class="service-icon" aria-hidden="true"><i class="fas fa-hdd"></i></div>
                         <h3 class="service-title">Data Recovery</h3>
-                        <p>Professional <a href="data-recovery.html" class="service-link">data recovery</a> from hard
-                            drives, SSDs, USB drives, and phones.</p>
-                    </div>
+                        <p>Professional data recovery from hard drives, SSDs, USB drives, and phones.</p>
+                    </a>
                 </div>
                 <div style="text-align: center; margin-top: 2rem;">
                     <a href="services.html" class="cta-button">
