@@ -238,12 +238,31 @@
         }
 
         .service-title {
+            font-family: var(--font-main);
             font-size: 1.4rem;
             text-transform: uppercase;
             font-weight: 800;
             border-bottom: 4px solid;
             border-image: var(--gradient-blue) 1;
             display: inline-block;
+        }
+
+        .service-title-link {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .service-title-link::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            cursor: pointer;
+        }
+
+        .service-cta {
+            position: relative;
+            z-index: 2;
         }
 
         .service-description {
@@ -517,7 +536,7 @@
                     <div class="service-card fade-in">
                         <div class="service-header">
                             <div class="service-icon" aria-hidden="true"><i class="fas fa-gamepad"></i></div>
-                            <h3 class="service-title">Gaming Console Repair</h3>
+                            <h3 class="service-title"><a class="service-title-link" href="console-repair.html">Gaming Console Repair</a></h3>
                         </div>
                         <p class="service-description">PS4, PS5, Xbox, Nintendo Switch and retro console repairs. HDMI ports, overheating and more.</p>
                         <ul class="service-features">
@@ -542,7 +561,7 @@
                     <div class="service-card fade-in">
                         <div class="service-header">
                             <div class="service-icon" aria-hidden="true"><i class="fas fa-mobile-alt"></i></div>
-                            <h3 class="service-title">Phone Repair</h3>
+                            <h3 class="service-title"><a class="service-title-link" href="iphone-repair.html">Phone Repair</a></h3>
                         </div>
                         <p class="service-description">We fix all phone brands. iPhone, Samsung, Pixel, OnePlus and more.</p>
                         <ul class="service-features">
@@ -567,7 +586,7 @@
                     <div class="service-card fade-in">
                         <div class="service-header">
                             <div class="service-icon" aria-hidden="true"><i class="fas fa-laptop"></i></div>
-                            <h3 class="service-title">Laptop Repair</h3>
+                            <h3 class="service-title"><a class="service-title-link" href="macbook-repair.html">Laptop Repair</a></h3>
                         </div>
                         <p class="service-description">MacBook, Dell, HP, Lenovo and ASUS repairs. We fix both hardware and software issues.</p>
                         <ul class="service-features">
@@ -592,7 +611,7 @@
                     <div class="service-card fade-in">
                         <div class="service-header">
                             <div class="service-icon" aria-hidden="true"><i class="fas fa-tablet-alt"></i></div>
-                            <h3 class="service-title">Tablet Repair</h3>
+                            <h3 class="service-title"><a class="service-title-link" href="tablet-repair.html">Tablet Repair</a></h3>
                         </div>
                         <p class="service-description">iPad, Samsung Galaxy Tab, Surface and more. Fast screen and battery fixes.</p>
                         <ul class="service-features">
@@ -617,7 +636,7 @@
                     <div class="service-card fade-in">
                         <div class="service-header">
                             <div class="service-icon" aria-hidden="true"><i class="fas fa-desktop"></i></div>
-                            <h3 class="service-title">Desktop PC Repair</h3>
+                            <h3 class="service-title"><a class="service-title-link" href="pc-repair.html">Desktop PC Repair</a></h3>
                         </div>
                         <p class="service-description">Desktop repairs, upgrades and custom builds. Virus removal and speed boosts.</p>
                         <ul class="service-features">
@@ -642,7 +661,7 @@
                     <div class="service-card fade-in">
                         <div class="service-header">
                             <div class="service-icon" aria-hidden="true"><i class="fas fa-hdd"></i></div>
-                            <h3 class="service-title">Data Recovery</h3>
+                            <h3 class="service-title"><a class="service-title-link" href="data-recovery.html">Data Recovery</a></h3>
                         </div>
                         <p class="service-description">Lost files? We recover data from hard drives, SSDs, USB sticks and memory cards.</p>
                         <ul class="service-features">
