@@ -430,11 +430,6 @@
 
         .model-item::before { content: "MODEL"; font-family: monospace; font-size: 0.6rem; position: absolute; top: 8px; right: 8px; color: #ccc; }
 
-        @media (hover: hover) {
-        .model-item:hover { background: var(--hazard-stripe); }
-        .model-item:hover .model-icon, .model-item:hover .model-name, .model-item:hover .model-years { background: var(--hex-white); color: var(--hex-black); box-shadow: 4px 4px 0 var(--hex-black); padding: 4px 8px; display: inline-block; position: relative; z-index: 2; }
-    }
-
         .model-icon { font-size: 2.5rem; color: var(--hex-black); margin-bottom: 1rem; transition: all 0.2s; }
 
         .model-name { font-size: 0.9rem; font-weight: 800; text-transform: uppercase; }
@@ -448,12 +443,6 @@
         .issue-card { background: var(--hex-white); border: 2px solid var(--hex-black); padding: 2.5rem; position: relative; transition: all 0.2s; display: flex; flex-direction: column; }
 
         .issue-card::before { content: attr(data-issue-num); font-family: monospace; font-size: 0.6rem; position: absolute; top: 10px; right: 10px; color: #ccc; }
-
-        @media (hover: hover) {
-        .issue-card:hover { background: var(--hazard-stripe); transform: translateY(-5px); box-shadow: 8px 8px 0 #000; }
-        .issue-card:hover .issue-title, .issue-card:hover .issue-description, .issue-card:hover .issue-symptoms li, .issue-card:hover .issue-price { background: var(--hex-white); color: var(--hex-black); box-shadow: 4px 4px 0 var(--hex-black); padding: 2px 5px; display: inline-block; position: relative; z-index: 2; }
-        .issue-card:hover .issue-icon { color: var(--hex-white); background: var(--hex-black); padding: 10px; display: inline-block; box-shadow: 4px 4px 0 var(--hex-white); }
-    }
 
         .issue-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
 
