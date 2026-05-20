@@ -6,7 +6,7 @@
    - Never caches /admin/ (auth-gated, always fresh)
 */
 
-const SW_VERSION = 'onlinefix-v5';
+const SW_VERSION = 'onlinefix-v6';
 const SHELL_CACHE = `shell-${SW_VERSION}`;
 const RUNTIME_CACHE = `runtime-${SW_VERSION}`;
 
