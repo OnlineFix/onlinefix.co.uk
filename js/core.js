@@ -96,7 +96,7 @@ window.addEventListener('appinstalled', () => {
 });
 
 // Animated stat counters (e.g. reviews page: 1000+, 5.0, 90%, 150+)
-document.addEventListener('DOMContentLoaded', () => {
+const initStatCounters = () => {
     const counters = document.querySelectorAll('.stat-number[data-target]');
     if (counters.length === 0) return;
 
@@ -127,11 +127,6 @@ document.addEventListener('DOMContentLoaded', () => {
         requestAnimationFrame(tick);
     };
 
-    const inViewport = (el) => {
-        const rect = el.getBoundingClientRect();
-        return rect.top < (window.innerHeight || document.documentElement.clientHeight) && rect.bottom > 0;
-    };
-
     const triggered = new WeakSet();
     const fire = (el) => {
         if (triggered.has(el)) return;
@@ -139,13 +134,21 @@ document.addEventListener('DOMContentLoaded', () => {
         animate(el);
     };
 
-    // Fire immediately for any counter already in view (covers the common case
-    // where the stats section is above the fold). iOS Safari has historically
+    const inViewport = (el) => {
+        const rect = el.getBoundingClientRect();
+        const vh = window.innerHeight || document.documentElement.clientHeight;
+        return rect.top < vh && rect.bottom > 0;
+    };
+
+    // Wait one frame so deferred CSS has settled before measuring positions,
+    // then fire any counter already in view. iOS Safari has historically
     // been unreliable about firing IntersectionObserver for already-visible
     // elements, so this is the primary trigger.
-    counters.forEach(c => { if (inViewport(c)) fire(c); });
+    requestAnimationFrame(() => {
+        counters.forEach(c => { if (inViewport(c)) fire(c); });
+    });
 
-    // For anything still below the fold, observe and fire on scroll-in.
+    // For anything still below the fold, observe and fire on first pixel of intersection.
     if ('IntersectionObserver' in window) {
         const obs = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
@@ -154,13 +157,25 @@ document.addEventListener('DOMContentLoaded', () => {
                     obs.unobserve(entry.target);
                 }
             });
-        }, { threshold: 0.2 });
-        counters.forEach(c => { if (!triggered.has(c)) obs.observe(c); });
+        }, { threshold: 0 });
+        counters.forEach(c => obs.observe(c));
     } else {
-        // No IO support — just fire everything.
-        counters.forEach(fire);
+        // No IO support — fall back to a scroll listener.
+        const onScroll = () => {
+            counters.forEach(c => { if (!triggered.has(c) && inViewport(c)) fire(c); });
+            if ([...counters].every(c => triggered.has(c))) {
+                window.removeEventListener('scroll', onScroll);
+            }
+        };
+        window.addEventListener('scroll', onScroll, { passive: true });
     }
-});
+};
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initStatCounters);
+} else {
+    initStatCounters();
+}
 
 // Mobile scroll nudge (for pages with horizontal-scrolling grids)
 // Use matchMedia instead of innerWidth to avoid forced reflow

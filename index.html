@@ -630,6 +630,14 @@
             text-decoration: none;
             color: inherit;
             cursor: pointer;
+            transition: all 0.1s;
+        }
+
+        @media (hover: hover) {
+            .service-card:hover {
+                transform: translate(4px, 4px);
+                box-shadow: -4px -4px 0 var(--hex-black);
+            }
         }
 
         .service-card p {
