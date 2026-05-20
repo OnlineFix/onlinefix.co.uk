@@ -1,0 +1,7 @@
+# Security policy for onlinefix.co.uk
+# See https://securitytxt.org / RFC 9116
+
+Contact: mailto:onlinerepairbooking@gmail.com
+Expires: 2027-05-20T00:00:00.000Z
+Preferred-Languages: en
+Canonical: https://onlinefix.co.uk/.well-known/security.txt
