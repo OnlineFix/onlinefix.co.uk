@@ -624,35 +624,13 @@
             border: 2px solid var(--hex-black);
             padding: 2rem;
             position: relative;
-            transition: all 0.2s;
             height: 100%;
+            font-family: 'Courier New', Courier, monospace;
         }
 
-        @media (hover: hover) {
-        .service-card:hover {
-                background: var(--hazard-stripe);
-                transform: translateY(-5px);
-                box-shadow: 8px 8px 0 #000;
-            }
-        .service-card:hover .service-title,
-            .service-card:hover .service-link,
-            .service-card:hover p {
-                background: var(--hex-white);
-                color: var(--hex-black);
-                box-shadow: 4px 4px 0 var(--hex-black);
-                padding: 2px 5px;
-                display: inline-block;
-                position: relative;
-                z-index: 2;
-            }
-        .service-card:hover .service-icon {
-                color: var(--hex-white);
-                background: var(--hex-black);
-                padding: 10px;
-                display: inline-block;
-                box-shadow: 4px 4px 0 var(--hex-white);
-            }
-    }
+        .service-card p {
+            font-family: 'Courier New', Courier, monospace;
+        }
 
         .service-icon {
             font-size: 2rem;
