@@ -240,6 +240,14 @@
             display: flex;
             flex-direction: column;
             font-family: 'Courier New', Courier, monospace;
+            transition: all 0.1s;
+        }
+
+        @media (hover: hover) {
+            .service-card:hover {
+                transform: translate(4px, 4px);
+                box-shadow: -4px -4px 0 var(--hex-black);
+            }
         }
 
         .service-card .service-description {
