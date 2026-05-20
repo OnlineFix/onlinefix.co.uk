@@ -215,8 +215,40 @@
 
         .issues-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            grid-template-columns: repeat(2, 1fr);
             gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .issues-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .issues-grid-cta {
+            grid-column: 1 / -1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            background: var(--gradient-blue);
+            color: var(--hex-white);
+            padding: 1.25rem 2rem;
+            text-decoration: none;
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 1rem;
+            border: 2px solid var(--hex-black);
+            box-shadow: 6px 6px 0 var(--hex-black);
+            transition: all 0.1s;
+            cursor: pointer;
+        }
+
+        @media (hover: hover) {
+            .issues-grid-cta:hover {
+                transform: translate(4px, 4px);
+                box-shadow: 2px 2px 0 var(--hex-black);
+            }
         }
 
         .issue-card {
@@ -332,31 +364,6 @@
             font-weight: 900;
             color: var(--hex-black);
         }
-
-        .issue-cta {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--gradient-blue);
-            color: var(--hex-white);
-            padding: 1rem;
-            text-decoration: none;
-            font-weight: 800;
-            text-transform: uppercase;
-            font-size: 0.9rem;
-            border: 2px solid var(--hex-black);
-            transition: all 0.1s;
-            cursor: pointer;
-            gap: 0.5rem;
-            width: 100%;
-        }
-
-        @media (hover: hover) {
-        .issue-cta:hover {
-                transform: translate(4px, 4px);
-                box-shadow: -4px -4px 0 var(--hex-black);
-            }
-    }
 
         .why-section {
             padding: 0 0 4rem;
@@ -703,10 +710,10 @@
         .issue-price {
                 font-size: 1.3rem;
             }
-        .issue-cta {
-                padding: 0.9rem;
-                font-size: 0.85rem;
-                min-height: 48px;
+        .issues-grid-cta {
+                padding: 1rem;
+                font-size: 0.9rem;
+                box-shadow: 4px 4px 0 var(--hex-black);
             }
         .why-grid {
                 grid-template-columns: repeat(2, 1fr);
@@ -946,8 +953,6 @@
                                 <div class="price-text">Starting From</div>
                                 <div class="issue-price">Series X: &pound;80 | From &pound;60</div>
                             </div>
-                            <a href="tel:+447940730537" class="issue-cta"><i class="fas fa-phone"
-                                    aria-hidden="true"></i> Book Xbox HDMI Repair</a>
                         </div>
                     </article>
 
@@ -976,10 +981,12 @@
                                 <div class="price-text">Starting From</div>
                                 <div class="issue-price">Series X: &pound;60 | From &pound;30</div>
                             </div>
-                            <a href="tel:+447940730537" class="issue-cta"><i class="fas fa-phone"
-                                    aria-hidden="true"></i> Book Xbox Clean</a>
                         </div>
                     </article>
+
+                    <a href="tel:+447940730537" class="issues-grid-cta">
+                        <i class="fas fa-phone" aria-hidden="true"></i> Get a Quote — Call 07940 730537
+                    </a>
 
                     <!-- XBOX DISK DRIVE -->
                     <article class="issue-card fade-in" data-issue-num="ISSUE_03">
@@ -1004,8 +1011,6 @@
                                 <div class="price-text">Starting From</div>
                                 <div class="issue-price">Series X: &pound;110 | From &pound;55</div>
                             </div>
-                            <a href="tel:+447940730537" class="issue-cta"><i class="fas fa-phone"
-                                    aria-hidden="true"></i> Book Xbox Drive Repair</a>
                         </div>
                     </article>
 
@@ -1032,8 +1037,6 @@
                                 <div class="price-text">Starting From</div>
                                 <div class="issue-price">From &pound;65</div>
                             </div>
-                            <a href="tel:+447940730537" class="issue-cta"><i class="fas fa-phone"
-                                    aria-hidden="true"></i> Book Xbox Power Repair</a>
                         </div>
                     </article>
 
