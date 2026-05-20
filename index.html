@@ -631,6 +631,12 @@
             color: inherit;
             cursor: pointer;
             transition: all 0.1s;
+            overflow: hidden;
+        }
+
+        .service-card > * {
+            position: relative;
+            z-index: 1;
         }
 
         @media (hover: hover) {
@@ -1144,6 +1150,10 @@
             0% { transform: translateY(0) rotate(0deg); opacity: 0.7; }
             100% { transform: translateY(-100vh) rotate(90deg); opacity: 0; }
         }
+        @keyframes float-up-card {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0.7; }
+            100% { transform: translateY(-280px) rotate(90deg); opacity: 0; }
+        }
     </style>
     <script>
         // Defer particles until after LCP to avoid forced reflow during load
@@ -1181,6 +1191,40 @@
                 requestIdleCallback(init, { timeout: 3000 });
             } else {
                 setTimeout(init, 2000);
+            }
+        })();
+    </script>
+    <script>
+        // Hover-triggered floating particles inside .service-card tiles
+        (function() {
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+            if (!window.matchMedia('(hover: hover)').matches) return;
+
+            function attach(card) {
+                var interval = null;
+                function spawn() {
+                    var el = document.createElement('div');
+                    var size = Math.random() * 2 + 3;
+                    el.style.cssText = 'position:absolute;width:' + size + 'px;height:' + size + 'px;background:#0033FF;pointer-events:none;animation:float-up-card 2.6s linear forwards;left:' + (Math.random() * 100) + '%;top:100%;z-index:0;opacity:0.7;will-change:transform,opacity';
+                    card.appendChild(el);
+                    setTimeout(function() { if (el.parentNode) el.remove(); }, 2600);
+                }
+                card.addEventListener('mouseenter', function() {
+                    if (!interval) { spawn(); interval = setInterval(spawn, 220); }
+                });
+                card.addEventListener('mouseleave', function() {
+                    if (interval) { clearInterval(interval); interval = null; }
+                });
+            }
+
+            function init() {
+                document.querySelectorAll('.services-grid .service-card').forEach(attach);
+            }
+
+            if ('requestIdleCallback' in window) {
+                requestIdleCallback(init, { timeout: 3000 });
+            } else {
+                setTimeout(init, 1500);
             }
         })();
     </script>
