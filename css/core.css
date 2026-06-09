@@ -224,9 +224,7 @@ a[aria-label] > i[class*="fa-"]:only-child,
 
 @media (hover: hover) {
     .nav-link:hover {
-        background: var(--hazard-stripe);
-        color: var(--hex-white);
-        text-shadow: 2px 2px 0 #000;
+        background: var(--hex-concrete);
     }
 }
 
@@ -305,6 +303,101 @@ a[aria-label] > i[class*="fa-"]:only-child,
 
 .mobile-menu-toggle[aria-expanded="true"] .hamburger span:nth-child(3) {
     transform: translateY(-8px) rotate(-45deg);
+}
+
+/* SERVICES DROPDOWN (desktop: hover/focus; mobile: always-visible grid in the menu) */
+.nav-item-services {
+    position: relative;
+}
+
+.nav-caret {
+    font-size: 0.65em;
+    margin-left: 6px;
+}
+
+.nav-dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 240px;
+    background: var(--hex-white);
+    border: 2px solid var(--hex-black);
+    list-style: none;
+    z-index: 1001;
+    box-shadow: 8px 8px 0 rgba(17, 17, 17, 0.15);
+}
+
+.nav-item-services:hover .nav-dropdown,
+.nav-item-services:focus-within .nav-dropdown {
+    display: block;
+}
+
+.nav-dropdown li {
+    display: block;
+}
+
+.nav-dropdown a {
+    display: flex;
+    align-items: center;
+    padding: 0.85rem 1.2rem;
+    text-decoration: none;
+    color: var(--hex-black);
+    font-weight: 500;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    border-bottom: 1px solid var(--hex-grid);
+}
+
+.nav-dropdown li:last-child a {
+    border-bottom: none;
+}
+
+@media (hover: hover) {
+    .nav-dropdown a:hover {
+        background: var(--hex-concrete);
+    }
+}
+
+/* Bottom info block inside the mobile menu (hidden on desktop) */
+li.nav-menu-meta {
+    display: none;
+}
+
+/* BREADCRUMBS (service pages) */
+.breadcrumbs {
+    font-family: monospace;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    margin-bottom: 1.25rem;
+    color: #555;
+}
+
+.breadcrumbs a {
+    color: var(--hex-accent);
+    text-decoration: none;
+}
+
+.breadcrumbs a:hover {
+    text-decoration: underline;
+}
+
+/* Jump links inside the page header (e.g. console -> PlayStation / Xbox guides) */
+.header-jump-links {
+    font-family: monospace;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    margin-top: 1rem;
+}
+
+.header-jump-links a {
+    color: var(--hex-accent);
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.header-jump-links a:hover {
+    text-decoration: underline;
 }
 
 /* LAYOUT */
@@ -441,15 +534,6 @@ a[aria-label] > i[class*="fa-"]:only-child,
 .cta-secondary {
     background: transparent;
     color: var(--hex-black);
-}
-
-@media (hover: hover) {
-    .cta-secondary:hover {
-        background: var(--hazard-stripe);
-        color: var(--hex-white);
-        text-shadow: 2px 2px 0 #000;
-        border-color: var(--hex-black);
-    }
 }
 
 .cta-secondary:active {
@@ -685,6 +769,70 @@ a[aria-label] > i[class*="fa-"]:only-child,
         padding: 0 1.1rem;
         letter-spacing: 0.5px;
         margin-left: auto;
+    }
+
+    .nav-menu {
+        justify-content: flex-start;
+        height: calc(100vh - 54px);
+        height: calc(100dvh - 54px);
+        overflow-y: auto;
+        border-bottom: none;
+        box-shadow: none;
+    }
+
+    /* The header bar already shows a CALL button on mobile — hide the
+       duplicate menu entry and let the info block anchor the bottom. */
+    li.nav-cta-item {
+        display: none;
+    }
+
+    li.nav-menu-meta {
+        display: block;
+        margin-top: auto;
+        padding: 1.25rem 1.5rem calc(1.25rem + var(--safe-area-bottom));
+        background: var(--hex-concrete);
+        border-top: 1px solid #e3e3e3;
+        font-family: monospace;
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        color: #555;
+        line-height: 1.9;
+    }
+
+    li.nav-menu-meta a {
+        color: var(--hex-accent);
+        text-decoration: none;
+        font-weight: 700;
+    }
+
+    .nav-item-services {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .nav-caret {
+        display: none;
+    }
+
+    .nav-dropdown {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        position: static;
+        min-width: 0;
+        border: none;
+        box-shadow: none;
+        background: var(--hex-concrete);
+    }
+
+    .nav-dropdown a {
+        padding: 0.85rem 1rem;
+        font-size: 0.75rem;
+        min-height: 44px;
+        border-bottom: 1px solid #e3e3e3;
+    }
+
+    .nav-dropdown li:last-child a {
+        border-bottom: 1px solid #e3e3e3;
     }
 
     .mobile-menu-toggle {

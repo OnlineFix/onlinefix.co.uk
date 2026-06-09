@@ -252,14 +252,7 @@ select {
 
 .device-option:hover span,
 .device-option:focus-within span {
-    background: var(--hazard-stripe);
-    color: var(--hex-white);
-    text-shadow: 1px 1px 0 #000;
-}
-
-.device-option:hover span i,
-.device-option:focus-within span i {
-    color: var(--hex-white);
+    background: var(--hex-concrete);
 }
 
 .device-option input:checked + span {
@@ -483,9 +476,7 @@ select {
 }
 
 .btn-secondary:hover:not(:disabled) {
-    background: var(--hazard-stripe);
-    color: var(--hex-white);
-    text-shadow: 2px 2px 0 #000;
+    background: var(--hex-concrete);
 }
 
 /* Review summary */
