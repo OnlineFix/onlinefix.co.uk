@@ -780,12 +780,15 @@ li.nav-menu-meta {
         box-shadow: none;
     }
 
+    /* The header bar already shows a CALL button on mobile — hide the
+       duplicate menu entry and let the info block anchor the bottom. */
     li.nav-cta-item {
-        margin-top: auto;
+        display: none;
     }
 
     li.nav-menu-meta {
         display: block;
+        margin-top: auto;
         padding: 1.25rem 1.5rem calc(1.25rem + var(--safe-area-bottom));
         background: var(--hex-concrete);
         border-top: 1px solid #e3e3e3;
