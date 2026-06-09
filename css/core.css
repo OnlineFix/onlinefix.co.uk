@@ -224,9 +224,7 @@ a[aria-label] > i[class*="fa-"]:only-child,
 
 @media (hover: hover) {
     .nav-link:hover {
-        background: var(--hazard-stripe);
-        color: var(--hex-white);
-        text-shadow: 2px 2px 0 #000;
+        background: var(--hex-concrete);
     }
 }
 
@@ -441,15 +439,6 @@ a[aria-label] > i[class*="fa-"]:only-child,
 .cta-secondary {
     background: transparent;
     color: var(--hex-black);
-}
-
-@media (hover: hover) {
-    .cta-secondary:hover {
-        background: var(--hazard-stripe);
-        color: var(--hex-white);
-        text-shadow: 2px 2px 0 #000;
-        border-color: var(--hex-black);
-    }
 }
 
 .cta-secondary:active {
