@@ -569,8 +569,14 @@
             </div>
         </div>
 
+        <!-- Staff-only gate: the form stays hidden until Firebase Auth confirms a login -->
+        <div id="auth-notice" class="form-container" style="text-align: center;">
+            <h1 class="form-title">Staff access required</h1>
+            <p style="color: #888;">Checking access&hellip; If you're not signed in, log in via the <a href="../admin/" style="color: #00C6FF;">admin dashboard</a> first.</p>
+        </div>
+
         <!-- Form Container -->
-        <div class="form-container">
+        <div class="form-container" id="repair-form-container" style="display: none;">
             <h1 class="form-title">Create New Repair Ticket</h1>
 
             <form id="repair-form">
@@ -792,11 +798,17 @@
 
         // Check authentication
         auth.onAuthStateChanged((user) => {
+            const formContainer = document.getElementById('repair-form-container');
+            const authNotice = document.getElementById('auth-notice');
             if (user) {
                 currentUser = user;
                 document.getElementById('user-info').textContent = `Logged in as: ${user.email}`;
+                if (formContainer) formContainer.style.display = '';
+                if (authNotice) authNotice.style.display = 'none';
             } else {
                 document.getElementById('user-info').textContent = 'Not logged in';
+                if (formContainer) formContainer.style.display = 'none';
+                if (authNotice) authNotice.style.display = '';
             }
         });
 

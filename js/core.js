@@ -34,6 +34,25 @@ if (mobileToggle && navMenu) {
     });
 }
 
+// Conversion event tracking — phone, WhatsApp and email link clicks.
+// window.gtag only exists after analytics consent (see cookies.js), so for
+// users who rejected cookies this is a silent no-op.
+document.addEventListener('click', (e) => {
+    const link = e.target.closest('a[href]');
+    if (!link || typeof window.gtag !== 'function') return;
+    const href = link.getAttribute('href');
+    let eventName = null;
+    if (href.startsWith('tel:')) eventName = 'phone_click';
+    else if (href.indexOf('wa.me/') !== -1) eventName = 'whatsapp_click';
+    else if (href.startsWith('mailto:')) eventName = 'email_click';
+    if (eventName) {
+        window.gtag('event', eventName, {
+            link_location: link.className || 'unstyled',
+            page_path: location.pathname
+        });
+    }
+});
+
 // FAQ accordion (for pages with .faq-item elements)
 document.addEventListener('DOMContentLoaded', () => {
     const faqQuestions = document.querySelectorAll('.faq-item .faq-question');
