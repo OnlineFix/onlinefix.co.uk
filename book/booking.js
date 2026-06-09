@@ -12,6 +12,27 @@
 (function () {
     'use strict';
 
+    // If the Firebase SDK failed to load (CDN unreachable, blocked, etc.)
+    // the rest of this module would throw and leave the page stuck on
+    // "Loading the booking form...". Swap that for clear contact options.
+    function showBookingUnavailable() {
+        var note = document.getElementById('booking-loading');
+        if (!note) return;
+        note.innerHTML = 'The online booking form couldn\'t load right now. '
+            + 'Please call <a href="tel:+447940730537">07940 730537</a> or '
+            + '<a href="https://wa.me/447940730537" target="_blank" rel="noopener noreferrer">message us on WhatsApp</a> '
+            + 'to book your drop-off.';
+    }
+
+    if (typeof firebase === 'undefined') {
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', showBookingUnavailable);
+        } else {
+            showBookingUnavailable();
+        }
+        return;
+    }
+
     // ---- Firebase --------------------------------------------------------
     const firebaseConfig = {
         apiKey: 'AIzaSyCKBlO4aHTVSjwyevg1OYZ0NWy3Y62HJuU',
@@ -22,7 +43,12 @@
         appId: '1:382934797751:web:5ac8a9c87d68a17b4cec32'
     };
 
-    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    try {
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    } catch (err) {
+        showBookingUnavailable();
+        return;
+    }
 
     // App Check is intentionally not enabled here — see the matching note
     // in /book/index.html for the full reasoning. Short version: production
@@ -139,6 +165,9 @@
 
     function goNext() {
         if (!validateStep(state.step)) return;
+        if (typeof window.gtag === 'function') {
+            window.gtag('event', 'booking_step_complete', { step: state.step });
+        }
         if (state.step < 5) showStep(state.step + 1);
     }
 
@@ -775,6 +804,9 @@
             const refId = ref.id.slice(-6).toUpperCase();
             const refEl = $('#reference-id');
             if (refEl) refEl.textContent = refId;
+            if (typeof window.gtag === 'function') {
+                window.gtag('event', 'booking_submitted', { category: state.category });
+            }
             showStep(6);
         } catch (err) {
             console.error('Booking submit failed:', err);

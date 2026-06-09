@@ -48,6 +48,9 @@
         document.head.appendChild(script);
         window.dataLayer = window.dataLayer || [];
         function gtag() { window.dataLayer.push(arguments); }
+        // Expose globally so event tracking (core.js, /track/) can fire
+        // conversion events. Only ever defined AFTER consent.
+        window.gtag = gtag;
         gtag('js', new Date());
         gtag('config', GA_ID, { anonymize_ip: true });
     }
