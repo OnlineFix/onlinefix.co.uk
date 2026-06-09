@@ -128,7 +128,7 @@
         .nav-menu{display:flex;list-style:none;gap:0;align-items:stretch;flex-grow:1;justify-content:flex-end}
         .nav-menu li{display:flex;align-items:stretch}
         .nav-link{text-decoration:none;color:var(--hex-black);font-weight:500;text-transform:uppercase;font-size:0.9rem;padding:0 2rem;display:flex;align-items:center;border-left:1px solid var(--hex-grid);position:relative;transition:all 0.2s}
-        .mobile-menu-toggle{display:none;background:transparent;border:none;font-size:1.5rem;color:var(--hex-black);cursor:pointer;padding:0 1.5rem;min-width:60px;outline:none}.nav-call{display:none}.hamburger{display:inline-flex;flex-direction:column;justify-content:center;gap:5px;width:22px;height:28px}.hamburger span{display:block;height:3px;width:100%;background:currentColor;transition:transform 0.2s,opacity 0.2s}.mobile-menu-toggle[aria-expanded="true"] .hamburger span:nth-child(1){transform:translateY(8px) rotate(45deg)}.mobile-menu-toggle[aria-expanded="true"] .hamburger span:nth-child(2){opacity:0}.mobile-menu-toggle[aria-expanded="true"] .hamburger span:nth-child(3){transform:translateY(-8px) rotate(-45deg)}
+        .mobile-menu-toggle{display:none;background:transparent;border:none;font-size:1.5rem;color:var(--hex-black);cursor:pointer;padding:0 1.5rem;min-width:60px;outline:none}.nav-call{display:none}.hamburger{display:inline-flex;flex-direction:column;justify-content:center;gap:5px;width:22px;height:28px}.hamburger span{display:block;height:3px;width:100%;background:currentColor;transition:transform 0.2s,opacity 0.2s}.mobile-menu-toggle[aria-expanded="true"] .hamburger span:nth-child(1){transform:translateY(8px) rotate(45deg)}.mobile-menu-toggle[aria-expanded="true"] .hamburger span:nth-child(2){opacity:0}.mobile-menu-toggle[aria-expanded="true"] .hamburger span:nth-child(3){transform:translateY(-8px) rotate(-45deg)}.nav-item-services{position:relative}.nav-dropdown{display:none}.nav-caret{font-size:0.65em;margin-left:6px}
         .container{max-width:1400px;margin:0 auto;padding:0 20px;position:relative;z-index:2;width:100%}
         .section-title{font-size:clamp(2rem,5vw,3rem);font-weight:700;text-transform:uppercase;text-align:center;padding-top:4rem;letter-spacing:-1px;margin-bottom:0.5rem}
         .cookie-banner{position:fixed;bottom:0;left:0;right:0;background:var(--hex-black);color:var(--hex-white);z-index:9999;border-top:4px solid;border-image:var(--gradient-blue) 1;transform:translateY(100%);transition:transform 0.3s ease}.cookie-banner.visible{transform:translateY(0)}
@@ -559,7 +559,20 @@
             <a href="/" class="nav-logo" aria-label="OnlineFix Home">OnlineFix</a>
             <ul class="nav-menu" id="nav-menu">
                 <li><a href="/" class="nav-link">Home</a></li>
-                <li><a href="services.html" class="nav-link">Services</a></li>
+                <li class="nav-item-services">
+                    <a href="services.html" class="nav-link">Services<span class="nav-caret" aria-hidden="true">&#9662;</span></a>
+                    <ul class="nav-dropdown" aria-label="Repair services">
+                        <li><a href="console-repair.html">Console Repair</a></li>
+                        <li><a href="playstation-repair.html">PlayStation Repair</a></li>
+                        <li><a href="xbox-repair.html">Xbox Repair</a></li>
+                        <li><a href="iphone-repair.html">Phone Repair</a></li>
+                        <li><a href="laptop-repair.html">Laptop Repair</a></li>
+                        <li><a href="macbook-repair.html">MacBook Repair</a></li>
+                        <li><a href="pc-repair.html">PC Repair</a></li>
+                        <li><a href="tablet-repair.html">Tablet Repair</a></li>
+                        <li><a href="data-recovery.html">Data Recovery</a></li>
+                    </ul>
+                </li>
                 <li><a href="about.html" class="nav-link active"
                         aria-current="page">About</a></li>
                 <li><a href="reviews.html" class="nav-link">Reviews</a></li>
@@ -790,6 +803,8 @@
                         <li><a href="/">Home</a></li>
                         <li><a href="services.html">Services</a></li>
                         <li><a href="console-repair.html">Console Repair</a></li>
+                        <li><a href="playstation-repair.html">PlayStation Repair</a></li>
+                        <li><a href="xbox-repair.html">Xbox Repair</a></li>
                         <li><a href="iphone-repair.html">iPhone Repair</a></li>
                         <li><a href="laptop-repair.html">Laptop Repair</a></li>
                         <li><a href="macbook-repair.html">MacBook Repair</a></li>
