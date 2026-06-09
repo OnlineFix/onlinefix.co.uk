@@ -1120,6 +1120,14 @@
             }
     }
     </style>
+    <style>
+        .bench-section{padding:4rem 0;background:var(--hex-white);border-top:2px solid var(--hex-black)}
+        .bench-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;max-width:1200px;margin:0 auto}
+        .bench-item{margin:0;border:2px solid var(--hex-black);background:var(--hex-white);box-shadow:8px 8px 0 #ddd}
+        .bench-item img{display:block;width:100%;height:auto;border-bottom:2px solid var(--hex-black)}
+        .bench-item figcaption{font-family:monospace;font-size:0.7rem;text-transform:uppercase;padding:0.6rem 0.8rem;color:#555}
+        @media(max-width:768px){.bench-section{padding:2rem 0}.bench-grid{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;gap:12px;padding-bottom:1rem;max-width:none}.bench-item{min-width:65vw;max-width:65vw;scroll-snap-align:start;flex-shrink:0}}
+    </style>
 </head>
 
 <body>
@@ -1460,6 +1468,29 @@
                         <p>Every repair is fully stress-tested before collection. Your console comes back working like
                             new, with a warranty included.</p>
                     </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Real repair photos (from Instagram) -->
+        <section class="bench-section" aria-labelledby="bench-heading">
+            <div class="container">
+                <h2 class="section-title fade-in" id="bench-heading">RECENT WORK</h2>
+                <p class="section-subtitle fade-in">Before, During &amp; After &mdash; Real Console Repairs</p>
+                <div class="scroll-hint" aria-hidden="true">SCROLL -&gt;</div>
+                <div class="bench-grid" role="list" data-scroll-nudge>
+                    <figure class="bench-item fade-in" role="listitem">
+                        <img src="/images/repair-ps5-fan-dust.webp" alt="Dust-clogged PS5 cooling fan photographed before deep cleaning" width="800" height="800" loading="lazy" decoding="async">
+                        <figcaption>PS5 FAN BEFORE DEEP CLEAN</figcaption>
+                    </figure>
+                    <figure class="bench-item fade-in" role="listitem">
+                        <img src="/images/repair-thermal-paste.webp" alt="Applying fresh thermal paste to a games console processor during a deep-clean service" width="800" height="800" loading="lazy" decoding="async">
+                        <figcaption>FRESH THERMAL PASTE // CONSOLE SERVICE</figcaption>
+                    </figure>
+                    <figure class="bench-item fade-in" role="listitem">
+                        <img src="/images/repair-ps5-fixed.webp" alt="Repaired PS5 booting to the Welcome Back to PlayStation screen" width="800" height="800" loading="lazy" decoding="async">
+                        <figcaption>POWERED UP // PS5 REPAIRED</figcaption>
+                    </figure>
                 </div>
             </div>
         </section>

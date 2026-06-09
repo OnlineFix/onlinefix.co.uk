@@ -531,6 +531,14 @@
         .faq-question { font-size: 0.8rem; padding: 0.9rem 1rem; }
     }
     </style>
+    <style>
+        .bench-section{padding:4rem 0;background:var(--hex-white);border-top:2px solid var(--hex-black)}
+        .bench-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;max-width:1200px;margin:0 auto}
+        .bench-item{margin:0;border:2px solid var(--hex-black);background:var(--hex-white);box-shadow:8px 8px 0 #ddd}
+        .bench-item img{display:block;width:100%;height:auto;border-bottom:2px solid var(--hex-black)}
+        .bench-item figcaption{font-family:monospace;font-size:0.7rem;text-transform:uppercase;padding:0.6rem 0.8rem;color:#555}
+        @media(max-width:768px){.bench-section{padding:2rem 0}.bench-grid{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;gap:12px;padding-bottom:1rem;max-width:none}.bench-item{min-width:65vw;max-width:65vw;scroll-snap-align:start;flex-shrink:0}}
+    </style>
 </head>
 <body>
     <a href="#main" class="skip-link">Skip to main content</a>
@@ -831,6 +839,25 @@
                         <h4>Tested &amp; Returned</h4>
                         <p>Every repair is stress-tested before collection. Your laptop comes back working properly, with a 90-day warranty on the work.</p>
                     </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Real repair photos (from Instagram) -->
+        <section class="bench-section" aria-labelledby="bench-heading">
+            <div class="container">
+                <h2 class="section-title fade-in" id="bench-heading">RECENT WORK</h2>
+                <p class="section-subtitle fade-in">Real Laptop Repairs From The Bench</p>
+                <div class="scroll-hint" aria-hidden="true">SCROLL -&gt;</div>
+                <div class="bench-grid" role="list" data-scroll-nudge>
+                    <figure class="bench-item fade-in" role="listitem">
+                        <img src="/images/repair-laptop-screen.webp" alt="HP laptop with a cracked screen photographed before screen replacement" width="800" height="800" loading="lazy" decoding="async">
+                        <figcaption>CRACKED SCREEN // BEFORE REPLACEMENT</figcaption>
+                    </figure>
+                    <figure class="bench-item fade-in" role="listitem">
+                        <img src="/images/repair-microscope-solder.webp" alt="Circuit board connections inspected under the microscope after micro-soldering" width="800" height="800" loading="lazy" decoding="async">
+                        <figcaption>MICRO-SOLDERING UNDER THE SCOPE</figcaption>
+                    </figure>
                 </div>
             </div>
         </section>
