@@ -359,6 +359,11 @@ a[aria-label] > i[class*="fa-"]:only-child,
     }
 }
 
+/* Bottom info block inside the mobile menu (hidden on desktop) */
+li.nav-menu-meta {
+    display: none;
+}
+
 /* BREADCRUMBS (service pages) */
 .breadcrumbs {
     font-family: monospace;
@@ -767,8 +772,34 @@ a[aria-label] > i[class*="fa-"]:only-child,
     }
 
     .nav-menu {
-        max-height: calc(100vh - 54px);
+        justify-content: flex-start;
+        height: calc(100vh - 54px);
+        height: calc(100dvh - 54px);
         overflow-y: auto;
+        border-bottom: none;
+        box-shadow: none;
+    }
+
+    li.nav-cta-item {
+        margin-top: auto;
+    }
+
+    li.nav-menu-meta {
+        display: block;
+        padding: 1.25rem 1.5rem calc(1.25rem + var(--safe-area-bottom));
+        background: var(--hex-concrete);
+        border-top: 1px solid #e3e3e3;
+        font-family: monospace;
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        color: #555;
+        line-height: 1.9;
+    }
+
+    li.nav-menu-meta a {
+        color: var(--hex-accent);
+        text-decoration: none;
+        font-weight: 700;
     }
 
     .nav-item-services {
