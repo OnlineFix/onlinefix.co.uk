@@ -6,17 +6,17 @@
    - Never caches /admin/ (auth-gated, always fresh)
 */
 
-const SW_VERSION = 'onlinefix-v8';
+const SW_VERSION = 'onlinefix-v10';
 const SHELL_CACHE = `shell-${SW_VERSION}`;
 const RUNTIME_CACHE = `runtime-${SW_VERSION}`;
 
 const SHELL_URLS = [
     '/',
     '/index.html',
-    '/css/core.min.css?v=20260609',
-    '/css/icons.min.css?v=20260609',
-    '/js/core.js?v=20260609',
-    '/js/cookies.js?v=20260609',
+    '/css/core.min.css?v=20260611',
+    '/css/icons.min.css?v=20260611',
+    '/js/core.js?v=20260611',
+    '/js/cookies.js?v=20260611',
     '/images/onlinefix-logo.webp?v=2',
     '/favicon-192x192.png',
     '/favicon-512x512.png?v=2',

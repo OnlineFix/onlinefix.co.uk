@@ -270,11 +270,6 @@ a[aria-label] > i[class*="fa-"]:only-child,
     outline: none;
 }
 
-/* Mobile-only call shortcut in the header bar (hidden on desktop) */
-.nav-call {
-    display: none;
-}
-
 /* CSS-drawn hamburger — no icon-font dependency, animates to an X via aria-expanded */
 .hamburger {
     display: inline-flex;
@@ -759,20 +754,6 @@ a[aria-label] > i[class*="fa-"]:only-child,
         height: 54px;
     }
 
-    .nav-call {
-        display: flex;
-        align-items: center;
-        background: var(--hex-black);
-        color: var(--hex-white);
-        text-decoration: none;
-        font-weight: 600;
-        font-size: 0.8rem;
-        text-transform: uppercase;
-        padding: 0 1.1rem;
-        letter-spacing: 0.5px;
-        margin-left: auto;
-    }
-
     .nav-menu {
         justify-content: flex-start;
         height: calc(100vh - 54px);
@@ -782,15 +763,12 @@ a[aria-label] > i[class*="fa-"]:only-child,
         box-shadow: none;
     }
 
-    /* The header bar already shows a CALL button on mobile — hide the
-       duplicate menu entry and let the info block anchor the bottom. */
     .nav-menu li.nav-cta-item {
-        display: none;
+        margin-top: auto;
     }
 
     .nav-menu li.nav-menu-meta {
         display: block;
-        margin-top: auto;
         padding: 1.25rem 1.5rem calc(1.25rem + var(--safe-area-bottom));
         background: var(--hex-concrete);
         border-top: 1px solid #e3e3e3;
