@@ -359,8 +359,10 @@ a[aria-label] > i[class*="fa-"]:only-child,
     }
 }
 
-/* Bottom info block inside the mobile menu (hidden on desktop) */
-li.nav-menu-meta {
+/* Bottom info block inside the mobile menu (hidden on desktop).
+   Specificity is deliberately higher than ".nav-menu li" so the hide rule
+   still wins if a stale cached stylesheet loads after the inline critical CSS. */
+.nav-menu li.nav-menu-meta {
     display: none;
 }
 
@@ -771,22 +773,33 @@ li.nav-menu-meta {
         margin-left: auto;
     }
 
+    /* Full-screen menu panel below the 54px header bar */
     .nav-menu {
+        display: none;
+        flex-direction: column;
         justify-content: flex-start;
+        position: absolute;
+        top: 54px;
+        left: 0;
+        right: 0;
         height: calc(100vh - 54px);
         height: calc(100dvh - 54px);
         overflow-y: auto;
-        border-bottom: none;
-        box-shadow: none;
+        background: var(--hex-white);
+        border-top: 2px solid var(--hex-black);
+    }
+
+    .nav-menu.active {
+        display: flex;
     }
 
     /* The header bar already shows a CALL button on mobile — hide the
        duplicate menu entry and let the info block anchor the bottom. */
-    li.nav-cta-item {
+    .nav-menu li.nav-cta-item {
         display: none;
     }
 
-    li.nav-menu-meta {
+    .nav-menu li.nav-menu-meta {
         display: block;
         margin-top: auto;
         padding: 1.25rem 1.5rem calc(1.25rem + var(--safe-area-bottom));
@@ -799,7 +812,7 @@ li.nav-menu-meta {
         line-height: 1.9;
     }
 
-    li.nav-menu-meta a {
+    .nav-menu li.nav-menu-meta a {
         color: var(--hex-accent);
         text-decoration: none;
         font-weight: 700;
@@ -842,23 +855,6 @@ li.nav-menu-meta {
         border: none;
         padding: 0 1rem;
         color: var(--hex-black);
-    }
-
-    .nav-menu {
-        display: none;
-        flex-direction: column;
-        position: absolute;
-        top: 54px;
-        left: 0;
-        right: 0;
-        background: var(--hex-white);
-        border-top: 2px solid var(--hex-black);
-        border-bottom: 2px solid var(--hex-black);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-    }
-
-    .nav-menu.active {
-        display: flex;
     }
 
     .nav-link {
