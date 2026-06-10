@@ -688,6 +688,8 @@
             border: 1px dashed var(--hex-black);
             box-shadow: 5px 5px 0 #ddd;
             height: 100%;
+            display: flex;
+            flex-direction: column;
         }
 
         .stars {
@@ -708,6 +710,8 @@
             color: var(--hex-white);
             display: inline-block;
             padding: 2px 8px;
+            margin-top: auto;
+            align-self: flex-start;
         }
 
         @media (max-width: 1100px) and (min-width: 769px) {
@@ -785,6 +789,7 @@
         .testimonial-card {
                 min-width: 65vw;
                 max-width: 65vw;
+                height: auto;
                 scroll-snap-align: start;
                 flex-shrink: 0;
                 padding: 1.2rem 1rem;
