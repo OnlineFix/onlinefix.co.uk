@@ -762,15 +762,17 @@ a[aria-label] > i[class*="fa-"]:only-child,
     .nav-call {
         display: flex;
         align-items: center;
-        background: var(--hex-black);
+        gap: 7px;
+        background: var(--gradient-blue);
         color: var(--hex-white);
         text-decoration: none;
-        font-weight: 600;
-        font-size: 0.8rem;
+        font-weight: 700;
+        font-size: 0.85rem;
         text-transform: uppercase;
-        padding: 0 1.1rem;
+        padding: 0 1.2rem;
         letter-spacing: 0.5px;
         margin-left: auto;
+        border-left: 2px solid var(--hex-black);
     }
 
     .nav-menu {
