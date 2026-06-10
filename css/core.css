@@ -359,8 +359,10 @@ a[aria-label] > i[class*="fa-"]:only-child,
     }
 }
 
-/* Bottom info block inside the mobile menu (hidden on desktop) */
-li.nav-menu-meta {
+/* Bottom info block inside the mobile menu (hidden on desktop).
+   Selector intentionally beats ".nav-menu li" regardless of stylesheet
+   load order, so a stale cached stylesheet can never reveal it. */
+.nav-menu li.nav-menu-meta {
     display: none;
 }
 
@@ -782,11 +784,11 @@ li.nav-menu-meta {
 
     /* The header bar already shows a CALL button on mobile — hide the
        duplicate menu entry and let the info block anchor the bottom. */
-    li.nav-cta-item {
+    .nav-menu li.nav-cta-item {
         display: none;
     }
 
-    li.nav-menu-meta {
+    .nav-menu li.nav-menu-meta {
         display: block;
         margin-top: auto;
         padding: 1.25rem 1.5rem calc(1.25rem + var(--safe-area-bottom));
@@ -799,7 +801,7 @@ li.nav-menu-meta {
         line-height: 1.9;
     }
 
-    li.nav-menu-meta a {
+    .nav-menu li.nav-menu-meta a {
         color: var(--hex-accent);
         text-decoration: none;
         font-weight: 700;
