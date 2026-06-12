@@ -111,6 +111,11 @@ a[aria-label] > i[class*="fa-"]:only-child,
     font-weight: 600;
 }
 
+/* Keeps multi-word phrases (e.g. page-subtitle segments) on one line */
+.nosplit {
+    white-space: nowrap;
+}
+
 .scroll-hint {
     display: none;
     text-align: right;
