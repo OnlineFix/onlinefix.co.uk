@@ -221,3 +221,50 @@ if (window.matchMedia('(max-width: 767px)').matches) {
         scrollGrids.forEach(grid => nudgeObserver.observe(grid));
     });
 }
+
+// Empty touchstart listener so iOS Safari applies :active pressed states
+document.addEventListener('touchstart', function () {}, { passive: true });
+
+// Floating accent dots inside the homepage hero and the grid-background
+// page headers. Deferred until idle so spawning never competes with LCP;
+// skipped entirely under prefers-reduced-motion.
+(function () {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var interval = null;
+    var targets = [];
+
+    function spawn() {
+        targets.forEach(function (target) {
+            var el = document.createElement('div');
+            var size = Math.random() * 2 + 3;
+            el.className = 'float-dot';
+            el.style.width = size + 'px';
+            el.style.height = size + 'px';
+            el.style.left = (Math.random() * 100) + '%';
+            target.appendChild(el);
+            setTimeout(function () { if (el.parentNode) el.remove(); }, 8000);
+        });
+    }
+
+    function start() {
+        if (!interval && targets.length) interval = setInterval(spawn, 150);
+    }
+    function stop() {
+        if (interval) { clearInterval(interval); interval = null; }
+    }
+
+    function init() {
+        targets = [].slice.call(document.querySelectorAll('.hero, .page-header'));
+        if (!targets.length) return;
+        start();
+        document.addEventListener('visibilitychange', function () {
+            document.hidden ? stop() : start();
+        });
+    }
+
+    if ('requestIdleCallback' in window) {
+        requestIdleCallback(init, { timeout: 3000 });
+    } else {
+        setTimeout(init, 2000);
+    }
+})();

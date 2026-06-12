@@ -111,6 +111,11 @@ a[aria-label] > i[class*="fa-"]:only-child,
     font-weight: 600;
 }
 
+/* Keeps multi-word phrases (e.g. page-subtitle segments) on one line */
+.nosplit {
+    white-space: nowrap;
+}
+
 .scroll-hint {
     display: none;
     text-align: right;
@@ -1149,15 +1154,16 @@ a[aria-label] > i[class*="fa-"]:only-child,
         padding: 0.5rem;
         text-decoration: none;
         color: var(--hex-black);
-        font-weight: 700;
+        font-weight: 600;
         text-transform: uppercase;
         font-size: 0.8rem;
+        letter-spacing: 0.04em;
         border-left: 1px solid var(--hex-grid);
     }
 
     .mobile-contact-bar a:first-child {
         border-left: none;
-        background: var(--gradient-blue);
+        background: var(--hex-black);
         color: var(--hex-white);
     }
 
@@ -1166,10 +1172,44 @@ a[aria-label] > i[class*="fa-"]:only-child,
         color: var(--hex-white);
     }
 
+    .mobile-contact-bar a:first-child:active {
+        background: #333;
+    }
+
     /* Keep page bottom (footer/copyright) reachable above the fixed bar */
     body:has(.mobile-contact-bar) {
         padding-bottom: calc(54px + var(--safe-area-bottom));
     }
+
+    /* The bar is the single persistent contact action on phones, so
+       in-page call/WhatsApp duplicates hide; desktop (no bar) keeps them.
+       Emergency sections stay — their message is the point, not the number. */
+    body:has(.mobile-contact-bar) .header-cta-row,
+    body:has(.mobile-contact-bar) .services-grid-cta,
+    body:has(.mobile-contact-bar) .issues-grid-cta,
+    body:has(.mobile-contact-bar) .hero .cta-button[href^="tel:"],
+    body:has(.mobile-contact-bar) .hero .cta-button[href*="wa.me"],
+    body:has(.mobile-contact-bar) .cta-section {
+        display: none;
+    }
+}
+
+/* Floating accent dots inside .hero and grid .page-header sections.
+   Spawned by core.js; sized/positioned per element inline. */
+@keyframes float-up {
+    0% { transform: translateY(0) rotate(0deg); opacity: 0.7; }
+    100% { transform: translateY(-100vh) rotate(90deg); opacity: 0; }
+}
+
+.float-dot {
+    position: absolute;
+    top: 100%;
+    z-index: 1;
+    background: var(--hex-accent);
+    opacity: 0.7;
+    pointer-events: none;
+    animation: float-up 8s linear infinite;
+    will-change: transform, opacity;
 }
 
 /* ANIMATIONS */
