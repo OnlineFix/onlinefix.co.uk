@@ -221,3 +221,6 @@ if (window.matchMedia('(max-width: 767px)').matches) {
         scrollGrids.forEach(grid => nudgeObserver.observe(grid));
     });
 }
+
+// Empty touchstart listener so iOS Safari applies :active pressed states
+document.addEventListener('touchstart', function () {}, { passive: true });

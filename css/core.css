@@ -1175,6 +1175,18 @@ a[aria-label] > i[class*="fa-"]:only-child,
     body:has(.mobile-contact-bar) {
         padding-bottom: calc(54px + var(--safe-area-bottom));
     }
+
+    /* The bar is the single persistent contact action on phones, so
+       in-page call/WhatsApp duplicates hide; desktop (no bar) keeps them.
+       Emergency sections stay — their message is the point, not the number. */
+    body:has(.mobile-contact-bar) .header-cta-row,
+    body:has(.mobile-contact-bar) .services-grid-cta,
+    body:has(.mobile-contact-bar) .issues-grid-cta,
+    body:has(.mobile-contact-bar) .hero .cta-button[href^="tel:"],
+    body:has(.mobile-contact-bar) .hero .cta-button[href*="wa.me"],
+    body:has(.mobile-contact-bar) .cta-section {
+        display: none;
+    }
 }
 
 /* ANIMATIONS */
