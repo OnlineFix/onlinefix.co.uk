@@ -328,9 +328,14 @@ a[aria-label] > i[class*="fa-"]:only-child,
     box-shadow: 8px 8px 0 rgba(17, 17, 17, 0.15);
 }
 
-.nav-item-services:hover .nav-dropdown,
-.nav-item-services:focus-within .nav-dropdown {
-    display: block;
+/* Desktop-only: opening on hover/focus. On phones the dropdown is an
+   always-visible grid; letting :focus-within restyle it re-layouts the
+   links mid-tap and the click lands on the wrong service. */
+@media (min-width: 769px) {
+    .nav-item-services:hover .nav-dropdown,
+    .nav-item-services:focus-within .nav-dropdown {
+        display: block;
+    }
 }
 
 .nav-dropdown li {
