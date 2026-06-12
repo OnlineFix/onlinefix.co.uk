@@ -169,12 +169,12 @@
         .page-title{font-size:clamp(2rem,6vw,4rem);font-weight:700;line-height:0.9;text-transform:uppercase;letter-spacing:-2px;color:var(--hex-black);margin-bottom:1rem}.page-title span{background:var(--gradient-blue);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;display:inline-block}
         .page-subtitle{font-family:'Courier New',Courier,monospace;font-size:clamp(0.9rem,2vw,1.1rem);text-transform:uppercase;background:var(--hex-black);color:var(--hex-white);display:inline-block;padding:5px 8px}
         .header-price-note{font-family:'Courier New',Courier,monospace;font-size:clamp(0.75rem,2vw,0.95rem);text-transform:uppercase;font-weight:700;margin:1rem 0 0.2rem}.header-cta-row{display:flex;justify-content:center;flex-wrap:wrap;margin-top:0.5rem}.cta-button{display:inline-flex;align-items:center;justify-content:center;background:var(--gradient-blue);color:var(--hex-white);padding:1rem 2rem;text-decoration:none;font-weight:600;text-transform:uppercase;font-size:0.9rem;border:2px solid var(--hex-black);margin:0.5rem;white-space:nowrap}.cta-secondary{background:transparent;color:var(--hex-black)}
-        @media(max-width:768px){.navbar{background:var(--hex-white);border-bottom:2px solid var(--hex-black)}.nav-logo{font-size:1.1rem;padding:0 1rem;letter-spacing:-0.5px}.nav-container{justify-content:space-between;height:54px}.mobile-menu-toggle{display:flex;align-items:center;background:transparent;border:none;padding:0 1rem;color:var(--hex-black)}.nav-menu{display:none;flex-direction:column;justify-content:flex-start;position:absolute;top:54px;left:0;right:0;height:calc(100vh - 54px);height:calc(100dvh - 54px);overflow-y:auto;background:var(--hex-white);border-top:2px solid var(--hex-black)}.nav-menu li.nav-cta-item{margin-top:auto}.nav-menu.active{display:flex}.nav-link{flex:1;padding:1.5rem;border-left:none;border-bottom:1px solid #eee;min-height:48px}.nav-cta{flex:1;padding:1.5rem;justify-content:center;border-left:none;min-height:48px}.container{padding:0 12px}.section-title{padding-top:2rem;margin-bottom:0}.page-header-box{padding:1.5rem 1rem;box-shadow:6px 6px 0 var(--hex-black)}.page-title{font-size:clamp(1.8rem,7vw,2.5rem);letter-spacing:-1px}.page-subtitle{font-size:clamp(0.65rem,2.5vw,0.85rem);word-break:break-word;padding:4px 6px}.page-header-content{padding:2.5rem 12px}}
-        @media(max-width:768px){.header-cta-row{flex-direction:column}.header-cta-row .cta-button{width:100%;margin:0.25rem 0}}
+        @media(max-width:768px){.navbar{background:var(--hex-white);border-bottom:2px solid var(--hex-black)}.nav-logo{font-size:1.1rem;padding:0 1rem;letter-spacing:-0.5px}.nav-container{justify-content:space-between;height:54px}.mobile-menu-toggle{display:flex;align-items:center;background:transparent;border:none;padding:0 1rem;color:var(--hex-black)}.nav-menu{display:none;flex-direction:column;justify-content:flex-start;position:absolute;top:54px;left:0;right:0;height:calc(100vh - 54px);height:calc(100dvh - 54px);overflow-y:auto;background:var(--hex-white);border-top:2px solid var(--hex-black)}.nav-menu li.nav-cta-item{margin-top:auto}.nav-menu.active{display:flex}.nav-link{flex:1;padding:1.5rem;border-left:none;border-bottom:1px solid #eee;min-height:48px}.nav-cta{flex:1;padding:1.5rem;justify-content:center;border-left:none;min-height:48px}.container{padding:0 12px}.section-title{padding-top:2rem;margin-bottom:0}.page-header-box{padding:1.5rem 1rem;box-shadow:6px 6px 0 var(--hex-black)}.page-title{font-size:clamp(1.8rem,7vw,2.5rem);letter-spacing:-1px}.page-subtitle{font-size:clamp(0.65rem,2.5vw,0.85rem);word-break:break-word;padding:4px 6px}.page-header-content{padding:1.75rem 12px}}
+        @media(max-width:768px){.header-cta-row{flex-direction:column}.header-cta-row .cta-button{width:100%;margin:0.25rem 0}.header-cta-row .cta-secondary{border:none;text-decoration:underline;font-size:0.85rem;padding:0.6rem;min-height:44px}}
     </style>
     <!-- Deferred stylesheets (non-render-blocking) -->
-    <link rel="stylesheet" href="/css/core.min.css?v=20260611" media="print" onload="this.media='all'">
-    <noscript><link rel="stylesheet" href="/css/core.min.css?v=20260611"></noscript>
+    <link rel="stylesheet" href="/css/core.min.css?v=20260612" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="/css/core.min.css?v=20260612"></noscript>
     <link rel="stylesheet" href="/css/icons.min.css?v=20260611" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="/css/icons.min.css?v=20260611"></noscript>
     <style>
@@ -252,6 +252,11 @@
             }
         }
 
+        .service-card:active {
+            transform: translate(2px, 2px);
+            box-shadow: -2px -2px 0 var(--hex-black);
+        }
+
         .service-card .service-description {
             font-family: 'Courier New', Courier, monospace;
         }
@@ -302,16 +307,32 @@
             cursor: pointer;
         }
 
+        /* Inline guide links must sit above the card's stretched-link overlay
+           or taps land on the card instead */
+        .service-description a {
+            position: relative;
+            z-index: 2;
+            color: var(--hex-accent);
+            font-weight: 700;
+        }
+
         .service-description {
             margin-bottom: 1.5rem;
             color: #555;
             line-height: 1.6;
         }
 
+        .service-features-wrap {
+            flex-grow: 1;
+            margin-bottom: 1.5rem;
+        }
+
+        .service-features-toggle {
+            display: none;
+        }
+
         .service-features {
             list-style: none;
-            margin-bottom: 1.5rem;
-            flex-grow: 1;
         }
 
         .service-features li {
@@ -331,28 +352,46 @@
 
         .service-bottom {
             margin-top: auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            border-top: 1px solid var(--hex-grid);
+            padding-top: 1rem;
         }
 
         .service-pricing {
-            background: var(--hex-concrete);
-            padding: 1rem;
-            border: 1px solid var(--hex-grid);
-            margin-bottom: 1rem;
-            text-align: center;
+            display: flex;
+            align-items: baseline;
+            gap: 0.5rem;
         }
 
         .price-text {
             font-family: monospace;
             font-size: 0.8rem;
             color: #666;
-            margin-bottom: 0.3rem;
             text-transform: uppercase;
         }
 
         .price-amount {
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             font-weight: 900;
             color: var(--hex-black);
+        }
+
+        .service-cta {
+            font-family: var(--font-main);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            color: var(--hex-accent);
+            white-space: nowrap;
+        }
+
+        @media (hover: hover) {
+            .service-card:hover .service-cta {
+                text-decoration: underline;
+            }
         }
 
         .emergency-section {
@@ -448,9 +487,6 @@
         }
 
         @media (max-width: 768px) {
-        .scroll-hint {
-                display: none;
-            }
         .page-title {
                 font-size: clamp(1.8rem, 7vw, 2.5rem);
             }
@@ -465,7 +501,51 @@
             }
         .service-card {
                 min-width: unset;
-                padding: 1.5rem;
+                padding: 1.25rem;
+                font-family: var(--font-main);
+            }
+        .service-card .service-description {
+                font-family: var(--font-main);
+            }
+        .service-header {
+                margin-bottom: 0.75rem;
+            }
+        .service-description {
+                margin-bottom: 1rem;
+                font-size: 0.95rem;
+            }
+        .service-features-wrap {
+                margin-bottom: 1rem;
+            }
+        .service-features-toggle {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                position: relative;
+                z-index: 2;
+                cursor: pointer;
+                list-style: none;
+                font-weight: 700;
+                text-transform: uppercase;
+                font-size: 0.8rem;
+                min-height: 44px;
+                padding: 0.5rem 0.75rem;
+                border: 1px solid var(--hex-grid);
+                background: var(--hex-concrete);
+            }
+        .service-features-toggle::-webkit-details-marker {
+                display: none;
+            }
+        .toggle-icon {
+                font-size: 1.2rem;
+                line-height: 1;
+                transition: transform 0.2s;
+            }
+        .service-features-wrap[open] .toggle-icon {
+                transform: rotate(45deg);
+            }
+        .service-features {
+                padding: 0.5rem 0.25rem 0;
             }
         .process-section {
                 padding: 2rem 0;
@@ -489,7 +569,9 @@
                 font-size: clamp(1.1rem, 4vw, 1.4rem);
             }
         .service-features li {
-                font-size: 0.95rem;
+                font-family: var(--font-main);
+                font-size: 0.9rem;
+                padding: 0.35rem 0;
             }
         .emergency-section {
                 padding: 2.5rem 0;
@@ -549,7 +631,7 @@
                     <p class="header-price-note">SAME-DAY &bull; 90-DAY WARRANTY &bull; NO FIX, NO FEE</p>
                     <div class="header-cta-row">
                         <a href="tel:+447940730537" class="cta-button">Call 07940 730537</a>
-                        <a href="https://wa.me/447940730537" target="_blank" rel="noopener noreferrer" class="cta-button cta-secondary">WhatsApp</a>
+                        <a href="https://wa.me/447940730537" target="_blank" rel="noopener noreferrer" class="cta-button cta-secondary">Message on WhatsApp</a>
                     </div>
                 </div>
             </div>
@@ -561,27 +643,30 @@
                 <h2 class="section-title fade-in" id="services-heading">WHAT WE FIX</h2>
                 <p class="section-subtitle fade-in">Full Service Specifications</p>
 
-                <div class="scroll-hint" aria-hidden="true">SCROLL &rarr;</div>
                 <div class="services-grid">
                     <div class="service-card fade-in">
                         <div class="service-header">
                             <div class="service-icon" aria-hidden="true"><i class="fas fa-gamepad"></i></div>
                             <h3 class="service-title"><a class="service-title-link" href="console-repair.html">Gaming Console Repair</a></h3>
                         </div>
-                        <p class="service-description">PS4, PS5, Xbox, Nintendo Switch and retro console repairs. HDMI ports, overheating and more. Dedicated guides: <a href="playstation-repair.html" style="color: var(--hex-accent); font-weight: 700;">PlayStation</a> &middot; <a href="xbox-repair.html" style="color: var(--hex-accent); font-weight: 700;">Xbox</a>.</p>
-                        <ul class="service-features">
-                            <li>HDMI port repair</li>
-                            <li>Charging issues</li>
-                            <li>Overheating solutions</li>
-                            <li>Disc drive repair</li>
-                            <li>Software troubleshooting</li>
-                            <li>Performance upgrades</li>
-                        </ul>
+                        <p class="service-description">PS4, PS5, Xbox, Nintendo Switch and retro console repairs. HDMI ports, overheating and more. Dedicated guides: <a href="playstation-repair.html">PlayStation</a> &middot; <a href="xbox-repair.html">Xbox</a>.</p>
+                        <details class="service-features-wrap" open>
+                            <summary class="service-features-toggle">What we fix<span class="toggle-icon" aria-hidden="true">+</span></summary>
+                            <ul class="service-features">
+                                <li>HDMI port repair</li>
+                                <li>Charging issues</li>
+                                <li>Overheating solutions</li>
+                                <li>Disc drive repair</li>
+                                <li>Software troubleshooting</li>
+                                <li>Performance upgrades</li>
+                            </ul>
+                        </details>
                         <div class="service-bottom">
                             <div class="service-pricing">
-                                <div class="price-text">Starting from</div>
-                                <div class="price-amount">&pound;30</div>
+                                <span class="price-text">From</span>
+                                <span class="price-amount">&pound;30</span>
                             </div>
+                            <span class="service-cta" aria-hidden="true">View prices &rarr;</span>
                         </div>
                     </div>
 
@@ -591,19 +676,23 @@
                             <h3 class="service-title"><a class="service-title-link" href="iphone-repair.html">Phone Repair</a></h3>
                         </div>
                         <p class="service-description">We fix all phone brands. iPhone, Samsung, Pixel, OnePlus and more.</p>
-                        <ul class="service-features">
-                            <li>Screen replacement and repair</li>
-                            <li>Battery replacement</li>
-                            <li>Water damage recovery</li>
-                            <li>Charging port repair</li>
-                            <li>Camera and speaker fixes</li>
-                            <li>Software troubleshooting</li>
-                        </ul>
+                        <details class="service-features-wrap" open>
+                            <summary class="service-features-toggle">What we fix<span class="toggle-icon" aria-hidden="true">+</span></summary>
+                            <ul class="service-features">
+                                <li>Screen replacement and repair</li>
+                                <li>Battery replacement</li>
+                                <li>Water damage recovery</li>
+                                <li>Charging port repair</li>
+                                <li>Camera and speaker fixes</li>
+                                <li>Software troubleshooting</li>
+                            </ul>
+                        </details>
                         <div class="service-bottom">
                             <div class="service-pricing">
-                                <div class="price-text">Starting from</div>
-                                <div class="price-amount">&pound;25</div>
+                                <span class="price-text">From</span>
+                                <span class="price-amount">&pound;25</span>
                             </div>
+                            <span class="service-cta" aria-hidden="true">View prices &rarr;</span>
                         </div>
                     </div>
 
@@ -612,20 +701,24 @@
                             <div class="service-icon" aria-hidden="true"><i class="fas fa-laptop"></i></div>
                             <h3 class="service-title"><a class="service-title-link" href="laptop-repair.html">Laptop Repair</a></h3>
                         </div>
-                        <p class="service-description">Dell, HP, Lenovo and ASUS repairs &mdash; plus a dedicated <a href="macbook-repair.html" style="color: var(--hex-accent); font-weight: 700;">MacBook service</a>. Hardware and software fixed.</p>
-                        <ul class="service-features">
-                            <li>Screen replacement</li>
-                            <li>Keyboard and trackpad repair</li>
-                            <li>Hard drive replacement/upgrade</li>
-                            <li>RAM upgrades</li>
-                            <li>Cooling system cleaning</li>
-                            <li>Performance optimization</li>
-                        </ul>
+                        <p class="service-description">Dell, HP, Lenovo and ASUS repairs &mdash; plus a dedicated <a href="macbook-repair.html">MacBook service</a>. Hardware and software fixed.</p>
+                        <details class="service-features-wrap" open>
+                            <summary class="service-features-toggle">What we fix<span class="toggle-icon" aria-hidden="true">+</span></summary>
+                            <ul class="service-features">
+                                <li>Screen replacement</li>
+                                <li>Keyboard and trackpad repair</li>
+                                <li>Hard drive replacement/upgrade</li>
+                                <li>RAM upgrades</li>
+                                <li>Cooling system cleaning</li>
+                                <li>Performance optimization</li>
+                            </ul>
+                        </details>
                         <div class="service-bottom">
                             <div class="service-pricing">
-                                <div class="price-text">Starting from</div>
-                                <div class="price-amount">&pound;45</div>
+                                <span class="price-text">From</span>
+                                <span class="price-amount">&pound;45</span>
                             </div>
+                            <span class="service-cta" aria-hidden="true">View prices &rarr;</span>
                         </div>
                     </div>
 
@@ -639,19 +732,23 @@
                             <h3 class="service-title"><a class="service-title-link" href="tablet-repair.html">Tablet Repair</a></h3>
                         </div>
                         <p class="service-description">iPad, Samsung Galaxy Tab, Surface and more. Fast screen and battery fixes.</p>
-                        <ul class="service-features">
-                            <li>Touch screen digitizer repair</li>
-                            <li>LCD display replacement</li>
-                            <li>Charging port fixes</li>
-                            <li>Battery replacement</li>
-                            <li>Home button repair</li>
-                            <li>Software restoration</li>
-                        </ul>
+                        <details class="service-features-wrap" open>
+                            <summary class="service-features-toggle">What we fix<span class="toggle-icon" aria-hidden="true">+</span></summary>
+                            <ul class="service-features">
+                                <li>Touch screen digitizer repair</li>
+                                <li>LCD display replacement</li>
+                                <li>Charging port fixes</li>
+                                <li>Battery replacement</li>
+                                <li>Home button repair</li>
+                                <li>Software restoration</li>
+                            </ul>
+                        </details>
                         <div class="service-bottom">
                             <div class="service-pricing">
-                                <div class="price-text">Starting from</div>
-                                <div class="price-amount">&pound;35</div>
+                                <span class="price-text">From</span>
+                                <span class="price-amount">&pound;35</span>
                             </div>
+                            <span class="service-cta" aria-hidden="true">View prices &rarr;</span>
                         </div>
                     </div>
 
@@ -661,19 +758,23 @@
                             <h3 class="service-title"><a class="service-title-link" href="pc-repair.html">Desktop PC Repair</a></h3>
                         </div>
                         <p class="service-description">Desktop repairs, upgrades and custom builds. Virus removal and speed boosts.</p>
-                        <ul class="service-features">
-                            <li>Component upgrades (RAM, GPU, CPU)</li>
-                            <li>Virus and malware removal</li>
-                            <li>System optimization</li>
-                            <li>Custom PC builds</li>
-                            <li>Hardware diagnostics</li>
-                            <li>Operating system installation</li>
-                        </ul>
+                        <details class="service-features-wrap" open>
+                            <summary class="service-features-toggle">What we fix<span class="toggle-icon" aria-hidden="true">+</span></summary>
+                            <ul class="service-features">
+                                <li>Component upgrades (RAM, GPU, CPU)</li>
+                                <li>Virus and malware removal</li>
+                                <li>System optimization</li>
+                                <li>Custom PC builds</li>
+                                <li>Hardware diagnostics</li>
+                                <li>Operating system installation</li>
+                            </ul>
+                        </details>
                         <div class="service-bottom">
                             <div class="service-pricing">
-                                <div class="price-text">Starting from</div>
-                                <div class="price-amount">&pound;30</div>
+                                <span class="price-text">From</span>
+                                <span class="price-amount">&pound;30</span>
                             </div>
+                            <span class="service-cta" aria-hidden="true">View prices &rarr;</span>
                         </div>
                     </div>
 
@@ -683,19 +784,23 @@
                             <h3 class="service-title"><a class="service-title-link" href="data-recovery.html">Data Recovery</a></h3>
                         </div>
                         <p class="service-description">Lost files? We recover data from hard drives, SSDs, USB sticks and memory cards.</p>
-                        <ul class="service-features">
-                            <li>Hard drive recovery</li>
-                            <li>SSD data restoration</li>
-                            <li>USB drive recovery</li>
-                            <li>Memory card restoration</li>
-                            <li>Deleted file recovery</li>
-                            <li>Corrupted storage fixes</li>
-                        </ul>
+                        <details class="service-features-wrap" open>
+                            <summary class="service-features-toggle">What we fix<span class="toggle-icon" aria-hidden="true">+</span></summary>
+                            <ul class="service-features">
+                                <li>Hard drive recovery</li>
+                                <li>SSD data restoration</li>
+                                <li>USB drive recovery</li>
+                                <li>Memory card restoration</li>
+                                <li>Deleted file recovery</li>
+                                <li>Corrupted storage fixes</li>
+                            </ul>
+                        </details>
                         <div class="service-bottom">
                             <div class="service-pricing">
-                                <div class="price-text">Starting from</div>
-                                <div class="price-amount">&pound;50</div>
+                                <span class="price-text">From</span>
+                                <span class="price-amount">&pound;50</span>
                             </div>
+                            <span class="service-cta" aria-hidden="true">View prices &rarr;</span>
                         </div>
                     </div>
                 </div>
@@ -749,6 +854,13 @@
             </div>
         </section>
     </main>
+
+    <!-- Mobile quick-contact bar (hidden on desktop) -->
+    <nav class="mobile-contact-bar" aria-label="Quick contact">
+        <a href="tel:+447940730537"><i class="fas fa-phone" aria-hidden="true"></i><span>Call</span></a>
+        <a href="https://wa.me/447940730537" target="_blank" rel="noopener noreferrer"><i class="fab fa-whatsapp" aria-hidden="true"></i><span>WhatsApp</span></a>
+        <a href="/book/"><i class="fas fa-calendar-check" aria-hidden="true"></i><span>Book</span></a>
+    </nav>
 
     <!-- Footer -->
     <footer class="footer" role="contentinfo">
@@ -824,6 +936,20 @@
     </div>
 
     
+    <script>
+        // Feature lists ship expanded in the markup (crawlers and no-JS users
+        // see everything); on small screens they collapse behind the
+        // "What we fix" toggle to keep cards compact.
+        (function () {
+            if (window.matchMedia('(max-width: 768px)').matches) {
+                document.querySelectorAll('.service-features-wrap[open]').forEach(function (d) {
+                    d.removeAttribute('open');
+                });
+            }
+            // Empty touchstart listener so iOS Safari applies :active states
+            document.addEventListener('touchstart', function () {}, { passive: true });
+        })();
+    </script>
     <script src="/js/core.js?v=20260611" defer></script>
     <script src="/js/cookies.js?v=20260611" defer></script>
 </body>
