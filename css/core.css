@@ -1149,21 +1149,26 @@ a[aria-label] > i[class*="fa-"]:only-child,
         padding: 0.5rem;
         text-decoration: none;
         color: var(--hex-black);
-        font-weight: 700;
+        font-weight: 600;
         text-transform: uppercase;
         font-size: 0.8rem;
+        letter-spacing: 0.04em;
         border-left: 1px solid var(--hex-grid);
     }
 
     .mobile-contact-bar a:first-child {
         border-left: none;
-        background: var(--gradient-blue);
+        background: var(--hex-black);
         color: var(--hex-white);
     }
 
     .mobile-contact-bar a:active {
         background: var(--hex-black);
         color: var(--hex-white);
+    }
+
+    .mobile-contact-bar a:first-child:active {
+        background: #333;
     }
 
     /* Keep page bottom (footer/copyright) reachable above the fixed bar */
