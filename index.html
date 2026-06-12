@@ -1180,55 +1180,13 @@
     </div>
 
 
+    <!-- Hero floating dots are spawned by core.js (.hero / .page-header) -->
     <style>
-        @keyframes float-up {
-            0% { transform: translateY(0) rotate(0deg); opacity: 0.7; }
-            100% { transform: translateY(-100vh) rotate(90deg); opacity: 0; }
-        }
         @keyframes float-up-card {
             0% { transform: translateY(0) rotate(0deg); opacity: 0.7; }
             100% { transform: translateY(-280px) rotate(90deg); opacity: 0; }
         }
     </style>
-    <script>
-        // Defer particles until after LCP to avoid forced reflow during load
-        (function() {
-            var particleInterval = null;
-            var heroSection = null;
-
-            function createFloatingElement() {
-                if (!heroSection) return;
-                var el = document.createElement('div');
-                var size = Math.random() * 2 + 3;
-                el.style.cssText = 'position:absolute;width:' + size + 'px;height:' + size + 'px;background:#0033FF;pointer-events:none;animation:float-up 8s linear infinite;left:' + (Math.random() * 100) + '%;top:100%;z-index:1;opacity:0.7;will-change:transform,opacity';
-                heroSection.appendChild(el);
-                setTimeout(function() { if (el.parentNode) el.remove(); }, 8000);
-            }
-
-            function start() {
-                if (!particleInterval) particleInterval = setInterval(createFloatingElement, 150);
-            }
-            function stop() {
-                if (particleInterval) { clearInterval(particleInterval); particleInterval = null; }
-            }
-
-            // Wait until after paint to avoid reflow during LCP
-            function init() {
-                heroSection = document.querySelector('.hero');
-                if (!heroSection) return;
-                start();
-                document.addEventListener('visibilitychange', function() {
-                    document.hidden ? stop() : start();
-                });
-            }
-
-            if ('requestIdleCallback' in window) {
-                requestIdleCallback(init, { timeout: 3000 });
-            } else {
-                setTimeout(init, 2000);
-            }
-        })();
-    </script>
     <script>
         // Hover-triggered floating particles inside .service-card tiles
         (function() {
