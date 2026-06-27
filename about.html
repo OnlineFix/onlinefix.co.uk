@@ -527,32 +527,70 @@
         .about-profile {
                 padding: 1.5rem;
             }
+        .profile-card {
+                padding: 1.5rem;
+            }
+        .profile-avatar {
+                width: 72px;
+                height: 72px;
+                font-size: 1.8rem;
+                margin-bottom: 0.75rem;
+            }
+        .profile-specs li {
+                padding: 0.4rem 0;
+            }
+        .profile-card .profile-foot {
+                margin: 1rem -1.5rem -1.5rem;
+            }
         .cert-section {
-                padding: 2.5rem 0;
+                padding: 2rem 0;
             }
         .values-grid {
                 grid-template-columns: 1fr 1fr;
             }
         .value-item {
-                padding: 1.5rem 1rem;
+                padding: 1.25rem 1rem;
             }
         .value-title {
                 font-size: clamp(1.1rem, 4vw, 1.4rem);
-                margin-bottom: 0.5rem;
+                margin-bottom: 0.4rem;
             }
         .value-icon {
-                font-size: 2rem;
-                margin-bottom: 0.75rem;
+                font-size: 1.75rem;
+                margin-bottom: 0.6rem;
+            }
+        .value-description {
+                font-size: 0.85rem;
+                line-height: 1.45;
             }
         .cert-grid {
-                grid-template-columns: 1fr;
-                gap: 12px;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
             }
         .cert-item {
-                padding: 1.5rem 1.25rem;
+                padding: 0.9rem 0.8rem;
+            }
+        .cert-item::before {
+                top: 7px;
+                right: 9px;
+                font-size: 0.6rem;
             }
         .cert-icon {
-                font-size: 1.75rem;
+                font-size: 1.4rem;
+                margin-bottom: 0.5rem;
+            }
+        .cert-badge {
+                margin-bottom: 0.45rem;
+                font-size: 0.55rem;
+                padding: 2px 5px;
+            }
+        .cert-title {
+                font-size: 0.85rem;
+                margin-bottom: 0.2rem;
+            }
+        .cert-desc {
+                font-size: 0.72rem;
+                line-height: 1.35;
             }
         .skill-tag {
                 font-size: 0.8rem;
@@ -718,9 +756,9 @@
                     <div class="value-item fade-in" role="listitem">
                         <div class="value-icon" aria-hidden="true"><i class="fas fa-clock"></i></div>
                         <h3 class="value-title">Realistic</h3>
-                        <p class="value-description">No false promises on turnaround. Most common repairs are done
-                            within a few hours by appointment; complex board-level work can take longer &mdash; and
-                            I'll always give you an honest timeframe before any work begins.</p>
+                        <p class="value-description">No false promises on turnaround. Common repairs take a few hours
+                            by appointment; complex board-level work takes longer &mdash; and I'll always give you an
+                            honest timeframe up front.</p>
                     </div>
                     <div class="value-item fade-in" role="listitem">
                         <div class="value-icon" aria-hidden="true"><i class="fas fa-handshake"></i></div>
@@ -741,37 +779,37 @@
                         <div class="cert-icon" aria-hidden="true"><i class="fab fa-apple"></i></div>
                         <span class="cert-badge is-trained">Trained</span>
                         <div class="cert-title">Apple</div>
-                        <p class="cert-desc">iPhone and iPad repairs done to the manufacturer's standard.</p>
+                        <p class="cert-desc">iPhone &amp; iPad, to manufacturer standard.</p>
                     </div>
                     <div class="cert-item fade-in" data-index="02">
                         <div class="cert-icon" aria-hidden="true"><i class="fab fa-android"></i></div>
                         <span class="cert-badge is-trained">Trained</span>
                         <div class="cert-title">Samsung &amp; Google</div>
-                        <p class="cert-desc">Up to date on the latest Galaxy and Pixel handsets.</p>
+                        <p class="cert-desc">Latest Galaxy &amp; Pixel handsets.</p>
                     </div>
                     <div class="cert-item fade-in" data-index="03">
                         <div class="cert-icon" aria-hidden="true"><i class="fas fa-laptop"></i></div>
                         <span class="cert-badge">Specialist</span>
                         <div class="cert-title">Laptops &amp; PCs</div>
-                        <p class="cert-desc">Screens, boards, storage, upgrades and diagnostics.</p>
+                        <p class="cert-desc">Screens, boards, storage &amp; upgrades.</p>
                     </div>
                     <div class="cert-item fade-in" data-index="04">
                         <div class="cert-icon" aria-hidden="true"><i class="fas fa-gamepad"></i></div>
                         <span class="cert-badge">Specialist</span>
                         <div class="cert-title">Consoles</div>
-                        <p class="cert-desc">HDMI ports, thermals and board work on PS5, Xbox and Switch.</p>
+                        <p class="cert-desc">PS5, Xbox &amp; Switch &mdash; ports, thermals, boards.</p>
                     </div>
                     <div class="cert-item fade-in" data-index="05">
                         <div class="cert-icon" aria-hidden="true"><i class="fas fa-microchip"></i></div>
                         <span class="cert-badge">Specialist</span>
                         <div class="cert-title">Micro-Soldering</div>
-                        <p class="cert-desc">Board-level component, track and connector repair.</p>
+                        <p class="cert-desc">Component, track &amp; connector repair.</p>
                     </div>
                     <div class="cert-item fade-in" data-index="06">
                         <div class="cert-icon" aria-hidden="true"><i class="fas fa-hdd"></i></div>
                         <span class="cert-badge">Specialist</span>
                         <div class="cert-title">Data Recovery</div>
-                        <p class="cert-desc">Files rescued from failed drives, SSDs and phones.</p>
+                        <p class="cert-desc">Failed drives, SSDs &amp; phones.</p>
                     </div>
                 </div>
             </div>
