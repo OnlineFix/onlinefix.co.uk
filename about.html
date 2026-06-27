@@ -203,7 +203,23 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: var(--hex-concrete);
+            position: relative;
+            background-color: var(--hex-concrete);
+            background-image:
+                linear-gradient(var(--hex-grid) 1px, transparent 1px),
+                linear-gradient(90deg, var(--hex-grid) 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+
+        .about-profile::before {
+            content: "FIG. 4.1 — OPERATOR ID";
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            font-family: monospace;
+            font-size: 0.65rem;
+            letter-spacing: 0.05em;
+            color: #999;
         }
 
         .profile-card {
@@ -268,6 +284,61 @@
             font-weight: 700;
             text-transform: uppercase;
             font-family: monospace;
+        }
+
+        .profile-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: monospace;
+            font-size: 0.65rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #444;
+            margin-bottom: 1.25rem;
+        }
+
+        .profile-status::before {
+            content: "";
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #16a34a;
+            box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.2);
+        }
+
+        .profile-specs {
+            list-style: none;
+            margin: 0 0 1.25rem;
+            border-top: 1px solid var(--hex-grid);
+        }
+
+        .profile-specs li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: monospace;
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--hex-grid);
+        }
+
+        .profile-specs .spec-key {
+            color: #999;
+            letter-spacing: 0.05em;
+        }
+
+        .profile-specs .spec-val {
+            font-weight: 700;
+            color: var(--hex-black);
+        }
+
+        .profile-card .profile-foot {
+            height: 10px;
+            margin: 1.25rem -2rem -2rem;
+            background: var(--hazard-stripe);
+            background-size: 14px 14px;
         }
 
         .timeline-section {
@@ -607,30 +678,39 @@
                 <div class="about-grid fade-in">
                     <div class="about-text">
                         <h2>Your Local Electronics Repair Expert</h2>
-                        <p>Welcome to OnlineFix! I'm <span class="highlight">Tomas</span>. I've been curious about
-                            technology and electronics for as long as I can remember &mdash; taking things apart to
-                            understand how they work started early and never really stopped.</p>
-                        <p>That curiosity became a career. I've worked in the industry for
-                            <span class="highlight">over 7 years</span>, across various high-street electronics repair
-                            shops here in Guildford. I still work as an advanced technician at
+                        <p>Hi, I'm <span class="highlight">Tomas</span> &mdash; the technician behind OnlineFix.
+                            I've been taking electronics apart to see how they work since I was a kid, and that same
+                            curiosity is still what gets me to the bench every day. The only difference now is that
+                            they go back together better than I found them.</p>
+                        <p>Over the past <span class="highlight">7+ years</span> I've worked across several
+                            high-street repair shops in Guildford, and I still work as an advanced technician at
                             <a href="https://www.google.com/maps/search/?api=1&amp;query=iSmash+Guildford"
-                                target="_blank" rel="noopener noreferrer">iSmash</a> in Guildford, helping improve how
-                            the workshop runs day to day.</p>
-                        <p>I started OnlineFix to help people find proper solutions to their needs and problems &mdash;
-                            with a <span class="highlight">transparent process and fair pricing</span>, not guesswork
-                            and inflated quotes.</p>
-                        <p>I'll be honest about why that matters. I genuinely believe around
-                            <span class="highlight">90% of high-street repair shops</span> don't have the skill or
-                            knowledge to complete even common repairs to the manufacturer's standard. Ignoring
-                            manufacturer guidance, or fitting cheap third-party parts to protect profit margins, is
-                            exactly what leaves people with new faults down the line. I'd rather do it properly the
-                            first time.</p>
+                                target="_blank" rel="noopener noreferrer">iSmash</a> in town. It means the skills I
+                            bring to your device are sharpened daily on the latest phones, consoles and laptops &mdash;
+                            not learned once and left to go rusty.</p>
+                        <p>I started OnlineFix to do repairs the way I'd want them done for me: a
+                            <span class="highlight">clear, honest process</span> and
+                            <span class="highlight">fair pricing</span>, with the right fix for your actual problem
+                            &mdash; never the most expensive one.</p>
+                        <p>And I'll be straight about why that matters. I genuinely believe around
+                            <span class="highlight">9 in 10 high-street repair shops</span> don't have the skill or
+                            knowledge to fix a device to the manufacturer's standard. Corners get cut on official
+                            guidance, or cheap third-party parts get fitted to protect margins &mdash; and that's
+                            exactly what brings a device back with new faults a few weeks later. I'd rather take the
+                            time to do it properly the first time.</p>
                     </div>
                     <div class="about-profile">
                         <div class="profile-card">
                             <div class="profile-avatar">T</div>
                             <div class="profile-name">Tomas</div>
                             <div class="profile-title">Owner & Lead Technician</div>
+                            <div class="profile-status">Available &mdash; By Appointment</div>
+                            <ul class="profile-specs">
+                                <li><span class="spec-key">Est.</span><span class="spec-val">2018</span></li>
+                                <li><span class="spec-key">Experience</span><span class="spec-val">7+ Years</span></li>
+                                <li><span class="spec-key">Based</span><span class="spec-val">Guildford</span></li>
+                                <li><span class="spec-key">Also at</span><span class="spec-val">iSmash</span></li>
+                            </ul>
                             <div class="profile-skills">
                                 <span class="skill-tag">Smartphones</span>
                                 <span class="skill-tag">Laptops</span>
@@ -639,6 +719,7 @@
                                 <span class="skill-tag">Data Recovery</span>
                                 <span class="skill-tag">Soldering</span>
                             </div>
+                            <div class="profile-foot" aria-hidden="true"></div>
                         </div>
                     </div>
                 </div>
