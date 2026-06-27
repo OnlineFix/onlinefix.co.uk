@@ -341,66 +341,6 @@
             background-size: 14px 14px;
         }
 
-        .timeline-section {
-            padding: 4rem 0;
-            background: var(--hex-black);
-            color: var(--hex-white);
-        }
-
-        .timeline-section .section-title {
-            color: var(--hex-white);
-            border-bottom: 1px solid #333;
-            padding-bottom: 2rem;
-            margin-bottom: 4rem;
-            padding-top: 0;
-        }
-
-        .timeline-section .section-subtitle {
-            color: #999;
-            margin-top: -3rem;
-        }
-
-        .timeline-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 0;
-            border: 1px solid #333;
-        }
-
-        .timeline-item {
-            padding: 2rem;
-            border-right: 1px solid #333;
-            position: relative;
-        }
-
-        .timeline-item:last-child {
-            border-right: none;
-        }
-
-        .timeline-year {
-            font-weight: 900;
-            font-size: 2rem;
-            background: var(--gradient-blue);
-            background-clip: text; -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            line-height: 1;
-            margin-bottom: 1rem;
-        }
-
-        .timeline-item h3 {
-            font-size: 1rem;
-            text-transform: uppercase;
-            margin-bottom: 0.5rem;
-            font-weight: 800;
-        }
-
-        .timeline-item p {
-            font-family: monospace;
-            color: #aaa;
-            font-size: 0.85rem;
-            line-height: 1.5;
-        }
-
         .values-section {
             padding: 0 0 4rem;
             border-top: 2px solid var(--hex-black);
@@ -468,35 +408,71 @@
 
         .cert-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
         }
 
         .cert-item {
             background: var(--hex-white);
             border: 2px solid var(--hex-black);
-            padding: 2rem;
-            text-align: center;
-            transition: all 0.2s;
+            padding: 1.75rem;
+            text-align: left;
+            position: relative;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+
+        .cert-item::before {
+            content: attr(data-index);
+            position: absolute;
+            top: 12px;
+            right: 14px;
+            font-family: monospace;
+            font-size: 0.7rem;
+            color: #bbb;
         }
 
         @media (hover: hover) {
         .cert-item:hover {
-                transform: translateY(-5px);
-                box-shadow: 8px 8px 0 #000;
+                transform: translate(-4px, -4px);
+                box-shadow: 8px 8px 0 var(--hex-black);
             }
     }
 
         .cert-icon {
-            font-size: 2.5rem;
-            color: var(--hex-black);
+            font-size: 2rem;
+            color: var(--hex-accent);
             margin-bottom: 1rem;
         }
 
+        .cert-badge {
+            display: inline-block;
+            font-family: monospace;
+            font-size: 0.6rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 2px 7px;
+            margin-bottom: 0.75rem;
+            border: 1px solid var(--hex-grid);
+            color: #777;
+        }
+
+        .cert-badge.is-trained {
+            background: var(--hex-black);
+            color: var(--hex-white);
+            border-color: var(--hex-black);
+        }
+
         .cert-title {
-            font-size: 0.9rem;
+            font-size: 1.05rem;
             font-weight: 800;
             text-transform: uppercase;
+            margin-bottom: 0.4rem;
+        }
+
+        .cert-desc {
+            color: #555;
+            font-size: 0.85rem;
+            line-height: 1.5;
         }
 
         .cta-button {
@@ -551,60 +527,70 @@
         .about-profile {
                 padding: 1.5rem;
             }
-        .timeline-section,
-            .cert-section {
-                padding: 2.5rem 0;
-            }
-        .timeline-section .section-title {
-                padding-bottom: 1rem;
-                margin-bottom: 2rem;
-            }
-        .timeline-section .section-subtitle {
-                margin-top: -1.5rem;
-            }
-        .timeline-grid {
-                display: grid;
-                grid-template-columns: 1fr;
-                gap: 0;
-                padding-bottom: 1rem;
-                border: 1px solid #333;
-            }
-        .timeline-item {
-                min-width: unset;
-                border-right: none;
-                border-bottom: 1px solid #333;
+        .profile-card {
                 padding: 1.5rem;
             }
-        .timeline-item:last-child {
-                border-bottom: none;
+        .profile-avatar {
+                width: 72px;
+                height: 72px;
+                font-size: 1.8rem;
+                margin-bottom: 0.75rem;
             }
-        .timeline-year {
-                font-size: 1.6rem;
-                margin-bottom: 0.5rem;
+        .profile-specs li {
+                padding: 0.4rem 0;
+            }
+        .profile-card .profile-foot {
+                margin: 1rem -1.5rem -1.5rem;
+            }
+        .cert-section {
+                padding: 2rem 0;
             }
         .values-grid {
                 grid-template-columns: 1fr 1fr;
             }
         .value-item {
-                padding: 1.5rem 1rem;
+                padding: 1.25rem 1rem;
             }
         .value-title {
                 font-size: clamp(1.1rem, 4vw, 1.4rem);
-                margin-bottom: 0.5rem;
+                margin-bottom: 0.4rem;
             }
         .value-icon {
-                font-size: 2rem;
-                margin-bottom: 0.75rem;
+                font-size: 1.75rem;
+                margin-bottom: 0.6rem;
+            }
+        .value-description {
+                font-size: 0.85rem;
+                line-height: 1.45;
             }
         .cert-grid {
-                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-                gap: 10px;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
             }
         .cert-item {
-                padding: 1.5rem 1rem;
+                padding: 0.9rem 0.8rem;
+            }
+        .cert-item::before {
+                top: 7px;
+                right: 9px;
+                font-size: 0.6rem;
             }
         .cert-icon {
-                font-size: 2rem;
+                font-size: 1.4rem;
+                margin-bottom: 0.5rem;
+            }
+        .cert-badge {
+                margin-bottom: 0.45rem;
+                font-size: 0.55rem;
+                padding: 2px 5px;
+            }
+        .cert-title {
+                font-size: 0.85rem;
+                margin-bottom: 0.2rem;
+            }
+        .cert-desc {
+                font-size: 0.72rem;
+                line-height: 1.35;
             }
         .skill-tag {
                 font-size: 0.8rem;
@@ -685,16 +671,16 @@
                         <p>Over the past <span class="highlight">7+ years</span> I've worked across several
                             high-street repair shops in Guildford, and I still work as an advanced technician at
                             <a href="https://www.google.com/maps/search/?api=1&amp;query=iSmash+Guildford"
-                                target="_blank" rel="noopener noreferrer">iSmash</a> in town. It means the skills I
-                            bring to your device are sharpened daily on the latest phones, consoles and laptops &mdash;
-                            not learned once and left to go rusty.</p>
+                                target="_blank" rel="noopener noreferrer">iSmash</a> in town. That keeps me
+                            hands-on with the latest phones day in, day out, so my skills stay sharp and current
+                            &mdash; not learned once and left to go rusty.</p>
                         <p>I started OnlineFix to do repairs the way I'd want them done for me: a
-                            <span class="highlight">clear, honest process</span> and
-                            <span class="highlight">fair pricing</span>, with the right fix for your actual problem
-                            &mdash; never the most expensive one.</p>
-                        <p>And I'll be straight about why that matters. I genuinely believe around
+                            <span class="highlight">clear, honest process</span>,
+                            <span class="highlight">fair pricing</span>, and a genuine focus on quality &mdash; the
+                            right solution for your problem, done to a standard that lasts.</p>
+                        <p>That standard matters more than most people realise. In my experience, around
                             <span class="highlight">9 in 10 high-street repair shops</span> don't have the skill or
-                            knowledge to fix a device to the manufacturer's standard. Corners get cut on official
+                            knowledge to fix a device to the manufacturer's specification. Corners get cut on official
                             guidance, or cheap third-party parts get fitted to protect margins &mdash; and that's
                             exactly what brings a device back with new faults a few weeks later. I'd rather take the
                             time to do it properly the first time.</p>
@@ -748,43 +734,6 @@
             </div>
         </section>
 
-        <section class="timeline-section" aria-labelledby="timeline-heading">
-            <div class="container">
-                <h2 class="section-title fade-in" id="timeline-heading">TIMELINE</h2>
-                <p class="section-subtitle fade-in">Operational History</p>
-                <div class="scroll-hint" aria-hidden="true">SCROLL &rarr;</div>
-                <div class="timeline-grid" role="list">
-                    <div class="timeline-item fade-in" role="listitem">
-                        <div class="timeline-year">2018</div>
-                        <h3>Started OnlineFix</h3>
-                        <p>Established as a local electronics repair service in Guildford, focusing on honest,
-                            affordable repairs.</p>
-                    </div>
-                    <div class="timeline-item fade-in" role="listitem">
-                        <div class="timeline-year">2019</div>
-                        <h3>Advanced Training</h3>
-                        <p>Completed specialized courses in water damage recovery and micro-soldering techniques.</p>
-                    </div>
-                    <div class="timeline-item fade-in" role="listitem">
-                        <div class="timeline-year">2020</div>
-                        <h3>Console Expertise</h3>
-                        <p>Expanded to gaming console repairs - PlayStation, Xbox, and Nintendo systems.</p>
-                    </div>
-                    <div class="timeline-item fade-in" role="listitem">
-                        <div class="timeline-year">2021</div>
-                        <h3>Data Recovery</h3>
-                        <p>Added professional data recovery services for damaged storage devices.</p>
-                    </div>
-                    <div class="timeline-item fade-in" role="listitem">
-                        <div class="timeline-year">2026</div>
-                        <h3>Trusted Locally</h3>
-                        <p>Hundreds of repairs on, with 170+ reviews and a 5-star rating from customers across
-                            Guildford and Surrey.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
         <section class="values-section" aria-labelledby="values-heading">
             <div class="container">
                 <h2 class="section-title fade-in" id="values-heading">OUR VALUES</h2>
@@ -807,9 +756,9 @@
                     <div class="value-item fade-in" role="listitem">
                         <div class="value-icon" aria-hidden="true"><i class="fas fa-clock"></i></div>
                         <h3 class="value-title">Realistic</h3>
-                        <p class="value-description">No false promises on turnaround. Most common repairs are done
-                            within a few hours by appointment; complex board-level work can take longer &mdash; and
-                            I'll always give you an honest timeframe before any work begins.</p>
+                        <p class="value-description">No false promises on turnaround. Common repairs take a few hours
+                            by appointment; complex board-level work takes longer &mdash; and I'll always give you an
+                            honest timeframe up front.</p>
                     </div>
                     <div class="value-item fade-in" role="listitem">
                         <div class="value-icon" aria-hidden="true"><i class="fas fa-handshake"></i></div>
@@ -826,29 +775,41 @@
                 <h2 class="section-title fade-in" id="cert-heading">EXPERTISE</h2>
                 <p class="section-subtitle fade-in">Trained &amp; Specialised</p>
                 <div class="cert-grid">
-                    <div class="cert-item fade-in">
+                    <div class="cert-item fade-in" data-index="01">
                         <div class="cert-icon" aria-hidden="true"><i class="fab fa-apple"></i></div>
-                        <div class="cert-title">Apple Trained</div>
+                        <span class="cert-badge is-trained">Trained</span>
+                        <div class="cert-title">Apple</div>
+                        <p class="cert-desc">iPhone &amp; iPad, to manufacturer standard.</p>
                     </div>
-                    <div class="cert-item fade-in">
+                    <div class="cert-item fade-in" data-index="02">
                         <div class="cert-icon" aria-hidden="true"><i class="fab fa-android"></i></div>
-                        <div class="cert-title">Samsung &amp; Google Trained</div>
+                        <span class="cert-badge is-trained">Trained</span>
+                        <div class="cert-title">Samsung &amp; Google</div>
+                        <p class="cert-desc">Latest Galaxy &amp; Pixel handsets.</p>
                     </div>
-                    <div class="cert-item fade-in">
+                    <div class="cert-item fade-in" data-index="03">
                         <div class="cert-icon" aria-hidden="true"><i class="fas fa-laptop"></i></div>
-                        <div class="cert-title">Laptop Specialist</div>
+                        <span class="cert-badge">Specialist</span>
+                        <div class="cert-title">Laptops &amp; PCs</div>
+                        <p class="cert-desc">Screens, boards, storage &amp; upgrades.</p>
                     </div>
-                    <div class="cert-item fade-in">
+                    <div class="cert-item fade-in" data-index="04">
                         <div class="cert-icon" aria-hidden="true"><i class="fas fa-gamepad"></i></div>
-                        <div class="cert-title">Console Repair Pro</div>
+                        <span class="cert-badge">Specialist</span>
+                        <div class="cert-title">Consoles</div>
+                        <p class="cert-desc">PS5, Xbox &amp; Switch &mdash; ports, thermals, boards.</p>
                     </div>
-                    <div class="cert-item fade-in">
+                    <div class="cert-item fade-in" data-index="05">
+                        <div class="cert-icon" aria-hidden="true"><i class="fas fa-microchip"></i></div>
+                        <span class="cert-badge">Specialist</span>
+                        <div class="cert-title">Micro-Soldering</div>
+                        <p class="cert-desc">Component, track &amp; connector repair.</p>
+                    </div>
+                    <div class="cert-item fade-in" data-index="06">
                         <div class="cert-icon" aria-hidden="true"><i class="fas fa-hdd"></i></div>
+                        <span class="cert-badge">Specialist</span>
                         <div class="cert-title">Data Recovery</div>
-                    </div>
-                    <div class="cert-item fade-in">
-                        <div class="cert-icon" aria-hidden="true"><i class="fas fa-shield-alt"></i></div>
-                        <div class="cert-title">Quality Assured</div>
+                        <p class="cert-desc">Failed drives, SSDs &amp; phones.</p>
                     </div>
                 </div>
             </div>
