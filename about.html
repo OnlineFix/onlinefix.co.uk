@@ -341,66 +341,6 @@
             background-size: 14px 14px;
         }
 
-        .timeline-section {
-            padding: 4rem 0;
-            background: var(--hex-black);
-            color: var(--hex-white);
-        }
-
-        .timeline-section .section-title {
-            color: var(--hex-white);
-            border-bottom: 1px solid #333;
-            padding-bottom: 2rem;
-            margin-bottom: 4rem;
-            padding-top: 0;
-        }
-
-        .timeline-section .section-subtitle {
-            color: #999;
-            margin-top: -3rem;
-        }
-
-        .timeline-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 0;
-            border: 1px solid #333;
-        }
-
-        .timeline-item {
-            padding: 2rem;
-            border-right: 1px solid #333;
-            position: relative;
-        }
-
-        .timeline-item:last-child {
-            border-right: none;
-        }
-
-        .timeline-year {
-            font-weight: 900;
-            font-size: 2rem;
-            background: var(--gradient-blue);
-            background-clip: text; -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            line-height: 1;
-            margin-bottom: 1rem;
-        }
-
-        .timeline-item h3 {
-            font-size: 1rem;
-            text-transform: uppercase;
-            margin-bottom: 0.5rem;
-            font-weight: 800;
-        }
-
-        .timeline-item p {
-            font-family: monospace;
-            color: #aaa;
-            font-size: 0.85rem;
-            line-height: 1.5;
-        }
-
         .values-section {
             padding: 0 0 4rem;
             border-top: 2px solid var(--hex-black);
@@ -468,35 +408,71 @@
 
         .cert-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
         }
 
         .cert-item {
             background: var(--hex-white);
             border: 2px solid var(--hex-black);
-            padding: 2rem;
-            text-align: center;
-            transition: all 0.2s;
+            padding: 1.75rem;
+            text-align: left;
+            position: relative;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+
+        .cert-item::before {
+            content: attr(data-index);
+            position: absolute;
+            top: 12px;
+            right: 14px;
+            font-family: monospace;
+            font-size: 0.7rem;
+            color: #bbb;
         }
 
         @media (hover: hover) {
         .cert-item:hover {
-                transform: translateY(-5px);
-                box-shadow: 8px 8px 0 #000;
+                transform: translate(-4px, -4px);
+                box-shadow: 8px 8px 0 var(--hex-black);
             }
     }
 
         .cert-icon {
-            font-size: 2.5rem;
-            color: var(--hex-black);
+            font-size: 2rem;
+            color: var(--hex-accent);
             margin-bottom: 1rem;
         }
 
+        .cert-badge {
+            display: inline-block;
+            font-family: monospace;
+            font-size: 0.6rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 2px 7px;
+            margin-bottom: 0.75rem;
+            border: 1px solid var(--hex-grid);
+            color: #777;
+        }
+
+        .cert-badge.is-trained {
+            background: var(--hex-black);
+            color: var(--hex-white);
+            border-color: var(--hex-black);
+        }
+
         .cert-title {
-            font-size: 0.9rem;
+            font-size: 1.05rem;
             font-weight: 800;
             text-transform: uppercase;
+            margin-bottom: 0.4rem;
+        }
+
+        .cert-desc {
+            color: #555;
+            font-size: 0.85rem;
+            line-height: 1.5;
         }
 
         .cta-button {
@@ -551,36 +527,8 @@
         .about-profile {
                 padding: 1.5rem;
             }
-        .timeline-section,
-            .cert-section {
+        .cert-section {
                 padding: 2.5rem 0;
-            }
-        .timeline-section .section-title {
-                padding-bottom: 1rem;
-                margin-bottom: 2rem;
-            }
-        .timeline-section .section-subtitle {
-                margin-top: -1.5rem;
-            }
-        .timeline-grid {
-                display: grid;
-                grid-template-columns: 1fr;
-                gap: 0;
-                padding-bottom: 1rem;
-                border: 1px solid #333;
-            }
-        .timeline-item {
-                min-width: unset;
-                border-right: none;
-                border-bottom: 1px solid #333;
-                padding: 1.5rem;
-            }
-        .timeline-item:last-child {
-                border-bottom: none;
-            }
-        .timeline-year {
-                font-size: 1.6rem;
-                margin-bottom: 0.5rem;
             }
         .values-grid {
                 grid-template-columns: 1fr 1fr;
@@ -597,14 +545,14 @@
                 margin-bottom: 0.75rem;
             }
         .cert-grid {
-                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-                gap: 10px;
+                grid-template-columns: 1fr;
+                gap: 12px;
             }
         .cert-item {
-                padding: 1.5rem 1rem;
+                padding: 1.5rem 1.25rem;
             }
         .cert-icon {
-                font-size: 2rem;
+                font-size: 1.75rem;
             }
         .skill-tag {
                 font-size: 0.8rem;
@@ -748,43 +696,6 @@
             </div>
         </section>
 
-        <section class="timeline-section" aria-labelledby="timeline-heading">
-            <div class="container">
-                <h2 class="section-title fade-in" id="timeline-heading">TIMELINE</h2>
-                <p class="section-subtitle fade-in">Operational History</p>
-                <div class="scroll-hint" aria-hidden="true">SCROLL &rarr;</div>
-                <div class="timeline-grid" role="list">
-                    <div class="timeline-item fade-in" role="listitem">
-                        <div class="timeline-year">2018</div>
-                        <h3>Started OnlineFix</h3>
-                        <p>Established as a local electronics repair service in Guildford, focusing on honest,
-                            affordable repairs.</p>
-                    </div>
-                    <div class="timeline-item fade-in" role="listitem">
-                        <div class="timeline-year">2019</div>
-                        <h3>Advanced Training</h3>
-                        <p>Completed specialized courses in water damage recovery and micro-soldering techniques.</p>
-                    </div>
-                    <div class="timeline-item fade-in" role="listitem">
-                        <div class="timeline-year">2020</div>
-                        <h3>Console Expertise</h3>
-                        <p>Expanded to gaming console repairs - PlayStation, Xbox, and Nintendo systems.</p>
-                    </div>
-                    <div class="timeline-item fade-in" role="listitem">
-                        <div class="timeline-year">2021</div>
-                        <h3>Data Recovery</h3>
-                        <p>Added professional data recovery services for damaged storage devices.</p>
-                    </div>
-                    <div class="timeline-item fade-in" role="listitem">
-                        <div class="timeline-year">2026</div>
-                        <h3>Trusted Locally</h3>
-                        <p>Hundreds of repairs on, with 170+ reviews and a 5-star rating from customers across
-                            Guildford and Surrey.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
         <section class="values-section" aria-labelledby="values-heading">
             <div class="container">
                 <h2 class="section-title fade-in" id="values-heading">OUR VALUES</h2>
@@ -826,29 +737,41 @@
                 <h2 class="section-title fade-in" id="cert-heading">EXPERTISE</h2>
                 <p class="section-subtitle fade-in">Trained &amp; Specialised</p>
                 <div class="cert-grid">
-                    <div class="cert-item fade-in">
+                    <div class="cert-item fade-in" data-index="01">
                         <div class="cert-icon" aria-hidden="true"><i class="fab fa-apple"></i></div>
-                        <div class="cert-title">Apple Trained</div>
+                        <span class="cert-badge is-trained">Trained</span>
+                        <div class="cert-title">Apple</div>
+                        <p class="cert-desc">iPhone and iPad repairs done to the manufacturer's standard.</p>
                     </div>
-                    <div class="cert-item fade-in">
+                    <div class="cert-item fade-in" data-index="02">
                         <div class="cert-icon" aria-hidden="true"><i class="fab fa-android"></i></div>
-                        <div class="cert-title">Samsung &amp; Google Trained</div>
+                        <span class="cert-badge is-trained">Trained</span>
+                        <div class="cert-title">Samsung &amp; Google</div>
+                        <p class="cert-desc">Up to date on the latest Galaxy and Pixel handsets.</p>
                     </div>
-                    <div class="cert-item fade-in">
+                    <div class="cert-item fade-in" data-index="03">
                         <div class="cert-icon" aria-hidden="true"><i class="fas fa-laptop"></i></div>
-                        <div class="cert-title">Laptop Specialist</div>
+                        <span class="cert-badge">Specialist</span>
+                        <div class="cert-title">Laptops &amp; PCs</div>
+                        <p class="cert-desc">Screens, boards, storage, upgrades and diagnostics.</p>
                     </div>
-                    <div class="cert-item fade-in">
+                    <div class="cert-item fade-in" data-index="04">
                         <div class="cert-icon" aria-hidden="true"><i class="fas fa-gamepad"></i></div>
-                        <div class="cert-title">Console Repair Pro</div>
+                        <span class="cert-badge">Specialist</span>
+                        <div class="cert-title">Consoles</div>
+                        <p class="cert-desc">HDMI ports, thermals and board work on PS5, Xbox and Switch.</p>
                     </div>
-                    <div class="cert-item fade-in">
+                    <div class="cert-item fade-in" data-index="05">
+                        <div class="cert-icon" aria-hidden="true"><i class="fas fa-microchip"></i></div>
+                        <span class="cert-badge">Specialist</span>
+                        <div class="cert-title">Micro-Soldering</div>
+                        <p class="cert-desc">Board-level component, track and connector repair.</p>
+                    </div>
+                    <div class="cert-item fade-in" data-index="06">
                         <div class="cert-icon" aria-hidden="true"><i class="fas fa-hdd"></i></div>
+                        <span class="cert-badge">Specialist</span>
                         <div class="cert-title">Data Recovery</div>
-                    </div>
-                    <div class="cert-item fade-in">
-                        <div class="cert-icon" aria-hidden="true"><i class="fas fa-shield-alt"></i></div>
-                        <div class="cert-title">Quality Assured</div>
+                        <p class="cert-desc">Files rescued from failed drives, SSDs and phones.</p>
                     </div>
                 </div>
             </div>
