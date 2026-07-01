@@ -487,7 +487,9 @@
             text-transform: uppercase;
             font-size: 0.9rem;
             border: 2px solid var(--hex-white);
-            margin: 0.5rem;
+            /* margin comes from core.css so its mobile width:100% + margin:0.5rem 0
+               pairing stays intact; overriding it here reintroduces an 8px
+               horizontal page overflow on phones */
             transition: all 0.1s;
         }
 
@@ -546,10 +548,13 @@
                 padding: 2rem 0;
             }
         .values-grid {
-                grid-template-columns: 1fr 1fr;
+                /* minmax(0,1fr) lets columns shrink below a word's min-content
+                   width on narrow screens / large font settings */
+                grid-template-columns: repeat(2, minmax(0, 1fr));
             }
         .value-item {
                 padding: 1.25rem 1rem;
+                overflow-wrap: break-word;
             }
         .value-title {
                 font-size: clamp(1.1rem, 4vw, 1.4rem);
