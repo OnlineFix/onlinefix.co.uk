@@ -41,6 +41,11 @@
   Cache-Control: public, max-age=0, must-revalidate
   Service-Worker-Allowed: /
 
+# llms.txt for AI agents — short cache, explicit content-type
+/llms.txt
+  Content-Type: text/plain; charset=utf-8
+  Cache-Control: public, max-age=3600, must-revalidate
+
 # Web app manifest — short cache, explicit content-type
 /manifest.webmanifest
   Content-Type: application/manifest+json; charset=utf-8

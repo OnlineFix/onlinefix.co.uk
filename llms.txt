@@ -1,0 +1,36 @@
+# OnlineFix
+
+> OnlineFix is an independent electronics repair workshop in Guildford, Surrey (UK), founded in 2018 and run by owner and lead technician Tomas. Same-day phone, laptop, PC, tablet and games console repair with a 90-day warranty and a no-fix-no-fee policy. Appointment only — no walk-ins. Call 07940 730537 or email hello@onlinefix.uk. Open 7 days a week, 10:00–22:00.
+
+Key facts:
+
+- Location: Guildford, Surrey, GU1 4PD, United Kingdom. Also serves Woking, Farnham, Godalming and the rest of Surrey.
+- Booking: appointment only — phone 07940 730537 (or message) to arrange a drop-off time. Walk-ins are not accepted.
+- Pricing: repairs start from £25 depending on device and fault. A small diagnostic fee applies and is credited towards the repair. No fix, no fee.
+- Warranty: 90-day warranty on all repairs.
+- Turnaround: most repairs same-day or within 24–48 hours, on-site at the Guildford workshop (devices are not sent away). Complex board-level work or data recovery can take 1–2 weeks.
+- Specialities: board-level micro-soldering, PS5/PS4/Xbox HDMI port replacement (PS5 HDMI £80), Blue Light of Death repair, MacBook logic board repair, data recovery.
+- Rating: 5.0 stars from 170+ Google reviews.
+
+## Services
+
+- [Console repair](https://onlinefix.co.uk/console-repair.html): PlayStation, Xbox and Nintendo Switch repair — HDMI ports from £60, disk drives from £55, overheating from £30.
+- [PlayStation repair](https://onlinefix.co.uk/playstation-repair.html): PS5 HDMI port £80 (PS4 from £60), PS5 disk drive £110, Blue Light of Death from £90, deep clean from £30.
+- [Xbox repair](https://onlinefix.co.uk/xbox-repair.html): Series X HDMI port £80 (Series S/One from £60), disk drive from £55, power supply from £65, deep clean from £30.
+- [iPhone repair](https://onlinefix.co.uk/iphone-repair.html): screens from £45, batteries from £35, charging ports from £45, water damage from £55.
+- [MacBook repair](https://onlinefix.co.uk/macbook-repair.html): logic boards from £95, screens from £149, batteries from £79, keyboards from £89, water damage from £85.
+- [Laptop repair](https://onlinefix.co.uk/laptop-repair.html): screens from £60, diagnosis from £30, SSD upgrades from £40 plus the drive, virus removal from £35.
+- [PC repair](https://onlinefix.co.uk/pc-repair.html): hardware diagnosis from £30, virus removal from £35, SSD/RAM upgrades from £25 labour, Windows installation from £35.
+- [Tablet repair](https://onlinefix.co.uk/tablet-repair.html): iPad and tablet screens from £55, batteries from £45, charging ports from £45.
+- [Data recovery](https://onlinefix.co.uk/data-recovery.html): deleted files from £45, failed hard drives from £55, SSDs from £65, phones from £45, RAID from £85. No data recovered, no fee.
+- [All services](https://onlinefix.co.uk/services.html): full catalogue of repairs.
+
+## Company
+
+- [About OnlineFix](https://onlinefix.co.uk/about.html): background on Tomas, the workshop and 8+ years of repair experience.
+- [Reviews](https://onlinefix.co.uk/reviews.html): customer reviews and Google rating.
+- [Contact](https://onlinefix.co.uk/contact.html): phone, email, location and opening hours.
+
+## Optional
+
+- [Privacy policy](https://onlinefix.co.uk/privacy.html)
