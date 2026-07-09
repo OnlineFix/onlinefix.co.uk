@@ -99,10 +99,11 @@
             "@id": "https://onlinefix.co.uk/#organization",
             "name": "OnlineFix",
             "founder": {
-                "@type": "Person",
-                "name": "Tomas",
-                "jobTitle": "Owner & Lead Technician"
+                "@id": "https://onlinefix.co.uk/#tomas"
             }
+        },
+        "mainEntity": {
+            "@id": "https://onlinefix.co.uk/#tomas"
         },
         "breadcrumb": {
             "@type": "BreadcrumbList",
@@ -111,6 +112,47 @@
                 {"@type": "ListItem", "position": 2, "name": "About", "item": "https://onlinefix.co.uk/about.html"}
             ]
         }
+    }
+    </script>
+
+    <!-- Person Schema (entity linking: Tomas -> OnlineFix) -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "@id": "https://onlinefix.co.uk/#tomas",
+        "name": "Tomas",
+        "jobTitle": "Owner & Lead Technician",
+        "description": "Tomas is the owner and lead technician of OnlineFix, an independent electronics repair workshop in Guildford, Surrey. He has over 8 years of hands-on experience in board-level micro-soldering, console repair, phone and laptop repair, and data recovery.",
+        "url": "https://onlinefix.co.uk/about.html",
+        "worksFor": {
+            "@id": "https://onlinefix.co.uk/#organization"
+        },
+        "workLocation": {
+            "@type": "Place",
+            "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Guildford",
+                "addressRegion": "Surrey",
+                "addressCountry": "GB"
+            }
+        },
+        "knowsAbout": [
+            "Micro-Soldering",
+            "Board-Level Repair",
+            "PlayStation 5 HDMI Port Replacement",
+            "Xbox Repair",
+            "Nintendo Switch Repair",
+            "iPhone Repair",
+            "MacBook Logic Board Repair",
+            "Laptop Repair",
+            "PC Repair",
+            "Data Recovery"
+        ],
+        "sameAs": [
+            "https://www.instagram.com/onlinefixrepairs",
+            "https://www.tiktok.com/@onlinefix"
+        ]
     }
     </script>
 

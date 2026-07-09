@@ -1231,6 +1231,97 @@ a[aria-label] > i[class*="fa-"]:only-child,
     }
 }
 
+/* PRICE & COMPARISON TABLES (AEO/GEO) */
+.price-section {
+    scroll-margin-top: 80px;
+    padding-bottom: 3rem;
+}
+
+.price-answer {
+    max-width: 820px;
+    margin: 0 auto 2.5rem;
+    text-align: center;
+    line-height: 1.7;
+    color: #333333;
+    padding: 0 1rem;
+}
+
+.price-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border: 2px solid var(--hex-black);
+    background: var(--hex-white);
+}
+
+.price-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 560px;
+    font-size: 0.95rem;
+}
+
+.price-table caption {
+    text-align: left;
+    padding: 1rem 1.25rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid var(--hex-black);
+}
+
+.price-table th,
+.price-table td {
+    padding: 0.9rem 1.25rem;
+    text-align: left;
+    border-bottom: 1px solid var(--hex-grid);
+    vertical-align: top;
+    line-height: 1.5;
+}
+
+.price-table thead th {
+    background: var(--hex-black);
+    color: var(--hex-white);
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    border-bottom: none;
+}
+
+.price-table tbody tr:nth-child(even) {
+    background: #f9f9f9;
+}
+
+.price-table tbody tr:last-child th,
+.price-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.price-table tbody th[scope="row"] {
+    font-weight: 600;
+}
+
+.price-table td:last-child {
+    font-weight: 700;
+    white-space: nowrap;
+    color: var(--hex-accent);
+}
+
+.compare-table td:last-child {
+    font-weight: 400;
+    white-space: normal;
+    color: inherit;
+}
+
+.price-note {
+    margin-top: 1rem;
+    text-align: center;
+    font-family: monospace;
+    font-size: 0.85rem;
+    color: #595959;
+    padding: 0 1rem;
+}
+
 /* SCROLL BAR */
 ::-webkit-scrollbar {
     width: 10px;
