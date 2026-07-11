@@ -419,9 +419,9 @@
         @media(max-width:768px){.navbar{background:var(--hex-white);border-bottom:2px solid var(--hex-black)}.nav-logo{font-size:1.1rem;padding:0 1rem;letter-spacing:-0.5px}.nav-container{justify-content:space-between;height:54px}.mobile-menu-toggle{display:flex;align-items:center;background:transparent;border:none;padding:0 1rem;color:var(--hex-black)}.nav-menu{display:none;flex-direction:column;justify-content:flex-start;position:absolute;top:54px;left:0;right:0;height:calc(100vh - 54px);height:calc(100dvh - 54px);overflow-y:auto;background:var(--hex-white);border-top:2px solid var(--hex-black)}.nav-menu li.nav-cta-item{margin-top:auto}.nav-menu.active{display:flex}.nav-link{flex:1;padding:1.5rem;border-left:none;border-bottom:1px solid #eee;min-height:48px}.nav-cta{flex:1;padding:1.5rem;justify-content:center;border-left:none;min-height:48px}.container{padding:0 12px}.section-title{padding-top:2rem;margin-bottom:0}}
     </style>
     <!-- Deferred stylesheets (non-render-blocking) -->
-    <link rel="stylesheet" href="/css/core.min.css?v=20260708" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="/css/core.min.css?v=20260710" media="print" onload="this.media='all'">
     <link rel="stylesheet" href="/css/icons.min.css?v=20260611" media="print" onload="this.media='all'">
-    <noscript><link rel="stylesheet" href="/css/core.min.css?v=20260708"><link rel="stylesheet" href="/css/icons.min.css?v=20260611"></noscript>
+    <noscript><link rel="stylesheet" href="/css/core.min.css?v=20260710"><link rel="stylesheet" href="/css/icons.min.css?v=20260611"></noscript>
     <style>
         .hero {
             min-height: 90vh;
@@ -1047,10 +1047,7 @@
         <section class="price-section" aria-labelledby="compare-heading">
             <div class="container">
                 <h2 class="section-title fade-in" id="compare-heading">Why Choose OnlineFix Over a High Street Repair Chain?</h2>
-                <p class="price-answer fade-in">OnlineFix repairs most devices same-day or within 24&ndash;48 hours on-site at our
-                    Guildford workshop, whereas high street chains such as Currys, CeX and Timpson typically send devices away
-                    to a central depot and can take up to 14 days. Every repair is carried out by Tomas, the owner and lead
-                    technician, with board-level micro-soldering in-house, a 90-day warranty, and a no-fix-no-fee policy.</p>
+                <p class="price-answer fade-in">OnlineFix repairs most devices same-day or within 24&ndash;48 hours on-site at our Guildford workshop, whereas high street chains such as Currys, CeX and Timpson typically send devices away and can take up to 14 days. Here&apos;s how an independent specialist compares:</p>
                 <div class="price-table-wrap fade-in">
                     <table class="price-table compare-table">
                         <caption>OnlineFix vs high street repair chains &mdash; at a glance</caption>
@@ -1064,38 +1061,38 @@
                         <tbody>
                             <tr>
                                 <th scope="row">Turnaround time</th>
-                                <td>Same-day to 48 hours for most repairs</td>
-                                <td>Often 1&ndash;2 weeks &mdash; devices sent away to a depot</td>
+                                <td data-label="OnlineFix">Same-day to 48 hours for most repairs</td>
+                                <td data-label="High street chains">Often 1&ndash;2 weeks &mdash; devices sent away to a depot</td>
                             </tr>
                             <tr>
                                 <th scope="row">Where the repair happens</th>
-                                <td>On-site at our Guildford workshop</td>
-                                <td>Usually shipped to a third-party repair centre</td>
+                                <td data-label="OnlineFix">On-site at our Guildford workshop</td>
+                                <td data-label="High street chains">Usually shipped to a third-party repair centre</td>
                             </tr>
                             <tr>
                                 <th scope="row">Board-level micro-soldering</th>
-                                <td>Yes &mdash; HDMI ports, logic boards, liquid damage</td>
-                                <td>Rarely offered; devices often replaced instead of repaired</td>
+                                <td data-label="OnlineFix">Yes &mdash; HDMI ports, logic boards, liquid damage</td>
+                                <td data-label="High street chains">Rarely offered; devices often replaced instead of repaired</td>
                             </tr>
                             <tr>
                                 <th scope="row">Who does the work</th>
-                                <td>Tomas, owner &amp; lead technician with 8+ years experience</td>
-                                <td>Rotating staff or outsourced technicians</td>
+                                <td data-label="OnlineFix">Tomas, owner &amp; lead technician with 8+ years experience</td>
+                                <td data-label="High street chains">Rotating staff or outsourced technicians</td>
                             </tr>
                             <tr>
                                 <th scope="row">Diagnostic fee</th>
-                                <td>Small fee, credited towards your repair</td>
-                                <td>Varies; often non-refundable</td>
+                                <td data-label="OnlineFix">Small fee, credited towards your repair</td>
+                                <td data-label="High street chains">Varies; often non-refundable</td>
                             </tr>
                             <tr>
                                 <th scope="row">No fix, no fee</th>
-                                <td>Yes, on all repairs</td>
-                                <td>Not guaranteed</td>
+                                <td data-label="OnlineFix">Yes, on all repairs</td>
+                                <td data-label="High street chains">Not guaranteed</td>
                             </tr>
                             <tr>
                                 <th scope="row">Data privacy</th>
-                                <td>Your device stays with one technician in Guildford</td>
-                                <td>Handled by couriers and multiple staff</td>
+                                <td data-label="OnlineFix">Your device stays with one technician in Guildford</td>
+                                <td data-label="High street chains">Handled by couriers and multiple staff</td>
                             </tr>
                         </tbody>
                     </table>

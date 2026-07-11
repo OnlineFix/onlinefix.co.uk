@@ -1322,6 +1322,125 @@ a[aria-label] > i[class*="fa-"]:only-child,
     padding: 0 1rem;
 }
 
+/* Mobile: stack table rows into cards — no horizontal swiping */
+@media (max-width: 640px) {
+    .price-table {
+        min-width: 0;
+        font-size: 0.9rem;
+    }
+
+    .price-table thead {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+    }
+
+    .price-table tbody,
+    .price-table tr,
+    .price-table th,
+    .price-table td {
+        display: block;
+    }
+
+    .price-table caption {
+        display: block;
+        padding: 1rem;
+    }
+
+    .price-table tr {
+        padding: 1rem;
+        border-bottom: 1px solid var(--hex-grid);
+    }
+
+    .price-table tbody tr:last-child {
+        border-bottom: none;
+    }
+
+    .price-table th,
+    .price-table td {
+        padding: 0;
+        border-bottom: none;
+    }
+
+    .price-table td:first-child,
+    .price-table tbody th[scope="row"] {
+        font-weight: 700;
+        margin-bottom: 0.6rem;
+    }
+
+    .price-table td[data-label] {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 1rem;
+        padding: 0.2rem 0;
+    }
+
+    .price-table td[data-label]::before {
+        content: attr(data-label);
+        flex-shrink: 0;
+        font-family: monospace;
+        font-size: 0.75rem;
+        font-weight: 400;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #595959;
+    }
+
+    .price-table td:last-child {
+        white-space: normal;
+    }
+
+    .compare-table td[data-label] {
+        display: block;
+        padding: 0.3rem 0;
+    }
+
+    .compare-table td[data-label]::before {
+        display: block;
+        margin-bottom: 0.1rem;
+    }
+}
+
+/* AT-A-GLANCE SUMMARY BOX */
+.ai-summary {
+    padding: 3rem 0;
+    border-top: 2px solid var(--hex-black);
+    background: var(--hex-white);
+}
+
+.summary-box {
+    max-width: 900px;
+    margin: 0 auto;
+    border: 2px solid var(--hex-black);
+    background: #f9f9f9;
+    padding: 1.75rem 2rem;
+}
+
+.summary-label {
+    font-family: monospace;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--hex-accent);
+    margin-bottom: 0.75rem;
+}
+
+.summary-box p:not(.summary-label) {
+    line-height: 1.7;
+    color: #333333;
+    font-size: 0.95rem;
+}
+
+@media (max-width: 768px) {
+    .summary-box {
+        padding: 1.25rem 1rem;
+    }
+}
+
 /* SCROLL BAR */
 ::-webkit-scrollbar {
     width: 10px;
