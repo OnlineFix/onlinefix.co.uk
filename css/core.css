@@ -1322,6 +1322,43 @@ a[aria-label] > i[class*="fa-"]:only-child,
     padding: 0 1rem;
 }
 
+/* AT-A-GLANCE SUMMARY BOX */
+.ai-summary {
+    padding: 3rem 0;
+    border-top: 2px solid var(--hex-black);
+    background: var(--hex-white);
+}
+
+.summary-box {
+    max-width: 900px;
+    margin: 0 auto;
+    border: 2px solid var(--hex-black);
+    background: #f9f9f9;
+    padding: 1.75rem 2rem;
+}
+
+.summary-label {
+    font-family: monospace;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--hex-accent);
+    margin-bottom: 0.75rem;
+}
+
+.summary-box p:not(.summary-label) {
+    line-height: 1.7;
+    color: #333333;
+    font-size: 0.95rem;
+}
+
+@media (max-width: 768px) {
+    .summary-box {
+        padding: 1.25rem 1rem;
+    }
+}
+
 /* SCROLL BAR */
 ::-webkit-scrollbar {
     width: 10px;
