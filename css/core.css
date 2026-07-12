@@ -1198,9 +1198,12 @@ a[aria-label] > i[class*="fa-"]:only-child,
         background: #333;
     }
 
-    /* Keep page bottom (footer/copyright) reachable above the fixed bar */
+    /* Keep page bottom (footer/copyright) reachable above the fixed bar.
+       Exactly the bar's height (52px links + 2px border) — the bar no
+       longer grows with the safe-area inset, so reserving the inset here
+       just leaves a blank band above the bar at the end of the page. */
     body:has(.mobile-contact-bar) {
-        padding-bottom: calc(54px + var(--safe-area-bottom));
+        padding-bottom: 54px;
     }
 
     /* The bar is the single persistent contact action on phones, so
