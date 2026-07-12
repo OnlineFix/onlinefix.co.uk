@@ -1146,17 +1146,21 @@ a[aria-label] > i[class*="fa-"]:only-child,
         display: flex;
         background: var(--hex-white);
         border-top: 2px solid var(--hex-black);
-        padding-bottom: var(--safe-area-bottom);
     }
 
+    /* The home-indicator inset lives on the links, not the bar, so each
+       button's own background fills it when iOS reveals the inset on
+       toolbar collapse — a bar-level padding shows as a white gap under
+       the black Call button. */
     .mobile-contact-bar a {
+        position: relative;
         flex: 1;
         display: inline-flex;
         align-items: center;
         justify-content: center;
         gap: 0.5rem;
-        min-height: 52px;
-        padding: 0.5rem;
+        min-height: calc(52px + var(--safe-area-bottom));
+        padding: 0.5rem 0.5rem calc(0.5rem + var(--safe-area-bottom));
         text-decoration: none;
         color: var(--hex-black);
         font-weight: 600;
@@ -1164,6 +1168,19 @@ a[aria-label] > i[class*="fa-"]:only-child,
         font-size: 0.8rem;
         letter-spacing: 0.04em;
         border-left: 1px solid var(--hex-grid);
+    }
+
+    /* iOS repositions fixed elements a frame late while the browser
+       toolbar animates away; bleed each button's background past the
+       viewport edge so that frame shows button colour, not page white. */
+    .mobile-contact-bar a::after {
+        content: '';
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        height: 60px;
+        background: inherit;
     }
 
     .mobile-contact-bar a:first-child {
