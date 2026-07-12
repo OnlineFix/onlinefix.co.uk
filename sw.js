@@ -13,9 +13,9 @@ const RUNTIME_CACHE = `runtime-${SW_VERSION}`;
 const SHELL_URLS = [
     '/',
     '/index.html',
-    '/css/core.min.css?v=20260614',
+    '/css/core.min.css?v=20260712',
     '/css/icons.min.css?v=20260611',
-    '/js/core.js?v=20260613',
+    '/js/core.js?v=20260712',
     '/js/cookies.js?v=20260611',
     '/images/onlinefix-logo.webp?v=2',
     '/favicon-192x192.png',
