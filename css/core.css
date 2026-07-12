@@ -1148,10 +1148,10 @@ a[aria-label] > i[class*="fa-"]:only-child,
         border-top: 2px solid var(--hex-black);
     }
 
-    /* The home-indicator inset lives on the links, not the bar, so each
-       button's own background fills it when iOS reveals the inset on
-       toolbar collapse — a bar-level padding shows as a white gap under
-       the black Call button. */
+    /* No safe-area padding on purpose: when the browser toolbar hides,
+       the bar drops flush to the physical bottom edge and the home
+       indicator floats over the buttons' lower edge. Padding the inset
+       instead reads as a gap under the buttons. */
     .mobile-contact-bar a {
         position: relative;
         flex: 1;
@@ -1159,8 +1159,8 @@ a[aria-label] > i[class*="fa-"]:only-child,
         align-items: center;
         justify-content: center;
         gap: 0.5rem;
-        min-height: calc(52px + var(--safe-area-bottom));
-        padding: 0.5rem 0.5rem calc(0.5rem + var(--safe-area-bottom));
+        min-height: 52px;
+        padding: 0.5rem;
         text-decoration: none;
         color: var(--hex-black);
         font-weight: 600;
