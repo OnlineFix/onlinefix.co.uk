@@ -102,6 +102,12 @@ a[aria-label] > i[class*="fa-"]:only-child,
     min-height: 24px;
 }
 
+/* Icon-only links (footer socials) carry no underline */
+.footer a[aria-label],
+.social-links a {
+    text-decoration: none;
+}
+
 /* UTILITY */
 .uppercase {
     text-transform: uppercase;
@@ -562,10 +568,17 @@ a[aria-label] > i[class*="fa-"]:only-child,
     margin-bottom: 2rem;
 }
 
-.cta-box {
-    border: 1px solid white;
-    padding: 2rem;
-    display: inline-block;
+/* Monochrome buttons on the black CTA band */
+.cta-section .cta-button {
+    background: var(--hex-white);
+    color: var(--hex-black);
+    border-color: var(--hex-white);
+}
+
+@media (hover: hover) {
+    .cta-section .cta-button:hover {
+        box-shadow: -4px -4px 0 #555;
+    }
 }
 
 /* FAQ SECTION */
@@ -678,6 +691,18 @@ a[aria-label] > i[class*="fa-"]:only-child,
 .footer-links a:hover {
     color: var(--hex-white);
     text-decoration: underline;
+}
+
+/* The long LINKS list splits into two shorter columns on desktop */
+@media (min-width: 769px) {
+    .footer-links--two-col {
+        columns: 2;
+        column-gap: 2rem;
+    }
+
+    .footer-links--two-col li {
+        break-inside: avoid;
+    }
 }
 
 /* PWA install button — only visible when the browser fires beforeinstallprompt.
@@ -925,11 +950,6 @@ a[aria-label] > i[class*="fa-"]:only-child,
     .cta-button {
         width: 100%;
         margin: 0.5rem 0;
-    }
-
-    .cta-box {
-        padding: 1.5rem;
-        display: block;
     }
 
     .faq-section {
