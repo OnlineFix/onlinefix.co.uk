@@ -1,0 +1,497 @@
+# OnlineFix — full reference
+
+> OnlineFix is an independent electronics repair workshop in Guildford, Surrey (UK), founded in 2018 and run by owner and lead technician Tomas. Same-day phone, laptop, PC, tablet and games console repair with a 90-day warranty and a no-fix-no-fee policy. Appointment only — no walk-ins. Call 07940 730537 or email hello@onlinefix.uk. Open 7 days a week, 10:00–22:00.
+
+Key facts:
+
+- Location: Guildford, Surrey, GU1 4PD, United Kingdom. Also serves Woking, Farnham, Godalming and the rest of Surrey.
+- Booking: appointment only — phone 07940 730537 (or message) to arrange a drop-off time. Walk-ins are not accepted.
+- Pricing: depends on the device and fault — see per-service prices below. Simple servicing and upgrades sit at the lower end; complex board-level or motherboard repairs start from £90 and can realistically take 1–2 weeks. A small diagnostic fee applies and is credited towards the repair. No fix, no fee.
+- Warranty: 90-day warranty on all repairs.
+- Turnaround: most repairs same-day or within 24–48 hours, on-site at the Guildford workshop (devices are not sent away). Complex board-level work or data recovery can take 1–2 weeks.
+- Specialities: board-level micro-soldering, PS5/PS4/Xbox HDMI port replacement (PS5 HDMI £80), Blue Light of Death repair, MacBook logic board repair, data recovery.
+- Rating: 5.0 stars from 170+ Google reviews.
+
+This document is generated from the structured data on onlinefix.co.uk and contains the full service catalogue, prices and FAQs in one file. A shorter index lives at https://onlinefix.co.uk/llms.txt.
+
+Current Google rating: 5.0 stars from 178 reviews.
+
+## OnlineFix | Phone, Laptop, PC & Console Repair — Guildford, Surrey
+
+URL: https://onlinefix.co.uk/
+
+OnlineFix — Guildford's 5-star repair shop. Same-day PS5, Xbox & Switch, phone, laptop & PC repairs. 90-day warranty, no fix no fee. Call 07940 730537.
+
+### Prices
+
+- iPhone Screen Repair. Professional iPhone screen replacement and repair services
+- MacBook Repair. Expert MacBook logic board repair, SSD upgrades, and hardware fixes
+- PlayStation & Xbox Repair. Gaming console HDMI port repair, disc drive fixes, and general maintenance
+
+### Frequently asked questions
+
+**How long do repairs take at OnlineFix?**
+
+Our most common repair is the HDMI port replacement, which takes around 2-3 hours. We work on an appointment basis, so this isn't a walk-in, while-you-wait service. More complex work such as level 3 micro-soldering, data recovery, or intermittent problems needing PC diagnostics can take 1-2 weeks.
+
+**Do you offer a warranty on electronics repairs?**
+
+Yes, OnlineFix offers comprehensive warranties on all repairs ranging from 3 months to lifetime coverage, depending on the specific repair and parts used. We use only high-quality parts and stand behind our workmanship.
+
+**Do I need to book an appointment for repair?**
+
+Yes, OnlineFix operates on an appointment-only basis at our Guildford location to ensure dedicated attention to your device. We do not accept walk-ins. Please call us on 07940 730537 or send a message to arrange a convenient drop-off time.
+
+**What devices does OnlineFix repair?**
+
+OnlineFix repairs phones (iPhone, Samsung, Google Pixel), laptops (all brands including HP, Lenovo, Dell, ASUS), MacBooks, PCs and gaming PCs, tablets (iPad, Samsung), and gaming consoles (PS5, PS4, Xbox Series X/S, Xbox One, Nintendo Switch). We also offer data recovery and board-level micro-soldering. If your device or issue isn't listed, get in touch by email at hello@onlinefix.uk or phone on 07940 730537 — chances are we can still help. Based in Guildford, Surrey, serving Woking, Godalming, and Farnham.
+
+**Where is OnlineFix located in Guildford?**
+
+OnlineFix is located in Guildford, Surrey (GU1 4PD). We serve customers across Surrey including Woking, Godalming, Farnham, and surrounding areas. We operate by appointment only — call 07940 730537 to book a convenient drop-off time. Open 7 days a week, 10am to 10pm.
+
+**My console won't show video on the TV — what's wrong?**
+
+This is usually a damaged HDMI port — the connector can be physically damaged or have pins broken off the board. It's one of our most common repairs. PS5 and Xbox Series X HDMI port replacement is £80.
+
+**Why does my PS5 shut down randomly?**
+
+Usually one of two things: the console is clogged up with dust, or the liquid metal thermal paste has oxidised and is causing a hotspot on the APU. We fix both with a full clean and thermal paste redo — £70 for PS5.
+
+## Electronics Repair Services Guildford | OnlineFix
+
+URL: https://onlinefix.co.uk/services.html
+
+Electronics repair services in Guildford: phone, laptop, PC, tablet & console repair. Same-day, 90-day warranty, no fix no fee. Call 07940 730537.
+
+### Prices
+
+- Smartphone Repair. Expert repair for all smartphone brands including iPhone and Samsung
+- Laptop Repair. Complete laptop repair for MacBook, Dell, HP, Lenovo, and ASUS
+- Tablet Repair. Professional tablet repair for iPad, Samsung Galaxy Tab, and Surface
+- Gaming Console Repair. PlayStation, Xbox, and Nintendo Switch repair services
+- Desktop PC Repair. Desktop computer repair, upgrades, and custom builds
+- Data Recovery. Professional data recovery for damaged hard drives, SSDs, and USB drives
+
+## Console Repair Guildford | PS5, Xbox & Switch Fix | OnlineFix
+
+URL: https://onlinefix.co.uk/console-repair.html
+
+PS5, Xbox & Switch repair in Guildford. HDMI ports from £60, deep cleans from £30, board-level fixes. Same-day, 90-day warranty. Call 07940 730537.
+
+### Prices
+
+- HDMI Port Replacement — from £60. Professional HDMI port replacement for PlayStation 5, PS4, Xbox Series X/S and Xbox One consoles with no video output
+- Disk Drive Repair & Replacement — from £55. Console disk drive repair for games not reading, ejecting issues, or grinding noises on PS5, PS4 and Xbox consoles
+- Power Supply & Blue Light of Death Repair — from £35. Console power supply diagnosis and repair for consoles that won't turn on, Blue Light of Death, random shutdowns, or blinking light issues.
+- Overheating & Thermal Repair — from £30. Deep cleaning, thermal paste replacement and fan repair for overheating PlayStation and Xbox consoles
+- Nintendo Switch Repair — from £30. Screen replacement, charging port repair and dock troubleshooting for Nintendo Switch and Switch OLED
+- Xbox Series X/S & Xbox One Repair — from £30. HDMI port replacement, disk drive repair, overheating fixes and power supply repair for Xbox Series X, Xbox Series S and Xbox One consoles in Guildford, Surrey
+
+### Frequently asked questions
+
+**How much does a PS5 HDMI port replacement cost?**
+
+PS5 HDMI port replacement at OnlineFix Guildford costs £80. Console HDMI port replacement starts from £60 for other models. The price includes the replacement port, professional micro-soldering, and full testing. Most HDMI repairs are completed within 24-48 hours. A small diagnostic fee applies and is credited towards your repair if you go ahead. All repairs include a 90-day warranty.
+
+**Why is my PlayStation not turning on?**
+
+A PlayStation that won't turn on is usually caused by a faulty power supply unit (PSU), blown fuse, or damaged APU. At OnlineFix we diagnose the exact cause with professional testing equipment and only charge for the repair needed. Common fixes include PSU replacement, fuse repair, or capacitor replacement.
+
+**Can you fix a PS5 or PS4 disk drive that won't read games?**
+
+Yes, we repair console disk drives that won't accept, read, or eject discs. Common causes include a faulty laser lens, worn rollers, or a failed drive motor. We can repair or replace the drive unit while keeping your console's pairing intact.
+
+**How long does a console repair take?**
+
+Most console repairs at OnlineFix Guildford are completed same-day or within 1-3 days depending on the issue. Simple fixes like thermal paste replacement or cleaning are often same-day. HDMI port replacement and board-level repairs typically take 24-48 hours. Unlike chains like CeX or Timpson who send consoles away for weeks, we repair on-site in Guildford. Call ahead to book a drop-off time.
+
+**Do you repair Xbox and Nintendo Switch as well?**
+
+Yes, OnlineFix repairs all major gaming consoles including PlayStation 5, PS4, PS3, Xbox Series X/S, Xbox One, Nintendo Switch and Switch OLED. We handle HDMI ports, disk drives, power issues, overheating, and more.
+
+**Is there a warranty on console repairs?**
+
+Yes, all console repairs at OnlineFix come with a 90-day warranty. We stand behind our work and use quality replacement parts. A small diagnostic fee applies to all jobs and is credited towards your repair if you go ahead. If the same issue recurs within the 90-day warranty period, we'll fix it at no additional cost.
+
+**Do you offer a console cleaning service?**
+
+Yes, OnlineFix offers professional deep cleaning for PS5, PS4, Xbox, and Nintendo Switch consoles. We fully disassemble the console, clean all internal components, remove dust buildup, replace thermal paste, and reassemble with thorough testing. A deep clean helps prevent overheating and extends your console's lifespan. Same-day service available at our Guildford shop.
+
+**Where can I get my PS5 HDMI port fixed near Guildford?**
+
+OnlineFix in Guildford, Surrey specialises in PS5 HDMI port replacement using professional micro-soldering equipment. We serve customers from Guildford, Woking, Godalming, Farnham, and across Surrey. PS5 HDMI port repair costs £80 with a 90-day warranty and no fix, no fee policy. Call 07940 730537 to book a drop-off.
+
+## PlayStation Repair Guildford | PS5 & PS4 HDMI Fix | OnlineFix
+
+URL: https://onlinefix.co.uk/playstation-repair.html
+
+PS5 & PS4 repair in Guildford. HDMI port replacement &pound;80, disk drive &pound;110, deep cleaning &pound;70. Same-day, 90-day warranty, no fix no fee. Call 07940 730537.
+
+### Prices
+
+- PS5 HDMI Port Replacement — £80. Professional micro-soldering HDMI port replacement for PlayStation 5 consoles with no video output, flickering, or signal loss. Full 4K HDR testing included.
+- PS5 Disk Drive Repair — £110. PS5 disk drive repair for games not reading, ejecting issues, or grinding noises. Drive pairing with motherboard maintained during repair.
+- PlayStation Blue Light of Death Repair — from £90. PS5 and PS4 power supply diagnosis and repair for Blue Light of Death, consoles that won't turn on, random shutdowns, and blinking light issues.
+- PS5 Deep Clean & Thermal Paste — £70. Full PS5 teardown, deep cleaning, thermal paste replacement with premium compound, and fan service to fix overheating and loud fan noise.
+
+### Frequently asked questions
+
+**How much does a PlayStation repair cost?**
+
+PlayStation repair costs at OnlineFix Guildford depend on the model and issue. For PS5: HDMI port replacement is £80, disk drive repair £110, Blue Light of Death from £90, and deep cleaning with thermal paste £70. PS4 repairs start lower — HDMI from £60, deep clean from £30. A small diagnostic fee applies and is credited towards your repair if you go ahead. All PlayStation repairs include a 90-day warranty.
+
+**How much does a PS5 HDMI port replacement cost?**
+
+PS5 HDMI port replacement at OnlineFix Guildford costs £80. The price includes the replacement port, professional micro-soldering, and full 4K HDR output testing. Most PS5 HDMI repairs are completed within 24-48 hours. PS4 HDMI port replacement starts from £60. All repairs include a 90-day warranty and no fix, no fee policy.
+
+**How long does a PlayStation repair take?**
+
+Most PlayStation repairs at OnlineFix are completed same-day or within 24-48 hours. Deep cleaning and thermal paste replacement is typically same-day for both PS5 and PS4. HDMI port replacement and board-level repairs take 24-48 hours for thorough testing. Unlike Currys, CeX, or Timpson who send consoles away for weeks, we repair on-site at our Guildford workshop.
+
+**Do you repair PS4 as well as PS5?**
+
+Yes, OnlineFix repairs all PlayStation models including PS5, PS5 Slim, PS5 Pro, PS4, PS4 Pro, PS4 Slim, and PS3. Many issues like HDMI port failures, overheating, disk drive faults, and Blue Light of Death affect multiple PlayStation generations. We have specific experience with each model's hardware quirks. All repairs include a 90-day warranty.
+
+**Can you fix a PlayStation Blue Light of Death?**
+
+Yes, OnlineFix specialises in PlayStation Blue Light of Death (BLOD) repair for both PS5 and PS4. This issue is usually caused by a faulty power supply unit (PSU), blown fuse, or damaged capacitors on the APU power delivery circuit. We diagnose the exact cause with professional testing equipment and perform board-level micro-soldering repairs. BLOD repair starts from £90 with a 90-day warranty.
+
+**Do Currys repair PlayStation consoles?**
+
+Currys offers PlayStation repairs through their Team Knowhow service, but they typically send the console away to a central repair centre which can take 2-4 weeks. OnlineFix in Guildford repairs PS5 and PS4 consoles on-site with same-day to 48-hour turnaround, 90-day warranty, and no fix no fee policy. We use professional micro-soldering equipment for board-level repairs that many high-street chains cannot perform.
+
+**Where can I get my PlayStation repaired near Guildford?**
+
+OnlineFix in Guildford, Surrey is a specialist PlayStation repair shop using professional micro-soldering equipment. We repair PS5, PS4, and PS3 consoles. We handle HDMI port replacement, disk drive repair, Blue Light of Death, overheating, and deep cleaning. We serve customers from Guildford, Woking, Godalming, Farnham, and across Surrey. Call 07940 730537 to book a drop-off.
+
+## Xbox Repair Guildford | HDMI Port Fix & Overheating | OnlineFix
+
+URL: https://onlinefix.co.uk/xbox-repair.html
+
+Xbox Series X/S & Xbox One repair in Guildford. HDMI port &pound;80, overheating fix & cleaning from &pound;30. Same-day, 90-day warranty, no fix no fee. Call 07940 730537.
+
+### Prices
+
+- Xbox HDMI Port Replacement — from £60. Professional micro-soldering HDMI port replacement for Xbox Series X, Series S, and Xbox One consoles with no video output, flickering, or signal loss. Full 4K HDR testing included.
+- Xbox Disk Drive Repair — from £55. Xbox disk drive repair for games not reading, ejecting issues, or grinding noises. Compatible with Xbox Series X, Series S, and Xbox One.
+- Xbox Power Supply Repair — from £65. Xbox power supply diagnosis and repair for consoles that won't turn on, random shutdowns, and blinking light issues.
+- Xbox Deep Clean & Thermal Paste — from £30. Full Xbox teardown, deep cleaning, thermal paste replacement with premium compound, and fan service to fix overheating and loud fan noise.
+
+### Frequently asked questions
+
+**How much does an Xbox repair cost?**
+
+Xbox repair costs at OnlineFix Guildford depend on the issue. Deep cleaning and thermal paste replacement starts from £30 (Xbox Series X £70), power supply repair from £65, disk drive repair from £55 (Xbox Series X £110), and HDMI port replacement from £60 (Xbox Series X £80). A small diagnostic fee applies and is credited towards your repair if you go ahead. All Xbox repairs include a 90-day warranty.
+
+**How much does an Xbox HDMI port replacement cost?**
+
+Xbox HDMI port replacement at OnlineFix Guildford costs from £60, with Xbox Series X at a set price of £80. The Xbox Series X is particularly prone to HDMI port damage. The price includes the replacement port, professional micro-soldering, and full 4K HDR output testing. Most Xbox HDMI repairs are completed within 24-48 hours. All repairs include a 90-day warranty and no fix, no fee policy.
+
+**How long does an Xbox repair take?**
+
+Most Xbox repairs at OnlineFix are completed same-day or within 24-48 hours. Deep cleaning and thermal paste replacement is typically same-day. HDMI port replacement and board-level repairs take 24-48 hours for thorough testing. Unlike Currys, CeX, or Timpson who send Xbox consoles away for weeks, we repair on-site at our Guildford workshop.
+
+**Can Currys fix my Xbox Series X?**
+
+Currys offers Xbox repairs through their Team Knowhow service, but they typically send the console away to a central repair centre which can take 2-4 weeks. OnlineFix in Guildford repairs Xbox consoles on-site with same-day to 48-hour turnaround, 90-day warranty, and no fix no fee policy. We use professional micro-soldering equipment for board-level repairs that many high-street chains cannot perform.
+
+**How much does CeX charge to fix an Xbox?**
+
+CeX offers console repairs but typically sends them away to third-party repair centres, which can take several weeks. Pricing varies and is not always transparent upfront. At OnlineFix Guildford, Xbox repairs start from £30 for cleaning and thermal service, with transparent pricing provided before any work begins. We repair on-site, same-day where possible, with a 90-day warranty.
+
+**Why does my Xbox Series X keep overheating?**
+
+Xbox Series X overheating is commonly caused by dust buildup blocking airflow, dried thermal paste on the processor, or a failing fan. Over time, thermal paste degrades and loses its ability to transfer heat efficiently. At OnlineFix Guildford, we perform a full Xbox teardown, deep clean, thermal paste replacement with premium compound, and fan service. Xbox overheating repair starts from £30 (Xbox Series X £70) with a 90-day warranty.
+
+**Where can I get my Xbox repaired near Guildford?**
+
+OnlineFix in Guildford, Surrey is a specialist Xbox repair shop using professional micro-soldering equipment. We handle HDMI port replacement, disk drive repair, power supply faults, overheating, and deep cleaning for Xbox Series X, Series S, and Xbox One. We serve customers from Guildford, Woking, Godalming, Farnham, and across Surrey. Call 07940 730537 to book a drop-off.
+
+## Phone & iPhone Repair Guildford | Express Fix | OnlineFix
+
+URL: https://onlinefix.co.uk/iphone-repair.html
+
+Phone & iPhone repair in Guildford. Screens from £45, batteries, charging ports & water damage. Express service, 90-day warranty. Call 07940 730537.
+
+### Prices
+
+- iPhone Screen Replacement — from £45. Professional iPhone screen replacement for cracked, unresponsive or black display screens on all iPhone models from the iPhone 8 to the latest releases
+- iPhone Battery Replacement — from £35. High-quality replacement battery for iPhones with poor battery life, swollen batteries, or unexpected shutdowns
+- iPhone Charging Port Repair — from £45. Lightning and USB-C charging port replacement for iPhones that won't charge, have loose connections, or intermittent charging
+- iPhone Water Damage Repair — from £55. Liquid damage diagnosis and board-level repair for water-damaged iPhones with ultrasonic cleaning and component replacement
+- iPhone Back Glass Replacement — from £45. Rear glass panel replacement for cracked or shattered iPhone back glass on iPhone 8 and later models
+- iPhone Camera Repair — from £40. Front and rear camera module replacement for blurry photos, black camera screen, or cracked camera lens on all iPhone models
+
+### Frequently asked questions
+
+**How much does an iPhone screen replacement cost in Guildford?**
+
+iPhone screen replacement at OnlineFix Guildford varies by model. Older models like iPhone 8 and SE start from around £45, while newer models like iPhone 15 Pro Max cost more due to OLED panels. The price includes the replacement screen, professional fitting, and full testing. A small diagnostic fee applies and is credited towards your repair if you go ahead. All repairs include a 90-day warranty.
+
+**How long does an iPhone screen repair take?**
+
+Most iPhone screen replacements at OnlineFix Guildford are completed within 30-60 minutes. Battery replacements take around 20-30 minutes. More complex repairs like charging port replacement or water damage recovery may take 1-3 hours. We always provide a time estimate when you book your drop-off.
+
+**Can you fix a water-damaged iPhone?**
+
+Yes, we specialise in iPhone water damage repair. We perform ultrasonic cleaning of the logic board, replace corroded components, and restore full functionality. The sooner you bring it in after water exposure, the better the chances. A small diagnostic fee applies and is credited towards the repair cost if you go ahead.
+
+**Do you use genuine Apple parts for iPhone repairs?**
+
+We use high-quality OEM-spec replacement parts that match or exceed Apple's quality standards. All screens are tested for colour accuracy, touch responsiveness, and brightness. Every repair includes a 90-day warranty covering both parts and labour.
+
+**Will my iPhone data be safe during repair?**
+
+Yes, your data remains completely untouched during repair. We never access, wipe, or modify your personal data. For screen and battery replacements, your phone keeps all its data. For water damage repairs, we prioritise data preservation throughout the recovery process.
+
+**Is there a warranty on iPhone repairs?**
+
+Yes, all iPhone repairs at OnlineFix come with a 90-day warranty. If the same issue recurs within the warranty period, we fix it at no additional cost. A small diagnostic fee applies to all jobs and is credited towards the repair cost if you go ahead.
+
+**Do you repair other phone brands besides iPhone?**
+
+Yes, OnlineFix repairs all major phone brands including Samsung Galaxy, Google Pixel, Huawei, OnePlus, and more. We handle screen replacements, battery swaps, charging port repairs, and water damage recovery for all Android and iOS devices. Express service available at our Guildford shop. Call 07940 730537 to book.
+
+## MacBook Repair Guildford | Screen, Battery & Logic Board | OnlineFix
+
+URL: https://onlinefix.co.uk/macbook-repair.html
+
+MacBook screen, battery, keyboard, SSD & logic board repair in Guildford. 90-day warranty, no fix no fee. Same-day where possible. Call 07940 730537.
+
+### Prices
+
+- MacBook Logic Board Repair — from £95. Professional board-level repair for MacBook Pro and MacBook Air with no power, no backlight, kernel panics, or GPU failure using micro-soldering
+- MacBook Screen Replacement — from £149. LCD and Retina display replacement for cracked, dead pixel, or flickering MacBook screens including MacBook Pro and MacBook Air models
+- MacBook Battery Replacement — from £79. High-quality replacement battery for MacBook Pro and MacBook Air with swollen battery, poor battery life, or not charging issues
+- MacBook Keyboard Repair — from £89. Keyboard replacement and repair for stuck, unresponsive, or butterfly mechanism MacBook keyboards including top case replacement
+- MacBook SSD Upgrade & Data Recovery — from £69. SSD storage upgrade and data recovery for MacBook Pro and MacBook Air, including transfer from failing drives
+- MacBook Water Damage Repair — from £85. Liquid damage diagnosis and board-level repair for MacBook Pro and MacBook Air with corrosion cleaning and component replacement
+
+### Frequently asked questions
+
+**How much does a MacBook screen replacement cost in Guildford?**
+
+MacBook screen replacement at OnlineFix Guildford starts from £149 depending on the model. MacBook Air screens are typically less expensive than MacBook Pro Retina displays. The price includes the replacement display, professional fitting, and full testing. A small diagnostic fee applies and is credited towards your repair if you go ahead. All repairs include a 90-day warranty.
+
+**Can you fix a MacBook that won't turn on?**
+
+Yes. A MacBook that won't turn on is usually caused by a faulty logic board, failed power IC, liquid damage, or a dead battery. At OnlineFix we diagnose the exact cause with board-level testing equipment and only charge for the specific repair needed. Most power-related MacBook repairs are completed within 24-48 hours.
+
+**Do you repair water-damaged MacBooks?**
+
+Yes, we specialise in MacBook liquid damage repair. We perform ultrasonic cleaning of the logic board, replace corroded components using micro-soldering, and restore full functionality. The sooner you bring it in after a spill, the better the chances of a full recovery. A small diagnostic fee applies and is credited towards the repair cost if you go ahead.
+
+**How long does a MacBook repair take?**
+
+Most MacBook repairs at OnlineFix Guildford are completed same-day or within 1-3 days. Battery and SSD swaps are typically same-day. Screen replacements and keyboard repairs take 24-48 hours. Logic board repairs may take 2-3 days for thorough diagnosis and testing. Unlike Apple Store or chains who send MacBooks away for weeks, we repair on-site in Guildford.
+
+**Is it worth repairing an old MacBook?**
+
+Often yes. An SSD upgrade and battery replacement can make a 2015-2019 MacBook feel brand new for a fraction of the cost of a replacement. We provide honest advice — if a repair doesn't make economic sense, we'll tell you upfront. A small diagnostic fee applies and is credited towards your repair if you go ahead.
+
+**Is there a warranty on MacBook repairs?**
+
+Yes, all MacBook repairs at OnlineFix come with a 90-day warranty. We stand behind our work and use quality replacement parts. If the same issue recurs within the warranty period, we'll fix it at no additional cost. A small diagnostic fee applies to all jobs and is credited towards your repair if you go ahead.
+
+## Laptop Repair Guildford | Screens From £60, Same-Day | OnlineFix
+
+URL: https://onlinefix.co.uk/laptop-repair.html
+
+Laptop repair in Guildford — HP, Lenovo, Dell, ASUS & more. Screens from £60, batteries, SSD upgrades. Same-day, no fix no fee. Call 07940 730537.
+
+### Prices
+
+- Laptop Screen Replacement — from £60. Screen replacement for cracked, flickering or dead laptop displays. All major brands including HP, Lenovo, Dell, ASUS and Acer, most common sizes in stock
+- Laptop Hardware Diagnosis — from £30. Full hardware diagnosis for laptops that won't turn on, won't charge, overheat or shut down randomly
+- Laptop SSD Upgrade — £40. Upgrade from a slow hard drive to a fast SSD with full data and operating system migration
+- Virus & Malware Removal — from £35. Complete virus, malware and adware removal with system clean-up and security hardening
+- Laptop Battery Replacement. Replacement batteries for laptops with short battery life, swollen batteries or laptops that only run on mains power
+- Laptop Keyboard Replacement. Keyboard replacement for laptops with broken, stuck or unresponsive keys, including liquid spill damage
+
+### Frequently asked questions
+
+**How much does a laptop screen replacement cost in Guildford?**
+
+Laptop screen replacement at OnlineFix Guildford starts from £60 depending on the screen size, resolution and panel type. We replace screens for all major brands — HP, Lenovo, Dell, ASUS, Acer, MSI and more — and stock common sizes so most replacements are completed same-day. All repairs include a 90-day warranty.
+
+**Which laptop brands do you repair?**
+
+We repair every major laptop brand: HP, Lenovo, Dell, ASUS, Acer, MSI, Samsung, Toshiba, Huawei and gaming laptops. For Apple laptops we have a dedicated MacBook repair service with board-level micro-soldering. If your brand isn't listed, call us — we can almost certainly help.
+
+**Can you fix a laptop that won't turn on?**
+
+Yes. A laptop that won't power on is usually a faulty charging port, dead battery, failed power circuitry or a motherboard fault. Hardware diagnosis at OnlineFix Guildford starts from £30 and we give you a clear quote before any repair work begins. With our no fix, no fee policy, you don't pay for the repair if we can't fix it.
+
+**Can you make my slow laptop faster?**
+
+Almost always, yes. The single biggest upgrade for an older laptop is swapping the hard drive for an SSD — boot times drop from minutes to seconds. SSD upgrades start from £40 plus the cost of the drive, including full transfer of your files and Windows installation. Combined with a clean-up and more memory where supported, a 5-8 year old laptop can feel like new.
+
+**How long does a laptop repair take?**
+
+Most laptop repairs at OnlineFix Guildford are completed same-day or within 24-48 hours. Screen replacements with stocked panels, SSD upgrades and virus removal are typically same-day. Repairs needing ordered parts usually take 2-3 days. Unlike big-chain stores that send laptops away for weeks, everything is repaired on-site in Guildford.
+
+**Is there a warranty on laptop repairs?**
+
+Yes, every laptop repair at OnlineFix comes with a 90-day warranty as standard. We use quality replacement parts and if the same fault returns within the warranty period, we fix it again free of charge. We also operate a no fix, no fee policy — if we can't repair it, you don't pay.
+
+## Laptop, PC & Computer Repair Guildford | Same-Day | OnlineFix
+
+URL: https://onlinefix.co.uk/pc-repair.html
+
+Laptop, PC & computer repair in Guildford. Screen replacement, virus removal, SSD upgrades, diagnosis from £30. Same-day, 90-day warranty. Call 07940 730537.
+
+### Prices
+
+- Hardware Diagnosis & Repair — from £30. Professional hardware diagnosis and repair for desktop PCs including motherboard, PSU, RAM, and GPU fault finding and component replacement
+- Virus & Malware Removal — from £35. Complete virus, malware, and ransomware removal for slow PCs with pop-ups, redirects, or compromised security
+- SSD/HDD Upgrade — from £40. Solid state drive and hard drive upgrades for faster boot times, improved performance, and expanded storage capacity
+- RAM & Component Upgrade — from £25. RAM upgrades and component replacements to boost PC performance for multitasking, gaming, and professional workloads
+- Windows Installation & Setup — from £35. Clean Windows installation, OS migration, driver setup, and full system configuration for desktop PCs
+- Overheating & Fan Repair — from £30. Thermal paste replacement, fan repair, dust cleaning, and cooling system restoration for overheating desktop PCs and gaming rigs
+
+### Frequently asked questions
+
+**How much does a PC repair cost in Guildford?**
+
+PC repair costs at OnlineFix Guildford depend on the issue. Hardware diagnosis starts from £30, virus removal from £35, and SSD upgrades from £40 (plus the cost of the drive). We provide a transparent quote before any work begins. A small diagnostic fee applies and is credited towards your repair if you go ahead. All repairs include a 90-day warranty.
+
+**How long does a PC repair take?**
+
+Most PC repairs at OnlineFix Guildford are completed same-day. Simple upgrades like RAM or SSD installation take 30-60 minutes. Virus removal and Windows installations typically take 1-3 hours. Hardware diagnosis and motherboard-level repairs may take 1-2 days depending on parts availability. We always provide a time estimate when you book your drop-off.
+
+**Will my files and data be safe during PC repair?**
+
+Yes, we prioritise data safety on every PC repair. For hardware upgrades and virus removal, your files remain intact. If a clean Windows installation is needed, we back up your data first. We never access personal files unnecessarily and always discuss data implications before starting any repair that could affect your stored files.
+
+**Do you repair gaming PCs and custom builds?**
+
+Yes, we repair all types of gaming PCs and custom builds. Whether it's a GPU failure, overheating issues, PSU problems, or performance bottlenecks, we diagnose and fix it. We also offer upgrade consultations to help you get the best performance from your gaming rig within your budget.
+
+**Is there a warranty on PC repairs?**
+
+Yes, all PC repairs at OnlineFix come with a 90-day warranty as standard. This covers both parts and labour. If the same fault recurs within the warranty period, we fix it at no additional cost. A small diagnostic fee applies to all jobs and is credited towards your repair if you go ahead.
+
+**Can you advise on PC upgrades to improve performance?**
+
+Absolutely. We offer free upgrade consultations when you book a drop-off. Whether you need more RAM for multitasking, an SSD for faster boot times, or a GPU upgrade for gaming, we assess your current setup and recommend the most cost-effective upgrades. We can source and install components for you with our 90-day warranty included.
+
+**Do you offer laptop screen replacement?**
+
+Yes, OnlineFix replaces laptop screens for all major brands including HP, Dell, Lenovo, ASUS, Acer, and more. We stock common screen sizes and can source replacements for most models. Laptop screen replacements start from £60 and are typically completed same-day. All screen replacements include a 90-day warranty. Call 07940 730537 to book at our Guildford shop.
+
+## iPad & Tablet Repair Guildford | Screens £55 | OnlineFix
+
+URL: https://onlinefix.co.uk/tablet-repair.html
+
+iPad & tablet repair in Guildford. Screen replacement from £55, battery & charging port fixes. Same-day, 90-day warranty, no fix no fee. Call 07940 730537.
+
+### Prices
+
+- Tablet Screen Replacement — from £55. Professional iPad and tablet screen replacement for cracked, unresponsive or black display screens on all iPad and Samsung Galaxy Tab models
+- Tablet Battery Replacement — from £45. High-capacity battery replacement for iPads and tablets with poor battery life, swollen batteries, or unexpected shutdowns
+- Tablet Charging Port Repair — from £45. Lightning and USB-C charging port replacement for iPads and tablets that won't charge, have loose connections, or intermittent charging
+- Tablet Water Damage Repair — from £65. Liquid damage diagnosis and board-level repair for water-damaged iPads and tablets with ultrasonic cleaning and component replacement
+- Tablet Button & Speaker Repair — from £35. Home button, power button, volume button, and speaker replacement for iPads and tablets with unresponsive controls or audio issues
+- Tablet Software & Performance Fix — from £25. Software troubleshooting, iOS and Android updates, factory resets, and performance optimisation for slow or unresponsive tablets
+
+### Frequently asked questions
+
+**How much does an iPad screen replacement cost in Guildford?**
+
+iPad screen replacement at OnlineFix Guildford starts from £55 and varies by model. Older iPads and iPad Mini models are at the lower end, while iPad Pro 12.9-inch with Liquid Retina XDR displays cost more due to the larger panel and advanced technology. The price includes the replacement screen, professional fitting, and full testing. A small diagnostic fee applies and is credited towards your repair if you go ahead. All repairs include a 90-day warranty.
+
+**How long does a tablet repair take?**
+
+Most iPad and tablet screen replacements are completed within 1-2 hours. Battery replacements take around 45-60 minutes due to the adhesive used in tablet construction. Charging port repairs are typically done within 1-2 hours. Water damage recovery may take longer depending on the extent of corrosion. We always provide a time estimate when you book your drop-off.
+
+**Will my data be safe during the tablet repair?**
+
+Yes, your data remains completely untouched during repair. We never access, wipe, or modify your personal data. For screen and battery replacements, your tablet keeps all its photos, apps, and files. For water damage repairs, data preservation is our priority throughout the recovery process. We recommend an iCloud or Google backup before any repair as best practice.
+
+**Do you repair Samsung tablets as well as iPads?**
+
+Yes, we repair both Apple iPads and Samsung Galaxy Tab devices. This includes the Samsung Galaxy Tab S series and Galaxy Tab A series. We carry out screen replacements, battery swaps, charging port repairs, and more on Samsung tablets. Call us to book a drop-off and we will confirm parts availability for your specific model.
+
+**Is there a warranty on tablet repairs?**
+
+Yes, every tablet repair at OnlineFix comes with a 90-day warranty as standard. We stand behind every repair and use quality replacement parts. If the same issue recurs within the warranty period, we fix it at no additional cost. A small diagnostic fee applies to all jobs and is credited towards your repair if you go ahead — so you only pay for the fix itself.
+
+**Can you fix a cracked iPad that still works?**
+
+Absolutely. Even if your iPad still functions with a cracked screen, we strongly recommend getting it repaired. Cracks can spread, sharp edges can cut your fingers, and moisture or dust can enter through the cracks and cause further internal damage. We replace the digitiser and LCD or Liquid Retina panel as needed, restoring your iPad to like-new condition with a 90-day warranty.
+
+## Data Recovery Guildford | No Data, No Fee | OnlineFix
+
+URL: https://onlinefix.co.uk/data-recovery.html
+
+Data recovery in Guildford from £45. Hard drives, SSDs, USB sticks & phones. No data, no fee &mdash; free assessment. Call 07940 730537.
+
+### Prices
+
+- Accidental Deletion Recovery — from £45. Recovery of accidentally deleted files, emptied recycle bin contents, and formatted drive data from hard drives, SSDs, and USB devices
+- Hard Drive Failure Recovery — from £55. Data recovery from failed, clicking, or undetected hard drives including mechanical failure, head crashes, and motor seizure
+- SSD Data Recovery — from £65. Professional data recovery from dead or corrupted solid state drives including SATA, NVMe, and M.2 SSDs with firmware-level recovery
+- Water and Fire Damage Recovery — from £75. Data recovery from water-damaged, flood-damaged, or fire-damaged storage devices with specialist cleaning and component-level repair
+- Phone Data Recovery — from £45. Data retrieval from dead, broken, or water-damaged smartphones including iPhone and Android devices with broken screens or no power
+- RAID and Server Recovery — from £85. RAID array and NAS data recovery for failed server configurations including RAID 0, RAID 1, RAID 5, and RAID 6 rebuilds
+
+### Frequently asked questions
+
+**What is the success rate for data recovery?**
+
+Our data recovery success rate is approximately 90% across all device types. Logical failures such as accidental deletion and formatting have the highest recovery rates, often close to 100%. Mechanical hard drive failures and water-damaged devices have slightly lower rates depending on the severity. We operate a no data, no fee policy — if we cannot recover your data, you do not pay.
+
+**How much does data recovery cost in Guildford?**
+
+Data recovery at OnlineFix Guildford starts from £45 for straightforward deleted file recovery. Hard drive failure recovery starts from £55, SSD recovery from £65, and RAID or server recovery from £85. We provide a fixed quote after diagnosis before any work begins. No data, no fee — you only pay if we successfully recover your files.
+
+**How long does data recovery take?**
+
+Simple deleted file recovery can often be completed within 24 hours. Hard drive and SSD recovery typically takes 2-5 working days depending on the severity of the failure. RAID and server recovery may take up to 7 working days. We offer a 24-hour priority service for urgent cases. You will receive a time estimate when you book your drop-off.
+
+**Is my data kept confidential during recovery?**
+
+Absolutely. Confidentiality is central to our data recovery service. We never browse, copy, or share your recovered files. Your data is handled on secure, isolated systems. Once recovery is complete and you have verified your files, all working copies are securely wiped from our systems. We are happy to sign a non-disclosure agreement if required.
+
+**What devices can you recover data from?**
+
+We recover data from virtually all storage devices including internal and external hard drives (HDD), solid state drives (SSD, NVMe, M.2), USB flash drives, SD cards, microSD cards, iPhones, Android phones, laptops, MacBooks, RAID arrays, and NAS devices. If your data was stored on it, we can almost certainly attempt recovery.
+
+**Should I attempt recovery myself before bringing it in?**
+
+We strongly recommend against DIY recovery attempts. Running a failed hard drive, installing recovery software on the affected drive, or opening a drive outside a clean environment can permanently destroy data. The best course of action is to power off the device immediately and book a drop-off with us. The less the device is used after data loss, the higher the chance of successful recovery.
+
+## About OnlineFix | Repair Technician Guildford
+
+URL: https://onlinefix.co.uk/about.html
+
+Meet Tomas, your trusted electronics repair expert in Guildford, Surrey. Years of experience in phone, laptop, tablet and console repairs.
+
+## Customer Reviews | OnlineFix Guildford
+
+URL: https://onlinefix.co.uk/reviews.html
+
+Read genuine customer reviews for OnlineFix electronics repair in Guildford, Surrey. 5-star rated phone, laptop, tablet and console repairs.
+
+### Sample customer reviews
+
+- Alex Thompson (5/5): "Absolutely outstanding service! My MacBook Pro had water damage and I thought it was completely dead. Tomas not only fixed it but also recovered all my important work files. The repair was completed in just 3 hours and at a very reasonable price. I can't recommend OnlineFix enough - they truly saved my business!"
+
+- Sarah Mitchell (5/5): "Excellent service! Tomas fixed my laptop screen in just 2 hours. Professional, affordable, and reliable. Highly recommended!"
+
+- James Lancaster (5/5): "Amazing work on my phone water damage repair. Thought it was completely dead but Tomas brought it back to life. Top quality service!"
+
+- Michael Roberts (5/5): "Fair pricing and honest service. Explained everything clearly and fixed my gaming console quickly. Will definitely return for future repairs."
+
+- Emma Wilson (5/5): "Fantastic service from start to finish. My tablet screen was completely shattered and Tomas had it looking brand new within the same day. Great communication and fair pricing."
+
+- David Chen (5/5): "Had my desktop PC completely upgraded and optimized. Tomas knows his stuff and provided excellent advice on the best components for my budget. Couldn't be happier!"
+
+- Rachel Cooper (5/5): "Brought in my Nintendo Switch with a drifting joystick and broken charging port. Tomas fixed both issues same day and it works perfectly now. Very reasonable prices compared to sending it off to Nintendo. Highly recommend!"
+
+## Contact OnlineFix | Guildford Repair Shop
+
+URL: https://onlinefix.co.uk/contact.html
+
+Contact OnlineFix for electronics repair in Guildford, Surrey. Call or WhatsApp 07940 730537, 10am-10pm daily. Drop-offs by appointment, 7 days a week.
