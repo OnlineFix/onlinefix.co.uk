@@ -1133,6 +1133,12 @@ a[aria-label] > i[class*="fa-"]:only-child,
 }
 
 @media (max-width: 768px) {
+    /* The home-indicator inset lives on the bar, not the links, so the
+       buttons keep a constant height when the browser toolbar collapses
+       and the inset appears — the bar slides with the viewport instead of
+       the buttons stretching. The inset strip below each button is painted
+       by its ::after bleed (background: inherit), so no white gap shows
+       under the black Call button. */
     .mobile-contact-bar {
         position: fixed;
         bottom: 0;
@@ -1142,12 +1148,9 @@ a[aria-label] > i[class*="fa-"]:only-child,
         display: flex;
         background: var(--hex-white);
         border-top: 2px solid var(--hex-black);
+        padding-bottom: var(--safe-area-bottom);
     }
 
-    /* The home-indicator inset lives on the links, not the bar, so each
-       button's own background fills it when iOS reveals the inset on
-       toolbar collapse — a bar-level padding shows as a white gap under
-       the black Call button. */
     .mobile-contact-bar a {
         position: relative;
         flex: 1;
@@ -1155,8 +1158,8 @@ a[aria-label] > i[class*="fa-"]:only-child,
         align-items: center;
         justify-content: center;
         gap: 0.5rem;
-        min-height: calc(52px + var(--safe-area-bottom));
-        padding: 0.5rem 0.5rem calc(0.5rem + var(--safe-area-bottom));
+        min-height: 52px;
+        padding: 0.5rem;
         text-decoration: none;
         color: var(--hex-black);
         font-weight: 600;
@@ -1166,9 +1169,10 @@ a[aria-label] > i[class*="fa-"]:only-child,
         border-left: 1px solid var(--hex-grid);
     }
 
-    /* iOS repositions fixed elements a frame late while the browser
-       toolbar animates away; bleed each button's background past the
-       viewport edge so that frame shows button colour, not page white. */
+    /* Each button's background bleeds past the viewport edge: it fills the
+       bar's safe-area strip with the button's own colour, and covers the
+       frame where iOS repositions fixed elements a beat late while the
+       browser toolbar animates away. */
     .mobile-contact-bar a::after {
         content: '';
         position: absolute;
