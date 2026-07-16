@@ -93,9 +93,14 @@
     {
         "@context": "https://schema.org",
         "@type": "WebPage",
+        "speakable": {
+            "@type": "SpeakableSpecification",
+            "cssSelector": [".page-subtitle", ".section-subtitle"]
+        },
         "name": "Electronics Repair Services in Guildford",
         "description": "Complete electronics repair services in Guildford, Surrey. Smartphone, laptop, tablet, gaming console, desktop PC repairs and data recovery.",
         "url": "https://onlinefix.co.uk/services.html",
+        "dateModified": "2026-07-16",
         "isPartOf": {
             "@type": "WebSite",
             "name": "OnlineFix",
@@ -123,7 +128,13 @@
         "provider": {
             "@type": "LocalBusiness",
             "@id": "https://onlinefix.co.uk/#organization",
-            "name": "OnlineFix"
+            "name": "OnlineFix",
+            "sameAs": [
+                "https://www.instagram.com/onlinefixrepairs",
+                "https://www.tiktok.com/@onlinefix",
+                "https://g.page/r/Cc0Vz3kdmt8bEBE/review",
+                "https://www.google.com/maps/place/OnlineFix"
+            ]
         },
         "areaServed": {
             "@type": "City",
@@ -916,6 +927,7 @@
             }
         })();
     </script>
+    <script src="/js/webmcp.js?v=20260716" defer></script>
     <script src="/js/core.js?v=20260712" defer></script>
     <script src="/js/cookies.js?v=20260611" defer></script>
 </body>

@@ -1,0 +1,61 @@
+name: Update freshness metadata
+
+# On every push to main:
+#   1. Sync sitemap <lastmod> and JSON-LD dateModified from git history
+#      (scripts/update-freshness.mjs)
+#   2. Regenerate llms-full.txt from on-page structured data
+#      (scripts/build-llms-full.mjs)
+#   3. Commit the result if anything changed (message must keep the
+#      "chore: freshness" prefix — update-freshness.mjs excludes those
+#      commits when computing content dates)
+#   4. Ping IndexNow so Bing/DuckDuckGo (and ChatGPT search/Copilot,
+#      which ride on Bing) recrawl promptly
+#
+# Pushes made here use GITHUB_TOKEN, which does not trigger workflows,
+# so this cannot loop.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-freshness
+  cancel-in-progress: false
+
+jobs:
+  freshness:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # full history — content dates come from git log
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Update sitemap lastmod + schema dateModified
+        run: node scripts/update-freshness.mjs
+
+      - name: Regenerate llms-full.txt
+        run: node scripts/build-llms-full.mjs
+
+      - name: Commit changes
+        run: |
+          if [[ -z "$(git status --porcelain)" ]]; then
+            echo "No changes — freshness metadata already in sync."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "chore: freshness metadata sync"
+          git push
+
+      - name: Ping IndexNow
+        continue-on-error: true # indexing nudge only — never fail the build
+        run: node scripts/ping-indexnow.mjs
