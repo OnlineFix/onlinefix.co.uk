@@ -77,9 +77,15 @@ self.addEventListener('fetch', (event) => {
                     }
                     return res;
                 })
-                .catch(() =>
-                    caches.match(req)
-                        .then((cached) => cached || caches.match('/') || caches.match('/404.html'))
+                .catch(async () =>
+                    // Each caches.match() returns a promise, so these must be
+                    // awaited in turn — `a || b` on unawaited promises always
+                    // picks the first one and can resolve to undefined, which
+                    // makes respondWith() throw instead of falling back.
+                    (await caches.match(req)) ||
+                    (await caches.match('/')) ||
+                    (await caches.match('/404.html')) ||
+                    Response.error()
                 )
         );
         return;

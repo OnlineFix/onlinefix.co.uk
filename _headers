@@ -8,6 +8,12 @@
 # dashboard -> onlinefix.co.uk zone -> Rules -> Transform Rules ->
 # Modify Response Header), or the change will not reach production.
 
+# Clickjacking protection lives here, not in the pages. Browsers ignore both
+# X-Frame-Options and CSP frame-ancestors when they arrive via <meta>, so the
+# auth-gated pages (/admin/, /new-repair/, /track/) depend on these headers
+# actually being served. If this file is not honoured by the host, mirror
+# X-Frame-Options and frame-ancestors in the Cloudflare Transform Rule too.
+
 /*
   X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
@@ -16,7 +22,7 @@
   Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=(), usb=()
   Cross-Origin-Opener-Policy: same-origin
   Cross-Origin-Resource-Policy: same-origin
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com https://www.gstatic.com https://www.googletagmanager.com https://*.google-analytics.com https://www.google.com https://www.recaptcha.net https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://*.googleapis.com https://*.firebaseio.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' data: https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' data: blob: https://firebasestorage.googleapis.com https://*.firebasestorage.app https://www.googletagmanager.com https://*.google-analytics.com; connect-src 'self' https://cloudflareinsights.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebasestorage.app https://*.google-analytics.com https://www.googletagmanager.com https://api.emailjs.com https://www.google.com https://www.recaptcha.net; frame-src 'self' https://www.google.com https://www.recaptcha.net; object-src 'none'; base-uri 'self'; form-action 'self'
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com https://www.gstatic.com https://www.googletagmanager.com https://*.google-analytics.com https://www.google.com https://www.recaptcha.net https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://*.googleapis.com https://*.firebaseio.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' data: https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' data: blob: https://firebasestorage.googleapis.com https://*.firebasestorage.app https://www.googletagmanager.com https://*.google-analytics.com; connect-src 'self' https://cloudflareinsights.com https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebasestorage.app https://*.google-analytics.com https://www.googletagmanager.com https://api.emailjs.com https://www.google.com https://www.recaptcha.net; frame-src 'self' https://www.google.com https://www.recaptcha.net; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'
 
 /css/*
   Cache-Control: public, max-age=31536000, immutable
