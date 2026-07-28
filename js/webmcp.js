@@ -14,7 +14,7 @@
         phone: '+44 7940 730537',
         whatsapp: 'https://wa.me/447940730537',
         email: 'hello@onlinefix.uk',
-        address: 'Guildford, Surrey, GU1 4PD, United Kingdom',
+        address: '13 Quarry Street, Guildford, Surrey, GU1 3UY, United Kingdom',
         areaServed: 'Guildford, Woking, Farnham, Godalming and the rest of Surrey',
         hours: 'Open 7 days a week, 10:00-22:00 (calls and messages)',
         booking: 'Appointment only — no walk-ins. Call or message 07940 730537 to arrange a drop-off time.',
