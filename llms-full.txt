@@ -7,6 +7,7 @@ Key facts:
 - Location: 13 Quarry Street, Guildford, Surrey, GU1 3UY, United Kingdom. Also serves Woking, Farnham, Godalming and the rest of Surrey.
 - Booking: appointment only — phone 07940 730537 (or message) to arrange a drop-off time. Walk-ins are not accepted.
 - Pricing: depends on the device and fault — see per-service prices below. Simple servicing and upgrades sit at the lower end; complex board-level or motherboard repairs start from £90 and can realistically take 1–2 weeks. A small diagnostic fee applies and is credited towards the repair. No fix, no fee.
+- Payment: cash or bank transfer only — credit and debit cards, Apple Pay and Google Pay are not accepted. Payment is due on collection, after you have checked the repair. Invoices are available on request.
 - Warranty: 90-day warranty on all repairs.
 - Turnaround: most repairs same-day or within 24–48 hours, on-site at the Guildford workshop (devices are not sent away). Complex board-level work or data recovery can take 1–2 weeks.
 - Specialities: board-level micro-soldering, PS5/PS4/Xbox HDMI port replacement (PS5 HDMI £80), Blue Light of Death repair, MacBook logic board repair, data recovery.
@@ -41,6 +42,10 @@ Yes, OnlineFix offers comprehensive warranties on all repairs ranging from 3 mon
 **Do I need to book an appointment for repair?**
 
 Yes, OnlineFix operates on an appointment-only basis at our Guildford location to ensure dedicated attention to your device. We do not accept walk-ins. Please call us on 07940 730537 or send a message to arrange a convenient drop-off time.
+
+**How can I pay for my repair at OnlineFix?**
+
+OnlineFix accepts cash or bank transfer only. We do not accept credit or debit cards, Apple Pay or Google Pay. Payment is due on collection, once you have seen the device working and you are happy with the repair — the booking itself requires no payment and no deposit. If you need an invoice, for business expenses or an insurance claim, just ask and we will issue one.
 
 **What devices does OnlineFix repair?**
 
