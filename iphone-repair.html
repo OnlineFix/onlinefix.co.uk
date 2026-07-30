@@ -429,7 +429,13 @@
 
         .page-header::before { content: "FIG. 09 — IPHONE REPAIR MANUAL"; position: absolute; top: 80px; left: 20px; font-family: monospace; font-size: 0.7rem; color: var(--hex-black); opacity: 0.6; }
 
-        .models-section { padding: 0; border-top: 2px solid var(--hex-black); background: var(--hex-white); overflow: hidden; }
+        .models-section { padding: 0 0 3rem; border-top: 2px solid var(--hex-black); background: var(--hex-white); overflow: hidden; }
+        .models-line { max-width: 900px; margin: 1.5rem auto 0; text-align: center; font-size: 1.05rem; line-height: 1.7; color: #333; }
+        .models-note { max-width: 900px; margin: 1rem auto 0; text-align: center; font-family: monospace; font-size: 0.85rem; line-height: 1.6; color: #666; }
+        @media (max-width: 768px) {
+            .models-line { font-size: 0.95rem; padding: 0 0.25rem; }
+            .models-note { font-size: 0.8rem; padding: 0 0.25rem; }
+        }
 
         .models-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; border: 2px solid var(--hex-black); }
 
@@ -675,29 +681,8 @@
         <section class="models-section" aria-labelledby="models-heading">
             <div class="container">
                 <h2 class="section-title fade-in" id="models-heading">MODELS WE REPAIR</h2>
-                <p class="section-subtitle fade-in">iPhone 12 and Newer &mdash; Every Variant</p>
-                <div class="models-grid">
-                    <div class="model-item fade-in">
-                        <div class="model-icon"><i class="fas fa-mobile-alt" aria-hidden="true"></i></div>
-                        <div class="model-name">iPhone 17 Series &amp; Air</div>
-                        <div class="model-years">Including Pro &amp; Pro Max</div>
-                    </div>
-                    <div class="model-item fade-in">
-                        <div class="model-icon"><i class="fas fa-mobile-alt" aria-hidden="true"></i></div>
-                        <div class="model-name">iPhone 15 / 16 Series</div>
-                        <div class="model-years">Including Plus, Pro &amp; Pro Max</div>
-                    </div>
-                    <div class="model-item fade-in">
-                        <div class="model-icon"><i class="fas fa-mobile-alt" aria-hidden="true"></i></div>
-                        <div class="model-name">iPhone 13 / 14</div>
-                        <div class="model-years">Including Mini, Plus &amp; Pro</div>
-                    </div>
-                    <div class="model-item fade-in">
-                        <div class="model-icon"><i class="fas fa-mobile-alt" aria-hidden="true"></i></div>
-                        <div class="model-name">iPhone 12 Series</div>
-                        <div class="model-years">Including Mini, Pro &amp; Pro Max</div>
-                    </div>
-                </div>
+                <p class="models-line fade-in"><strong>iPhone 12 and newer</strong> &mdash; iPhone 12, 13, 14, 15, 16, the iPhone 17 series and iPhone Air, including every Mini, Plus, Pro and Pro Max variant. We also repair <strong>Samsung Galaxy, Google Pixel, Huawei and OnePlus</strong> phones.</p>
+                <p class="models-note fade-in">Older than an iPhone 12? Give us a ring &mdash; we&apos;ll tell you honestly whether it&apos;s worth repairing or whether a local phone shop will sort you out faster.</p>
             </div>
         </section>
 
@@ -940,9 +925,9 @@
         <section class="price-section" aria-labelledby="pricing-heading">
             <div class="container">
                 <h2 class="section-title fade-in" id="pricing-heading">How Much Does an iPhone Repair Cost in Guildford?</h2>
-                <p class="price-answer fade-in">iPhone repair at OnlineFix in Guildford starts from &pound;35, with screen replacement from &pound;95 depending on the model. Every repair includes a 90-day warranty and our no-fix-no-fee guarantee; typical starting prices are listed below.</p>
+                <p class="price-answer fade-in">There is no single price for &ldquo;an iPhone repair&rdquo; &mdash; a battery on an older model and board-level work on an iPhone 17 Pro Max are different jobs at very different costs. The figures below are the <strong>lowest</strong> we charge for each type of repair, on the cheapest model with the most affordable part. Your model, the part you choose and the fault all move the price up from there. Board-level work is quoted individually and can run into several hundred pounds. Every repair includes a 90-day warranty and our no-fix-no-fee guarantee.</p>
                 <p class="price-warning fade-in" style="max-width:900px;margin:0 auto 1.25rem;border:2px solid var(--hex-black);background:var(--hex-white);padding:1rem 1.25rem;font-family:monospace;font-size:0.85rem;line-height:1.6;box-shadow:6px 6px 0 var(--hex-black);">
-                    <strong style="text-transform:uppercase;">Starting prices &mdash; not quotes.</strong> Each figure below is the <strong>cheapest model</strong> for that repair. Your device may cost more depending on the model and the fault. We confirm your exact price before any work starts &mdash; and if we can&apos;t fix it, there&apos;s no fee.
+                    <strong style="text-transform:uppercase;">Estimates, not quotes.</strong> Every figure below is the <strong>lowest</strong> we charge for that repair &mdash; cheapest model, most affordable part. Your model, the part you choose and the fault all move it up, sometimes a long way. <strong>A firm quote is only given after we&apos;ve had the device and diagnosed it</strong> (or assessed it from what you tell us). Nothing is charged without your say-so: diagnostics are free on most devices, work starts only once you confirm the quote, and if you decide not to go ahead you pay nothing and take the device home. Full detail in our <a href="/booking-terms.html" style="color:var(--hex-accent);">booking terms</a>.
                 </p>
                 <div class="price-table-wrap fade-in">
                     <table class="price-table">
@@ -985,10 +970,15 @@
                                 <td data-label="Repair type">Camera repair</td>
                                 <td data-label="Starts at">from &pound;40</td>
                             </tr>
+                            <tr>
+                                <td>No power, no signal, won&apos;t boot after a drop or spill</td>
+                                <td data-label="Repair type">Board-level micro-soldering</td>
+                                <td data-label="Starts at">Quoted after diagnosis &mdash; often several hundred pounds</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
-                <p class="price-note fade-in">Your exact price is confirmed after diagnosis, before any work begins &mdash; the diagnostic fee is credited towards your repair. Appointment only: call 07940 730537.</p>
+                <p class="price-note fade-in">Diagnostics are free on most devices; where a fee applies we agree it with you first and credit it towards the repair. Appointment only: call 07940 730537.</p>
             </div>
         </section>
 
