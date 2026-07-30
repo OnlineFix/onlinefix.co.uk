@@ -1263,6 +1263,106 @@ a[aria-label] > i[class*="fa-"]:only-child,
     padding: 0 1rem;
 }
 
+/* Pricing terms disclosure. The headline stays visible so the "these are
+   estimates" point is never hidden; the detail collapses so mobile isn't
+   handed a wall of monospace before the first price. Native <details> —
+   no JS, keyboard and screen-reader friendly by default. */
+.price-terms {
+    max-width: 900px;
+    margin: 0 auto 1.5rem;
+    border: 2px solid var(--hex-black);
+    background: var(--hex-white);
+    box-shadow: 6px 6px 0 var(--hex-black);
+    font-family: monospace;
+    text-align: left;
+}
+
+.price-terms > summary {
+    cursor: pointer;
+    padding: 0.9rem 1rem;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    font-weight: 700;
+    text-transform: uppercase;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: 44px;
+}
+
+.price-terms > summary::-webkit-details-marker {
+    display: none;
+}
+
+.price-terms > summary::after {
+    content: "+";
+    margin-left: auto;
+    font-size: 1.3rem;
+    font-weight: 900;
+    line-height: 1;
+    color: var(--hex-accent);
+    flex-shrink: 0;
+}
+
+.price-terms[open] > summary::after {
+    content: "\2212";
+}
+
+.price-terms[open] > summary {
+    border-bottom: 2px solid var(--hex-black);
+}
+
+/* Body copy uses the readable sans, not the monospace of the summary —
+   three paragraphs of monospace is hard going on a phone. */
+.price-terms-body {
+    padding: 1rem;
+    font-family: var(--font-main);
+    font-size: 0.9rem;
+    line-height: 1.65;
+    color: #444444;
+}
+
+.price-terms-body p {
+    margin-bottom: 0.75rem;
+}
+
+.price-terms-body p:last-child {
+    margin-bottom: 0;
+}
+
+.price-terms-body strong {
+    color: var(--hex-black);
+}
+
+.price-terms-body a {
+    color: var(--hex-accent);
+}
+
+@media (max-width: 768px) {
+    .price-terms {
+        box-shadow: 4px 4px 0 var(--hex-black);
+        margin-bottom: 1rem;
+    }
+
+    .price-terms > summary {
+        font-size: 0.75rem;
+        padding: 0.85rem 0.9rem;
+    }
+
+    .price-terms-body {
+        font-size: 0.85rem;
+        padding: 0.9rem;
+    }
+
+    /* Centred copy is harder to read once it wraps over several lines,
+       so body text goes left-aligned on phones. */
+    .price-answer {
+        text-align: left;
+        margin-bottom: 1.5rem;
+    }
+}
+
 .price-table-wrap {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
