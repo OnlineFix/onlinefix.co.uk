@@ -138,8 +138,13 @@
     }
 
     /* The repair ID is the only credential guarding the public tracking page
-       (see firestore.rules), so it must be unguessable: 128 bits of CSPRNG. */
-    function newRepairId() { return 'REP_' + randomHex(16).toUpperCase(); }
+       (see firestore.rules), so it has to be unguessable rather than
+       sequential. 64 bits of CSPRNG gives 1.8e19 possibilities: against a
+       few thousand live tickets, reaching even a 1% chance of guessing one
+       takes ~1.8e13 attempts, and every attempt is a separate App
+       Check-gated Firestore query. Short enough to read out over the phone
+       and to fit an email line, which 128 bits was not. */
+    function newRepairId() { return 'REP_' + randomHex(8).toUpperCase(); }
 
     function titleCase(str) {
         return String(str || '').toLowerCase().replace(/\b[a-z]/g, function (c) { return c.toUpperCase(); });
@@ -240,7 +245,7 @@
         if (user) {
             $('#topbar-meta').innerHTML =
                 '<strong>' + escapeHTML(user.email || 'Signed in') + '</strong><br>Ticket ' +
-                escapeHTML(state.repairId.slice(0, 12)) + '…';
+                escapeHTML(state.repairId);
             $('#gate-shell').hidden = true;
             $('#flow').hidden = false;
             $('#actionbar').hidden = false;
