@@ -11,6 +11,12 @@
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
+/* The hidden attribute only sets display:none at user-agent level, so any
+   author `display` declaration silently beats it — .actionbar (flex) and
+   .btn (inline-flex) both did, which meant hiding them in JS did nothing.
+   Make hidden authoritative. */
+[hidden] { display: none !important; }
+
 :root {
     --bg-base: #0B0E14;
     --bg-surface: #151A23;
@@ -588,6 +594,90 @@ select.input {
     margin-top: 0.85rem;
 }
 .sigpad-bar__note { font-size: 0.85rem; color: var(--text-dark); flex: 1; }
+
+/* On the thank-you screen the customer is holding the iPad, so the top bar
+   drops the signed-in staff address, the ticket reference and the progress
+   rail — none of which are theirs to read. */
+body[data-step="done"] .topbar__meta,
+body[data-step="done"] .steprail { display: none; }
+
+/* ======================= Thank you (customer) ======================= */
+/* The customer is holding the iPad on this screen, so it shows them
+   something warm and nothing operational. Everything the technician
+   needs sits behind the Staff button underneath. */
+
+.thanks {
+    text-align: center;
+    padding: 3.5rem 1.75rem 3rem;
+    background: linear-gradient(160deg, rgba(16, 185, 129, 0.14), rgba(0, 228, 255, 0.05));
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    border-radius: var(--radius-lg);
+}
+
+.thanks__icon {
+    width: 92px;
+    height: 92px;
+    margin: 0 auto 1.5rem;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: rgba(16, 185, 129, 0.16);
+    border: 2px solid var(--success);
+    color: var(--success);
+}
+
+.thanks__title {
+    font-size: 2.6rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin-bottom: 0.75rem;
+}
+
+.thanks__text {
+    font-size: 1.25rem;
+    color: var(--text-main);
+    max-width: 34ch;
+    margin: 0 auto 1rem;
+}
+
+.thanks__meta {
+    color: var(--text-muted);
+    font-size: 1rem;
+    max-width: 44ch;
+    margin: 0 auto;
+}
+
+.thanks__shop {
+    margin-top: 2.5rem;
+    font-size: 0.85rem;
+    color: var(--text-dark);
+}
+
+/* Quiet on purpose — it should not invite a customer to press it. */
+.staff-reveal {
+    display: flex;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+.staff-reveal .btn {
+    min-height: 48px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    border-color: var(--border-color);
+}
+
+.staff-reveal .btn:hover { color: var(--text-muted); }
+
+#staff-panel { margin-top: 2rem; }
+
+@media (max-width: 700px) {
+    .thanks { padding: 2.5rem 1.25rem 2rem; }
+    .thanks__title { font-size: 2rem; }
+    .thanks__text { font-size: 1.1rem; }
+}
 
 /* ============================ Done screen ============================ */
 

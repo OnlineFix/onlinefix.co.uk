@@ -266,6 +266,9 @@
     function renderStep() {
         var name = currentStep();
 
+        // Drives the CSS that strips staff chrome from the customer's screen.
+        document.body.dataset.step = name;
+
         $$('.step').forEach(function (el) {
             el.classList.toggle('is-active', el.dataset.step === name);
         });
@@ -1195,7 +1198,20 @@
     function showDone(repair, trackUrl, delivery) {
         hideOverlay();
 
-        $('#done-sub').textContent = repair.customerName + ' · ' + repair.device;
+        // Customer-facing half. Addressed to them by name, and says nothing
+        // about tracking links or what was emailed to whom.
+        $('#thanks-title').textContent = repair.firstName
+            ? 'Thank you, ' + repair.firstName
+            : 'Thank you';
+        $('#thanks-text').textContent = 'Your ' + (repair.device || 'device') + ' is booked in with us.';
+        $('#thanks-meta').textContent = repair.customerEmail
+            ? 'Your confirmation is on its way to ' + repair.customerEmail +
+              ", and we'll be in touch as soon as we have news."
+            : "We'll be in touch as soon as we have news.";
+
+        // Staff half, hidden until the technician asks for it.
+        $('#staff-panel').hidden = true;
+        $('#btn-staff').hidden = false;
         $('#done-url').textContent = trackUrl;
 
         $('#delivery').innerHTML = delivery.map(function (item) {
@@ -1246,6 +1262,12 @@
 
     $('#btn-next').addEventListener('click', goNext);
     $('#btn-back').addEventListener('click', goBack);
+
+    $('#btn-staff').addEventListener('click', function () {
+        $('#staff-panel').hidden = false;
+        $('#btn-staff').hidden = true;
+        $('#staff-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
 
     $('#btn-new').addEventListener('click', function () {
         // A fresh ticket means a fresh unguessable ID and a clean slate.
