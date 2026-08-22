@@ -215,7 +215,7 @@
     // State
     // ------------------------------------------------------------------
 
-    var STEPS = ['device', 'issue', 'photos', 'handover', 'customer', 'done'];
+    var STEPS = ['tech', 'handover', 'customer', 'done'];
 
     var state = {
         repairId: newRepairId(),
@@ -308,7 +308,7 @@
             $('#terms-body').innerHTML = TERMS_HTML;
             $('#terms-version').textContent = 'Version ' + TERMS_VERSION + ' · ' + TERMS_EFFECTIVE;
             sizeSignaturePad();
-        } else if (name === 'photos') {
+        } else if (name === 'tech') {
             next.innerHTML = 'Continue <svg class="icon" width="18" height="18"><use href="#i-arrow-right"/></svg>';
             note.textContent = state.photos.length + ' photo' + (state.photos.length === 1 ? '' : 's') + ' captured';
         } else {
@@ -352,17 +352,12 @@
 
         function fail(el) { if (!firstBad) firstBad = el; ok = false; }
 
-        if (name === 'device') {
+        if (name === 'tech') {
             if (!state.category) { setFieldError('category', true); fail($('[data-chipgroup="category"]')); }
             if (!requireText('#f-brand', 'brand')) fail($('#f-brand'));
             if (!requireText('#f-model', 'model')) fail($('#f-model'));
-        }
-
-        if (name === 'issue') {
             if (!requireText('#f-issue', 'issue', 5)) fail($('#f-issue'));
-        }
 
-        if (name === 'photos') {
             var settled = state.photos.filter(function (p) { return p.status === 'done'; });
             var inflight = state.photos.some(function (p) { return p.status === 'uploading'; });
             if (inflight) {
@@ -605,7 +600,7 @@
         });
 
         var note = $('#actionbar-note');
-        if (currentStep() === 'photos') {
+        if (currentStep() === 'tech') {
             note.textContent = state.photos.length + ' photo' + (state.photos.length === 1 ? '' : 's') + ' captured';
         }
     }
