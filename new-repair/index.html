@@ -230,12 +230,15 @@
     <!-- ============================ Intake flow ============================ -->
     <main class="shell" id="flow" hidden>
 
-        <!-- ------------------------- 1. Device ------------------------- -->
-        <section class="step" data-step="device">
-            <p class="step__eyebrow">Step 1 of 4 · Technician</p>
+        <!-- ------------------------- 1. Technician (single page) ------------------------- -->
+        <!-- One page per person: the technician works down this with the device
+             in hand, then hands the iPad over for the customer's single page. -->
+        <section class="step" data-step="tech">
+            <p class="step__eyebrow">Step 1 of 2 &middot; Technician</p>
             <h1 class="step__title">What are we looking at?</h1>
             <p class="step__lede">Log the device while it's in your hands. The customer fills in their own details
-                later — don't ask for them yet.</p>
+                after the handover &mdash; don't ask for them yet.</p>
+
 
             <div class="card">
                 <h2 class="card__title"><svg class="icon" width="20" height="20"><use href="#i-grid" /></svg>Device
@@ -308,73 +311,6 @@
                 </div>
             </div>
 
-            <div class="card">
-                <h2 class="card__title"><svg class="icon" width="20" height="20"><use href="#i-lock" /></svg>Access to
-                    the device<span class="card__hint">Needed to test the repair</span></h2>
-                <div class="field">
-                    <label class="field__label">How does it unlock?</label>
-                    <div class="chips" data-chipgroup="unlockType" role="radiogroup" aria-label="Unlock method">
-                        <button type="button" class="chip" data-value="none" role="radio" aria-checked="false">No
-                            lock</button>
-                        <button type="button" class="chip" data-value="pin" role="radio" aria-checked="false">PIN</button>
-                        <button type="button" class="chip" data-value="pattern" role="radio"
-                            aria-checked="false">Pattern</button>
-                        <button type="button" class="chip" data-value="password" role="radio"
-                            aria-checked="false">Password</button>
-                        <button type="button" class="chip" data-value="withheld" role="radio"
-                            aria-checked="false">Customer won't share</button>
-                    </div>
-                </div>
-                <div class="field" id="unlock-code-field" hidden>
-                    <label class="field__label" for="f-unlock">Code / pattern</label>
-                    <input class="input" id="f-unlock" name="unlockCode" maxlength="60" autocomplete="off"
-                        spellcheck="false" placeholder="e.g. 4821, or L-shape from top-left">
-                    <p class="field__help">Stored on the ticket for staff only. Clear it from the ticket once the
-                        device goes back — don't keep unlock codes longer than the repair needs.</p>
-                </div>
-            </div>
-
-            <div class="card">
-                <h2 class="card__title"><svg class="icon" width="20" height="20"><use href="#i-plus" /></svg>Left with
-                    the device<span class="card__hint">Tick everything you're taking in</span></h2>
-                <div class="checkgrid" data-checkgroup="accessories">
-                    <label class="checkbox"><input type="checkbox" value="Charger / power brick"><span
-                            class="checkbox__box"><svg class="icon" width="14" height="14"><use
-                                    href="#i-check" /></svg></span><span class="checkbox__text">Charger / power
-                            brick</span></label>
-                    <label class="checkbox"><input type="checkbox" value="Cable"><span class="checkbox__box"><svg
-                                class="icon" width="14" height="14"><use href="#i-check" /></svg></span><span
-                            class="checkbox__text">Cable</span></label>
-                    <label class="checkbox"><input type="checkbox" value="Case / cover"><span
-                            class="checkbox__box"><svg class="icon" width="14" height="14"><use
-                                    href="#i-check" /></svg></span><span class="checkbox__text">Case / cover</span></label>
-                    <label class="checkbox"><input type="checkbox" value="SIM tray / SIM card"><span
-                            class="checkbox__box"><svg class="icon" width="14" height="14"><use
-                                    href="#i-check" /></svg></span><span class="checkbox__text">SIM tray / SIM
-                            card</span></label>
-                    <label class="checkbox"><input type="checkbox" value="Stylus / pen"><span
-                            class="checkbox__box"><svg class="icon" width="14" height="14"><use
-                                    href="#i-check" /></svg></span><span class="checkbox__text">Stylus / pen</span></label>
-                    <label class="checkbox"><input type="checkbox" value="Controller(s)"><span
-                            class="checkbox__box"><svg class="icon" width="14" height="14"><use
-                                    href="#i-check" /></svg></span><span class="checkbox__text">Controller(s)</span></label>
-                    <label class="checkbox"><input type="checkbox" value="Memory card / drive"><span
-                            class="checkbox__box"><svg class="icon" width="14" height="14"><use
-                                    href="#i-check" /></svg></span><span class="checkbox__text">Memory card /
-                            drive</span></label>
-                    <label class="checkbox"><input type="checkbox" value="Bag / box"><span class="checkbox__box"><svg
-                                class="icon" width="14" height="14"><use href="#i-check" /></svg></span><span
-                            class="checkbox__text">Bag / box</span></label>
-                </div>
-            </div>
-        </section>
-
-        <!-- ------------------------- 2. Issue ------------------------- -->
-        <section class="step" data-step="issue">
-            <p class="step__eyebrow">Step 2 of 4 · Technician</p>
-            <h1 class="step__title">What's wrong with it?</h1>
-            <p class="step__lede">Describe the fault the way you'd explain it back to the customer, then record the
-                condition it arrived in.</p>
 
             <div class="card">
                 <h2 class="card__title"><svg class="icon" width="20" height="20"><use href="#i-wrench" /></svg>The
@@ -437,6 +373,97 @@
             </div>
 
             <div class="card">
+                <h2 class="card__title"><svg class="icon" width="20" height="20"><use href="#i-camera" /></svg>Photograph
+                    the device<span class="card__hint">Before it leaves the counter</span></h2>
+
+            <div class="banner banner--info">
+                <svg class="icon" width="18" height="18"><use href="#i-info" /></svg>
+                <div>Photos upload as you take them, so they're saved even if something goes wrong later. Wait for
+                    every tile to read <strong>Saved</strong> before you carry on.</div>
+            </div>
+
+            <div class="photo-actions">
+                <button type="button" class="photo-btn photo-btn--camera" id="btn-camera">
+                    <svg class="icon" width="34" height="34"><use href="#i-camera" /></svg>
+                    Take a photo
+                    <small>Opens the iPad camera</small>
+                </button>
+                <button type="button" class="photo-btn" id="btn-library">
+                    <svg class="icon" width="34" height="34"><use href="#i-image" /></svg>
+                    From library
+                    <small>Pick existing</small>
+                </button>
+            </div>
+
+            <input type="file" id="input-camera" accept="image/*" capture="environment" hidden>
+            <input type="file" id="input-library" accept="image/*" multiple hidden>
+
+            <div class="photo-grid" id="photo-grid"></div>
+
+            <p class="field__error" data-error-for="photos">Take at least one photo of the device.</p>
+            </div>
+
+            <div class="card">
+                <h2 class="card__title"><svg class="icon" width="20" height="20"><use href="#i-lock" /></svg>Access to
+                    the device<span class="card__hint">Needed to test the repair</span></h2>
+                <div class="field">
+                    <label class="field__label">How does it unlock?</label>
+                    <div class="chips" data-chipgroup="unlockType" role="radiogroup" aria-label="Unlock method">
+                        <button type="button" class="chip" data-value="none" role="radio" aria-checked="false">No
+                            lock</button>
+                        <button type="button" class="chip" data-value="pin" role="radio" aria-checked="false">PIN</button>
+                        <button type="button" class="chip" data-value="pattern" role="radio"
+                            aria-checked="false">Pattern</button>
+                        <button type="button" class="chip" data-value="password" role="radio"
+                            aria-checked="false">Password</button>
+                        <button type="button" class="chip" data-value="withheld" role="radio"
+                            aria-checked="false">Customer won't share</button>
+                    </div>
+                </div>
+                <div class="field" id="unlock-code-field" hidden>
+                    <label class="field__label" for="f-unlock">Code / pattern</label>
+                    <input class="input" id="f-unlock" name="unlockCode" maxlength="60" autocomplete="off"
+                        spellcheck="false" placeholder="e.g. 4821, or L-shape from top-left">
+                    <p class="field__help">Stored on the ticket for staff only. Clear it from the ticket once the
+                        device goes back — don't keep unlock codes longer than the repair needs.</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="card__title"><svg class="icon" width="20" height="20"><use href="#i-plus" /></svg>Left with
+                    the device<span class="card__hint">Tick everything you're taking in</span></h2>
+                <div class="checkgrid" data-checkgroup="accessories">
+                    <label class="checkbox"><input type="checkbox" value="Charger / power brick"><span
+                            class="checkbox__box"><svg class="icon" width="14" height="14"><use
+                                    href="#i-check" /></svg></span><span class="checkbox__text">Charger / power
+                            brick</span></label>
+                    <label class="checkbox"><input type="checkbox" value="Cable"><span class="checkbox__box"><svg
+                                class="icon" width="14" height="14"><use href="#i-check" /></svg></span><span
+                            class="checkbox__text">Cable</span></label>
+                    <label class="checkbox"><input type="checkbox" value="Case / cover"><span
+                            class="checkbox__box"><svg class="icon" width="14" height="14"><use
+                                    href="#i-check" /></svg></span><span class="checkbox__text">Case / cover</span></label>
+                    <label class="checkbox"><input type="checkbox" value="SIM tray / SIM card"><span
+                            class="checkbox__box"><svg class="icon" width="14" height="14"><use
+                                    href="#i-check" /></svg></span><span class="checkbox__text">SIM tray / SIM
+                            card</span></label>
+                    <label class="checkbox"><input type="checkbox" value="Stylus / pen"><span
+                            class="checkbox__box"><svg class="icon" width="14" height="14"><use
+                                    href="#i-check" /></svg></span><span class="checkbox__text">Stylus / pen</span></label>
+                    <label class="checkbox"><input type="checkbox" value="Controller(s)"><span
+                            class="checkbox__box"><svg class="icon" width="14" height="14"><use
+                                    href="#i-check" /></svg></span><span class="checkbox__text">Controller(s)</span></label>
+                    <label class="checkbox"><input type="checkbox" value="Memory card / drive"><span
+                            class="checkbox__box"><svg class="icon" width="14" height="14"><use
+                                    href="#i-check" /></svg></span><span class="checkbox__text">Memory card /
+                            drive</span></label>
+                    <label class="checkbox"><input type="checkbox" value="Bag / box"><span class="checkbox__box"><svg
+                                class="icon" width="14" height="14"><use href="#i-check" /></svg></span><span
+                            class="checkbox__text">Bag / box</span></label>
+                </div>
+            </div>
+
+            <div class="card">
                 <h2 class="card__title"><svg class="icon" width="20" height="20"><use href="#i-clock" /></svg>Quote
                     &amp; turnaround</h2>
                 <div class="grid-3">
@@ -467,41 +494,7 @@
             </div>
         </section>
 
-        <!-- ------------------------- 3. Photos ------------------------- -->
-        <section class="step" data-step="photos">
-            <p class="step__eyebrow">Step 3 of 4 · Technician</p>
-            <h1 class="step__title">Photograph the device</h1>
-            <p class="step__lede">Shoot it now, before it leaves the counter. Front, back, and a close-up of every mark
-                you ticked on the last step.</p>
-
-            <div class="banner banner--info">
-                <svg class="icon" width="18" height="18"><use href="#i-info" /></svg>
-                <div>Photos upload as you take them, so they're saved even if something goes wrong later. Wait for
-                    every tile to read <strong>Saved</strong> before you carry on.</div>
-            </div>
-
-            <div class="photo-actions">
-                <button type="button" class="photo-btn photo-btn--camera" id="btn-camera">
-                    <svg class="icon" width="34" height="34"><use href="#i-camera" /></svg>
-                    Take a photo
-                    <small>Opens the iPad camera</small>
-                </button>
-                <button type="button" class="photo-btn" id="btn-library">
-                    <svg class="icon" width="34" height="34"><use href="#i-image" /></svg>
-                    From library
-                    <small>Pick existing</small>
-                </button>
-            </div>
-
-            <input type="file" id="input-camera" accept="image/*" capture="environment" hidden>
-            <input type="file" id="input-library" accept="image/*" multiple hidden>
-
-            <div class="photo-grid" id="photo-grid"></div>
-
-            <p class="field__error" data-error-for="photos">Take at least one photo of the device.</p>
-        </section>
-
-        <!-- ------------------------- 4. Handover ------------------------- -->
+        <!-- ------------------------- 2. Handover ------------------------- -->
         <section class="step" data-step="handover">
             <div class="handover">
                 <div class="handover__icon">
@@ -519,11 +512,11 @@
             </div>
         </section>
 
-        <!-- ------------------------- 5. Customer (single page) ------------------------- -->
+        <!-- ------------------------- 3. Customer (single page) ------------------------- -->
         <!-- Details, terms and signature all live on one scrolling page: the
              customer picks the iPad up once, works down it, and hands it back. -->
         <section class="step" data-step="customer">
-            <p class="step__eyebrow">Step 4 of 4 &middot; Customer</p>
+            <p class="step__eyebrow">Step 2 of 2 &middot; Customer</p>
             <h1 class="step__title">Your details &amp; agreement</h1>
             <p class="step__lede">Fill in your details, have a read of the terms, and sign at the bottom. It takes a
                 minute.</p>
@@ -673,7 +666,7 @@
             </div>
         </section>
 
-        <!-- ------------------------- 7. Done ------------------------- -->
+        <!-- ------------------------- 4. Done ------------------------- -->
         <section class="step" data-step="done">
 
             <!-- Customer-facing. This is what the customer is looking at as they
