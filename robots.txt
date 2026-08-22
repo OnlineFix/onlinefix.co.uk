@@ -8,6 +8,7 @@ Disallow: /track/
 Disallow: /new-repair/
 Disallow: /book/
 Disallow: /booking-terms.html
+Disallow: /docs/
 
 # AI / answer engine crawlers — explicitly welcome.
 # Bots pick the most specific matching group, so mirror the rules above.
@@ -32,5 +33,6 @@ Disallow: /track/
 Disallow: /new-repair/
 Disallow: /book/
 Disallow: /booking-terms.html
+Disallow: /docs/
 
 Sitemap: https://onlinefix.co.uk/sitemap.xml
