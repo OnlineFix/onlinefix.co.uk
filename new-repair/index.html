@@ -682,43 +682,59 @@
 
         <!-- ------------------------- 7. Done ------------------------- -->
         <section class="step" data-step="done">
-            <div class="done-hero">
-                <div class="done-hero__icon"><svg class="icon" width="44" height="44"><use href="#i-check" /></svg>
-                </div>
-                <h1 class="done-hero__title">Repair booked in</h1>
-                <p class="done-hero__sub" id="done-sub">The customer's confirmation is on its way.</p>
+
+            <!-- Customer-facing. This is what the customer is looking at as they
+                 hand the iPad back, so it deliberately carries no tracking link,
+                 no delivery receipts and no staff controls — those live behind
+                 the Staff button below. -->
+            <div class="thanks">
+                <div class="thanks__icon"><svg class="icon" width="46" height="46"><use href="#i-check" /></svg></div>
+                <h1 class="thanks__title" id="thanks-title">Thank you</h1>
+                <p class="thanks__text" id="thanks-text">Your device is booked in with us.</p>
+                <p class="thanks__meta" id="thanks-meta">Your confirmation is on its way by email, and we'll be in
+                    touch as soon as we have news.</p>
+                <p class="thanks__shop">OnlineFix &middot; 13 Quarry Street, Guildford GU1 3UY &middot; 07940 730537</p>
             </div>
 
-            <div class="card">
-                <h2 class="card__title"><svg class="icon" width="20" height="20"><use href="#i-pin" /></svg>Tracking
-                    link</h2>
-                <div class="ticket-id" id="done-url">—</div>
-                <button type="button" class="btn btn--ghost btn--block" id="btn-copy-url">
-                    <svg class="icon" width="18" height="18"><use href="#i-copy" /></svg>Copy link
+            <div class="staff-reveal">
+                <button type="button" class="btn btn--ghost" id="btn-staff">
+                    <svg class="icon" width="18" height="18"><use href="#i-lock" /></svg>Staff
                 </button>
             </div>
 
-            <div class="card">
-                <h2 class="card__title"><svg class="icon" width="20" height="20"><use href="#i-mail" /></svg>What went
-                    out</h2>
-                <div class="delivery" id="delivery"></div>
-            </div>
-
-            <div class="card">
-                <h2 class="card__title"><svg class="icon" width="20" height="20"><use href="#i-wrench" /></svg>Next</h2>
-                <div class="done-actions">
-                    <a class="btn btn--primary" id="btn-text" href="#" target="_blank" rel="noopener">
-                        <svg class="icon" width="18" height="18"><use href="#i-message" /></svg>Text the customer
-                    </a>
-                    <a class="btn btn--ghost" id="btn-label" href="#" target="_blank" rel="noopener">
-                        <svg class="icon" width="18" height="18"><use href="#i-printer" /></svg>Print device label
-                    </a>
-                    <button type="button" class="btn btn--ghost" id="btn-new">
-                        <svg class="icon" width="18" height="18"><use href="#i-plus" /></svg>Start another intake
+            <div id="staff-panel" hidden>
+                <div class="card">
+                    <h2 class="card__title"><svg class="icon" width="20" height="20"><use href="#i-pin" /></svg>Tracking
+                        link</h2>
+                    <div class="ticket-id" id="done-url">&mdash;</div>
+                    <button type="button" class="btn btn--ghost btn--block" id="btn-copy-url">
+                        <svg class="icon" width="18" height="18"><use href="#i-copy" /></svg>Copy link
                     </button>
-                    <a class="btn btn--ghost" href="../admin/">
-                        <svg class="icon" width="18" height="18"><use href="#i-grid" /></svg>Dashboard
-                    </a>
+                </div>
+
+                <div class="card">
+                    <h2 class="card__title"><svg class="icon" width="20" height="20"><use href="#i-mail" /></svg>What
+                        went out</h2>
+                    <div class="delivery" id="delivery"></div>
+                </div>
+
+                <div class="card">
+                    <h2 class="card__title"><svg class="icon" width="20" height="20"><use
+                                href="#i-wrench" /></svg>Next</h2>
+                    <div class="done-actions">
+                        <a class="btn btn--primary" id="btn-text" href="#" target="_blank" rel="noopener">
+                            <svg class="icon" width="18" height="18"><use href="#i-message" /></svg>Text the customer
+                        </a>
+                        <a class="btn btn--ghost" id="btn-label" href="#" target="_blank" rel="noopener">
+                            <svg class="icon" width="18" height="18"><use href="#i-printer" /></svg>Print device label
+                        </a>
+                        <button type="button" class="btn btn--ghost" id="btn-new">
+                            <svg class="icon" width="18" height="18"><use href="#i-plus" /></svg>Start another intake
+                        </button>
+                        <a class="btn btn--ghost" href="../admin/">
+                            <svg class="icon" width="18" height="18"><use href="#i-grid" /></svg>Dashboard
+                        </a>
+                    </div>
                 </div>
             </div>
         </section>
