@@ -67,6 +67,15 @@ service cloud.firestore {
       allow read, update, delete: if isAdmin();
     }
 
+    // Customer directory, built by the in-store intake page (/new-repair/).
+    // One document per person, so repeat customers link to their own repair
+    // history instead of being re-keyed every visit. Holds name, contact
+    // details and postal address, so it is admin-only in both directions —
+    // there is deliberately no public read path here at all.
+    match /customers/{customerId} {
+      allow read, write: if isAdmin();
+    }
+
     // Availability settings (working hours, blocked dates). Public read so
     // the booking form can disable unavailable slots; admin write only.
     match /availability/{document} {

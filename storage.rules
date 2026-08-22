@@ -2,15 +2,21 @@ rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
 
+    // Admin access is granted via a custom claim (admin == true) set with the
+    // Firebase Admin SDK, with the email allow-list kept as a transitional
+    // fallback until set-admin-claim.mjs has been run for every admin
+    // account. Remove the email branch once verified.
+    function isAdmin() {
+      return request.auth != null
+        && (request.auth.token.admin == true
+            || request.auth.token.email in ['onlinerepairbooking@gmail.com']);
+    }
+
     // Repair photos
     match /repairs/{repairId}/{allPaths=**} {
       // Only admin-claim users can upload. Both /admin/ and /new-repair/
-      // are admin tools; customers never write here. Email allow-list is
-      // kept as a transitional fallback until set-admin-claim.mjs has
-      // been run for every admin account; remove once verified.
-      allow write: if request.auth != null
-                   && (request.auth.token.admin == true
-                       || request.auth.token.email in ['onlinerepairbooking@gmail.com'])
+      // are admin tools; customers never write here.
+      allow write: if isAdmin()
                    && request.resource.size < 10 * 1024 * 1024  // 10MB max
                    && request.resource.contentType.matches('image/.*');
 
@@ -27,9 +33,21 @@ service firebase.storage {
       allow create: if request.resource.size < 5 * 1024 * 1024
                     && request.resource.contentType.matches('image/.*');
 
-      allow read, delete: if request.auth != null
-                          && (request.auth.token.admin == true
-                              || request.auth.token.email in ['onlinerepairbooking@gmail.com']);
+      allow read, delete: if isAdmin();
+    }
+
+    // Signed drop-off agreements from the in-store intake page.
+    //
+    // Deliberately NOT stored under /repairs/{id}/, which is public-read so
+    // the tracking page can show device photos. A customer's signature is
+    // personal data and must never be reachable by URL alone, so it lives on
+    // its own path that only signed-in admins can read.
+    match /consents/{repairId}/{allPaths=**} {
+      allow write: if isAdmin()
+                   && request.resource.size < 2 * 1024 * 1024   // 2MB max
+                   && request.resource.contentType.matches('image/.*');
+
+      allow read: if isAdmin();
     }
 
     // Deny all other access

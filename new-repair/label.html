@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="referrer" content="no-referrer">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://www.google.com https://www.recaptcha.net; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://www.google.com https://www.recaptcha.net; font-src 'self' data:; frame-src https://www.google.com https://www.recaptcha.net; base-uri 'none'; form-action 'none';">
+    <title>Device label — OnlineFix</title>
+
+    <link rel="stylesheet" href="intake.css">
+    <style>
+        .shell { max-width: 680px; padding-bottom: 3rem; }
+        .actionbar { display: none; }
+
+        /* On-screen preview drawn in real millimetres so what you see is the
+           physical label. The same element is what actually prints. */
+        .label-stage {
+            background: #F1F3F7;
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            display: grid;
+            place-items: center;
+            overflow-x: auto;
+        }
+
+        .label {
+            background: #FFFFFF;
+            color: #000000;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            box-sizing: border-box;
+            padding: 2mm 2.5mm;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .18);
+        }
+
+        .label__top { display: flex; align-items: baseline; justify-content: space-between; gap: 2mm; }
+        .label__brand { font-weight: 800; letter-spacing: -0.02em; }
+        .label__ref { font-weight: 800; font-family: 'SF Mono', ui-monospace, Menlo, monospace; }
+        .label__name { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .label__device { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .label__issue {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.25;
+        }
+        .label__foot {
+            display: flex;
+            justify-content: space-between;
+            gap: 2mm;
+            border-top: 0.3mm solid #000;
+            padding-top: 1mm;
+            white-space: nowrap;
+        }
+
+        @media print {
+            html, body { background: #fff !important; margin: 0 !important; padding: 0 !important; }
+            body * { visibility: hidden; }
+            .label, .label * { visibility: visible; }
+            .label {
+                position: absolute;
+                inset: 0;
+                margin: 0;
+                box-shadow: none;
+                page-break-after: always;
+                break-after: page;
+            }
+        }
+    </style>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-check-compat.js"></script>
+    <script defer src="label.js"></script>
+</head>
+
+<body>
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+        <symbol id="i-printer" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7 9V3h10v6" />
+            <rect x="3" y="9" width="18" height="8" rx="2" />
+            <rect x="7" y="14" width="10" height="7" rx="1" />
+        </symbol>
+        <symbol id="i-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <rect x="4" y="10.5" width="16" height="11" rx="2" />
+            <path d="M8 10.5V7a4 4 0 0 1 8 0v3.5" />
+        </symbol>
+        <symbol id="i-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9.5" />
+            <line x1="12" y1="11" x2="12" y2="16.5" />
+            <line x1="12" y1="7.5" x2="12" y2="7.5" />
+        </symbol>
+    </svg>
+
+    <header class="topbar">
+        <div class="topbar__brand">Online<span>Fix</span></div>
+        <div class="topbar__meta" id="topbar-meta"><strong>Loading…</strong></div>
+    </header>
+
+    <main class="shell">
+        <div id="gate" hidden>
+            <div class="gate">
+                <div style="color:var(--text-dark);margin-bottom:1rem;">
+                    <svg class="icon" width="52" height="52"><use href="#i-lock" /></svg>
+                </div>
+                <h1 class="step__title">Sign in first</h1>
+                <p class="step__lede" style="margin-inline:auto;">Sign in on this computer — the one the LabelWriter is
+                    plugged into — and it will remember you.</p>
+                <a class="btn btn--primary btn--lg" href="../admin/">Sign in</a>
+            </div>
+        </div>
+
+        <div id="error" hidden>
+            <div class="gate">
+                <h1 class="step__title">Ticket not found</h1>
+                <p class="step__lede" style="margin-inline:auto;" id="error-text">That reference didn't match
+                    anything.</p>
+                <a class="btn btn--ghost btn--lg" href="../admin/">Open dashboard</a>
+            </div>
+        </div>
+
+        <div id="content" hidden>
+            <p class="step__eyebrow">Device label</p>
+            <h1 class="step__title" id="who">—</h1>
+            <p class="step__lede">Print this and stick it on the device before it goes on the shelf.</p>
+
+            <div class="card">
+                <h2 class="card__title">Label roll</h2>
+                <div class="field">
+                    <label class="field__label" for="size">Which labels are loaded?</label>
+                    <select class="input" id="size"></select>
+                    <p class="field__help">LabelWriter 550 models only accept genuine DYMO rolls — the printer reads a
+                        chip in the roll, so third-party labels will not feed.</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="card__title">Preview <span class="card__hint" id="dims"></span></h2>
+                <div class="label-stage">
+                    <div class="label" id="label"></div>
+                </div>
+            </div>
+
+            <div class="banner banner--info">
+                <svg class="icon" width="18" height="18"><use href="#i-info" /></svg>
+                <div>In the print dialog choose <strong>DYMO LabelWriter 550</strong>, set paper size to the roll you
+                    picked above, scale to <strong>100%</strong>, and turn margins <strong>off</strong>. Safari and
+                    Chrome both remember it after the first time.</div>
+            </div>
+
+            <button type="button" class="btn btn--primary btn--lg btn--block" id="btn-print">
+                <svg class="icon" width="20" height="20"><use href="#i-printer" /></svg>Print label
+            </button>
+        </div>
+    </main>
+
+    <style id="page-rule"></style>
+</body>
+
+</html>

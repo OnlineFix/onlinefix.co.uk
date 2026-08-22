@@ -36,6 +36,13 @@
 /favicon*
   Cache-Control: public, max-age=31536000, immutable
 
+# In-store repair intake (/new-repair/). Staff tool, no cache-busting query
+# on its CSS/JS, so it must revalidate rather than pin — a stale intake page
+# on the shop iPad would silently keep writing an old data shape.
+/new-repair/*
+  Cache-Control: no-cache, must-revalidate
+  X-Robots-Tag: noindex, nofollow
+
 # Service worker — must refresh quickly so clients pick up new cache versions
 /sw.js
   Cache-Control: public, max-age=0, must-revalidate

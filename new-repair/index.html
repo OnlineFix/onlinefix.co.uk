@@ -3,1233 +3,752 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="robots" content="noindex, nofollow">
-    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta name="referrer" content="no-referrer">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com https://www.gstatic.com https://cdn.jsdelivr.net https://www.googletagmanager.com https://www.google.com https://www.recaptcha.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.firebasestorage.app https://firebasestorage.googleapis.com; connect-src 'self' https://cloudflareinsights.com https://*.googleapis.com https://*.firebaseio.com https://*.firebasestorage.app wss://*.firebaseio.com https://*.google-analytics.com https://www.google.com https://www.recaptcha.net; font-src 'self' data:; frame-src https://www.google.com https://www.recaptcha.net; frame-ancestors 'none';">
-    <title>New Repair - OnlineFix</title>
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://www.google.com https://www.recaptcha.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.firebasestorage.app https://firebasestorage.googleapis.com; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebasestorage.app wss://*.firebaseio.com https://www.google.com https://www.recaptcha.net; font-src 'self' data:; frame-src https://www.google.com https://www.recaptcha.net; base-uri 'none'; form-action 'none';">
+    <title>Repair Intake — OnlineFix</title>
 
-    <!-- Firebase -->
+    <link rel="stylesheet" href="intake.css">
+
+    <!-- Firebase (compat build, loaded in dependency order before intake.js) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-check-compat.js"></script>
 
-    <!-- EmailJS for sending emails -->
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"
-        integrity="sha512-fD9DI5bZwQxOi7MhYWnnNPlvXdp/2Pj3XSTRrFs5FQa4mizyGLnJcN6tuvUS6LbmgN1ut+XGSABKvjN0H6Aoow=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            /* Premium Dark Mode Colors */
-            --bg-base: #0B0E14;
-            /* Deepest dark for background */
-            --bg-surface: #151A23;
-            /* Slightly lighter for cards/sections */
-            --bg-elevated: #1F2735;
-            /* Pop-outs, modals, hover states */
-
-            --primary-blue: #0033FF;
-            /* Brand color */
-            --primary-glow: rgba(0, 51, 255, 0.4);
-            --accent-cyan: #00E4FF;
-            /* Secondary accent */
-
-            --text-main: #FFFFFF;
-            --text-muted: #94A3B8;
-            --text-dark: #64748B;
-
-            --border-color: rgba(255, 255, 255, 0.08);
-
-            /* Status Colors */
-            --success: #10B981;
-            --warning: #F59E0B;
-            --danger: #EF4444;
-            --info: #3B82F6;
-
-            --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
-            --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
-            --shadow-glow: 0 0 20px var(--primary-glow);
-
-            /* Utilities */
-            --radius-md: 12px;
-            --radius-lg: 20px;
-            --white: #FFFFFF;
-            --gray-400: #9CA3AF;
-            --gray-600: #4B5563;
-            --primary-cyan: #00E4FF;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            line-height: 1.6;
-            color: var(--text-main);
-            background: var(--bg-base);
-            min-height: 100vh;
-        }
-
-        .container {
-            max-width: 1000px;
-            /* Kept slightly wider for forms */
-            margin: 0 auto;
-            padding: 2rem 1.5rem;
-        }
-
-        /* Header */
-        .header {
-            background: var(--bg-surface);
-            border-radius: var(--radius-lg);
-            padding: 1.5rem 2rem;
-            box-shadow: var(--shadow-sm);
-            margin-bottom: 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border: 1px solid var(--border-color);
-        }
-
-        .logo {
-            font-size: 1.8rem;
-            font-weight: 800;
-            color: var(--text-main);
-            text-shadow: 0 0 15px var(--primary-glow);
-        }
-
-        .user-info {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-        }
-
-        /* Main Form */
-        .form-container {
-            background: var(--bg-surface);
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-md);
-            padding: 2.5rem;
-            border: 1px solid var(--border-color);
-        }
-
-        .form-title {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--text-main);
-            margin-bottom: 2.5rem;
-            text-align: center;
-        }
-
-        /* Form Grid */
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .form-section {
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: var(--radius-md);
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-            border: 1px solid var(--border-color);
-        }
-
-        .section-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: var(--text-main);
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .section-title i {
-            color: var(--primary-cyan);
-            background: rgba(0, 51, 255, 0.15);
-            padding: 0.5rem;
-            border-radius: 8px;
-        }
-
-        /* Form Elements */
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 0.85rem;
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            background: var(--bg-base);
-            color: var(--text-main);
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: var(--primary-blue);
-            box-shadow: 0 0 0 3px rgba(0, 51, 255, 0.2);
-        }
-
-        .form-input::placeholder {
-            color: var(--text-dark);
-        }
-
-        .form-textarea {
-            min-height: 120px;
-            resize: vertical;
-        }
-
-        /* Photo Upload */
-        .photo-upload {
-            border: 2px dashed var(--border-color);
-            border-radius: var(--radius-md);
-            padding: 2.5rem 1.5rem;
-            text-align: center;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            background: rgba(255, 255, 255, 0.02);
-        }
-
-        .photo-upload:hover {
-            border-color: var(--primary-blue);
-            background: rgba(0, 51, 255, 0.05);
-            box-shadow: inset 0 0 20px rgba(0, 51, 255, 0.1);
-        }
-
-        .photo-upload.dragover {
-            border-color: var(--primary-cyan);
-            background: rgba(0, 228, 255, 0.1);
-            transform: scale(1.02);
-        }
-
-        .photo-preview {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 1rem;
-            margin-top: 1.5rem;
-        }
-
-        .photo-item {
-            position: relative;
-            border-radius: var(--radius-md);
-            overflow: hidden;
-            border: 1px solid var(--border-color);
-        }
-
-        .photo-item img {
-            width: 100%;
-            height: 120px;
-            object-fit: cover;
-            display: block;
-        }
-
-        .photo-remove {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            background: rgba(239, 68, 68, 0.9);
-            color: var(--white);
-            border: none;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            backdrop-filter: blur(4px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
-        }
-
-        .photo-remove:hover {
-            transform: scale(1.1);
-            background: var(--danger);
-        }
-
-        /* Buttons */
-        .button-group {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            margin-top: 3rem;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.85rem 1.75rem;
-            border: none;
-            border-radius: var(--radius-md);
-            text-decoration: none;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 1rem;
-        }
-
-        .btn-primary {
-            background: var(--primary-blue);
-            color: var(--white);
-            box-shadow: 0 4px 15px var(--primary-glow);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px var(--primary-glow);
-            filter: brightness(1.1);
-        }
-
-        .btn-secondary {
-            background: var(--bg-elevated);
-            color: var(--text-main);
-            border: 1px solid var(--border-color);
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .btn-success {
-            background: rgba(16, 185, 129, 0.15);
-            color: var(--success);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-        }
-
-        .btn-success:hover {
-            background: rgba(16, 185, 129, 0.25);
-        }
-
-        /* Success Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(5px);
-            z-index: 2000;
-        }
-
-        .modal.show {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            animation: modalFadeIn 0.3s ease;
-        }
-
-        @keyframes modalFadeIn {
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
-        }
-
-        .modal-content {
-            background: var(--bg-surface);
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--border-color);
-            padding: 3rem 2rem;
-            max-width: 600px;
-            width: 90%;
-            text-align: center;
-            box-shadow: var(--shadow-md), 0 0 40px rgba(0, 0, 0, 0.5);
-            animation: modalSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        @keyframes modalSlideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .success-icon {
-            font-size: 4rem;
-            color: var(--success);
-            margin-bottom: 1.5rem;
-            text-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
-        }
-
-        .repair-id {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--text-main);
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 1rem 2rem;
-            border-radius: var(--radius-md);
-            display: inline-block;
-            margin: 1rem 0;
-            letter-spacing: 0.1em;
-            font-family: monospace;
-            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
-        }
-
-        .nfc-url {
-            background: var(--bg-base);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            padding: 1.25rem;
-            font-family: monospace;
-            font-size: 0.9rem;
-            word-break: break-all;
-            margin: 0;
-            color: var(--primary-cyan);
-            text-align: left;
-        }
-
-        .copy-container {
-            position: relative;
-            margin: 0.5rem 0;
-        }
-
-        /* Loading */
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 3rem 2rem;
-        }
-
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 3px solid rgba(0, 51, 255, 0.2);
-            border-top: 3px solid var(--primary-blue);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 1.5rem;
-            box-shadow: 0 0 20px var(--primary-glow);
-        }
-
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
-        /* Alerts */
-        .alert {
-            padding: 1rem;
-            border-radius: var(--radius-md);
-            margin-bottom: 1rem;
-            font-weight: 500;
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 2000;
-            min-width: 300px;
-            animation: alertSlideIn 0.3s ease;
-        }
-
-        @keyframes alertSlideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .alert-success {
-            background: rgba(16, 185, 129, 0.1);
-            color: #34D399;
-            border: 1px solid rgba(16, 185, 129, 0.3);
-        }
-
-        .alert-error {
-            background: rgba(239, 68, 68, 0.1);
-            color: #F87171;
-            border: 1px solid rgba(239, 68, 68, 0.3);
-        }
-
-        /* Print Styles */
-        @media print {
-            body * {
-                visibility: hidden;
-            }
-
-            .print-label,
-            .print-label * {
-                visibility: visible;
-            }
-
-            .print-label {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 2.25in;
-                height: 1.25in;
-                padding: 0.1in;
-                font-size: 10pt;
-                line-height: 1.2;
-            }
-        }
-
-        /* Dymo Label Preview */
-        .label-preview {
-            display: none;
-            border: 1px solid var(--border-color);
-            background: var(--bg-base);
-            border-radius: var(--radius-md);
-            padding: 1.5rem;
-            margin-top: 1.5rem;
-            margin-left: auto;
-            margin-right: auto;
-            width: 350px;
-            max-width: 100%;
-            text-align: left;
-        }
-
-        .label-content {
-            font-size: 0.9rem;
-            line-height: 1.4;
-            color: var(--text-main);
-            font-family: monospace;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .container {
-                padding: 1rem;
-            }
-
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .button-group {
-                flex-direction: column;
-            }
-
-            .header {
-                flex-direction: column;
-                gap: 1rem;
-                text-align: center;
-            }
-        }
-    </style>
+    <script defer src="intake.js"></script>
 </head>
 
 <body>
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <div class="logo">OnlineFix<span style="color: var(--text-main); font-weight: 300;"> Admin</span></div>
-            <div style="display: flex; gap: 1rem; align-items: center;">
-                <div class="user-info" id="user-info">
-                    <i class="fas fa-user-circle" style="margin-right: 0.5rem; color: var(--text-muted);"></i>
-                    <span>Not logged in</span>
-                </div>
-                <a href="../admin/" class="btn btn-secondary">
-                    <i class="fas fa-arrow-left"></i>
-                    Dashboard
-                </a>
-            </div>
+
+    <!-- ==================================================================
+         Icon sprite. Stroke-drawn originals rather than an icon webfont:
+         the shop iPad renders them instantly with no CDN round-trip, and
+         the page needs no font-src exception in its CSP.
+         ================================================================== -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+        <defs>
+            <g id="s" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round"></g>
+        </defs>
+        <symbol id="i-phone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <rect x="6" y="2" width="12" height="20" rx="2.5" />
+            <line x1="10.5" y1="18.5" x2="13.5" y2="18.5" />
+        </symbol>
+        <symbol id="i-tablet" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <rect x="4" y="2" width="16" height="20" rx="2.5" />
+            <line x1="11" y1="18.5" x2="13" y2="18.5" />
+        </symbol>
+        <symbol id="i-laptop" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <rect x="4" y="4" width="16" height="11" rx="1.5" />
+            <line x1="2" y1="19" x2="22" y2="19" />
+        </symbol>
+        <symbol id="i-desktop" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="3" width="20" height="13" rx="1.5" />
+            <line x1="8" y1="21" x2="16" y2="21" />
+            <line x1="12" y1="16" x2="12" y2="21" />
+        </symbol>
+        <symbol id="i-console" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="7" width="20" height="11" rx="4.5" />
+            <line x1="7" y1="11" x2="7" y2="14" />
+            <line x1="5.5" y1="12.5" x2="8.5" y2="12.5" />
+            <circle cx="16" cy="11.75" r="1" />
+            <circle cx="18.25" cy="14" r="1" />
+        </symbol>
+        <symbol id="i-hdd" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="6" width="20" height="12" rx="2" />
+            <line x1="6" y1="14" x2="6" y2="14" />
+            <line x1="10" y1="14" x2="18" y2="14" />
+        </symbol>
+        <symbol id="i-camera" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 8.5h3.2l1.6-2.4h8.4l1.6 2.4H21a1 1 0 0 1 1 1V19a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V9.5a1 1 0 0 1 1-1Z" />
+            <circle cx="12" cy="13.75" r="3.6" />
+        </symbol>
+        <symbol id="i-image" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="16" rx="2" />
+            <circle cx="8.5" cy="9.5" r="1.8" />
+            <path d="m4 18 5-5 3.5 3.5L16 13l4 4" />
+        </symbol>
+        <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="m4.5 12.5 5 5 10-10" />
+        </symbol>
+        <symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 6 18 18M18 6 6 18" />
+        </symbol>
+        <symbol id="i-arrow-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 12h15M13 6l6 6-6 6" />
+        </symbol>
+        <symbol id="i-arrow-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 12H5M11 6l-6 6 6 6" />
+        </symbol>
+        <symbol id="i-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="8" r="4" />
+            <path d="M4 20a8 8 0 0 1 16 0" />
+        </symbol>
+        <symbol id="i-mail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2.5" y="5" width="19" height="14" rx="2" />
+            <path d="m3 7 9 6 9-6" />
+        </symbol>
+        <symbol id="i-message" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12a8 8 0 0 1-8 8H7l-4 3V12a8 8 0 0 1 8-8h2a8 8 0 0 1 8 8Z" />
+        </symbol>
+        <symbol id="i-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12Z" />
+            <circle cx="12" cy="10" r="2.6" />
+        </symbol>
+        <symbol id="i-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <rect x="4" y="10.5" width="16" height="11" rx="2" />
+            <path d="M8 10.5V7a4 4 0 0 1 8 0v3.5" />
+        </symbol>
+        <symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2.5 4 6v6c0 5 3.4 8.7 8 9.9 4.6-1.2 8-4.9 8-9.9V6Z" />
+            <path d="m8.75 12 2.25 2.25 4.25-4.5" />
+        </symbol>
+        <symbol id="i-printer" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7 9V3h10v6" />
+            <rect x="3" y="9" width="18" height="8" rx="2" />
+            <rect x="7" y="14" width="10" height="7" rx="1" />
+        </symbol>
+        <symbol id="i-pen" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15.5 4.5 19.5 8.5 8 20H4v-4Z" />
+            <path d="m13.5 6.5 4 4" />
+        </symbol>
+        <symbol id="i-clipboard" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <rect x="5" y="4.5" width="14" height="17" rx="2" />
+            <rect x="9" y="2.5" width="6" height="4" rx="1.2" />
+        </symbol>
+        <symbol id="i-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="9" width="12" height="12" rx="2" />
+            <path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1" />
+        </symbol>
+        <symbol id="i-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3 1.8 20.5h20.4Z" />
+            <line x1="12" y1="9.5" x2="12" y2="14" />
+            <line x1="12" y1="17.3" x2="12" y2="17.3" />
+        </symbol>
+        <symbol id="i-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9.5" />
+            <line x1="12" y1="11" x2="12" y2="16.5" />
+            <line x1="12" y1="7.5" x2="12" y2="7.5" />
+        </symbol>
+        <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 5v14M5 12h14" />
+        </symbol>
+        <symbol id="i-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 6.5h16M9.5 6.5V4h5v2.5M6.5 6.5 7.5 21h9l1-14.5" />
+        </symbol>
+        <symbol id="i-handshake" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 9.5h3.5L9 6.5h6l3.5 3H22" />
+            <path d="M5.5 9.5v6l4 3 2.5-2 2.5 2 4-3v-6" />
+            <path d="M9 12.5h6" />
+        </symbol>
+        <symbol id="i-wrench" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 5.5a6 6 0 0 1-8 7.7L6 19.2a2.4 2.4 0 0 1-3.4-3.4l6-6A6 6 0 0 1 16.3 2Z" />
+        </symbol>
+        <symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9.5" />
+            <path d="M12 6.5V12l3.75 2.25" />
+        </symbol>
+        <symbol id="i-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 12a8 8 0 1 1-2.6-5.9" />
+            <path d="M20 3.5V9h-5.5" />
+        </symbol>
+        <symbol id="i-grid" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7.5" height="7.5" rx="1.5" />
+            <rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5" />
+            <rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5" />
+            <rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5" />
+        </symbol>
+    </svg>
+
+    <!-- ============================ Top bar ============================ -->
+    <header class="topbar">
+        <div class="topbar__brand">Online<span>Fix</span></div>
+        <div class="steprail" id="steprail" role="progressbar" aria-label="Intake progress" aria-valuemin="1"
+            aria-valuemax="6" aria-valuenow="1"></div>
+        <div class="topbar__meta" id="topbar-meta">
+            <strong>Checking access…</strong>
         </div>
+    </header>
 
-        <!-- Staff-only gate: the form stays hidden until Firebase Auth confirms a login -->
-        <div id="auth-notice" class="form-container" style="text-align: center;">
-            <h1 class="form-title">Staff access required</h1>
-            <p style="color: #888;">Checking access&hellip; If you're not signed in, log in via the <a href="../admin/" style="color: #00C6FF;">admin dashboard</a> first.</p>
-        </div>
-
-        <!-- Form Container -->
-        <div class="form-container" id="repair-form-container" style="display: none;">
-            <h1 class="form-title">Create New Repair Ticket</h1>
-
-            <form id="repair-form">
-                <!-- Customer Information -->
-                <div class="form-section">
-                    <h2 class="section-title">
-                        <i class="fas fa-user"></i>
-                        Customer Information
-                    </h2>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label class="form-label">First Name</label>
-                            <input type="text" class="form-input" name="firstName" placeholder="John" required maxlength="100">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Last Name</label>
-                            <input type="text" class="form-input" name="lastName" placeholder="Doe" required maxlength="100">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Email</label>
-                            <input type="email" class="form-input" name="email" placeholder="customer@email.com">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Phone Number</label>
-                            <input type="tel" class="form-input" name="phone" placeholder="+44 7940 730537" required maxlength="20">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Device Information -->
-                <div class="form-section">
-                    <div
-                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
-                        <h2 class="section-title" style="margin-bottom: 0;">
-                            <i class="fas fa-mobile-alt"></i>
-                            Device & Repair Details
-                        </h2>
-                        <div style="min-width: 250px;">
-                            <select class="form-input" id="quick-select-repair" onchange="autoFillRepair()"
-                                style="padding: 0.5rem 1rem; font-size: 0.9rem; background: rgba(0, 51, 255, 0.05); border-color: var(--primary-blue); color: var(--accent-cyan); cursor: pointer; border-radius: 20px;">
-                                <option value="">⚡ Quick Fill Common Repair...</option>
-                                <option value="ps5-hdmi">PS5 HDMI Port</option>
-                                <option value="xsx-hdmi">Xbox Series X HDMI</option>
-                                <option value="ps5-clean">PS5 Deep Clean</option>
-                                <option value="xsx-clean">Xbox Series X Clean</option>
-                                <option value="pc-rebuild">PC Rebuild</option>
-                                <option value="laptop-diag">Laptop Diagnostics</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label class="form-label">Device</label>
-                            <input type="text" class="form-input" name="device"
-                                placeholder="iPhone 13 Pro, Samsung S22, etc." required maxlength="200">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Price (£)</label>
-                            <input type="number" class="form-input" name="price" step="0.01" placeholder="0.00">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Issue Description</label>
-                        <textarea class="form-input form-textarea" name="issue"
-                            placeholder="Describe the problem with the device..." required maxlength="2000"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Device Photos</label>
-                        <div class="photo-upload" onclick="document.getElementById('photo-input').click()">
-                            <div style="font-size: 2rem; color: var(--gray-400); margin-bottom: 0.5rem;">
-                                <i class="fas fa-camera"></i>
-                            </div>
-                            <div style="color: var(--gray-600);">Click to upload photos or drag and drop</div>
-                            <input type="file" id="photo-input" multiple accept="image/*" style="display: none;">
-                        </div>
-                        <div class="photo-preview" id="photo-preview"></div>
-                    </div>
-                </div>
-
-                <!-- Action Buttons -->
-                <div class="button-group">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i>
-                        Create Repair
-                    </button>
-                    <button type="button" class="btn btn-secondary" onclick="resetForm()">
-                        <i class="fas fa-redo"></i>
-                        Reset Form
-                    </button>
-                </div>
-            </form>
-
-            <!-- Loading -->
-            <div class="loading" id="loading">
-                <div class="spinner"></div>
-                <p>Creating repair ticket...</p>
+    <!-- ============================ Auth gate ============================ -->
+    <div class="shell" id="gate-shell">
+        <div class="gate" id="gate">
+            <div style="font-size:3rem;color:var(--text-dark);margin-bottom:1rem;">
+                <svg class="icon" width="56" height="56"><use href="#i-lock" /></svg>
             </div>
+            <h1 class="step__title">Staff access required</h1>
+            <p class="step__lede" style="margin-inline:auto;">Checking your sign-in… If nothing happens, sign in on the
+                admin dashboard first, then come back to this page.</p>
+            <a class="btn btn--primary btn--lg" href="../admin/">Go to dashboard</a>
         </div>
     </div>
 
-    <!-- Success Modal -->
-    <div class="modal" id="success-modal">
-        <div class="modal-content">
-            <div class="success-icon">
-                <i class="fas fa-shield-check"></i>
-            </div>
-            <h2 style="color: var(--text-main); margin-bottom: 0.5rem;">Repair Created Securely</h2>
-            <p style="color: var(--text-muted); margin-bottom: 1.5rem;">The device has been logged into the system.</p>
-            <div class="repair-id" id="generated-repair-id">REPAIR_123456</div>
+    <!-- ============================ Intake flow ============================ -->
+    <main class="shell" id="flow" hidden>
 
-            <div
-                style="margin: 2rem 0; padding: 1.5rem; background: rgba(0, 51, 255, 0.05); border-radius: var(--radius-md); border: 1px solid rgba(0, 51, 255, 0.2);">
-                <p
-                    style="color: var(--text-muted); margin-bottom: 0.75rem; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em;">
-                    <i class="fas fa-link" style="margin-right: 0.5rem;"></i>Secure Public Tracking URL:
-                </p>
-                <div class="copy-container">
-                    <div class="nfc-url" id="nfc-url" style="padding-right: 4.5rem;">
-                        [URL will be generated]
+        <!-- ------------------------- 1. Device ------------------------- -->
+        <section class="step" data-step="device">
+            <p class="step__eyebrow">Step 1 of 6 · Technician</p>
+            <h1 class="step__title">What are we looking at?</h1>
+            <p class="step__lede">Log the device while it's in your hands. The customer fills in their own details
+                later — don't ask for them yet.</p>
+
+            <div class="card">
+                <h2 class="card__title"><svg class="icon" width="20" height="20"><use href="#i-grid" /></svg>Device
+                    type</h2>
+                <div class="chips" data-chipgroup="category" role="radiogroup" aria-label="Device type">
+                    <button type="button" class="chip" data-value="phone" role="radio" aria-checked="false"><svg
+                            class="icon" width="20" height="20"><use href="#i-phone" /></svg>Phone</button>
+                    <button type="button" class="chip" data-value="tablet" role="radio" aria-checked="false"><svg
+                            class="icon" width="20" height="20"><use href="#i-tablet" /></svg>Tablet</button>
+                    <button type="button" class="chip" data-value="laptop" role="radio" aria-checked="false"><svg
+                            class="icon" width="20" height="20"><use href="#i-laptop" /></svg>Laptop</button>
+                    <button type="button" class="chip" data-value="desktop" role="radio" aria-checked="false"><svg
+                            class="icon" width="20" height="20"><use href="#i-desktop" /></svg>Desktop PC</button>
+                    <button type="button" class="chip" data-value="console" role="radio" aria-checked="false"><svg
+                            class="icon" width="20" height="20"><use href="#i-console" /></svg>Console</button>
+                    <button type="button" class="chip" data-value="other" role="radio" aria-checked="false"><svg
+                            class="icon" width="20" height="20"><use href="#i-hdd" /></svg>Other</button>
+                </div>
+                <p class="field__error" data-error-for="category">Pick a device type.</p>
+            </div>
+
+            <div class="card">
+                <h2 class="card__title"><svg class="icon" width="20" height="20"><use href="#i-clipboard" /></svg>Make
+                    &amp; model</h2>
+                <div class="grid-2">
+                    <div class="field">
+                        <label class="field__label" for="f-brand">Brand</label>
+                        <input class="input" id="f-brand" name="brand" list="brand-list" maxlength="60"
+                            autocomplete="off" autocapitalize="words" placeholder="Apple, Samsung, Sony…">
+                        <datalist id="brand-list">
+                            <option value="Apple"></option>
+                            <option value="Samsung"></option>
+                            <option value="Sony"></option>
+                            <option value="Microsoft"></option>
+                            <option value="Nintendo"></option>
+                            <option value="Google"></option>
+                            <option value="Lenovo"></option>
+                            <option value="HP"></option>
+                            <option value="Dell"></option>
+                            <option value="ASUS"></option>
+                            <option value="Acer"></option>
+                            <option value="MSI"></option>
+                            <option value="Huawei"></option>
+                            <option value="OnePlus"></option>
+                            <option value="Xiaomi"></option>
+                            <option value="Motorola"></option>
+                        </datalist>
+                        <p class="field__error" data-error-for="brand">Add the brand.</p>
                     </div>
-                    <button class="btn btn-primary" onclick="copyNFCLink()"
-                        style="position: absolute; right: 0.5rem; top: 50%; transform: translateY(-50%); padding: 0.5rem 1rem; font-size: 0.85rem;">
-                        <i class="fas fa-copy"></i>
-                        Copy
+                    <div class="field">
+                        <label class="field__label" for="f-model">Model</label>
+                        <input class="input" id="f-model" name="model" maxlength="100" autocomplete="off"
+                            autocapitalize="words" placeholder="iPhone 13 Pro, PS5 Slim…">
+                        <p class="field__error" data-error-for="model">Add the model.</p>
+                    </div>
+                </div>
+                <div class="grid-2" style="margin-top:1.25rem;">
+                    <div class="field">
+                        <label class="field__label" for="f-serial">Serial / IMEI <span class="opt">— optional</span></label>
+                        <input class="input" id="f-serial" name="serial" maxlength="60" autocomplete="off"
+                            autocapitalize="characters" spellcheck="false" placeholder="Dial *#06# on phones">
+                        <p class="field__help">Worth capturing: it's how you prove which physical unit came in.</p>
+                    </div>
+                    <div class="field">
+                        <label class="field__label" for="f-colour">Colour / distinguishing marks <span
+                                class="opt">— optional</span></label>
+                        <input class="input" id="f-colour" name="colour" maxlength="80" autocomplete="off"
+                            placeholder="Space grey, blue case, name sticker…">
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="card__title"><svg class="icon" width="20" height="20"><use href="#i-lock" /></svg>Access to
+                    the device<span class="card__hint">Needed to test the repair</span></h2>
+                <div class="field">
+                    <label class="field__label">How does it unlock?</label>
+                    <div class="chips" data-chipgroup="unlockType" role="radiogroup" aria-label="Unlock method">
+                        <button type="button" class="chip" data-value="none" role="radio" aria-checked="false">No
+                            lock</button>
+                        <button type="button" class="chip" data-value="pin" role="radio" aria-checked="false">PIN</button>
+                        <button type="button" class="chip" data-value="pattern" role="radio"
+                            aria-checked="false">Pattern</button>
+                        <button type="button" class="chip" data-value="password" role="radio"
+                            aria-checked="false">Password</button>
+                        <button type="button" class="chip" data-value="withheld" role="radio"
+                            aria-checked="false">Customer won't share</button>
+                    </div>
+                </div>
+                <div class="field" id="unlock-code-field" hidden>
+                    <label class="field__label" for="f-unlock">Code / pattern</label>
+                    <input class="input" id="f-unlock" name="unlockCode" maxlength="60" autocomplete="off"
+                        spellcheck="false" placeholder="e.g. 4821, or L-shape from top-left">
+                    <p class="field__help">Stored on the ticket for staff only. Clear it from the ticket once the
+                        device goes back — don't keep unlock codes longer than the repair needs.</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="card__title"><svg class="icon" width="20" height="20"><use href="#i-plus" /></svg>Left with
+                    the device<span class="card__hint">Tick everything you're taking in</span></h2>
+                <div class="checkgrid" data-checkgroup="accessories">
+                    <label class="checkbox"><input type="checkbox" value="Charger / power brick"><span
+                            class="checkbox__box"><svg class="icon" width="14" height="14"><use
+                                    href="#i-check" /></svg></span><span class="checkbox__text">Charger / power
+                            brick</span></label>
+                    <label class="checkbox"><input type="checkbox" value="Cable"><span class="checkbox__box"><svg
+                                class="icon" width="14" height="14"><use href="#i-check" /></svg></span><span
+                            class="checkbox__text">Cable</span></label>
+                    <label class="checkbox"><input type="checkbox" value="Case / cover"><span
+                            class="checkbox__box"><svg class="icon" width="14" height="14"><use
+                                    href="#i-check" /></svg></span><span class="checkbox__text">Case / cover</span></label>
+                    <label class="checkbox"><input type="checkbox" value="SIM tray / SIM card"><span
+                            class="checkbox__box"><svg class="icon" width="14" height="14"><use
+                                    href="#i-check" /></svg></span><span class="checkbox__text">SIM tray / SIM
+                            card</span></label>
+                    <label class="checkbox"><input type="checkbox" value="Stylus / pen"><span
+                            class="checkbox__box"><svg class="icon" width="14" height="14"><use
+                                    href="#i-check" /></svg></span><span class="checkbox__text">Stylus / pen</span></label>
+                    <label class="checkbox"><input type="checkbox" value="Controller(s)"><span
+                            class="checkbox__box"><svg class="icon" width="14" height="14"><use
+                                    href="#i-check" /></svg></span><span class="checkbox__text">Controller(s)</span></label>
+                    <label class="checkbox"><input type="checkbox" value="Memory card / drive"><span
+                            class="checkbox__box"><svg class="icon" width="14" height="14"><use
+                                    href="#i-check" /></svg></span><span class="checkbox__text">Memory card /
+                            drive</span></label>
+                    <label class="checkbox"><input type="checkbox" value="Bag / box"><span class="checkbox__box"><svg
+                                class="icon" width="14" height="14"><use href="#i-check" /></svg></span><span
+                            class="checkbox__text">Bag / box</span></label>
+                </div>
+            </div>
+        </section>
+
+        <!-- ------------------------- 2. Issue ------------------------- -->
+        <section class="step" data-step="issue">
+            <p class="step__eyebrow">Step 2 of 6 · Technician</p>
+            <h1 class="step__title">What's wrong with it?</h1>
+            <p class="step__lede">Describe the fault the way you'd explain it back to the customer, then record the
+                condition it arrived in.</p>
+
+            <div class="card">
+                <h2 class="card__title"><svg class="icon" width="20" height="20"><use href="#i-wrench" /></svg>The
+                    job<span class="card__hint">Tap a common job to prefill</span></h2>
+                <div class="chips" id="quickjobs" style="margin-bottom:1.25rem;"></div>
+                <div class="field">
+                    <label class="field__label" for="f-issue">Reported fault &amp; work agreed</label>
+                    <textarea class="textarea" id="f-issue" name="issue" maxlength="2000"
+                        placeholder="Customer reports no display output. HDMI port physically damaged — pins bent. Agreed: replace HDMI port, test on 4K set."></textarea>
+                    <p class="field__error" data-error-for="issue">Describe the fault.</p>
+                    <p class="field__help">The customer sees this on their tracking page, so keep it plain English.</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="card__title"><svg class="icon" width="20" height="20"><use
+                            href="#i-alert" /></svg>Condition on arrival<span class="card__hint">Your evidence if
+                        anything is disputed</span></h2>
+                <div class="checkgrid" data-checkgroup="condition">
+                    <label class="checkbox"><input type="checkbox" value="Cracked or chipped screen"><span
+                            class="checkbox__box"><svg class="icon" width="14" height="14"><use
+                                    href="#i-check" /></svg></span><span class="checkbox__text">Cracked or chipped
+                            screen</span></label>
+                    <label class="checkbox"><input type="checkbox" value="Dents / deep scratches"><span
+                            class="checkbox__box"><svg class="icon" width="14" height="14"><use
+                                    href="#i-check" /></svg></span><span class="checkbox__text">Dents / deep
+                            scratches</span></label>
+                    <label class="checkbox"><input type="checkbox" value="Bent or separated frame"><span
+                            class="checkbox__box"><svg class="icon" width="14" height="14"><use
+                                    href="#i-check" /></svg></span><span class="checkbox__text">Bent or separated
+                            frame</span></label>
+                    <label class="checkbox"><input type="checkbox" value="Liquid damage indicator tripped"><span
+                            class="checkbox__box"><svg class="icon" width="14" height="14"><use
+                                    href="#i-check" /></svg></span><span class="checkbox__text">Liquid indicator
+                            tripped</span></label>
+                    <label class="checkbox"><input type="checkbox" value="Evidence of previous repair"><span
+                            class="checkbox__box"><svg class="icon" width="14" height="14"><use
+                                    href="#i-check" /></svg></span><span class="checkbox__text">Evidence of previous
+                            repair</span></label>
+                    <label class="checkbox"><input type="checkbox" value="Missing screws or parts"><span
+                            class="checkbox__box"><svg class="icon" width="14" height="14"><use
+                                    href="#i-check" /></svg></span><span class="checkbox__text">Missing screws or
+                            parts</span></label>
+                    <label class="checkbox"><input type="checkbox" value="Swollen battery"><span
+                            class="checkbox__box"><svg class="icon" width="14" height="14"><use
+                                    href="#i-check" /></svg></span><span class="checkbox__text">Swollen
+                            battery</span></label>
+                    <label class="checkbox"><input type="checkbox" value="Does not power on at all"><span
+                            class="checkbox__box"><svg class="icon" width="14" height="14"><use
+                                    href="#i-check" /></svg></span><span class="checkbox__text">Does not power on at
+                            all</span></label>
+                </div>
+                <div class="field" style="margin-top:1.25rem;">
+                    <label class="field__label" for="f-condition-notes">Condition notes <span class="opt">—
+                            optional</span></label>
+                    <textarea class="textarea" id="f-condition-notes" name="conditionNotes" maxlength="1000"
+                        style="min-height:96px;"
+                        placeholder="Scuff on bottom-left corner, rear glass hairline crack — both present before we touched it."></textarea>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="card__title"><svg class="icon" width="20" height="20"><use href="#i-clock" /></svg>Quote
+                    &amp; turnaround</h2>
+                <div class="grid-3">
+                    <div class="field">
+                        <label class="field__label" for="f-price">Estimated price (£)</label>
+                        <input class="input" id="f-price" name="price" type="number" inputmode="decimal" step="0.01"
+                            min="0" max="99999" placeholder="0.00">
+                        <p class="field__help">Leave blank if it's diagnostics-first.</p>
+                    </div>
+                    <div class="field">
+                        <label class="field__label" for="f-deposit">Deposit taken (£) <span class="opt">—
+                                optional</span></label>
+                        <input class="input" id="f-deposit" name="deposit" type="number" inputmode="decimal"
+                            step="0.01" min="0" max="99999" placeholder="0.00">
+                    </div>
+                    <div class="field">
+                        <label class="field__label" for="f-turnaround">Turnaround</label>
+                        <select class="input" id="f-turnaround" name="turnaround">
+                            <option value="">Select…</option>
+                            <option value="Same day">Same day</option>
+                            <option value="1–2 working days">1–2 working days</option>
+                            <option value="3–5 working days">3–5 working days</option>
+                            <option value="1–2 weeks">1–2 weeks</option>
+                            <option value="Quote after diagnostics">Quote after diagnostics</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ------------------------- 3. Photos ------------------------- -->
+        <section class="step" data-step="photos">
+            <p class="step__eyebrow">Step 3 of 6 · Technician</p>
+            <h1 class="step__title">Photograph the device</h1>
+            <p class="step__lede">Shoot it now, before it leaves the counter. Front, back, and a close-up of every mark
+                you ticked on the last step.</p>
+
+            <div class="banner banner--info">
+                <svg class="icon" width="18" height="18"><use href="#i-info" /></svg>
+                <div>Photos upload as you take them, so they're saved even if something goes wrong later. Wait for
+                    every tile to read <strong>Saved</strong> before you carry on.</div>
+            </div>
+
+            <div class="photo-actions">
+                <button type="button" class="photo-btn photo-btn--camera" id="btn-camera">
+                    <svg class="icon" width="34" height="34"><use href="#i-camera" /></svg>
+                    Take a photo
+                    <small>Opens the iPad camera</small>
+                </button>
+                <button type="button" class="photo-btn" id="btn-library">
+                    <svg class="icon" width="34" height="34"><use href="#i-image" /></svg>
+                    From library
+                    <small>Pick existing</small>
+                </button>
+            </div>
+
+            <input type="file" id="input-camera" accept="image/*" capture="environment" hidden>
+            <input type="file" id="input-library" accept="image/*" multiple hidden>
+
+            <div class="photo-grid" id="photo-grid"></div>
+
+            <p class="field__error" data-error-for="photos">Take at least one photo of the device.</p>
+        </section>
+
+        <!-- ------------------------- 4. Handover ------------------------- -->
+        <section class="step" data-step="handover">
+            <div class="handover">
+                <div class="handover__icon">
+                    <svg class="icon" width="76" height="76"><use href="#i-handshake" /></svg>
+                </div>
+                <h1 class="handover__title">Pass the iPad over</h1>
+                <p class="handover__text">The device is logged and photographed. The next two screens are for the
+                    customer — their details, then the terms and a signature.</p>
+            </div>
+
+            <div class="card" style="margin-top:1.5rem;">
+                <h2 class="card__title"><svg class="icon" width="20" height="20"><use href="#i-clipboard" /></svg>Logged
+                    so far</h2>
+                <div class="summary" id="handover-summary"></div>
+            </div>
+        </section>
+
+        <!-- ------------------------- 5. Customer ------------------------- -->
+        <section class="step" data-step="customer">
+            <p class="step__eyebrow">Step 4 of 6 · Customer</p>
+            <h1 class="step__title">Your details</h1>
+            <p class="step__lede">We need these so we can reach you about the repair and hand the device back to the
+                right person.</p>
+
+            <div class="recall" id="recall">
+                <svg class="icon" width="22" height="22"><use href="#i-user" /></svg>
+                <div class="recall__text" id="recall-text"></div>
+                <button type="button" class="btn btn--ghost" id="recall-fill">Fill it in</button>
+            </div>
+
+            <div class="card">
+                <h2 class="card__title"><svg class="icon" width="20" height="20"><use href="#i-user" /></svg>Who you
+                    are</h2>
+                <div class="grid-2">
+                    <div class="field">
+                        <label class="field__label" for="f-first">First name</label>
+                        <input class="input" id="f-first" name="firstName" maxlength="60" autocomplete="given-name"
+                            autocapitalize="words" placeholder="Jane">
+                        <p class="field__error" data-error-for="firstName">We need your first name.</p>
+                    </div>
+                    <div class="field">
+                        <label class="field__label" for="f-last">Last name</label>
+                        <input class="input" id="f-last" name="lastName" maxlength="60" autocomplete="family-name"
+                            autocapitalize="words" placeholder="Okafor">
+                        <p class="field__error" data-error-for="lastName">We need your last name.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="card__title"><svg class="icon" width="20" height="20"><use href="#i-mail" /></svg>How we
+                    reach you</h2>
+                <div class="grid-2">
+                    <div class="field">
+                        <label class="field__label" for="f-email">Email</label>
+                        <input class="input" id="f-email" name="email" type="email" inputmode="email" maxlength="200"
+                            autocomplete="email" autocapitalize="off" spellcheck="false"
+                            placeholder="jane@example.com">
+                        <p class="field__error" data-error-for="email">Check the email address.</p>
+                        <p class="field__help">Your repair confirmation and tracking link go here.</p>
+                    </div>
+                    <div class="field">
+                        <label class="field__label" for="f-phone">Mobile number</label>
+                        <input class="input" id="f-phone" name="phone" type="tel" inputmode="tel" maxlength="24"
+                            autocomplete="tel" placeholder="07700 900123">
+                        <p class="field__error" data-error-for="phone">Check the mobile number.</p>
+                        <p class="field__help">We text you when the device is ready to collect.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="card__title"><svg class="icon" width="20" height="20"><use
+                            href="#i-pin" /></svg>Address</h2>
+                <div class="field">
+                    <label class="field__label" for="f-addr1">Address line 1</label>
+                    <input class="input" id="f-addr1" name="addressLine1" maxlength="120" autocomplete="address-line1"
+                        autocapitalize="words" placeholder="13 Quarry Street">
+                    <p class="field__error" data-error-for="addressLine1">We need your address.</p>
+                </div>
+                <div class="field">
+                    <label class="field__label" for="f-addr2">Address line 2 <span class="opt">— optional</span></label>
+                    <input class="input" id="f-addr2" name="addressLine2" maxlength="120"
+                        autocomplete="address-line2" autocapitalize="words" placeholder="Flat 2">
+                </div>
+                <div class="grid-2">
+                    <div class="field">
+                        <label class="field__label" for="f-city">Town / city</label>
+                        <input class="input" id="f-city" name="city" maxlength="80" autocomplete="address-level2"
+                            autocapitalize="words" placeholder="Guildford">
+                        <p class="field__error" data-error-for="city">We need your town or city.</p>
+                    </div>
+                    <div class="field">
+                        <label class="field__label" for="f-postcode">Postcode</label>
+                        <input class="input" id="f-postcode" name="postcode" maxlength="12" autocomplete="postal-code"
+                            autocapitalize="characters" spellcheck="false" placeholder="GU1 3UY">
+                        <p class="field__error" data-error-for="postcode">Check the postcode.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="card__title"><svg class="icon" width="20" height="20"><use href="#i-shield" /></svg>Staying
+                    in touch</h2>
+                <label class="checkbox checkbox--wide" data-single="marketingOptIn">
+                    <input type="checkbox" id="f-marketing">
+                    <span class="checkbox__box"><svg class="icon" width="14" height="14"><use
+                                href="#i-check" /></svg></span>
+                    <span class="checkbox__text">Send me occasional offers and repair tips
+                        <small>Entirely optional and separate from your repair. We'll still email and text you about
+                            this repair either way. Unsubscribe any time.</small></span>
+                </label>
+                <p class="field__help" style="margin-top:1rem;">We use your details only to carry out and support this
+                    repair. Full detail in our <a href="../privacy.html" target="_blank" rel="noopener"
+                        style="color:var(--accent-cyan);">privacy notice</a>.</p>
+            </div>
+        </section>
+
+        <!-- ------------------------- 6. Terms & signature ------------------------- -->
+        <section class="step" data-step="sign">
+            <p class="step__eyebrow">Step 5 of 6 · Customer</p>
+            <h1 class="step__title">Check and sign</h1>
+            <p class="step__lede">Please read this through. It's the agreement for leaving your device with us.</p>
+
+            <div class="card">
+                <h2 class="card__title"><svg class="icon" width="20" height="20"><use href="#i-clipboard" /></svg>What
+                    you're leaving with us</h2>
+                <div class="summary" id="sign-summary"></div>
+            </div>
+
+            <div class="card">
+                <h2 class="card__title"><svg class="icon" width="20" height="20"><use href="#i-shield" /></svg>Repair
+                    terms<span class="card__hint" id="terms-version"></span></h2>
+                <div class="terms" id="terms-body" tabindex="0" aria-label="Repair terms"></div>
+            </div>
+
+            <div class="card">
+                <h2 class="card__title"><svg class="icon" width="20" height="20"><use
+                            href="#i-check" /></svg>Confirmations</h2>
+                <div style="display:grid;gap:0.75rem;">
+                    <label class="checkbox checkbox--wide" data-single="ackOwner">
+                        <input type="checkbox" id="f-ack-owner">
+                        <span class="checkbox__box"><svg class="icon" width="14" height="14"><use
+                                    href="#i-check" /></svg></span>
+                        <span class="checkbox__text">I own this device, or I'm authorised to leave it for repair</span>
+                    </label>
+                    <label class="checkbox checkbox--wide" data-single="ackBackup">
+                        <input type="checkbox" id="f-ack-backup">
+                        <span class="checkbox__box"><svg class="icon" width="14" height="14"><use
+                                    href="#i-check" /></svg></span>
+                        <span class="checkbox__text">I understand my data may be lost during repair
+                            <small>Back up anything you can't lose before you leave it with us.</small></span>
+                    </label>
+                    <label class="checkbox checkbox--wide" data-single="ackTerms">
+                        <input type="checkbox" id="f-ack-terms">
+                        <span class="checkbox__box"><svg class="icon" width="14" height="14"><use
+                                    href="#i-check" /></svg></span>
+                        <span class="checkbox__text">I've read and agree to the repair terms above</span>
+                    </label>
+                </div>
+                <p class="field__error" data-error-for="acks">Please tick all three boxes.</p>
+            </div>
+
+            <div class="card">
+                <h2 class="card__title"><svg class="icon" width="20" height="20"><use href="#i-pen" /></svg>Signature</h2>
+                <div class="field">
+                    <label class="field__label" for="f-signed-name">Your full name</label>
+                    <input class="input" id="f-signed-name" name="signedName" maxlength="120" autocapitalize="words"
+                        autocomplete="name" placeholder="Type your name as you'd sign it">
+                    <p class="field__error" data-error-for="signedName">Type your full name.</p>
+                </div>
+                <div class="sigpad" id="sigpad">
+                    <canvas id="sig-canvas"></canvas>
+                    <div class="sigpad__baseline"></div>
+                    <div class="sigpad__hint">Sign here with your finger</div>
+                </div>
+                <div class="sigpad-bar">
+                    <span class="sigpad-bar__note" id="sig-note">Draw your signature in the white box above.</span>
+                    <button type="button" class="btn btn--ghost" id="sig-clear">
+                        <svg class="icon" width="18" height="18"><use href="#i-refresh" /></svg>Clear
                     </button>
                 </div>
-                <p
-                    style="font-size: 0.85rem; color: var(--success); margin-top: 1rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
-                    <i class="fas fa-paper-plane"></i> Email notifications configured
-                </p>
-                <p style="font-size: 0.75rem; color: var(--text-dark); margin-top: 0.5rem;">
-                    <i class="fas fa-info-circle"></i> Note: Please wait a few moments for the tracking link to become
-                    live on the network.
-                </p>
+                <p class="field__error" data-error-for="signature">A signature is needed to leave the device.</p>
+            </div>
+        </section>
+
+        <!-- ------------------------- 7. Done ------------------------- -->
+        <section class="step" data-step="done">
+            <div class="done-hero">
+                <div class="done-hero__icon"><svg class="icon" width="44" height="44"><use href="#i-check" /></svg>
+                </div>
+                <h1 class="done-hero__title">Repair booked in</h1>
+                <p class="done-hero__sub" id="done-sub">The customer's confirmation is on its way.</p>
             </div>
 
-            <div class="button-group">
-                <button class="btn btn-primary" onclick="printLabel()">
-                    <i class="fas fa-print"></i>
-                    Print Label
+            <div class="card">
+                <h2 class="card__title"><svg class="icon" width="20" height="20"><use href="#i-pin" /></svg>Tracking
+                    link</h2>
+                <div class="ticket-id" id="done-url">—</div>
+                <button type="button" class="btn btn--ghost btn--block" id="btn-copy-url">
+                    <svg class="icon" width="18" height="18"><use href="#i-copy" /></svg>Copy link
                 </button>
-                <button class="btn btn-secondary" onclick="testTrackingLink()">
-                    <i class="fas fa-external-link-alt"></i>
-                    Test Tracking
-                </button>
-                <button class="btn btn-secondary" onclick="createAnother()">
-                    <i class="fas fa-plus"></i>
-                    New Repair
-                </button>
-                <a href="../admin/" class="btn btn-success"
-                    style="background: var(--bg-elevated); color: var(--text-main); border: 1px solid var(--border-color);">
-                    <i class="fas fa-tachometer-alt"></i>
-                    Dashboard
-                </a>
             </div>
 
-            <!-- Label Preview -->
-            <div class="label-preview" id="label-preview">
-                <h4 style="margin-bottom: 0.5rem;">Label Preview:</h4>
-                <div class="label-content" id="label-content">
-                    <!-- Label content will be populated here -->
+            <div class="card">
+                <h2 class="card__title"><svg class="icon" width="20" height="20"><use href="#i-mail" /></svg>What went
+                    out</h2>
+                <div class="delivery" id="delivery"></div>
+            </div>
+
+            <div class="card">
+                <h2 class="card__title"><svg class="icon" width="20" height="20"><use href="#i-wrench" /></svg>Next</h2>
+                <div class="done-actions">
+                    <a class="btn btn--primary" id="btn-text" href="#" target="_blank" rel="noopener">
+                        <svg class="icon" width="18" height="18"><use href="#i-message" /></svg>Text the customer
+                    </a>
+                    <a class="btn btn--ghost" id="btn-label" href="#" target="_blank" rel="noopener">
+                        <svg class="icon" width="18" height="18"><use href="#i-printer" /></svg>Print device label
+                    </a>
+                    <button type="button" class="btn btn--ghost" id="btn-new">
+                        <svg class="icon" width="18" height="18"><use href="#i-plus" /></svg>Start another intake
+                    </button>
+                    <a class="btn btn--ghost" href="../admin/">
+                        <svg class="icon" width="18" height="18"><use href="#i-grid" /></svg>Dashboard
+                    </a>
                 </div>
             </div>
+        </section>
+
+    </main>
+
+    <!-- ============================ Action bar ============================ -->
+    <div class="actionbar" id="actionbar" hidden>
+        <div class="actionbar__inner">
+            <button type="button" class="btn btn--ghost" id="btn-back">
+                <svg class="icon" width="18" height="18"><use href="#i-arrow-left" /></svg>Back
+            </button>
+            <span class="actionbar__note" id="actionbar-note"></span>
+            <span class="actionbar__spacer"></span>
+            <button type="button" class="btn btn--primary btn--lg" id="btn-next">
+                Continue
+                <svg class="icon" width="18" height="18"><use href="#i-arrow-right" /></svg>
+            </button>
         </div>
     </div>
 
-    <!-- Print Label (Hidden) -->
-    <div class="print-label" id="print-label" style="display: none;">
-        <!-- Dymo label content will be populated here -->
+    <!-- ============================ Overlays ============================ -->
+    <div class="overlay" id="overlay">
+        <div>
+            <div class="spinner"></div>
+            <p class="overlay__title" id="overlay-title">Working…</p>
+            <p class="overlay__text" id="overlay-text"></p>
+        </div>
     </div>
 
-    <script>
-        // IMPORTANT: Update this to match your GitHub Pages URL structure
-        const GITHUB_PAGES_BASE_URL = 'https://onlinefix.co.uk';
-
-        // Initialize EmailJS (You need to sign up at emailjs.com and get your own keys)
-        // Instructions:
-        // 1. Sign up at https://www.emailjs.com/
-        // 2. Add your email service (Gmail, Outlook, etc.)
-        // 3. Create an email template
-        // 4. Get your Public Key, Service ID, and Template ID
-        // 5. Replace YOUR_EMAILJS_PUBLIC_KEY below with your actual public key
-        // 6. Update the emailjs.send() call with your Service ID and Template ID
-        // emailjs.init("YOUR_EMAILJS_PUBLIC_KEY"); // Replace with your EmailJS public key when ready
-
-        // Utility for escaping HTML to prevent XSS
-        function escapeHTML(str) {
-            if (str === null || str === undefined) return '';
-            return String(str)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#039;');
-        }
-
-        // Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyCKBlO4aHTVSjwyevg1OYZ0NWy3Y62HJuU",
-            authDomain: "onlinefix-repair.firebaseapp.com",
-            projectId: "onlinefix-repair",
-            storageBucket: "onlinefix-repair.firebasestorage.app",
-            messagingSenderId: "382934797751",
-            appId: "1:382934797751:web:5ac8a9c87d68a17b4cec32"
-        };
-
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const appCheck = firebase.appCheck();
-        appCheck.activate(new firebase.appCheck.ReCaptchaEnterpriseProvider('6LdZJRIsAAAAAOx4EZqupxMVvX4B3u3YlK5ez-3r'), true);
-        const db = firebase.firestore();
-        const storage = firebase.storage();
-        const auth = firebase.auth();
-
-        // Global variables
-        let uploadedPhotos = [];
-        let currentUser = null;
-        let currentRepairData = null;
-
-        // Check authentication
-        auth.onAuthStateChanged((user) => {
-            const formContainer = document.getElementById('repair-form-container');
-            const authNotice = document.getElementById('auth-notice');
-            if (user) {
-                currentUser = user;
-                document.getElementById('user-info').textContent = `Logged in as: ${user.email}`;
-                if (formContainer) formContainer.style.display = '';
-                if (authNotice) authNotice.style.display = 'none';
-            } else {
-                document.getElementById('user-info').textContent = 'Not logged in';
-                if (formContainer) formContainer.style.display = 'none';
-                if (authNotice) authNotice.style.display = '';
-            }
-        });
-
-        // Form submission
-        document.getElementById('repair-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            await createRepair();
-        });
-
-        // Auto-fill common repairs
-        function autoFillRepair() {
-            const select = document.getElementById('quick-select-repair');
-            const deviceInput = document.querySelector('input[name="device"]');
-            const issueInput = document.querySelector('textarea[name="issue"]');
-
-            const repairs = {
-                'ps5-hdmi': { device: 'Sony PlayStation 5', issue: 'HDMI Port Replacement' },
-                'xsx-hdmi': { device: 'Microsoft Xbox Series X', issue: 'HDMI Port Replacement' },
-                'ps5-clean': { device: 'Sony PlayStation 5', issue: 'Deep Cleaning & Thermal Paste' },
-                'xsx-clean': { device: 'Microsoft Xbox Series X', issue: 'Deep Cleaning & Thermal Paste' },
-                'pc-rebuild': { device: 'Custom PC', issue: 'Full PC Rebuild / Assembly' },
-                'laptop-diag': { device: 'Laptop', issue: 'General Diagnostics' }
-            };
-
-            if (select.value && repairs[select.value]) {
-                const data = repairs[select.value];
-                deviceInput.value = data.device;
-                issueInput.value = data.issue;
-
-                // Flash inputs briefly to show they changed
-                [deviceInput, issueInput].forEach(el => {
-                    const originalBorder = el.style.borderColor;
-                    el.style.borderColor = 'var(--primary-cyan)';
-                    setTimeout(() => el.style.borderColor = originalBorder, 800);
-                });
-
-                // Reset dropdown to default after selection so they can use it again if needed
-                setTimeout(() => select.value = "", 500);
-            }
-        }
-
-        // Photo upload handling
-        document.getElementById('photo-input').addEventListener('change', handlePhotoUpload);
-
-        function handlePhotoUpload(e) {
-            const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-            const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/heic'];
-            const files = Array.from(e.target.files);
-            files.forEach(file => {
-                if (!file.type.startsWith('image/') || !ALLOWED_TYPES.some(t => file.type === t)) {
-                    alert(`Skipped "${file.name}": not a valid image type.`);
-                    return;
-                }
-                if (file.size > MAX_FILE_SIZE) {
-                    alert(`Skipped "${file.name}": exceeds 10MB limit.`);
-                    return;
-                }
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    addPhotoPreview(e.target.result, file);
-                };
-                reader.readAsDataURL(file);
-            });
-        }
-
-        function addPhotoPreview(src, file) {
-            const preview = document.getElementById('photo-preview');
-            const photoItem = document.createElement('div');
-            photoItem.className = 'photo-item';
-
-            const photoSuffixBytes = new Uint8Array(8);
-            crypto.getRandomValues(photoSuffixBytes);
-            const photoId = 'photo_' + Date.now() + '_' + Array.from(photoSuffixBytes, b => b.toString(16).padStart(2, '0')).join('');
-            photoItem.innerHTML = `
-                <img src="${escapeHTML(src)}" alt="Device photo">
-                <button type="button" class="photo-remove" onclick="removePhoto('${escapeHTML(photoId)}')">×</button>
-            `;
-
-            photoItem.dataset.photoId = photoId;
-            preview.appendChild(photoItem);
-
-            uploadedPhotos.push({ id: photoId, file, src });
-        }
-
-        function removePhoto(photoId) {
-            const photoElement = document.querySelector(`[data-photo-id="${photoId}"]`);
-            if (photoElement) {
-                photoElement.remove();
-            }
-            uploadedPhotos = uploadedPhotos.filter(photo => photo.id !== photoId);
-        }
-
-        // Drag and drop for photos
-        const photoUpload = document.querySelector('.photo-upload');
-
-        photoUpload.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            photoUpload.classList.add('dragover');
-        });
-
-        photoUpload.addEventListener('dragleave', () => {
-            photoUpload.classList.remove('dragover');
-        });
-
-        photoUpload.addEventListener('drop', (e) => {
-            e.preventDefault();
-            photoUpload.classList.remove('dragover');
-
-            const files = Array.from(e.dataTransfer.files);
-            files.forEach(file => {
-                if (file.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        addPhotoPreview(e.target.result, file);
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
-        });
-
-        // Create repair
-        async function createRepair() {
-            document.getElementById('repair-form').style.display = 'none';
-            document.getElementById('loading').style.display = 'block';
-
-            try {
-                const formData = new FormData(document.getElementById('repair-form'));
-                const data = Object.fromEntries(formData);
-
-                // Generate repair ID. The ID is the only access token guarding
-                // ticket data (see firestore.rules / storage.rules), so it must be
-                // unguessable: 128 bits of CSPRNG output rendered as 32 hex chars.
-                const idBytes = new Uint8Array(16);
-                crypto.getRandomValues(idBytes);
-                const repairId = 'REP_' + Array.from(idBytes, b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
-
-                // Upload photos if any
-                const photoUrls = [];
-                for (const photo of uploadedPhotos) {
-                    try {
-                        const photoRef = storage.ref().child(`repairs/${repairId}/${photo.id}`);
-                        const snapshot = await photoRef.put(photo.file);
-                        const downloadURL = await snapshot.ref.getDownloadURL();
-                        photoUrls.push(downloadURL);
-                    } catch (error) {
-                        console.error('Error uploading photo:', error);
-                    }
-                }
-
-                // Parse device info for better compatibility
-                let brand = 'Unknown';
-                let model = 'Unknown';
-                let deviceType = 'Device';
-
-                if (data.device) {
-                    // Try to extract brand and model from device string
-                    const deviceParts = data.device.trim().split(' ');
-                    if (deviceParts.length > 0) {
-                        brand = deviceParts[0];
-                        model = data.device;
-
-                        // Determine device type
-                        const deviceLower = data.device.toLowerCase();
-                        if (deviceLower.includes('iphone') || deviceLower.includes('phone')) {
-                            deviceType = 'iPhone';
-                        } else if (deviceLower.includes('ipad') || deviceLower.includes('tablet')) {
-                            deviceType = 'iPad';
-                        } else if (deviceLower.includes('macbook') || deviceLower.includes('laptop')) {
-                            deviceType = 'MacBook';
-                        } else if (deviceLower.includes('samsung')) {
-                            deviceType = 'Samsung';
-                            brand = 'Samsung';
-                        }
-                    }
-                }
-
-                // Create repair document
-                const repairData = {
-                    repairId: repairId,
-                    customerName: `${data.firstName || ''} ${data.lastName || ''}`.trim() || 'Unknown',
-                    firstName: data.firstName || '',
-                    lastName: data.lastName || '',
-                    customerEmail: data.email || '',
-                    customerPhone: data.phone || '',
-                    device: data.device || '',
-                    // Fields expected by track page
-                    brand: brand,
-                    model: model,
-                    deviceType: deviceType,
-                    issueDescription: data.issue || 'No description provided',
-                    estimatedCost: data.price ? parseFloat(data.price) : null,
-                    currentStatus: 'received',
-                    dateReceived: firebase.firestore.Timestamp.now(),
-                    photos: photoUrls,
-                    progress: [{
-                        status: 'received',
-                        timestamp: firebase.firestore.Timestamp.now(),
-                        notes: 'Device received and logged into system',
-                        technician: currentUser ? currentUser.email : 'System'
-                    }],
-                    createdBy: currentUser ? currentUser.email : 'Anonymous',
-                    createdAt: firebase.firestore.Timestamp.now()
-                };
-
-                // Save to Firestore
-                const docRef = await db.collection('repairs').add(repairData);
-
-                // Repair created successfully
-
-                // Verify the repair was saved by reading it back
-                const savedDoc = await docRef.get();
-                if (!savedDoc.exists) {
-                    throw new Error('Failed to verify repair was saved');
-                }
-
-                // Store current repair data for label printing
-                currentRepairData = repairData;
-
-                // Send email notification
-                await sendEmailNotification(repairData);
-
-                // Show success modal
-                showSuccessModal(repairId);
-
-            } catch (error) {
-                console.error('Error creating repair:', error);
-                showAlert('Error creating repair: ' + error.message, 'error');
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('repair-form').style.display = 'block';
-            }
-        }
-
-        // Send email notification
-        async function sendEmailNotification(repairData) {
-            try {
-                // EmailJS template parameters
-                const templateParams = {
-                    to_email: 'onlinerepairbooking@gmail.com',
-                    repair_id: repairData.repairId,
-                    customer_name: repairData.customerName,
-                    customer_email: repairData.customerEmail,
-                    customer_phone: repairData.customerPhone,
-                    device: repairData.device,
-                    issue: repairData.issueDescription,
-                    price: repairData.estimatedCost ? `£${repairData.estimatedCost}` : 'Not specified',
-                    nfc_url: `${GITHUB_PAGES_BASE_URL}/track/?id=${repairData.repairId}`,
-                    date: new Date().toLocaleString('en-GB')
-                };
-
-                // EMAILJS SETUP INSTRUCTIONS:
-                // 1. Sign up at https://www.emailjs.com/
-                // 2. Add email service (Gmail recommended)
-                // 3. Create email template with variables above
-                // 4. Get your IDs from EmailJS dashboard
-                // 5. Replace the IDs below:
-
-                // Uncomment this line when EmailJS is configured:
-                // await emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', templateParams);
-
-                // Email notification ready to send (enable EmailJS above)
-
-                // Always use mailto as fallback for now
-                sendEmailViaMailto(repairData);
-
-            } catch (error) {
-                console.error('Error with email notification:', error);
-                // Try mailto as fallback
-                sendEmailViaMailto(repairData);
-            }
-        }
-
-        // Show success modal
-        function showSuccessModal(repairId) {
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('generated-repair-id').textContent = repairId;
-            document.getElementById('nfc-url').textContent = `${GITHUB_PAGES_BASE_URL}/track/?id=${repairId}`;
-
-            // Show label preview
-            updateLabelPreview();
-            document.getElementById('label-preview').style.display = 'block';
-
-            document.getElementById('success-modal').classList.add('show');
-        }
-
-        // Update label preview
-        function updateLabelPreview() {
-            if (!currentRepairData) return;
-
-            const labelContent = `
-                <strong>OnlineFix</strong><br>
-                ${escapeHTML(currentRepairData.repairId)}<br>
-                ${escapeHTML(currentRepairData.customerName)}<br>
-                ${escapeHTML(currentRepairData.device)}<br>
-                ${escapeHTML(currentRepairData.customerPhone)}<br>
-                ${currentRepairData.estimatedCost ? `£${escapeHTML(currentRepairData.estimatedCost)}` : ''}<br>
-                ${new Date().toLocaleDateString('en-GB')}<br>
-                <small style="font-size: 0.7em;">onlinefix.co.uk/track</small>
-            `;
-
-            document.getElementById('label-content').innerHTML = labelContent;
-        }
-
-        // Print label
-        function printLabel() {
-            if (!currentRepairData) return;
-
-            // Create print content for Dymo label (2.25" x 1.25")
-            const printLabel = document.getElementById('print-label');
-            printLabel.innerHTML = `
-                <div style="width: 2.25in; height: 1.25in; padding: 0.1in; font-family: Arial, sans-serif; font-size: 10pt; line-height: 1.2;">
-                    <div style="font-weight: bold; font-size: 11pt;">OnlineFix</div>
-                    <div style="font-weight: bold; margin: 2px 0;">${escapeHTML(currentRepairData.repairId)}</div>
-                    <div>${escapeHTML(currentRepairData.customerName)}</div>
-                    <div style="font-size: 9pt;">${escapeHTML(currentRepairData.device)}</div>
-                    <div style="font-size: 9pt;">${escapeHTML(currentRepairData.customerPhone)}</div>
-                    ${currentRepairData.estimatedCost ? `<div style="font-size: 9pt;">£${escapeHTML(currentRepairData.estimatedCost)}</div>` : ''}
-                    <div style="font-size: 8pt; margin-top: 2px;">${new Date().toLocaleDateString('en-GB')}</div>
-                    <div style="font-size: 7pt; margin-top: 2px;">Track: onlinefix.co.uk/track</div>
-                </div>
-            `;
-
-            printLabel.style.display = 'block';
-            window.print();
-            printLabel.style.display = 'none';
-        }
-
-        // Create another repair
-        function createAnother() {
-            document.getElementById('success-modal').classList.remove('show');
-            resetForm();
-            document.getElementById('repair-form').style.display = 'block';
-        }
-
-        // Reset form
-        function resetForm() {
-            document.getElementById('repair-form').reset();
-            document.getElementById('photo-preview').innerHTML = '';
-            uploadedPhotos = [];
-            currentRepairData = null;
-        }
-
-        // Show alert
-        function showAlert(message, type) {
-            const alert = document.createElement('div');
-            alert.className = `alert alert-${type}`;
-            alert.textContent = message;
-
-            document.body.appendChild(alert);
-
-            setTimeout(() => {
-                alert.style.opacity = '0';
-                setTimeout(() => alert.remove(), 300);
-            }, 5000);
-        }
-
-        // Test tracking link
-        function testTrackingLink() {
-            const nfcUrl = document.getElementById('nfc-url').textContent.trim();
-            const win = window.open(nfcUrl, '_blank', 'noopener,noreferrer');
-            if (win) win.opener = null;
-        }
-
-        // Alternative email sending using mailto (fallback if EmailJS not configured)
-        function sendEmailViaMailto(repairData) {
-            const subject = `New Repair: ${repairData.repairId}`;
-            const body = `
-New repair ticket created:
-
-Repair ID: ${repairData.repairId}
-Customer: ${repairData.customerName}
-Email: ${repairData.customerEmail}
-Phone: ${repairData.customerPhone}
-Device: ${repairData.device}
-Issue: ${repairData.issueDescription}
-Price: ${repairData.estimatedCost ? `£${repairData.estimatedCost}` : 'Not specified'}
-
-NFC URL: ${GITHUB_PAGES_BASE_URL}/track/?id=${repairData.repairId}
-
-Date: ${new Date().toLocaleString('en-GB')}
-            `;
-
-            const mailtoLink = `mailto:onlinerepairbooking@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-            const win = window.open(mailtoLink, '_blank');
-            if (win && win !== window) win.opener = null;
-        }
-
-        // Copy NFC link to clipboard
-        function copyNFCLink() {
-            const nfcUrl = document.getElementById('nfc-url').textContent.trim();
-
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(nfcUrl).then(() => {
-                    showAlert('NFC link copied to clipboard!', 'success');
-                }).catch(err => {
-                    console.error('Failed to copy:', err);
-                    fallbackCopy(nfcUrl);
-                });
-            } else {
-                fallbackCopy(nfcUrl);
-            }
-        }
-
-        // Fallback copy method for older browsers
-        function fallbackCopy(text) {
-            const textArea = document.createElement('textarea');
-            textArea.value = text;
-            textArea.style.position = 'fixed';
-            textArea.style.opacity = '0';
-            document.body.appendChild(textArea);
-            textArea.select();
-
-            try {
-                document.execCommand('copy');
-                showAlert('NFC link copied to clipboard!', 'success');
-            } catch (err) {
-                showAlert('Failed to copy link', 'error');
-            }
-
-            document.body.removeChild(textArea);
-        }
-    </script>
 </body>
 
 </html>
