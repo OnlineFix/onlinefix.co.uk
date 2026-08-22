@@ -138,8 +138,13 @@
     }
 
     /* The repair ID is the only credential guarding the public tracking page
-       (see firestore.rules), so it must be unguessable: 128 bits of CSPRNG. */
-    function newRepairId() { return 'REP_' + randomHex(16).toUpperCase(); }
+       (see firestore.rules), so it has to be unguessable rather than
+       sequential. 64 bits of CSPRNG gives 1.8e19 possibilities: against a
+       few thousand live tickets, reaching even a 1% chance of guessing one
+       takes ~1.8e13 attempts, and every attempt is a separate App
+       Check-gated Firestore query. Short enough to read out over the phone
+       and to fit an email line, which 128 bits was not. */
+    function newRepairId() { return 'REP_' + randomHex(8).toUpperCase(); }
 
     function titleCase(str) {
         return String(str || '').toLowerCase().replace(/\b[a-z]/g, function (c) { return c.toUpperCase(); });
@@ -166,14 +171,10 @@
         return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(raw || '').trim());
     }
 
-    function isValidPostcode(raw) {
-        return /^[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}$/i.test(String(raw || '').trim());
-    }
-
     function formatPostcode(raw) {
-        var s = String(raw || '').toUpperCase().replace(/\s+/g, '');
-        if (s.length < 5) return s;
-        return s.slice(0, s.length - 3) + ' ' + s.slice(-3);
+        var value = String(raw || '').toUpperCase().replace(/\s+/g, '');
+        if (!/^[A-Z]{1,2}\d[A-Z\d]?\d[A-Z]{2}$/.test(value)) return String(raw || '').trim();
+        return value.slice(0, value.length - 3) + ' ' + value.slice(-3);
     }
 
     function money(value) {
@@ -214,7 +215,7 @@
     // State
     // ------------------------------------------------------------------
 
-    var STEPS = ['device', 'issue', 'photos', 'handover', 'customer', 'sign', 'done'];
+    var STEPS = ['device', 'issue', 'photos', 'handover', 'customer', 'done'];
 
     var state = {
         repairId: newRepairId(),
@@ -244,7 +245,7 @@
         if (user) {
             $('#topbar-meta').innerHTML =
                 '<strong>' + escapeHTML(user.email || 'Signed in') + '</strong><br>Ticket ' +
-                escapeHTML(state.repairId.slice(0, 12)) + '…';
+                escapeHTML(state.repairId);
             $('#gate-shell').hidden = true;
             $('#flow').hidden = false;
             $('#actionbar').hidden = false;
@@ -276,13 +277,14 @@
         // Progress rail covers the six input steps; "done" fills it entirely.
         var rail = $('#steprail');
         rail.innerHTML = '';
-        for (var i = 0; i < 6; i++) {
+        var railSegments = STEPS.length - 1;   // every step except 'done'
+        for (var i = 0; i < railSegments; i++) {
             var seg = document.createElement('div');
             seg.className = 'steprail__seg' +
                 (i < state.stepIndex ? ' is-done' : (i === state.stepIndex ? ' is-current' : ''));
             rail.appendChild(seg);
         }
-        rail.setAttribute('aria-valuenow', String(Math.min(state.stepIndex + 1, 6)));
+        rail.setAttribute('aria-valuenow', String(Math.min(state.stepIndex + 1, railSegments)));
 
         var back = $('#btn-back');
         var next = $('#btn-next');
@@ -300,7 +302,7 @@
         if (name === 'handover') {
             next.innerHTML = 'Hand over to customer <svg class="icon" width="18" height="18"><use href="#i-arrow-right"/></svg>';
             renderSummary($('#handover-summary'), false);
-        } else if (name === 'sign') {
+        } else if (name === 'customer') {
             next.innerHTML = 'Agree &amp; create repair <svg class="icon" width="18" height="18"><use href="#i-check"/></svg>';
             renderSummary($('#sign-summary'), true);
             $('#terms-body').innerHTML = TERMS_HTML;
@@ -320,7 +322,7 @@
         clearAllErrors();
         if (!validateStep(currentStep())) return;
 
-        if (currentStep() === 'sign') { submitIntake(); return; }
+        if (currentStep() === 'customer') { submitIntake(); return; }
 
         state.stepIndex = Math.min(state.stepIndex + 1, STEPS.length - 1);
         renderStep();
@@ -382,16 +384,7 @@
             if (!isValidPhone(phoneEl.value)) {
                 phoneEl.classList.add('is-invalid'); setFieldError('phone', true); fail(phoneEl);
             }
-            if (!requireText('#f-addr1', 'addressLine1')) fail($('#f-addr1'));
-            if (!requireText('#f-city', 'city')) fail($('#f-city'));
 
-            var pcEl = $('#f-postcode');
-            if (!isValidPostcode(pcEl.value)) {
-                pcEl.classList.add('is-invalid'); setFieldError('postcode', true); fail(pcEl);
-            }
-        }
-
-        if (name === 'sign') {
             var acks = ['#f-ack-owner', '#f-ack-backup', '#f-ack-terms'].every(function (id) { return $(id).checked; });
             if (!acks) { setFieldError('acks', true); ok = false; }
             if (!requireText('#f-signed-name', 'signedName', 2)) fail($('#f-signed-name'));
@@ -800,10 +793,10 @@
     });
 
     window.addEventListener('resize', function () {
-        if (currentStep() === 'sign') sizeSignaturePad();
+        if (currentStep() === 'customer') sizeSignaturePad();
     });
     window.addEventListener('orientationchange', function () {
-        setTimeout(function () { if (currentStep() === 'sign') sizeSignaturePad(); }, 300);
+        setTimeout(function () { if (currentStep() === 'customer') sizeSignaturePad(); }, 300);
     });
 
     function signatureBlob() {
@@ -933,18 +926,16 @@
             var lastName = $('#f-last').value.trim();
             var email = $('#f-email').value.trim();
             var phone = $('#f-phone').value.trim();
-            var postcode = formatPostcode($('#f-postcode').value);
             var customerName = (firstName + ' ' + lastName).trim();
-            var now = firebase.firestore.Timestamp.now();
-            var photoUrls = state.photos.filter(function (p) { return p.status === 'done'; }).map(function (p) { return p.url; });
-            var photoPaths = state.photos.filter(function (p) { return p.status === 'done'; }).map(function (p) { return p.path; });
-
             var address = {
                 line1: $('#f-addr1').value.trim(),
                 line2: $('#f-addr2').value.trim(),
                 city: $('#f-city').value.trim(),
-                postcode: postcode
+                postcode: formatPostcode($('#f-postcode').value)
             };
+            var now = firebase.firestore.Timestamp.now();
+            var photoUrls = state.photos.filter(function (p) { return p.status === 'done'; }).map(function (p) { return p.url; });
+            var photoPaths = state.photos.filter(function (p) { return p.status === 'done'; }).map(function (p) { return p.path; });
 
             var repairData = {
                 // --- fields the tracking + admin pages already read ---
@@ -1057,13 +1048,20 @@
             emailLower: customer.email.toLowerCase(),
             phone: customer.phone,
             phoneE164: normalisePhone(customer.phone),
-            address: customer.address,
             marketingOptIn: customer.marketingOptIn,
             updatedAt: firebase.firestore.Timestamp.now(),
             lastRepairId: state.repairId,
             repairIds: firebase.firestore.FieldValue.arrayUnion(state.repairId),
             repairCount: firebase.firestore.FieldValue.increment(1)
         };
+
+        // Only write an address when one was actually given, so a returning
+        // customer who skips the optional fields keeps the address already on
+        // file rather than having it blanked.
+        var hasAddress = Object.keys(customer.address).some(function (key) {
+            return customer.address[key];
+        });
+        if (hasAddress) payload.address = customer.address;
 
         var id = state.matchedCustomerId;
         if (!id) {
@@ -1283,7 +1281,7 @@
     });
 
     $('#f-postcode').addEventListener('blur', function () {
-        if (isValidPostcode(this.value)) this.value = formatPostcode(this.value);
+        this.value = formatPostcode(this.value);
     });
 
     // Guard against a stray swipe binning a half-finished intake.

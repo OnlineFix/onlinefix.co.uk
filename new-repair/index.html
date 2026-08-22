@@ -25,6 +25,14 @@
 
 <body>
 
+    <!-- Ambient background, matching the customer-facing tracking page. -->
+    <div class="bg-dots" aria-hidden="true">
+        <div class="dot dot-1"></div>
+        <div class="dot dot-2"></div>
+        <div class="dot dot-3"></div>
+    </div>
+
+
     <!-- ==================================================================
          Icon sprite. Stroke-drawn originals rather than an icon webfont:
          the shop iPad renders them instantly with no CDN round-trip, and
@@ -224,7 +232,7 @@
 
         <!-- ------------------------- 1. Device ------------------------- -->
         <section class="step" data-step="device">
-            <p class="step__eyebrow">Step 1 of 6 · Technician</p>
+            <p class="step__eyebrow">Step 1 of 4 · Technician</p>
             <h1 class="step__title">What are we looking at?</h1>
             <p class="step__lede">Log the device while it's in your hands. The customer fills in their own details
                 later — don't ask for them yet.</p>
@@ -363,7 +371,7 @@
 
         <!-- ------------------------- 2. Issue ------------------------- -->
         <section class="step" data-step="issue">
-            <p class="step__eyebrow">Step 2 of 6 · Technician</p>
+            <p class="step__eyebrow">Step 2 of 4 · Technician</p>
             <h1 class="step__title">What's wrong with it?</h1>
             <p class="step__lede">Describe the fault the way you'd explain it back to the customer, then record the
                 condition it arrived in.</p>
@@ -461,7 +469,7 @@
 
         <!-- ------------------------- 3. Photos ------------------------- -->
         <section class="step" data-step="photos">
-            <p class="step__eyebrow">Step 3 of 6 · Technician</p>
+            <p class="step__eyebrow">Step 3 of 4 · Technician</p>
             <h1 class="step__title">Photograph the device</h1>
             <p class="step__lede">Shoot it now, before it leaves the counter. Front, back, and a close-up of every mark
                 you ticked on the last step.</p>
@@ -511,12 +519,14 @@
             </div>
         </section>
 
-        <!-- ------------------------- 5. Customer ------------------------- -->
+        <!-- ------------------------- 5. Customer (single page) ------------------------- -->
+        <!-- Details, terms and signature all live on one scrolling page: the
+             customer picks the iPad up once, works down it, and hands it back. -->
         <section class="step" data-step="customer">
-            <p class="step__eyebrow">Step 4 of 6 · Customer</p>
-            <h1 class="step__title">Your details</h1>
-            <p class="step__lede">We need these so we can reach you about the repair and hand the device back to the
-                right person.</p>
+            <p class="step__eyebrow">Step 4 of 4 &middot; Customer</p>
+            <h1 class="step__title">Your details &amp; agreement</h1>
+            <p class="step__lede">Fill in your details, have a read of the terms, and sign at the bottom. It takes a
+                minute.</p>
 
             <div class="recall" id="recall">
                 <svg class="icon" width="22" height="22"><use href="#i-user" /></svg>
@@ -525,8 +535,8 @@
             </div>
 
             <div class="card">
-                <h2 class="card__title"><svg class="icon" width="20" height="20"><use href="#i-user" /></svg>Who you
-                    are</h2>
+                <h2 class="card__title"><svg class="icon" width="20" height="20"><use href="#i-user" /></svg>How we
+                    reach you</h2>
                 <div class="grid-2">
                     <div class="field">
                         <label class="field__label" for="f-first">First name</label>
@@ -541,82 +551,64 @@
                         <p class="field__error" data-error-for="lastName">We need your last name.</p>
                     </div>
                 </div>
-            </div>
-
-            <div class="card">
-                <h2 class="card__title"><svg class="icon" width="20" height="20"><use href="#i-mail" /></svg>How we
-                    reach you</h2>
-                <div class="grid-2">
+                <div class="grid-2" style="margin-top:1.25rem;">
                     <div class="field">
                         <label class="field__label" for="f-email">Email</label>
                         <input class="input" id="f-email" name="email" type="email" inputmode="email" maxlength="200"
                             autocomplete="email" autocapitalize="off" spellcheck="false"
                             placeholder="jane@example.com">
                         <p class="field__error" data-error-for="email">Check the email address.</p>
-                        <p class="field__help">Your repair confirmation and tracking link go here.</p>
+                        <p class="field__help">Your confirmation and tracking link go here.</p>
                     </div>
                     <div class="field">
                         <label class="field__label" for="f-phone">Mobile number</label>
                         <input class="input" id="f-phone" name="phone" type="tel" inputmode="tel" maxlength="24"
                             autocomplete="tel" placeholder="07700 900123">
                         <p class="field__error" data-error-for="phone">Check the mobile number.</p>
-                        <p class="field__help">We text you when the device is ready to collect.</p>
+                        <p class="field__help">We text you when it's ready to collect.</p>
                     </div>
                 </div>
-            </div>
-
-            <div class="card">
-                <h2 class="card__title"><svg class="icon" width="20" height="20"><use
-                            href="#i-pin" /></svg>Address</h2>
-                <div class="field">
-                    <label class="field__label" for="f-addr1">Address line 1</label>
-                    <input class="input" id="f-addr1" name="addressLine1" maxlength="120" autocomplete="address-line1"
-                        autocapitalize="words" placeholder="13 Quarry Street">
-                    <p class="field__error" data-error-for="addressLine1">We need your address.</p>
-                </div>
-                <div class="field">
-                    <label class="field__label" for="f-addr2">Address line 2 <span class="opt">— optional</span></label>
-                    <input class="input" id="f-addr2" name="addressLine2" maxlength="120"
-                        autocomplete="address-line2" autocapitalize="words" placeholder="Flat 2">
-                </div>
-                <div class="grid-2">
-                    <div class="field">
-                        <label class="field__label" for="f-city">Town / city</label>
-                        <input class="input" id="f-city" name="city" maxlength="80" autocomplete="address-level2"
-                            autocapitalize="words" placeholder="Guildford">
-                        <p class="field__error" data-error-for="city">We need your town or city.</p>
-                    </div>
-                    <div class="field">
-                        <label class="field__label" for="f-postcode">Postcode</label>
-                        <input class="input" id="f-postcode" name="postcode" maxlength="12" autocomplete="postal-code"
-                            autocapitalize="characters" spellcheck="false" placeholder="GU1 3UY">
-                        <p class="field__error" data-error-for="postcode">Check the postcode.</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card">
-                <h2 class="card__title"><svg class="icon" width="20" height="20"><use href="#i-shield" /></svg>Staying
-                    in touch</h2>
-                <label class="checkbox checkbox--wide" data-single="marketingOptIn">
+                <label class="checkbox checkbox--wide" data-single="marketingOptIn" style="margin-top:1.25rem;">
                     <input type="checkbox" id="f-marketing">
                     <span class="checkbox__box"><svg class="icon" width="14" height="14"><use
                                 href="#i-check" /></svg></span>
                     <span class="checkbox__text">Send me occasional offers and repair tips
-                        <small>Entirely optional and separate from your repair. We'll still email and text you about
-                            this repair either way. Unsubscribe any time.</small></span>
+                        <small>Optional, and separate from this repair — we'll contact you about the repair either way.
+                            Unsubscribe any time.</small></span>
                 </label>
                 <p class="field__help" style="margin-top:1rem;">We use your details only to carry out and support this
-                    repair. Full detail in our <a href="../privacy.html" target="_blank" rel="noopener"
+                    repair. More in our <a href="../privacy.html" target="_blank" rel="noopener"
                         style="color:var(--accent-cyan);">privacy notice</a>.</p>
             </div>
-        </section>
 
-        <!-- ------------------------- 6. Terms & signature ------------------------- -->
-        <section class="step" data-step="sign">
-            <p class="step__eyebrow">Step 5 of 6 · Customer</p>
-            <h1 class="step__title">Check and sign</h1>
-            <p class="step__lede">Please read this through. It's the agreement for leaving your device with us.</p>
+            <div class="card">
+                <h2 class="card__title"><svg class="icon" width="20" height="20"><use href="#i-pin" /></svg>Address<span
+                        class="card__hint">Optional</span></h2>
+                <p class="field__help" style="margin:-0.5rem 0 1.25rem;">Only needed if we ever have to post the device
+                    back to you. Leave it blank if you're collecting in person.</p>
+                <div class="field">
+                    <label class="field__label" for="f-addr1">Address line 1 <span class="opt">&mdash; optional</span></label>
+                    <input class="input" id="f-addr1" name="addressLine1" maxlength="120" autocomplete="address-line1"
+                        autocapitalize="words" placeholder="13 Quarry Street">
+                </div>
+                <div class="field">
+                    <label class="field__label" for="f-addr2">Address line 2 <span class="opt">&mdash; optional</span></label>
+                    <input class="input" id="f-addr2" name="addressLine2" maxlength="120" autocomplete="address-line2"
+                        autocapitalize="words" placeholder="Flat 2">
+                </div>
+                <div class="grid-2">
+                    <div class="field">
+                        <label class="field__label" for="f-city">Town / city <span class="opt">&mdash; optional</span></label>
+                        <input class="input" id="f-city" name="city" maxlength="80" autocomplete="address-level2"
+                            autocapitalize="words" placeholder="Guildford">
+                    </div>
+                    <div class="field">
+                        <label class="field__label" for="f-postcode">Postcode <span class="opt">&mdash; optional</span></label>
+                        <input class="input" id="f-postcode" name="postcode" maxlength="12" autocomplete="postal-code"
+                            autocapitalize="characters" spellcheck="false" placeholder="GU1 3UY">
+                    </div>
+                </div>
+            </div>
 
             <div class="card">
                 <h2 class="card__title"><svg class="icon" width="20" height="20"><use href="#i-clipboard" /></svg>What
@@ -658,7 +650,8 @@
             </div>
 
             <div class="card">
-                <h2 class="card__title"><svg class="icon" width="20" height="20"><use href="#i-pen" /></svg>Signature</h2>
+                <h2 class="card__title"><svg class="icon" width="20" height="20"><use
+                            href="#i-pen" /></svg>Signature</h2>
                 <div class="field">
                     <label class="field__label" for="f-signed-name">Your full name</label>
                     <input class="input" id="f-signed-name" name="signedName" maxlength="120" autocapitalize="words"
