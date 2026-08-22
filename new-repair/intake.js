@@ -408,6 +408,24 @@
     // Chip + checkbox groups
     // ------------------------------------------------------------------
 
+    /* These two setters exist instead of a computed `state[key] = value`.
+       A dynamic write means any group name appearing in the markup could
+       reach any field on the shared state object — including state.photos,
+       which feeds image URLs straight into the DOM. Routing every write
+       through an explicit switch keeps a value read out of the page
+       confined to the one field it belongs to. */
+    function setChoice(key, value) {
+        var choice = String(value == null ? '' : value);
+        if (key === 'category') state.category = choice;
+        else if (key === 'unlockType') state.unlockType = choice;
+    }
+
+    function setChecks(key, values) {
+        var picked = values.map(function (value) { return String(value == null ? '' : value); });
+        if (key === 'accessories') state.accessories = picked;
+        else if (key === 'condition') state.condition = picked;
+    }
+
     $$('[data-chipgroup]').forEach(function (group) {
         var key = group.dataset.chipgroup;
         group.addEventListener('click', function (event) {
@@ -419,7 +437,7 @@
                 c.classList.toggle('is-selected', on);
                 c.setAttribute('aria-checked', on ? 'true' : 'false');
             });
-            state[key] = chip.dataset.value;
+            setChoice(key, chip.dataset.value);
             setFieldError(key, false);
 
             if (key === 'unlockType') {
@@ -438,7 +456,7 @@
                 input.closest('.checkbox').classList.toggle('is-checked', input.checked);
                 if (input.checked) picked.push(input.value);
             });
-            state[key] = picked;
+            setChecks(key, picked);
         });
     });
 
