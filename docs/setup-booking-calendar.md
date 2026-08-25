@@ -355,6 +355,27 @@ The Decline button reads its options from a Firestore collection called
 `declineReasons`. If that collection is empty the button has nothing to offer
 and the decline flow is unusable. Nothing creates these for you.
 
+### The quick way
+
+There is a script that writes all five, with the right field names and
+readable document ids:
+
+```bash
+GOOGLE_APPLICATION_CREDENTIALS=./service-account.json \
+node scripts/seed-booking-config.mjs
+```
+
+It also fills in the settings fields the backend added (appointment length,
+buffer, hold expiry, which calendar to read) without touching working hours
+you have already set. Safe to run twice — it leaves anything that already
+exists alone.
+
+That is the whole step. The rest of this section is the manual route, if you
+would rather see each document as you create it, or want to change the wording
+as you go.
+
+### The manual way
+
 1. Firebase console -> **Firestore Database** -> **Start collection**.
 2. Collection ID: `declineReasons` — exactly that, capital R.
 3. For each reason, add a document. **Set the Document ID yourself** rather
