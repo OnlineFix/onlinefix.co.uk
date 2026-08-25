@@ -138,3 +138,11 @@ working hours.**
 
 ### `bookings/{id}` status
 `held` → `accepted` | `declined` | `expired` | `cancelled`
+
+Bookings taken before this backend existed carry status **`pending`** and a
+`preferredAt` instead of `slotStart`/`slotEnd`/`slotKey`. `decideBooking`
+accepts them as readily as a `held` one — it derives the appointment window
+from `preferredAt` plus `appointmentMinutes`, and writes the missing fields
+back on accept. Anything listing bookings should therefore treat `pending`
+and `held` as the same "awaiting your decision" bucket, and must not assume
+`slotStart` exists.

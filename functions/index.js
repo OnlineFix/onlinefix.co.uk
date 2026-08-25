@@ -33,6 +33,13 @@ const MAX_RANGE_DAYS = 62;
 const CATEGORIES = ['phone', 'laptop', 'console', 'tablet', 'desktop', 'other'];
 const MAX_HELD_PER_EMAIL = 5;
 
+// Bookings taken before this backend existed carry status 'pending' and a
+// `preferredAt` rather than slotStart/slotEnd/slotKey. They are real requests
+// from real customers, so they stay decidable rather than becoming a dead end
+// in the dashboard.
+const LEGACY_PENDING = 'pending';
+const DECIDABLE = ['held', LEGACY_PENDING];
+
 /* ---- helpers ----------------------------------------------------------- */
 
 function requireAdmin(request) {
@@ -141,6 +148,25 @@ function validateSubmission(data) {
         photos,
         photoPaths: photoPaths.filter((p) => typeof p === 'string').map((p) => p.slice(0, 200)),
         tempId
+    };
+}
+
+/* Appointment window for a booking, filling in what the pre-backend
+   documents do not carry. Returns Timestamps so callers can write them back. */
+function resolveSlot(booking, settings) {
+    if (booking.slotStart && booking.slotEnd) {
+        return { start: booking.slotStart, end: booking.slotEnd };
+    }
+    const startTs = booking.slotStart || booking.preferredAt;
+    if (!startTs || typeof startTs.toDate !== 'function') {
+        throw new HttpsError('failed-precondition',
+            'This booking has no appointment time recorded, so it cannot be accepted.');
+    }
+    const start = startTs.toDate();
+    const mins = Number(settings.appointmentMinutes) || Number(settings.slotIntervalMinutes) || 30;
+    return {
+        start: admin.firestore.Timestamp.fromDate(start),
+        end: admin.firestore.Timestamp.fromDate(new Date(start.getTime() + mins * 60000))
     };
 }
 
@@ -299,10 +325,10 @@ exports.decideBooking = onCall({ cors: true }, async (request) => {
     if (!snap.exists) throw new HttpsError('not-found', 'Booking not found.');
     const booking = snap.data();
 
-    if (decision === 'accept' && booking.status !== 'held') {
+    if (decision === 'accept' && !DECIDABLE.includes(booking.status)) {
         throw new HttpsError('failed-precondition', `Booking is already ${booking.status}.`);
     }
-    if (decision === 'decline' && !['held'].includes(booking.status)) {
+    if (decision === 'decline' && !DECIDABLE.includes(booking.status)) {
         throw new HttpsError('failed-precondition', `Booking is already ${booking.status}.`);
     }
     if (decision === 'cancel' && booking.status !== 'accepted') {
@@ -310,17 +336,23 @@ exports.decideBooking = onCall({ cors: true }, async (request) => {
     }
 
     const settings = await loadSettings(db);
-    const lockRef = booking.slotKey
-        ? db.collection('slotLocks').doc(booking.slotKey)
-        : null;
+    const slot = resolveSlot(booking, settings);
+    // A legacy booking has no lock, so derive its key and start holding the
+    // slot properly from the moment it is decided.
+    const lockKey = booking.slotKey || slotKey(slot.start.toDate());
+    const lockRef = db.collection('slotLocks').doc(lockKey);
     const now = admin.firestore.FieldValue.serverTimestamp();
+
+    // Everything downstream reads slotStart/slotEnd, so hand it a document
+    // that has them whichever era the booking came from.
+    const resolved = Object.assign({}, booking, { slotStart: slot.start, slotEnd: slot.end });
 
     if (decision === 'accept') {
         let calendarEventId = null;
         try {
             calendarEventId = await createBookingEvent({
                 calendarId: settings.calendarId,
-                booking,
+                booking: resolved,
                 bookingId,
                 addressLine: mailer.BUSINESS_ADDRESS
             });
@@ -337,15 +369,19 @@ exports.decideBooking = onCall({ cors: true }, async (request) => {
             calendarEventId,
             decidedAt: now,
             respondedAt: now,
+            slotStart: slot.start,
+            slotEnd: slot.end,
+            slotKey: lockKey,
             adminNotes: typeof note === 'string' ? note.slice(0, 500) : (booking.adminNotes || '')
         });
-        if (lockRef) {
-            await lockRef.set({
-                status: 'accepted',
-                expiresAt: null,
-                updatedAt: now
-            }, { merge: true });
-        }
+        await lockRef.set({
+            bookingId,
+            status: 'accepted',
+            slotStart: slot.start,
+            slotEnd: slot.end,
+            expiresAt: null,
+            updatedAt: now
+        }, { merge: true });
 
         try {
             const fresh = await bookingRef.get();
@@ -365,7 +401,7 @@ exports.decideBooking = onCall({ cors: true }, async (request) => {
             await deleteEvent({ calendarId: settings.calendarId, eventId: booking.calendarEventId });
         }
         await bookingRef.update({ status: 'cancelled', decidedAt: now });
-        if (lockRef) await lockRef.set({ status: 'released', updatedAt: now }, { merge: true });
+        await lockRef.set({ status: 'released', updatedAt: now }, { merge: true });
         logger.info('Booking cancelled', { bookingId });
         return { ok: true, status: 'cancelled' };
     }
@@ -392,12 +428,15 @@ exports.decideBooking = onCall({ cors: true }, async (request) => {
         respondedAt: now,
         declineReason: { id: declineReasonId || null, label: reasonLabel, message: reasonBody }
     });
-    if (lockRef) await lockRef.set({ status: 'released', updatedAt: now }, { merge: true });
+    await lockRef.set({ status: 'released', updatedAt: now }, { merge: true });
 
     try {
         const fresh = await bookingRef.get();
         await db.collection('mail').add(
-            mailer.customerDeclined({ booking: fresh.data(), bookingId, reasonLabel, reasonBody })
+            mailer.customerDeclined({
+                booking: Object.assign({}, fresh.data(), { slotStart: slot.start, slotEnd: slot.end }),
+                bookingId, reasonLabel, reasonBody
+            })
         );
     } catch (err) {
         logger.error('Decline email failed to queue', { bookingId, error: err.message });
