@@ -5977,12 +5977,18 @@
                     try {
                         const call = getBookingFunctions().httpsCallable('decideBooking');
                         const res = await call(payload);
+                        // Report the status the server actually landed on, not
+                        // the one that was asked for - a slot taken out from
+                        // under a stale hold comes back 'cancelled'.
                         const status = (res && res.data && res.data.status) || (isAccept ? 'accepted' : 'declined');
+                        const who = customer.name || 'the customer';
+                        const message = status === 'accepted'
+                            ? `Booking accepted — ${who} has been emailed a confirmation.`
+                            : status === 'declined'
+                                ? `Booking declined — ${who} has been emailed and the slot is free again.`
+                                : `Booking is now ${status}.`;
                         modal.remove();
-                        showAlert(isAccept
-                            ? `Booking accepted — ${customer.name || 'the customer'} has been emailed a confirmation.`
-                            : `Booking declined — ${customer.name || 'the customer'} has been emailed and the slot is free again.`,
-                            'success');
+                        showAlert(message, 'success');
                         trackEvent('booking_decision', { decision: payload.decision, status: status });
                     } catch (error) {
                         console.error('decideBooking failed:', error);
