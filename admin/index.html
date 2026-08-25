@@ -7,7 +7,7 @@
     <meta name="robots" content="noindex, nofollow">
     <meta http-equiv="X-Frame-Options" content="DENY">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com https://www.gstatic.com https://cdnjs.cloudflare.com https://www.googletagmanager.com https://www.google.com https://www.recaptcha.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.firebasestorage.app https://firebasestorage.googleapis.com; connect-src 'self' https://cloudflareinsights.com https://*.googleapis.com https://*.firebaseio.com https://*.firebasestorage.app wss://*.firebaseio.com https://*.google-analytics.com https://www.google.com https://www.recaptcha.net; font-src 'self' data: https://cdnjs.cloudflare.com; frame-src https://www.google.com https://www.recaptcha.net; frame-ancestors 'none';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com https://www.gstatic.com https://cdnjs.cloudflare.com https://www.googletagmanager.com https://www.google.com https://www.recaptcha.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.firebasestorage.app https://firebasestorage.googleapis.com; connect-src 'self' https://cloudflareinsights.com https://*.googleapis.com https://*.cloudfunctions.net https://*.run.app https://*.firebaseio.com https://*.firebasestorage.app wss://*.firebaseio.com https://*.google-analytics.com https://www.google.com https://www.recaptcha.net; font-src 'self' data: https://cdnjs.cloudflare.com; frame-src https://www.google.com https://www.recaptcha.net; frame-ancestors 'none';">
     <title>Admin Dashboard - OnlineFix Repair Management</title>
 
     <!-- Firebase -->
@@ -15,6 +15,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-functions-compat.js"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"
         integrity="sha512-fD9DI5bZwQxOi7MhYWnnNPlvXdp/2Pj3XSTRrFs5FQa4mizyGLnJcN6tuvUS6LbmgN1ut+XGSABKvjN0H6Aoow=="
@@ -1911,6 +1912,754 @@
                 width: 100%;
             }
         }
+        /* === BOOKINGS === */
+        .booking-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .booking-filter-count {
+            display: inline-block;
+            margin-left: 0.35rem;
+            padding: 0.05rem 0.4rem;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.08);
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+
+        .booking-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .booking-card {
+            background: var(--bg-base);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 1.25rem;
+            transition: all 0.2s ease;
+        }
+
+        .booking-card:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .booking-card.needs-action {
+            border-left: 3px solid var(--warning);
+        }
+
+        .booking-card-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .booking-when {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .booking-when i {
+            font-size: 0.9rem;
+            color: var(--accent-cyan);
+        }
+
+        .booking-when-sub {
+            font-size: 0.78rem;
+            color: var(--text-dark);
+            margin-top: 0.2rem;
+        }
+
+        .booking-head-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 0.4rem;
+        }
+
+        .booking-ref {
+            font-family: monospace;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            color: var(--accent-cyan);
+        }
+
+        .booking-hold {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .booking-hold.hold-soon {
+            color: var(--warning);
+        }
+
+        .booking-hold.hold-gone {
+            color: #F87171;
+        }
+
+        .booking-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .booking-field-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-dark);
+            margin-bottom: 0.25rem;
+        }
+
+        .booking-field-value {
+            font-size: 0.9rem;
+            color: var(--text-main);
+            word-break: break-word;
+        }
+
+        .booking-field-value a {
+            color: var(--accent-cyan);
+            text-decoration: none;
+        }
+
+        .booking-field-value a:hover {
+            text-decoration: underline;
+        }
+
+        .booking-issue {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            white-space: pre-wrap;
+        }
+
+        .booking-photos {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+
+        .booking-photo {
+            width: 72px;
+            height: 72px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .booking-photo:hover {
+            border-color: var(--primary-blue);
+            transform: translateY(-2px);
+        }
+
+        .booking-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .booking-decision-note {
+            margin-top: 1rem;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: rgba(255, 255, 255, 0.02);
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* Booking status badges - same shape as the repair ones */
+        .status-held {
+            background: rgba(245, 158, 11, 0.15);
+            color: #FBBF24;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .status-accepted {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34D399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .status-declined {
+            background: rgba(239, 68, 68, 0.15);
+            color: #F87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .status-expired,
+        .status-cancelled {
+            background: rgba(100, 116, 139, 0.15);
+            color: #94A3B8;
+            border: 1px solid rgba(100, 116, 139, 0.3);
+        }
+
+        /* Upcoming, grouped by day */
+        .booking-day-group {
+            margin-bottom: 1.75rem;
+        }
+
+        .booking-day-heading {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .booking-day-heading h3 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .booking-day-count {
+            background: var(--bg-elevated);
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.15rem 0.5rem;
+            border-radius: 10px;
+        }
+
+        /* Decline reason picker */
+        .decline-reason {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.85rem 1rem;
+            margin-bottom: 0.5rem;
+            background: var(--bg-base);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .decline-reason:hover {
+            border-color: var(--primary-blue);
+        }
+
+        .decline-reason.selected {
+            border-color: var(--primary-blue);
+            background: rgba(0, 51, 255, 0.08);
+        }
+
+        .decline-reason input {
+            margin-top: 0.3rem;
+            width: 16px;
+            height: 16px;
+            accent-color: var(--primary-blue);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .decline-reason-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .decline-reason-body {
+            font-size: 0.78rem;
+            color: var(--text-dark);
+            margin-top: 0.25rem;
+            white-space: pre-wrap;
+        }
+
+        /* Confirmation step shared by accept and decline */
+        .confirm-pane {
+            text-align: center;
+            padding: 0.5rem 0 0;
+        }
+
+        .confirm-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 1.25rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+        }
+
+        .confirm-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 0.5rem;
+        }
+
+        .confirm-body {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            max-width: 420px;
+            margin: 0 auto;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* === AVAILABILITY === */
+        .avail-panel {
+            background: var(--bg-base);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+        }
+
+        .avail-panel-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 1.25rem;
+        }
+
+        .avail-panel-title i {
+            color: var(--accent-cyan);
+            font-size: 0.9rem;
+        }
+
+        .avail-hours-table {
+            width: 100%;
+        }
+
+        .avail-hours-table td {
+            padding: 0.4rem 0.35rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .avail-hours-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .avail-day-name {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-main);
+            white-space: nowrap;
+        }
+
+        .avail-time-input {
+            padding: 0.45rem 0.55rem;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color-scheme: dark;
+            font-family: inherit;
+        }
+
+        .avail-time-input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(0, 51, 255, 0.2);
+        }
+
+        .avail-time-input:disabled {
+            opacity: 0.35;
+        }
+
+        .avail-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .avail-toggle input {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--primary-blue);
+            cursor: pointer;
+        }
+
+        .avail-rule-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .avail-rule-hint {
+            font-size: 0.72rem;
+            color: var(--text-dark);
+            margin-top: 0.35rem;
+            line-height: 1.4;
+        }
+
+        /* Precedence rule callout */
+        .avail-precedence {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.9rem 1.25rem;
+            border-radius: var(--radius-md);
+            background: linear-gradient(90deg, rgba(0, 51, 255, 0.12), rgba(0, 228, 255, 0.06));
+            border: 1px solid rgba(0, 51, 255, 0.25);
+            font-size: 0.82rem;
+            color: var(--text-muted);
+        }
+
+        .avail-precedence-step {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 10px;
+            background: var(--bg-base);
+            border: 1px solid var(--border-color);
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--text-main);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .avail-precedence i.fa-chevron-right {
+            font-size: 0.6rem;
+            color: var(--text-dark);
+        }
+
+        .avail-divider {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .avail-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.9rem;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .avail-legend span {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        /* Month grid */
+        .avail-month {
+            margin-top: 1.5rem;
+        }
+
+        .avail-month-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 0.75rem;
+        }
+
+        .avail-grid {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(0, 1fr));
+            gap: 0.5rem;
+        }
+
+        .avail-weekday {
+            text-align: center;
+            font-size: 0.68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-dark);
+            padding-bottom: 0.15rem;
+        }
+
+        .avail-cell {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+            min-height: 106px;
+            padding: 0.5rem;
+            background: var(--bg-base);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            text-align: left;
+            font-family: inherit;
+            color: inherit;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .avail-cell:hover {
+            border-color: var(--primary-blue);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+        }
+
+        .avail-cell.is-blank {
+            background: transparent;
+            border-color: transparent;
+            min-height: 0;
+            cursor: default;
+            box-shadow: none;
+        }
+
+        .avail-cell.is-past {
+            opacity: 0.35;
+        }
+
+        .avail-cell.is-shut {
+            background: rgba(239, 68, 68, 0.05);
+            border-color: rgba(239, 68, 68, 0.2);
+        }
+
+        .avail-cell.is-today {
+            box-shadow: inset 0 0 0 1px var(--accent-cyan);
+        }
+
+        .avail-cell-date {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.25rem;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .avail-cell-today-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent-cyan);
+        }
+
+        .avail-cell-hours {
+            font-size: 0.68rem;
+            color: var(--text-muted);
+            line-height: 1.3;
+        }
+
+        .avail-cell-hours.shut {
+            color: #F87171;
+        }
+
+        .avail-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.25rem;
+        }
+
+        .avail-tag {
+            padding: 0.08rem 0.35rem;
+            border-radius: 6px;
+            font-size: 0.58rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .avail-tag-open {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34D399;
+        }
+
+        .avail-tag-block {
+            background: rgba(239, 68, 68, 0.15);
+            color: #F87171;
+        }
+
+        .avail-tag-ignore {
+            background: rgba(245, 158, 11, 0.18);
+            color: #FBBF24;
+        }
+
+        .avail-tag-note {
+            background: rgba(59, 130, 246, 0.15);
+            color: #60A5FA;
+        }
+
+        .avail-events {
+            display: flex;
+            flex-direction: column;
+            gap: 0.15rem;
+            margin-top: auto;
+        }
+
+        .avail-event {
+            padding: 0.1rem 0.3rem;
+            border-left: 2px solid var(--text-dark);
+            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.04);
+            font-size: 0.62rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .avail-event.is-booking {
+            border-left-color: var(--accent-cyan);
+        }
+
+        .avail-event-more {
+            font-size: 0.6rem;
+            color: var(--text-dark);
+            padding-left: 0.3rem;
+        }
+
+        /* Per-date editor */
+        .avail-context {
+            background: var(--bg-base);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .avail-context-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            font-size: 0.85rem;
+            padding: 0.2rem 0;
+        }
+
+        .avail-context-row span:first-child {
+            color: var(--text-dark);
+        }
+
+        .avail-context-row span:last-child {
+            color: var(--text-main);
+            font-weight: 600;
+            text-align: right;
+        }
+
+        .avail-interval-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .avail-interval-row .sep {
+            color: var(--text-dark);
+            font-size: 0.85rem;
+        }
+
+        .avail-interval-remove {
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid rgba(239, 68, 68, 0.25);
+            color: #F87171;
+            border-radius: 8px;
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            flex-shrink: 0;
+        }
+
+        .avail-interval-remove:hover {
+            background: rgba(239, 68, 68, 0.22);
+        }
+
+        .avail-warning {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.6rem;
+            margin-top: 0.6rem;
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-md);
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            font-size: 0.8rem;
+            line-height: 1.5;
+            color: #FBBF24;
+        }
+
+        .avail-preview {
+            margin-top: 0.5rem;
+            padding: 0.7rem 1rem;
+            border-radius: var(--radius-md);
+            background: rgba(16, 185, 129, 0.08);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            font-size: 0.82rem;
+            color: #34D399;
+        }
+
+        .avail-preview.is-shut {
+            background: rgba(239, 68, 68, 0.08);
+            border-color: rgba(239, 68, 68, 0.25);
+            color: #F87171;
+        }
+
+        @media (max-width: 768px) {
+            .avail-cell {
+                min-height: 74px;
+                padding: 0.3rem;
+                gap: 0.15rem;
+            }
+
+            .avail-grid {
+                gap: 0.25rem;
+            }
+
+            .avail-cell-hours,
+            .avail-events {
+                display: none;
+            }
+
+            .booking-card-head {
+                flex-direction: column;
+            }
+
+            .booking-head-right {
+                align-items: flex-start;
+            }
+        }
     </style>
 </head>
 
@@ -1982,6 +2731,19 @@
                     <a href="#" class="nav-link active" data-section="overview">
                         <i class="fas fa-chart-line"></i>
                         Overview
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link" data-section="bookings">
+                        <i class="fas fa-calendar-check"></i>
+                        Bookings
+                        <span class="overdue-nav-badge hidden" id="nav-bookings-badge">0</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link" data-section="availability">
+                        <i class="fas fa-clock"></i>
+                        Availability
                     </a>
                 </div>
                 <div class="nav-item">
@@ -2309,6 +3071,125 @@
                 </div>
             </div>
 
+            <!-- Bookings Section -->
+            <div id="bookings-section" class="content-section hidden">
+                <div class="section-header" style="flex-wrap: wrap; gap: 0.75rem;">
+                    <h2 class="section-title">Bookings <span class="results-count" id="bookings-results-count"></span></h2>
+                    <div class="booking-toolbar">
+                        <button class="date-range-btn active" id="booking-view-queue" onclick="setBookingView('queue', this)">
+                            <i class="fas fa-inbox"></i> Requests
+                        </button>
+                        <button class="date-range-btn" id="booking-view-upcoming" onclick="setBookingView('upcoming', this)">
+                            <i class="fas fa-calendar-day"></i> Upcoming
+                        </button>
+                        <button class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.85rem;" onclick="loadBookingsData()" title="Reconnect the live feed">
+                            <i class="fas fa-arrows-rotate"></i>
+                            <span class="btn-label">Refresh</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <div class="booking-toolbar" id="booking-filter-bar" style="margin-bottom: 1.25rem;">
+                        <button class="date-range-btn active" data-booking-filter="held" onclick="setBookingFilter('held', this)">
+                            Needs action <span class="booking-filter-count" id="booking-count-held">0</span>
+                        </button>
+                        <button class="date-range-btn" data-booking-filter="accepted" onclick="setBookingFilter('accepted', this)">
+                            Accepted <span class="booking-filter-count" id="booking-count-accepted">0</span>
+                        </button>
+                        <button class="date-range-btn" data-booking-filter="declined" onclick="setBookingFilter('declined', this)">
+                            Declined <span class="booking-filter-count" id="booking-count-declined">0</span>
+                        </button>
+                        <button class="date-range-btn" data-booking-filter="expired" onclick="setBookingFilter('expired', this)">
+                            Expired <span class="booking-filter-count" id="booking-count-expired">0</span>
+                        </button>
+                        <button class="date-range-btn" data-booking-filter="cancelled" onclick="setBookingFilter('cancelled', this)">
+                            Cancelled <span class="booking-filter-count" id="booking-count-cancelled">0</span>
+                        </button>
+                        <button class="date-range-btn" data-booking-filter="all" onclick="setBookingFilter('all', this)">
+                            All <span class="booking-filter-count" id="booking-count-all">0</span>
+                        </button>
+                    </div>
+                    <div class="booking-list" id="bookings-list">
+                        <!-- Populated by JS -->
+                    </div>
+                    <div class="empty-state hidden" id="bookings-empty">
+                        <i class="fas fa-calendar-check"></i>
+                        <p id="bookings-empty-title">No booking requests yet</p>
+                        <small id="bookings-empty-hint">Requests from onlinefix.co.uk/book/ appear here the moment they arrive</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Availability Section -->
+            <div id="availability-section" class="content-section hidden">
+                <div class="section-header" style="flex-wrap: wrap; gap: 0.75rem;">
+                    <h2 class="section-title">Availability</h2>
+                    <div class="booking-toolbar">
+                        <span class="booking-hold" id="avail-calendar-status"></span>
+                        <button class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.85rem;" onclick="loadAvailability(true)" title="Re-read settings, overrides and the calendar">
+                            <i class="fas fa-arrows-rotate"></i>
+                            <span class="btn-label">Refresh</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="section-content">
+                    <!-- The rule that decides every slot, stated where he edits -->
+                    <div class="avail-precedence">
+                        <strong style="color: var(--text-main);">Precedence:</strong>
+                        <span class="avail-precedence-step"><i class="fas fa-ban" style="color: #F87171;"></i> Manual block</span>
+                        <i class="fas fa-chevron-right"></i>
+                        <span class="avail-precedence-step"><i class="fas fa-plus" style="color: #34D399;"></i> Manual open</span>
+                        <i class="fas fa-chevron-right"></i>
+                        <span class="avail-precedence-step"><i class="fab fa-google" style="color: #60A5FA;"></i> Calendar busy</span>
+                        <i class="fas fa-chevron-right"></i>
+                        <span class="avail-precedence-step"><i class="fas fa-business-time" style="color: var(--text-muted);"></i> Working hours</span>
+                        <span style="flex-basis: 100%; font-size: 0.78rem; color: var(--text-dark);">Highest wins. A manual open can add time the weekly pattern does not cover; a manual block removes time regardless of everything else.</span>
+                    </div>
+
+                    <div class="form-grid" style="margin-top: 1.5rem;">
+                        <div class="avail-panel">
+                            <h3 class="avail-panel-title"><i class="fas fa-business-time"></i> Weekly working hours</h3>
+                            <table class="avail-hours-table">
+                                <tbody id="avail-hours-body">
+                                    <!-- Populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="avail-panel">
+                            <h3 class="avail-panel-title"><i class="fas fa-sliders"></i> Slot rules</h3>
+                            <div class="avail-rule-grid" id="avail-rules-grid">
+                                <!-- Populated by JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.25rem;">
+                        <button class="btn btn-secondary" onclick="renderAvailabilityForm()">
+                            <i class="fas fa-rotate-left"></i>
+                            Reset
+                        </button>
+                        <button class="btn btn-primary" id="avail-save-btn" onclick="saveAvailabilitySettings()">
+                            <i class="fas fa-save"></i>
+                            Save working hours
+                        </button>
+                    </div>
+
+                    <div class="avail-divider">
+                        <h3 class="avail-panel-title" style="margin-bottom: 0;"><i class="fas fa-calendar-days"></i> <span id="avail-horizon-title">The next 60 days</span></h3>
+                        <div class="avail-legend">
+                            <span><span class="avail-tag avail-tag-open">Open+</span> extra open time</span>
+                            <span><span class="avail-tag avail-tag-block">Block</span> time removed</span>
+                            <span><span class="avail-tag avail-tag-ignore">Cal off</span> calendar busy ignored</span>
+                            <span><i class="fas fa-square" style="color: var(--accent-cyan);"></i> booking</span>
+                            <span><i class="fas fa-square" style="color: var(--text-dark);"></i> diary commitment</span>
+                        </div>
+                    </div>
+                    <div id="availability-calendar">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
             <!-- Loading -->
             <div id="loading" class="loading">
                 <div class="spinner"></div>
@@ -2549,6 +3430,8 @@
             const titles = {
                 'overview': 'Dashboard Overview',
                 'repairs': 'All Repairs',
+                'bookings': 'Bookings',
+                'availability': 'Availability',
                 'kanban': 'Kanban Board',
                 'analytics': 'Business Analytics'
             };
@@ -2565,6 +3448,10 @@
                 renderKanban('kanban-container');
             } else if (sectionName === 'analytics') {
                 renderAnalytics();
+            } else if (sectionName === 'bookings') {
+                renderBookings();
+            } else if (sectionName === 'availability') {
+                loadAvailability(false);
             }
         }
 
@@ -2573,6 +3460,10 @@
 
         function loadDashboardData() {
             document.getElementById('loading').style.display = 'block';
+
+            // Booking requests have their own live listener so the sidebar
+            // badge is right whichever section is on screen.
+            loadBookingsData();
 
             // Unsubscribe previous listener if any
             if (unsubscribeRepairs) unsubscribeRepairs();
@@ -4256,6 +5147,1571 @@
                     showAlert('Error deleting repair: ' + error.message, 'error');
                 }
             }
+        }
+
+        /* ==================================================================
+           BOOKINGS & AVAILABILITY
+
+           Everything below drives the two booking screens. Two rules hold
+           throughout:
+
+             1. Times crossing the wire are absolute instants; times shown to
+                a human are Europe/London wall clock. The server owns the
+                conversion (see docs/booking-api-contract.md), so nothing here
+                ever rebuilds an instant from a date plus a time.
+
+             2. Booking documents carry customer-typed text. It is written
+                with textContent or escapeHTML(), never interpolated raw, and
+                photo URLs are checked for an https:// origin before they are
+                allowed anywhere near src or href.
+           ================================================================== */
+
+        const BOOKING_TZ = 'Europe/London';
+        const BOOKING_FN_REGION = 'europe-west2';
+
+        let bookingFunctions = null;
+
+        // Callable client, created lazily so a missing compat script surfaces
+        // as a readable error instead of a TypeError at load time.
+        function getBookingFunctions() {
+            if (bookingFunctions) return bookingFunctions;
+            const app = firebase.app();
+            if (typeof app.functions !== 'function') {
+                throw new Error('The Cloud Functions SDK did not load. Reload the page and try again.');
+            }
+            bookingFunctions = app.functions(BOOKING_FN_REGION);
+            return bookingFunctions;
+        }
+
+        /* ---- small DOM builders (nodes, not HTML strings) ----------------- */
+
+        function bkEl(tag, className, text) {
+            const node = document.createElement(tag);
+            if (className) node.className = className;
+            if (text !== undefined && text !== null && text !== '') node.textContent = String(text);
+            return node;
+        }
+
+        // "fa-check" gets the solid style; pass "fab fa-whatsapp" to override it.
+        function bkIcon(name, cssText) {
+            const i = document.createElement('i');
+            i.className = String(name).indexOf(' ') === -1 ? 'fas ' + name : String(name);
+            if (cssText) i.style.cssText = cssText;
+            return i;
+        }
+
+        function bkField(label, valueNode) {
+            const wrap = bkEl('div');
+            wrap.appendChild(bkEl('div', 'booking-field-label', label));
+            const value = bkEl('div', 'booking-field-value');
+            if (valueNode instanceof Node) value.appendChild(valueNode);
+            else value.textContent = valueNode === null || valueNode === undefined || valueNode === '' ? '—' : String(valueNode);
+            wrap.appendChild(value);
+            return wrap;
+        }
+
+        function bkButton(label, className, iconName, onClick) {
+            const btn = bkEl('button', className);
+            btn.type = 'button';
+            if (iconName) btn.appendChild(bkIcon(iconName));
+            btn.appendChild(bkEl('span', null, label));
+            if (onClick) btn.addEventListener('click', onClick);
+            return btn;
+        }
+
+        /* ---- time helpers ------------------------------------------------- */
+
+        // Firestore Timestamp | {seconds} | Date | ISO string -> Date | null
+        function bkToDate(value) {
+            if (!value) return null;
+            if (value instanceof Date) return isNaN(value.getTime()) ? null : value;
+            if (typeof value.toDate === 'function') {
+                try { return value.toDate(); } catch (_) { return null; }
+            }
+            if (typeof value.seconds === 'number') return new Date(value.seconds * 1000);
+            if (typeof value === 'string') {
+                const d = new Date(value);
+                return isNaN(d.getTime()) ? null : d;
+            }
+            return null;
+        }
+
+        function bkLondon(date, options) {
+            if (!date) return '';
+            return new Intl.DateTimeFormat('en-GB', Object.assign({ timeZone: BOOKING_TZ }, options)).format(date);
+        }
+
+        // Absolute instant -> the London calendar date it falls on.
+        function bkDateKey(date) {
+            const parts = new Intl.DateTimeFormat('en-GB', {
+                timeZone: BOOKING_TZ, year: 'numeric', month: '2-digit', day: '2-digit'
+            }).formatToParts(date);
+            const p = {};
+            parts.forEach((part) => { p[part.type] = part.value; });
+            return `${p.year}-${p.month}-${p.day}`;
+        }
+
+        // A date key back to a Date safely parked at midday UTC, so formatting
+        // it in London can never land on the previous day.
+        function bkDateKeyToDate(dateKey) {
+            const d = new Date(String(dateKey) + 'T12:00:00Z');
+            return isNaN(d.getTime()) ? null : d;
+        }
+
+        function bkAddDays(date, days) {
+            return new Date(date.getTime() + days * 86400000);
+        }
+
+        function bkWhenLabel(date) {
+            return bkLondon(date, {
+                weekday: 'short', day: 'numeric', month: 'short', year: 'numeric',
+                hour: '2-digit', minute: '2-digit', hour12: false
+            });
+        }
+
+        function bkTimeLabel(date) {
+            return bkLondon(date, { hour: '2-digit', minute: '2-digit', hour12: false });
+        }
+
+        function bkDurationLabel(ms) {
+            const mins = Math.floor(Math.abs(ms) / 60000);
+            if (mins < 60) return `${mins}m`;
+            const hours = Math.floor(mins / 60);
+            if (hours < 24) return `${hours}h ${mins % 60}m`;
+            const days = Math.floor(hours / 24);
+            return `${days}d ${hours % 24}h`;
+        }
+
+        /* ---- booking state ------------------------------------------------ */
+
+        const bookingStatusConfig = {
+            held: { label: 'Awaiting decision', class: 'status-held', icon: 'fa-hourglass-half' },
+            accepted: { label: 'Accepted', class: 'status-accepted', icon: 'fa-check-circle' },
+            declined: { label: 'Declined', class: 'status-declined', icon: 'fa-times-circle' },
+            expired: { label: 'Expired', class: 'status-expired', icon: 'fa-clock' },
+            cancelled: { label: 'Cancelled', class: 'status-cancelled', icon: 'fa-ban' }
+        };
+
+        const bookingCategoryLabels = {
+            phone: 'Phone', laptop: 'Laptop', console: 'Console',
+            tablet: 'Tablet', desktop: 'Desktop', other: 'Other'
+        };
+
+        let allBookings = [];
+        let unsubscribeBookings = null;
+        let bookingsLoading = true;
+        let bookingsError = null;
+        let bookingStatusFilter = 'held';
+        let bookingsViewMode = 'queue';
+        let declineReasonsCache = null;
+        let bookingHoldTicker = null;
+
+        // Requests written by the pre-callable booking form carry status
+        // 'pending'; they are the same thing as a hold awaiting a decision.
+        function bkStatus(booking) {
+            const raw = String(booking.status || '').toLowerCase();
+            if (raw === 'pending') return 'held';
+            return bookingStatusConfig[raw] ? raw : 'held';
+        }
+
+        function bkSlotDate(booking) {
+            return bkToDate(booking.slotStart || booking.preferredAt);
+        }
+
+        function bkReference(booking) {
+            if (booking.reference) return String(booking.reference).toUpperCase();
+            return String(booking.id || '').slice(-6).toUpperCase();
+        }
+
+        function bkHoldInfo(booking) {
+            const expires = bkToDate(booking.holdExpiresAt);
+            if (!expires) {
+                // Requests taken before the callable backend existed have no
+                // hold at all - they sit here until they are answered.
+                return { cls: '', icon: 'fa-infinity', label: 'No expiry (pre-booking-system request)' };
+            }
+            const ms = expires.getTime() - Date.now();
+            if (ms <= 0) {
+                return { cls: 'hold-gone', icon: 'fa-hourglass-end', label: 'Hold expired — the slot is being released' };
+            }
+            return {
+                cls: ms < 6 * 3600000 ? 'hold-soon' : '',
+                icon: 'fa-hourglass-half',
+                label: `${bkDurationLabel(ms)} left on the hold`
+            };
+        }
+
+        // Only ever hand an https:// URL to src or href.
+        function bkSafeUrl(url) {
+            if (typeof url !== 'string') return null;
+            const trimmed = url.trim();
+            return trimmed.slice(0, 8).toLowerCase() === 'https://' ? trimmed : null;
+        }
+
+        function bkMailto(email) {
+            const value = String(email || '').trim();
+            return /^[^\s@<>"']+@[^\s@<>"']+\.[^\s@<>"']+$/.test(value) ? value : null;
+        }
+
+        function bkTel(phone) {
+            const value = String(phone || '').replace(/[^\d+]/g, '');
+            return value.length >= 6 ? value : null;
+        }
+
+        /* ---- live feed ---------------------------------------------------- */
+
+        function loadBookingsData() {
+            if (unsubscribeBookings) unsubscribeBookings();
+            bookingsLoading = true;
+            bookingsError = null;
+            renderBookings();
+
+            unsubscribeBookings = db.collection('bookings')
+                .orderBy('createdAt', 'desc')
+                .limit(400)
+                .onSnapshot((snapshot) => {
+                    bookingsLoading = false;
+                    bookingsError = null;
+                    allBookings = snapshot.docs.map((doc) => Object.assign({ id: doc.id }, doc.data()));
+                    updateBookingsNavBadge();
+                    renderBookings();
+                }, (error) => {
+                    console.error('Error listening to bookings:', error);
+                    bookingsLoading = false;
+                    bookingsError = error.message || String(error);
+                    renderBookings();
+                    showAlert('Error loading bookings: ' + bookingsError, 'error');
+                });
+
+            // Holds are counted down in the card, so the list needs a nudge
+            // even when nothing in Firestore changed.
+            if (!bookingHoldTicker) {
+                bookingHoldTicker = setInterval(() => {
+                    const section = document.getElementById('bookings-section');
+                    if (section && !section.classList.contains('hidden')) renderBookings();
+                    updateBookingsNavBadge();
+                }, 60000);
+            }
+        }
+
+        function updateBookingsNavBadge() {
+            const badge = document.getElementById('nav-bookings-badge');
+            if (!badge) return;
+            const held = allBookings.filter((b) => bkStatus(b) === 'held').length;
+            badge.textContent = held;
+            badge.classList.toggle('hidden', held === 0);
+        }
+
+        /* ---- rendering ---------------------------------------------------- */
+
+        function setBookingView(mode, btn) {
+            bookingsViewMode = mode === 'upcoming' ? 'upcoming' : 'queue';
+            ['booking-view-queue', 'booking-view-upcoming'].forEach((id) => {
+                const el = document.getElementById(id);
+                if (el) el.classList.remove('active');
+            });
+            if (btn) btn.classList.add('active');
+            const bar = document.getElementById('booking-filter-bar');
+            if (bar) bar.classList.toggle('hidden', bookingsViewMode === 'upcoming');
+            renderBookings();
+        }
+
+        function setBookingFilter(status, btn) {
+            bookingStatusFilter = status;
+            document.querySelectorAll('#booking-filter-bar .date-range-btn').forEach((el) => {
+                el.classList.remove('active');
+            });
+            if (btn) btn.classList.add('active');
+            renderBookings();
+        }
+
+        function updateBookingFilterCounts() {
+            const counts = { held: 0, accepted: 0, declined: 0, expired: 0, cancelled: 0, all: allBookings.length };
+            allBookings.forEach((b) => { counts[bkStatus(b)] += 1; });
+            Object.keys(counts).forEach((key) => {
+                const el = document.getElementById('booking-count-' + key);
+                if (el) el.textContent = counts[key];
+            });
+            return counts;
+        }
+
+        function showBookingsEmpty(title, hint) {
+            const empty = document.getElementById('bookings-empty');
+            if (!empty) return;
+            empty.classList.remove('hidden');
+            const titleEl = document.getElementById('bookings-empty-title');
+            const hintEl = document.getElementById('bookings-empty-hint');
+            if (titleEl) titleEl.textContent = title;
+            if (hintEl) hintEl.textContent = hint;
+        }
+
+        function renderBookings() {
+            const container = document.getElementById('bookings-list');
+            if (!container) return;
+            const empty = document.getElementById('bookings-empty');
+            const countEl = document.getElementById('bookings-results-count');
+            container.innerHTML = '';
+            if (empty) empty.classList.add('hidden');
+            updateBookingFilterCounts();
+
+            if (bookingsLoading) {
+                const loading = bkEl('div', 'loading');
+                loading.appendChild(bkEl('div', 'spinner'));
+                loading.appendChild(bkEl('p', null, 'Loading bookings...'));
+                container.appendChild(loading);
+                if (countEl) countEl.textContent = '';
+                return;
+            }
+
+            if (bookingsError) {
+                if (countEl) countEl.textContent = '';
+                showBookingsEmpty('Bookings could not be loaded', bookingsError);
+                return;
+            }
+
+            if (bookingsViewMode === 'upcoming') {
+                renderUpcomingBookings(container, countEl);
+                return;
+            }
+
+            const rows = allBookings
+                .filter((b) => bookingStatusFilter === 'all' || bkStatus(b) === bookingStatusFilter)
+                .sort((a, b) => {
+                    const aTime = bkToDate(a.createdAt);
+                    const bTime = bkToDate(b.createdAt);
+                    return (bTime ? bTime.getTime() : 0) - (aTime ? aTime.getTime() : 0);
+                });
+
+            if (countEl) countEl.textContent = rows.length ? `(${rows.length})` : '';
+
+            if (!rows.length) {
+                const label = bookingStatusFilter === 'all'
+                    ? 'No bookings yet'
+                    : `Nothing ${bookingStatusFilter === 'held' ? 'waiting on you' : bookingStatusConfig[bookingStatusFilter].label.toLowerCase()}`;
+                showBookingsEmpty(label, bookingStatusFilter === 'held'
+                    ? 'Every request has been answered. New ones appear here the moment they arrive.'
+                    : 'Requests from onlinefix.co.uk/book/ appear here the moment they arrive.');
+                return;
+            }
+
+            rows.forEach((booking) => container.appendChild(buildBookingCard(booking)));
+        }
+
+        function renderUpcomingBookings(container, countEl) {
+            const cutoff = Date.now() - 3600000; // keep the appointment on screen while it happens
+            const upcoming = allBookings
+                .filter((b) => bkStatus(b) === 'accepted')
+                .map((b) => ({ booking: b, when: bkSlotDate(b) }))
+                .filter((row) => row.when && row.when.getTime() >= cutoff)
+                .sort((a, b) => a.when.getTime() - b.when.getTime());
+
+            if (countEl) countEl.textContent = upcoming.length ? `(${upcoming.length} coming up)` : '';
+
+            if (!upcoming.length) {
+                showBookingsEmpty('Nothing in the diary', 'Accepted bookings show up here, grouped by day.');
+                return;
+            }
+
+            const groups = [];
+            const byKey = {};
+            upcoming.forEach((row) => {
+                const key = bkDateKey(row.when);
+                if (!byKey[key]) {
+                    byKey[key] = { key: key, rows: [] };
+                    groups.push(byKey[key]);
+                }
+                byKey[key].rows.push(row.booking);
+            });
+
+            groups.forEach((group) => {
+                const wrap = bkEl('div', 'booking-day-group');
+                const heading = bkEl('div', 'booking-day-heading');
+                heading.appendChild(bkEl('h3', null, bkDayHeading(group.key)));
+                heading.appendChild(bkEl('span', 'booking-day-count',
+                    group.rows.length === 1 ? '1 booking' : `${group.rows.length} bookings`));
+                wrap.appendChild(heading);
+                const list = bkEl('div', 'booking-list');
+                group.rows.forEach((booking) => list.appendChild(buildBookingCard(booking)));
+                wrap.appendChild(list);
+                container.appendChild(wrap);
+            });
+        }
+
+        function bkDayHeading(dateKey) {
+            const now = new Date();
+            const date = bkDateKeyToDate(dateKey);
+            if (!date) return dateKey;
+            const label = bkLondon(date, { weekday: 'long', day: 'numeric', month: 'long' });
+            if (dateKey === bkDateKey(now)) return 'Today · ' + label;
+            if (dateKey === bkDateKey(bkAddDays(now, 1))) return 'Tomorrow · ' + label;
+            return label;
+        }
+
+        function buildBookingCard(booking) {
+            const status = bkStatus(booking);
+            const config = bookingStatusConfig[status];
+            const when = bkSlotDate(booking);
+            const customer = booking.customer || {};
+            const device = booking.device || {};
+
+            const card = bkEl('div', 'booking-card' + (status === 'held' ? ' needs-action' : ''));
+            card.dataset.bookingId = booking.id;
+
+            /* head: when, reference, status, hold */
+            const head = bkEl('div', 'booking-card-head');
+            const headLeft = bkEl('div');
+            const whenRow = bkEl('div', 'booking-when');
+            whenRow.appendChild(bkIcon('fa-calendar-day'));
+            whenRow.appendChild(bkEl('span', null, when ? bkWhenLabel(when) : 'No appointment time recorded'));
+            headLeft.appendChild(whenRow);
+
+            const created = bkToDate(booking.createdAt);
+            const subParts = [];
+            if (created) subParts.push('Requested ' + bkLondon(created, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false }));
+            const responded = bkToDate(booking.respondedAt);
+            if (responded) subParts.push('answered ' + bkLondon(responded, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false }));
+            if (subParts.length) headLeft.appendChild(bkEl('div', 'booking-when-sub', subParts.join(' · ')));
+            head.appendChild(headLeft);
+
+            const headRight = bkEl('div', 'booking-head-right');
+            const badge = bkEl('span', 'status-badge ' + config.class);
+            badge.appendChild(bkIcon(config.icon));
+            badge.appendChild(bkEl('span', null, config.label));
+            headRight.appendChild(badge);
+            headRight.appendChild(bkEl('span', 'booking-ref', 'REF ' + bkReference(booking)));
+            if (status === 'held') {
+                const hold = bkHoldInfo(booking);
+                if (hold) {
+                    const holdRow = bkEl('span', 'booking-hold ' + hold.cls);
+                    holdRow.appendChild(bkIcon(hold.icon));
+                    holdRow.appendChild(bkEl('span', null, hold.label));
+                    headRight.appendChild(holdRow);
+                }
+            }
+            head.appendChild(headRight);
+            card.appendChild(head);
+
+            /* customer, contact, device */
+            const grid = bkEl('div', 'booking-grid');
+            grid.appendChild(bkField('Customer', customer.name || '—'));
+
+            const contact = bkEl('div');
+            const email = bkMailto(customer.email);
+            if (email) {
+                const link = bkEl('a', null, customer.email);
+                link.href = 'mailto:' + email;
+                contact.appendChild(link);
+            } else if (customer.email) {
+                contact.appendChild(bkEl('span', null, customer.email));
+            }
+            const phone = bkTel(customer.phone);
+            if (customer.phone) {
+                contact.appendChild(bkEl('div'));
+                if (phone) {
+                    const link = bkEl('a', null, customer.phone);
+                    link.href = 'tel:' + phone;
+                    contact.appendChild(link);
+                } else {
+                    contact.appendChild(bkEl('span', null, customer.phone));
+                }
+            }
+            grid.appendChild(bkField('Contact', contact.childNodes.length ? contact : '—'));
+
+            const deviceLabel = [
+                bookingCategoryLabels[device.category] || device.category,
+                device.brand,
+                device.model
+            ].filter(Boolean).join(' · ');
+            grid.appendChild(bkField('Device', deviceLabel || '—'));
+            card.appendChild(grid);
+
+            /* the reported fault, verbatim and untrusted */
+            if (booking.issue) {
+                card.appendChild(bkEl('div', 'booking-field-label', 'Reported issue'));
+                card.appendChild(bkEl('div', 'booking-issue', booking.issue));
+            }
+            if (booking.extraNotes) {
+                const extra = bkEl('div', 'booking-issue');
+                extra.style.marginTop = '0.5rem';
+                extra.textContent = booking.extraNotes;
+                card.appendChild(extra);
+            }
+
+            /* photos - https only, opened in a new tab with the opener cut */
+            const photos = Array.isArray(booking.photos) ? booking.photos.map(bkSafeUrl).filter(Boolean) : [];
+            if (photos.length) {
+                const strip = bkEl('div', 'booking-photos');
+                photos.forEach((url, index) => {
+                    const img = bkEl('img', 'booking-photo');
+                    img.src = url;
+                    img.alt = 'Booking photo ' + (index + 1);
+                    img.loading = 'lazy';
+                    img.title = 'Open full size';
+                    img.addEventListener('click', () => safeOpen(url));
+                    strip.appendChild(img);
+                });
+                card.appendChild(strip);
+            }
+
+            /* what was decided, once it has been */
+            const decisionBits = [];
+            if (booking.declineReasonLabel) decisionBits.push('Reason sent: ' + booking.declineReasonLabel);
+            else if (booking.declineReasonId) decisionBits.push('Reason sent: ' + booking.declineReasonId);
+            if (booking.declineMessage) decisionBits.push(booking.declineMessage);
+            const internalNote = booking.adminNote || booking.note || booking.adminNotes;
+            if (internalNote) decisionBits.push('Your note: ' + internalNote);
+            if (booking.calendarEventId) decisionBits.push('In your Google Calendar');
+            if (decisionBits.length) {
+                card.appendChild(bkEl('div', 'booking-decision-note', decisionBits.join('\n')));
+            }
+
+            /* actions - only a held booking can still be decided */
+            if (status === 'held') {
+                const actions = bkEl('div', 'booking-actions');
+                actions.appendChild(bkButton('Accept', 'btn btn-success', 'fa-check',
+                    () => openBookingDecision(booking.id, 'accept')));
+                actions.appendChild(bkButton('Decline', 'btn btn-danger', 'fa-xmark',
+                    () => openBookingDecision(booking.id, 'decline')));
+                if (email) {
+                    actions.appendChild(bkButton('Email', 'btn btn-email', 'fa-envelope',
+                        () => { window.location.href = 'mailto:' + email; }));
+                }
+                if (phone) {
+                    actions.appendChild(bkButton('WhatsApp', 'btn btn-whatsapp', 'fab fa-whatsapp',
+                        () => safeOpen('https://wa.me/' + phone.replace(/\D/g, ''))));
+                }
+                card.appendChild(actions);
+            }
+
+            return card;
+        }
+
+        /* ---- decide: accept / decline ------------------------------------- */
+
+        // Reasons live in Firestore so the wording can be changed without a
+        // deploy. A read failure is not fatal - free text still works.
+        async function loadDeclineReasons() {
+            if (declineReasonsCache) return declineReasonsCache;
+            try {
+                const snap = await db.collection('declineReasons').get();
+                declineReasonsCache = snap.docs
+                    .map((doc) => {
+                        const data = doc.data() || {};
+                        return { id: doc.id, label: data.label || doc.id, emailBody: data.emailBody || '' };
+                    })
+                    .sort((a, b) => String(a.label).localeCompare(String(b.label)));
+            } catch (error) {
+                console.warn('Could not load decline reasons:', error);
+                declineReasonsCache = [];
+                showAlert('Saved decline reasons could not be loaded — you can still write your own.', 'info');
+            }
+            return declineReasonsCache;
+        }
+
+        function bookingErrorMessage(error) {
+            const code = String((error && error.code) || '').replace(/^functions\//, '');
+            switch (code) {
+                case 'already-exists':
+                    return 'That slot was taken while you were deciding. Nothing was changed.';
+                case 'failed-precondition':
+                    return 'That booking can no longer be decided — it may have expired or already been answered.';
+                case 'invalid-argument':
+                    return (error && error.message) || 'That request was not valid.';
+                case 'not-found':
+                    return 'That booking no longer exists.';
+                case 'permission-denied':
+                    return 'Your account is not allowed to decide bookings. The admin claim may be missing — sign out and back in.';
+                case 'unauthenticated':
+                    return 'You have been signed out. Sign in again and retry.';
+                case 'unavailable':
+                case 'deadline-exceeded':
+                    return 'Could not reach the booking service. Check your connection and try again.';
+                case 'internal':
+                    return 'The booking service failed part-way. Refresh before retrying so you can see what actually happened.';
+                default:
+                    return (error && error.message) ? error.message : 'Something went wrong.';
+            }
+        }
+
+        // One modal, two panes: pick what you are doing, then confirm it.
+        // Nothing fires from a single click.
+        async function openBookingDecision(bookingId, decision) {
+            const booking = allBookings.find((b) => b.id === bookingId);
+            if (!booking) {
+                showAlert('That booking is no longer in the list. Refresh and try again.', 'error');
+                return;
+            }
+
+            const isAccept = decision === 'accept';
+            const customer = booking.customer || {};
+            const when = bkSlotDate(booking);
+            const whenText = when ? bkWhenLabel(when) : 'the requested time';
+
+            const modal = bkEl('div', 'modal show');
+            const content = bkEl('div', 'modal-content');
+            content.style.maxWidth = '620px';
+
+            const header = bkEl('div', 'modal-header');
+            header.appendChild(bkEl('h2', 'modal-title', isAccept ? 'Accept booking' : 'Decline booking'));
+            const close = bkEl('button', 'close-btn', '×');
+            close.type = 'button';
+            close.addEventListener('click', () => modal.remove());
+            header.appendChild(close);
+            content.appendChild(header);
+
+            /* summary of who and when, same in both flows */
+            const summary = bkEl('div', 'avail-context');
+            [
+                ['When', whenText],
+                ['Customer', customer.name || '—'],
+                ['Device', [bookingCategoryLabels[(booking.device || {}).category] || (booking.device || {}).category,
+                    (booking.device || {}).brand, (booking.device || {}).model].filter(Boolean).join(' ') || '—'],
+                ['Reference', bkReference(booking)]
+            ].forEach((pair) => {
+                const row = bkEl('div', 'avail-context-row');
+                row.appendChild(bkEl('span', null, pair[0]));
+                row.appendChild(bkEl('span', null, pair[1]));
+                summary.appendChild(row);
+            });
+
+            /* ---- pane 1: choose ---- */
+            const choosePane = bkEl('div');
+            choosePane.appendChild(summary);
+
+            let selectedReason = null;   // { id, label, emailBody } | { custom: true }
+            let customMessageInput = null;
+
+            if (isAccept) {
+                const info = bkEl('div', 'avail-preview');
+                info.textContent = 'Accepting books the slot into your Google Calendar and emails '
+                    + (customer.email || 'the customer')
+                    + ' a confirmation with the shop address and a calendar invite.';
+                choosePane.appendChild(info);
+            } else {
+                choosePane.appendChild(bkEl('div', 'form-label', 'Why are you declining?'));
+                const reasonList = bkEl('div');
+                reasonList.appendChild(bkEl('p', 'booking-when-sub', 'Loading saved reasons...'));
+                choosePane.appendChild(reasonList);
+
+                const customWrap = bkEl('div', 'form-group hidden');
+                customWrap.appendChild(bkEl('label', 'form-label', 'Message to the customer'));
+                customMessageInput = bkEl('textarea', 'form-input form-textarea');
+                customMessageInput.placeholder = 'Written in your own words — this is what gets emailed.';
+                customMessageInput.maxLength = 1000;
+                customWrap.appendChild(customMessageInput);
+                choosePane.appendChild(customWrap);
+
+                loadDeclineReasons().then((reasons) => {
+                    reasonList.innerHTML = '';
+                    const options = reasons.map((r) => ({ id: r.id, label: r.label, emailBody: r.emailBody }));
+                    options.push({ custom: true, label: 'Something else — write your own', emailBody: '' });
+
+                    options.forEach((option, index) => {
+                        const row = bkEl('label', 'decline-reason');
+                        const radio = document.createElement('input');
+                        radio.type = 'radio';
+                        radio.name = 'decline-reason-choice';
+                        radio.value = String(index);
+                        row.appendChild(radio);
+                        const body = bkEl('div');
+                        body.appendChild(bkEl('div', 'decline-reason-label', option.label));
+                        if (option.emailBody) body.appendChild(bkEl('div', 'decline-reason-body', option.emailBody));
+                        row.appendChild(body);
+                        radio.addEventListener('change', () => {
+                            reasonList.querySelectorAll('.decline-reason').forEach((el) => el.classList.remove('selected'));
+                            row.classList.add('selected');
+                            selectedReason = option;
+                            customWrap.classList.toggle('hidden', !option.custom);
+                            continueBtn.disabled = false;
+                        });
+                        reasonList.appendChild(row);
+                    });
+                });
+            }
+
+            /* an internal note, kept on the booking and never emailed */
+            const noteGroup = bkEl('div', 'form-group');
+            noteGroup.style.marginTop = '1.25rem';
+            noteGroup.appendChild(bkEl('label', 'form-label', 'Private note (optional)'));
+            const noteInput = bkEl('input', 'form-input');
+            noteInput.type = 'text';
+            noteInput.maxLength = 300;
+            noteInput.placeholder = 'Only you ever see this';
+            noteGroup.appendChild(noteInput);
+            choosePane.appendChild(noteGroup);
+
+            const chooseFooter = bkEl('div', 'modal-footer');
+            if (!isAccept) {
+                const note = bkEl('div', 'booking-when-sub');
+                note.style.marginRight = 'auto';
+                note.textContent = 'The slot goes back on sale as soon as this is sent.';
+                chooseFooter.appendChild(note);
+            }
+            chooseFooter.appendChild(bkButton('Cancel', 'btn btn-secondary', null, () => modal.remove()));
+            const continueBtn = bkButton('Continue', isAccept ? 'btn btn-success' : 'btn btn-danger', 'fa-arrow-right', () => {
+                if (!isAccept) {
+                    if (!selectedReason) {
+                        showAlert('Pick a reason first.', 'error');
+                        return;
+                    }
+                    if (selectedReason.custom && !String(customMessageInput.value || '').trim()) {
+                        showAlert('Write the message the customer will get.', 'error');
+                        customMessageInput.focus();
+                        return;
+                    }
+                }
+                buildConfirmPane();
+                choosePane.classList.add('hidden');
+                chooseFooter.classList.add('hidden');
+                confirmPane.classList.remove('hidden');
+                confirmFooter.classList.remove('hidden');
+            });
+            if (!isAccept) continueBtn.disabled = true;
+            chooseFooter.appendChild(continueBtn);
+
+            /* ---- pane 2: confirm ---- */
+            const confirmPane = bkEl('div', 'confirm-pane hidden');
+            const confirmFooter = bkEl('div', 'modal-footer hidden');
+
+            function buildConfirmPane() {
+                confirmPane.innerHTML = '';
+                const icon = bkEl('div', 'confirm-icon');
+                icon.style.background = isAccept ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)';
+                icon.style.color = isAccept ? '#34D399' : '#F87171';
+                icon.appendChild(bkIcon(isAccept ? 'fa-check' : 'fa-triangle-exclamation'));
+                confirmPane.appendChild(icon);
+                confirmPane.appendChild(bkEl('div', 'confirm-title',
+                    isAccept ? 'Accept this booking?' : 'Decline this booking?'));
+
+                const body = bkEl('div', 'confirm-body');
+                if (isAccept) {
+                    body.textContent = `${customer.name || 'The customer'} will be emailed a confirmation for ${whenText}, `
+                        + 'and the appointment will be written to your Google Calendar. This cannot be undone from here.';
+                } else {
+                    const reasonLabel = selectedReason && selectedReason.custom
+                        ? 'your own message'
+                        : `"${(selectedReason && selectedReason.label) || ''}"`;
+                    body.textContent = `${customer.name || 'The customer'} will be emailed ${reasonLabel}, `
+                        + `and ${whenText} goes back on sale immediately. This cannot be undone from here.`;
+                }
+                confirmPane.appendChild(body);
+            }
+
+            const backBtn = bkButton('Back', 'btn btn-secondary', 'fa-arrow-left', () => {
+                confirmPane.classList.add('hidden');
+                confirmFooter.classList.add('hidden');
+                choosePane.classList.remove('hidden');
+                chooseFooter.classList.remove('hidden');
+            });
+            confirmFooter.appendChild(backBtn);
+
+            const confirmBtn = bkButton(isAccept ? 'Yes, accept' : 'Yes, decline',
+                isAccept ? 'btn btn-success' : 'btn btn-danger',
+                isAccept ? 'fa-check' : 'fa-xmark',
+                async () => {
+                    const payload = { bookingId: booking.id, decision: isAccept ? 'accept' : 'decline' };
+                    const note = String(noteInput.value || '').trim();
+                    if (note) payload.note = note;
+                    if (!isAccept) {
+                        if (selectedReason && selectedReason.custom) {
+                            payload.declineMessage = String(customMessageInput.value || '').trim();
+                        } else if (selectedReason) {
+                            payload.declineReasonId = selectedReason.id;
+                        }
+                    }
+
+                    confirmBtn.disabled = true;
+                    backBtn.disabled = true;
+                    confirmBtn.innerHTML = '';
+                    const spinner = bkIcon('fa-circle-notch');
+                    spinner.style.cssText = 'animation: spin 1s linear infinite;';
+                    confirmBtn.appendChild(spinner);
+                    confirmBtn.appendChild(bkEl('span', null, isAccept ? 'Accepting...' : 'Declining...'));
+
+                    try {
+                        const call = getBookingFunctions().httpsCallable('decideBooking');
+                        const res = await call(payload);
+                        const status = (res && res.data && res.data.status) || (isAccept ? 'accepted' : 'declined');
+                        modal.remove();
+                        showAlert(isAccept
+                            ? `Booking accepted — ${customer.name || 'the customer'} has been emailed a confirmation.`
+                            : `Booking declined — ${customer.name || 'the customer'} has been emailed and the slot is free again.`,
+                            'success');
+                        trackEvent('booking_decision', { decision: payload.decision, status: status });
+                    } catch (error) {
+                        console.error('decideBooking failed:', error);
+                        showAlert(bookingErrorMessage(error), 'error');
+                        confirmBtn.disabled = false;
+                        backBtn.disabled = false;
+                        confirmBtn.innerHTML = '';
+                        confirmBtn.appendChild(bkIcon(isAccept ? 'fa-check' : 'fa-xmark'));
+                        confirmBtn.appendChild(bkEl('span', null, isAccept ? 'Yes, accept' : 'Yes, decline'));
+                    }
+                });
+            confirmFooter.appendChild(confirmBtn);
+
+            content.appendChild(choosePane);
+            content.appendChild(confirmPane);
+            content.appendChild(chooseFooter);
+            content.appendChild(confirmFooter);
+            modal.appendChild(content);
+            document.body.appendChild(modal);
+        }
+
+        /* ==================================================================
+           AVAILABILITY
+           ================================================================== */
+
+        const AVAIL_WEEK_INDEX = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+        const AVAIL_WEEK_ORDER = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+        const AVAIL_DAY_LABELS = {
+            mon: 'Monday', tue: 'Tuesday', wed: 'Wednesday', thu: 'Thursday',
+            fri: 'Friday', sat: 'Saturday', sun: 'Sunday'
+        };
+
+        // Mirrors DEFAULT_SETTINGS in functions/lib/availability.js.
+        const AVAIL_DEFAULT_SETTINGS = {
+            workingHours: {
+                mon: { open: '10:00', close: '18:00', closed: false },
+                tue: { open: '10:00', close: '18:00', closed: false },
+                wed: { open: '10:00', close: '18:00', closed: false },
+                thu: { open: '10:00', close: '18:00', closed: false },
+                fri: { open: '10:00', close: '18:00', closed: false },
+                sat: { open: '11:00', close: '16:00', closed: false },
+                sun: { open: '00:00', close: '00:00', closed: true }
+            },
+            blockedDates: [],
+            minNoticeHours: 4,
+            maxFutureDays: 60,
+            slotIntervalMinutes: 30,
+            appointmentMinutes: 30,
+            bufferMinutes: 0,
+            holdExpiryHours: 48
+        };
+
+        const AVAIL_RULE_FIELDS = [
+            { key: 'slotIntervalMinutes', id: 'avail-slot-interval', label: 'Slot interval', unit: 'min', min: 5, max: 240, hint: 'How far apart slot start times are.' },
+            { key: 'appointmentMinutes', id: 'avail-appointment-minutes', label: 'Appointment', unit: 'min', min: 5, max: 480, hint: 'How long each drop-off holds the diary.' },
+            { key: 'bufferMinutes', id: 'avail-buffer-minutes', label: 'Buffer', unit: 'min', min: 0, max: 120, hint: 'Breathing room either side of an appointment.' },
+            { key: 'minNoticeHours', id: 'avail-min-notice', label: 'Min notice', unit: 'hrs', min: 0, max: 336, hint: 'Nothing bookable sooner than this.' },
+            { key: 'maxFutureDays', id: 'avail-max-future', label: 'Horizon', unit: 'days', min: 1, max: 62, hint: 'How far ahead customers can book (62 max).' },
+            { key: 'holdExpiryHours', id: 'avail-hold-expiry', label: 'Hold expiry', unit: 'hrs', min: 1, max: 336, hint: 'Undecided requests release the slot after this.' }
+        ];
+
+        let availSettings = null;
+        let availOverrides = {};
+        let availEventsByDate = {};
+        let availCalendarOk = null;
+        let availCalendarError = null;
+        let availLoaded = false;
+        let availLoading = false;
+
+        /* ---- interval maths, mirroring functions/lib/availability.js ------- */
+
+        function availToMinutes(value) {
+            const match = /^(\d{1,2}):(\d{2})$/.exec(String(value || '').trim());
+            if (!match) return null;
+            const hours = Number(match[1]);
+            const mins = Number(match[2]);
+            if (hours > 23 || mins > 59) return null;
+            return hours * 60 + mins;
+        }
+
+        function availFromMinutes(total) {
+            const hours = Math.floor(total / 60);
+            const mins = total % 60;
+            return String(hours).padStart(2, '0') + ':' + String(mins).padStart(2, '0');
+        }
+
+        function availNormalise(intervals) {
+            const clean = intervals
+                .filter((i) => i && Number.isFinite(i.start) && Number.isFinite(i.end) && i.end > i.start)
+                .sort((a, b) => a.start - b.start);
+            const out = [];
+            clean.forEach((i) => {
+                const last = out[out.length - 1];
+                if (last && i.start <= last.end) last.end = Math.max(last.end, i.end);
+                else out.push({ start: i.start, end: i.end });
+            });
+            return out;
+        }
+
+        function availSubtract(intervals, cuts) {
+            let work = availNormalise(intervals);
+            availNormalise(cuts).forEach((cut) => {
+                const next = [];
+                work.forEach((iv) => {
+                    if (cut.end <= iv.start || cut.start >= iv.end) { next.push(iv); return; }
+                    if (cut.start > iv.start) next.push({ start: iv.start, end: cut.start });
+                    if (cut.end < iv.end) next.push({ start: cut.end, end: iv.end });
+                });
+                work = next;
+            });
+            return work;
+        }
+
+        function availParseIntervals(list) {
+            if (!Array.isArray(list)) return [];
+            return list.map((row) => {
+                const start = availToMinutes(row && row.start);
+                const end = availToMinutes(row && row.end);
+                return (start === null || end === null) ? null : { start: start, end: end };
+            }).filter(Boolean);
+        }
+
+        function availDayKey(dateKey) {
+            const date = bkDateKeyToDate(dateKey);
+            return date ? AVAIL_WEEK_INDEX[date.getUTCDay()] : 'mon';
+        }
+
+        // The open intervals for one date, before the live calendar is
+        // consulted: manual block > manual open > working hours.
+        function availOpenIntervals(dateKey, override) {
+            const settings = availSettings || AVAIL_DEFAULT_SETTINGS;
+            const ov = override || {};
+            if (ov.closed === true) return [];
+
+            let base = [];
+            if (!(settings.blockedDates || []).includes(dateKey)) {
+                const hours = (settings.workingHours || {})[availDayKey(dateKey)];
+                if (hours && !hours.closed) {
+                    const start = availToMinutes(hours.open);
+                    const end = availToMinutes(hours.close);
+                    if (start !== null && end !== null && end > start) base.push({ start: start, end: end });
+                }
+            }
+            base = availNormalise(base.concat(availParseIntervals(ov.opens)));
+            return availSubtract(base, availParseIntervals(ov.blocks));
+        }
+
+        function availIntervalsLabel(intervals) {
+            if (!intervals.length) return 'Closed';
+            return intervals.map((iv) => availFromMinutes(iv.start) + '–' + availFromMinutes(iv.end)).join(', ');
+        }
+
+        function availMergeSettings(stored) {
+            const merged = Object.assign({}, AVAIL_DEFAULT_SETTINGS, stored || {});
+            merged.workingHours = Object.assign({}, AVAIL_DEFAULT_SETTINGS.workingHours, (stored || {}).workingHours || {});
+            if (!merged.appointmentMinutes) merged.appointmentMinutes = merged.slotIntervalMinutes;
+            return merged;
+        }
+
+        function availHorizonDays() {
+            const settings = availSettings || AVAIL_DEFAULT_SETTINGS;
+            const requested = Number(settings.maxFutureDays) || 60;
+            // getSlots and getCalendarEvents both cap a range at 62 days.
+            return Math.min(62, Math.max(28, requested));
+        }
+
+        /* ---- loading ------------------------------------------------------ */
+
+        async function loadAvailability(force) {
+            if (availLoading) return;
+            if (availLoaded && !force) return;
+            availLoading = true;
+
+            const calendarHost = document.getElementById('availability-calendar');
+            if (calendarHost && !availLoaded) {
+                calendarHost.innerHTML = '';
+                const loading = bkEl('div', 'loading');
+                loading.appendChild(bkEl('div', 'spinner'));
+                loading.appendChild(bkEl('p', null, 'Reading working hours, overrides and your calendar...'));
+                calendarHost.appendChild(loading);
+            }
+
+            try {
+                const snap = await db.collection('availability').doc('settings').get();
+                availSettings = availMergeSettings(snap.exists ? snap.data() : {});
+            } catch (error) {
+                console.error('Could not read availability/settings:', error);
+                availSettings = availMergeSettings({});
+                showAlert('Could not read the saved working hours — showing defaults. ' + (error.message || ''), 'error');
+            }
+
+            renderAvailabilityForm();
+
+            const fromKey = bkDateKey(new Date());
+            const toKey = bkDateKey(bkAddDays(new Date(), availHorizonDays()));
+
+            try {
+                const snap = await db.collection('availabilityOverrides')
+                    .where(firebase.firestore.FieldPath.documentId(), '>=', fromKey)
+                    .where(firebase.firestore.FieldPath.documentId(), '<=', toKey)
+                    .get();
+                availOverrides = {};
+                snap.forEach((doc) => { availOverrides[doc.id] = doc.data() || {}; });
+            } catch (error) {
+                console.error('Could not read availabilityOverrides:', error);
+                showAlert('Could not read the per-date overrides: ' + (error.message || error), 'error');
+            }
+
+            await loadAvailabilityCalendar(fromKey, toKey);
+
+            availLoaded = true;
+            availLoading = false;
+            renderAvailabilityCalendar();
+        }
+
+        // Existing commitments, so the diary is visible while he edits rather
+        // than on some other screen.
+        async function loadAvailabilityCalendar(fromKey, toKey) {
+            availEventsByDate = {};
+            availCalendarError = null;
+            try {
+                const call = getBookingFunctions().httpsCallable('getCalendarEvents');
+                const res = await call({ from: fromKey, to: toKey });
+                const data = (res && res.data) || {};
+                availCalendarOk = data.ok !== false;
+                (data.events || []).forEach((event) => {
+                    availEventDateKeys(event).forEach((key) => {
+                        if (!availEventsByDate[key]) availEventsByDate[key] = [];
+                        availEventsByDate[key].push(event);
+                    });
+                });
+                Object.keys(availEventsByDate).forEach((key) => {
+                    availEventsByDate[key].sort((a, b) => String(a.start || '').localeCompare(String(b.start || '')));
+                });
+            } catch (error) {
+                console.error('getCalendarEvents failed:', error);
+                availCalendarOk = false;
+                availCalendarError = bookingErrorMessage(error);
+            }
+            renderAvailabilityCalendarStatus();
+        }
+
+        function availEventDateKeys(event) {
+            if (!event || !event.start) return [];
+            if (event.allDay) {
+                // All-day events end on an exclusive date.
+                const keys = [];
+                const start = bkDateKeyToDate(String(event.start).slice(0, 10));
+                const endRaw = bkDateKeyToDate(String(event.end || event.start).slice(0, 10));
+                if (!start) return [];
+                const end = endRaw && endRaw > start ? endRaw : bkAddDays(start, 1);
+                for (let cursor = start; cursor < end && keys.length < 62; cursor = bkAddDays(cursor, 1)) {
+                    keys.push(bkDateKey(cursor));
+                }
+                return keys;
+            }
+            const start = bkToDate(event.start);
+            return start ? [bkDateKey(start)] : [];
+        }
+
+        function renderAvailabilityCalendarStatus() {
+            const host = document.getElementById('avail-calendar-status');
+            if (!host) return;
+            host.innerHTML = '';
+            host.className = 'booking-hold';
+            if (availCalendarOk === null) return;
+            if (availCalendarOk) {
+                const count = Object.keys(availEventsByDate).reduce((sum, key) => sum + availEventsByDate[key].length, 0);
+                host.appendChild(bkIcon('fa-circle-check'));
+                host.appendChild(bkEl('span', null, `Google Calendar connected · ${count} commitment${count === 1 ? '' : 's'} in view`));
+            } else {
+                host.className = 'booking-hold hold-gone';
+                host.appendChild(bkIcon('fa-triangle-exclamation'));
+                host.appendChild(bkEl('span', null, 'Calendar unreachable' + (availCalendarError ? ' — ' + availCalendarError : '')));
+            }
+        }
+
+        /* ---- weekly hours + slot rules form ------------------------------- */
+
+        function renderAvailabilityForm() {
+            const settings = availSettings || AVAIL_DEFAULT_SETTINGS;
+
+            const body = document.getElementById('avail-hours-body');
+            if (body) {
+                body.innerHTML = '';
+                AVAIL_WEEK_ORDER.forEach((day) => {
+                    const hours = (settings.workingHours || {})[day] || { open: '10:00', close: '18:00', closed: true };
+                    const row = document.createElement('tr');
+
+                    const nameCell = document.createElement('td');
+                    nameCell.appendChild(bkEl('span', 'avail-day-name', AVAIL_DAY_LABELS[day]));
+                    row.appendChild(nameCell);
+
+                    const timeCell = document.createElement('td');
+                    const openInput = document.createElement('input');
+                    openInput.type = 'time';
+                    openInput.className = 'avail-time-input';
+                    openInput.id = 'avail-open-' + day;
+                    openInput.value = hours.open || '10:00';
+                    const closeInput = document.createElement('input');
+                    closeInput.type = 'time';
+                    closeInput.className = 'avail-time-input';
+                    closeInput.id = 'avail-close-' + day;
+                    closeInput.value = hours.close || '18:00';
+                    timeCell.appendChild(openInput);
+                    const sep = bkEl('span', 'sep', ' – ');
+                    sep.style.cssText = 'color: var(--text-dark); padding: 0 0.35rem;';
+                    timeCell.appendChild(sep);
+                    timeCell.appendChild(closeInput);
+                    row.appendChild(timeCell);
+
+                    const toggleCell = document.createElement('td');
+                    const toggle = bkEl('label', 'avail-toggle');
+                    const closedInput = document.createElement('input');
+                    closedInput.type = 'checkbox';
+                    closedInput.id = 'avail-closed-' + day;
+                    closedInput.checked = hours.closed === true;
+                    const applyDisabled = () => {
+                        openInput.disabled = closedInput.checked;
+                        closeInput.disabled = closedInput.checked;
+                    };
+                    closedInput.addEventListener('change', applyDisabled);
+                    applyDisabled();
+                    toggle.appendChild(closedInput);
+                    toggle.appendChild(bkEl('span', null, 'Closed'));
+                    toggleCell.appendChild(toggle);
+                    row.appendChild(toggleCell);
+
+                    body.appendChild(row);
+                });
+            }
+
+            const rules = document.getElementById('avail-rules-grid');
+            if (rules) {
+                rules.innerHTML = '';
+                AVAIL_RULE_FIELDS.forEach((field) => {
+                    const wrap = bkEl('div');
+                    const label = bkEl('label', 'form-label', field.label + ' (' + field.unit + ')');
+                    label.htmlFor = field.id;
+                    wrap.appendChild(label);
+                    const input = document.createElement('input');
+                    input.type = 'number';
+                    input.className = 'form-input';
+                    input.id = field.id;
+                    input.min = String(field.min);
+                    input.max = String(field.max);
+                    input.step = '1';
+                    const value = settings[field.key];
+                    input.value = String(value === undefined || value === null ? AVAIL_DEFAULT_SETTINGS[field.key] : value);
+                    wrap.appendChild(input);
+                    wrap.appendChild(bkEl('div', 'avail-rule-hint', field.hint));
+                    rules.appendChild(wrap);
+                });
+            }
+
+            const title = document.getElementById('avail-horizon-title');
+            if (title) title.textContent = `The next ${availHorizonDays()} days`;
+        }
+
+        async function saveAvailabilitySettings() {
+            if (!document.getElementById('avail-closed-mon')) {
+                showAlert('The working hours have not finished loading yet.', 'info');
+                return;
+            }
+            const workingHours = {};
+            for (let i = 0; i < AVAIL_WEEK_ORDER.length; i++) {
+                const day = AVAIL_WEEK_ORDER[i];
+                const closed = document.getElementById('avail-closed-' + day).checked;
+                const open = document.getElementById('avail-open-' + day).value;
+                const close = document.getElementById('avail-close-' + day).value;
+                if (!closed) {
+                    const startMins = availToMinutes(open);
+                    const endMins = availToMinutes(close);
+                    if (startMins === null || endMins === null) {
+                        showAlert(`${AVAIL_DAY_LABELS[day]} needs both an opening and a closing time.`, 'error');
+                        return;
+                    }
+                    if (endMins <= startMins) {
+                        showAlert(`${AVAIL_DAY_LABELS[day]} closes before it opens.`, 'error');
+                        return;
+                    }
+                }
+                workingHours[day] = { open: open || '00:00', close: close || '00:00', closed: closed };
+            }
+
+            const update = { workingHours: workingHours };
+            for (let i = 0; i < AVAIL_RULE_FIELDS.length; i++) {
+                const field = AVAIL_RULE_FIELDS[i];
+                const value = Number(document.getElementById(field.id).value);
+                if (!Number.isFinite(value) || value < field.min || value > field.max) {
+                    showAlert(`${field.label} must be between ${field.min} and ${field.max} ${field.unit}.`, 'error');
+                    return;
+                }
+                update[field.key] = Math.round(value);
+            }
+            if (update.appointmentMinutes < update.slotIntervalMinutes) {
+                showAlert('Heads up: appointments are shorter than the gap between slot start times.', 'info');
+            }
+
+            const btn = document.getElementById('avail-save-btn');
+            if (btn) btn.disabled = true;
+            try {
+                update.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
+                await db.collection('availability').doc('settings').set(update, { merge: true });
+                availSettings = availMergeSettings(Object.assign({}, availSettings, update));
+                showAlert('Working hours saved. The booking page picks this up immediately.', 'success');
+                renderAvailabilityForm();
+                renderAvailabilityCalendar();
+            } catch (error) {
+                console.error('Saving availability settings failed:', error);
+                showAlert('Could not save the working hours: ' + (error.message || error), 'error');
+            } finally {
+                if (btn) btn.disabled = false;
+            }
+        }
+
+        /* ---- the month grid ----------------------------------------------- */
+
+        function renderAvailabilityCalendar() {
+            const host = document.getElementById('availability-calendar');
+            if (!host) return;
+            host.innerHTML = '';
+
+            const today = new Date();
+            const todayKey = bkDateKey(today);
+            const days = availHorizonDays();
+            const keys = [];
+            for (let i = 0; i <= days; i++) keys.push(bkDateKey(bkAddDays(today, i)));
+
+            // Group into calendar months so the grid reads like a wall planner.
+            const months = [];
+            const monthIndex = {};
+            keys.forEach((key) => {
+                const monthKey = key.slice(0, 7);
+                if (!monthIndex[monthKey]) {
+                    monthIndex[monthKey] = { key: monthKey, keys: [] };
+                    months.push(monthIndex[monthKey]);
+                }
+                monthIndex[monthKey].keys.push(key);
+            });
+
+            months.forEach((month) => {
+                const wrap = bkEl('div', 'avail-month');
+                const first = bkDateKeyToDate(month.keys[0]);
+                wrap.appendChild(bkEl('div', 'avail-month-title',
+                    bkLondon(first, { month: 'long', year: 'numeric' })));
+
+                const grid = bkEl('div', 'avail-grid');
+                ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].forEach((label) => {
+                    grid.appendChild(bkEl('div', 'avail-weekday', label));
+                });
+
+                // Blank cells so the first day of the run lands under its weekday.
+                const firstDayIndex = (bkDateKeyToDate(month.keys[0]).getUTCDay() + 6) % 7;
+                for (let i = 0; i < firstDayIndex; i++) {
+                    grid.appendChild(bkEl('div', 'avail-cell is-blank'));
+                }
+
+                month.keys.forEach((key) => grid.appendChild(buildAvailabilityCell(key, todayKey)));
+                wrap.appendChild(grid);
+                host.appendChild(wrap);
+            });
+        }
+
+        function buildAvailabilityCell(dateKey, todayKey) {
+            const override = availOverrides[dateKey];
+            const intervals = availOpenIntervals(dateKey, override);
+            const events = availEventsByDate[dateKey] || [];
+
+            const cell = bkEl('button', 'avail-cell');
+            cell.type = 'button';
+            cell.dataset.date = dateKey;
+            if (!intervals.length) cell.classList.add('is-shut');
+            if (dateKey === todayKey) cell.classList.add('is-today');
+            cell.title = 'Edit ' + dateKey;
+            cell.addEventListener('click', () => openAvailabilityDate(dateKey));
+
+            const dateRow = bkEl('div', 'avail-cell-date');
+            dateRow.appendChild(bkEl('span', null, String(Number(dateKey.slice(8, 10)))));
+            if (dateKey === todayKey) dateRow.appendChild(bkEl('span', 'avail-cell-today-dot'));
+            cell.appendChild(dateRow);
+
+            const hours = bkEl('div', 'avail-cell-hours' + (intervals.length ? '' : ' shut'),
+                availIntervalsLabel(intervals));
+            cell.appendChild(hours);
+
+            const tags = bkEl('div', 'avail-tags');
+            if (override) {
+                if (Array.isArray(override.opens) && override.opens.length) tags.appendChild(bkEl('span', 'avail-tag avail-tag-open', 'Open+'));
+                if (override.closed === true || (Array.isArray(override.blocks) && override.blocks.length)) {
+                    tags.appendChild(bkEl('span', 'avail-tag avail-tag-block', override.closed === true ? 'Shut' : 'Block'));
+                }
+                if (override.ignoreCalendarBusy === true) tags.appendChild(bkEl('span', 'avail-tag avail-tag-ignore', 'Cal off'));
+                if (override.note) {
+                    const noteTag = bkEl('span', 'avail-tag avail-tag-note', 'Note');
+                    noteTag.title = String(override.note);
+                    tags.appendChild(noteTag);
+                }
+            }
+            if (tags.childNodes.length) cell.appendChild(tags);
+
+            if (events.length) {
+                const list = bkEl('div', 'avail-events');
+                events.slice(0, 3).forEach((event) => {
+                    const chip = bkEl('div', 'avail-event' + (event.source === 'booking' ? ' is-booking' : ''));
+                    const start = event.allDay ? null : bkToDate(event.start);
+                    chip.textContent = (start ? bkTimeLabel(start) + ' ' : '') + (event.summary || '(no title)');
+                    chip.title = chip.textContent;
+                    list.appendChild(chip);
+                });
+                if (events.length > 3) {
+                    list.appendChild(bkEl('div', 'avail-event-more', `+${events.length - 3} more`));
+                }
+                cell.appendChild(list);
+            }
+
+            return cell;
+        }
+
+        /* ---- per-date override editor -------------------------------------- */
+
+        function availIntervalRow(container, start, end, onChange) {
+            const row = bkEl('div', 'avail-interval-row');
+            const startInput = document.createElement('input');
+            startInput.type = 'time';
+            startInput.className = 'avail-time-input';
+            startInput.value = start || '';
+            const endInput = document.createElement('input');
+            endInput.type = 'time';
+            endInput.className = 'avail-time-input';
+            endInput.value = end || '';
+            startInput.addEventListener('change', onChange);
+            endInput.addEventListener('change', onChange);
+            row.appendChild(startInput);
+            row.appendChild(bkEl('span', 'sep', 'to'));
+            row.appendChild(endInput);
+            const remove = bkEl('button', 'avail-interval-remove');
+            remove.type = 'button';
+            remove.appendChild(bkIcon('fa-trash'));
+            remove.title = 'Remove';
+            remove.addEventListener('click', () => { row.remove(); onChange(); });
+            row.appendChild(remove);
+            container.appendChild(row);
+            return row;
+        }
+
+        function availReadIntervals(container) {
+            const out = [];
+            container.querySelectorAll('.avail-interval-row').forEach((row) => {
+                const inputs = row.querySelectorAll('input[type="time"]');
+                const start = inputs[0] ? inputs[0].value : '';
+                const end = inputs[1] ? inputs[1].value : '';
+                if (start && end) out.push({ start: start, end: end });
+            });
+            return out;
+        }
+
+        function openAvailabilityDate(dateKey) {
+            const override = availOverrides[dateKey] || {};
+            const settings = availSettings || AVAIL_DEFAULT_SETTINGS;
+            const dayKey = availDayKey(dateKey);
+            const weekly = (settings.workingHours || {})[dayKey] || { closed: true };
+            const events = availEventsByDate[dateKey] || [];
+            const date = bkDateKeyToDate(dateKey);
+
+            const modal = bkEl('div', 'modal show');
+            const content = bkEl('div', 'modal-content');
+            content.style.maxWidth = '640px';
+
+            const header = bkEl('div', 'modal-header');
+            header.appendChild(bkEl('h2', 'modal-title',
+                bkLondon(date, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })));
+            const close = bkEl('button', 'close-btn', '×');
+            close.type = 'button';
+            close.addEventListener('click', () => modal.remove());
+            header.appendChild(close);
+            content.appendChild(header);
+
+            /* context: the weekly pattern and what is already in the diary */
+            const context = bkEl('div', 'avail-context');
+            const weeklyRow = bkEl('div', 'avail-context-row');
+            weeklyRow.appendChild(bkEl('span', null, `Working hours (${AVAIL_DAY_LABELS[dayKey]})`));
+            weeklyRow.appendChild(bkEl('span', null, weekly.closed
+                ? 'Closed'
+                : `${weekly.open}–${weekly.close}`));
+            context.appendChild(weeklyRow);
+
+            const calRow = bkEl('div', 'avail-context-row');
+            calRow.appendChild(bkEl('span', null, 'In your Google Calendar'));
+            calRow.appendChild(bkEl('span', null, availCalendarOk === false
+                ? 'Unavailable'
+                : (events.length ? `${events.length} commitment${events.length === 1 ? '' : 's'}` : 'Nothing booked')));
+            context.appendChild(calRow);
+
+            events.forEach((event) => {
+                const row = bkEl('div', 'avail-context-row');
+                const start = event.allDay ? null : bkToDate(event.start);
+                const end = event.allDay ? null : bkToDate(event.end);
+                row.appendChild(bkEl('span', null, event.allDay
+                    ? 'All day'
+                    : `${start ? bkTimeLabel(start) : '?'}–${end ? bkTimeLabel(end) : '?'}`));
+                const label = bkEl('span', null, event.summary || '(no title)');
+                if (event.source === 'booking') label.style.color = 'var(--accent-cyan)';
+                row.appendChild(label);
+                context.appendChild(row);
+            });
+            content.appendChild(context);
+
+            /* whole-day close */
+            const closedGroup = bkEl('div', 'form-group');
+            const closedToggle = bkEl('label', 'avail-toggle');
+            const closedInput = document.createElement('input');
+            closedInput.type = 'checkbox';
+            closedInput.checked = override.closed === true;
+            closedToggle.appendChild(closedInput);
+            closedToggle.appendChild(bkEl('span', null, 'Close this whole day — nothing bookable, whatever the hours say'));
+            closedGroup.appendChild(closedToggle);
+            content.appendChild(closedGroup);
+
+            /* extra open time */
+            const opensGroup = bkEl('div', 'form-group');
+            opensGroup.appendChild(bkEl('label', 'form-label', 'Extra open time'));
+            opensGroup.appendChild(bkEl('div', 'avail-rule-hint', 'Adds bookable time this date only — the way to open a Sunday or a late evening.'));
+            const opensHost = bkEl('div');
+            opensHost.style.marginTop = '0.6rem';
+            opensGroup.appendChild(opensHost);
+            const addOpen = bkButton('Add open interval', 'btn btn-secondary', 'fa-plus', () => {
+                availIntervalRow(opensHost, '', '', updatePreview);
+            });
+            addOpen.style.cssText = 'padding: 0.5rem 1rem; font-size: 0.85rem;';
+            opensGroup.appendChild(addOpen);
+            content.appendChild(opensGroup);
+
+            /* blocked time */
+            const blocksGroup = bkEl('div', 'form-group');
+            blocksGroup.appendChild(bkEl('label', 'form-label', 'Blocked time'));
+            blocksGroup.appendChild(bkEl('div', 'avail-rule-hint', 'Removes time. Beats both the working hours and any open interval above.'));
+            const blocksHost = bkEl('div');
+            blocksHost.style.marginTop = '0.6rem';
+            blocksGroup.appendChild(blocksHost);
+            const addBlock = bkButton('Add blocked interval', 'btn btn-secondary', 'fa-plus', () => {
+                availIntervalRow(blocksHost, '', '', updatePreview);
+            });
+            addBlock.style.cssText = 'padding: 0.5rem 1rem; font-size: 0.85rem;';
+            blocksGroup.appendChild(addBlock);
+            content.appendChild(blocksGroup);
+
+            availParseIntervals(override.opens).forEach((iv) => {
+                availIntervalRow(opensHost, availFromMinutes(iv.start), availFromMinutes(iv.end), () => updatePreview());
+            });
+            availParseIntervals(override.blocks).forEach((iv) => {
+                availIntervalRow(blocksHost, availFromMinutes(iv.start), availFromMinutes(iv.end), () => updatePreview());
+            });
+
+            /* note */
+            const noteGroup = bkEl('div', 'form-group');
+            noteGroup.appendChild(bkEl('label', 'form-label', 'Note (private)'));
+            const noteInput = document.createElement('input');
+            noteInput.type = 'text';
+            noteInput.className = 'form-input';
+            noteInput.maxLength = 200;
+            noteInput.placeholder = 'Bank holiday — half day';
+            noteInput.value = override.note ? String(override.note) : '';
+            noteGroup.appendChild(noteInput);
+            content.appendChild(noteGroup);
+
+            /* ignore calendar busy, with the warning it deserves */
+            const ignoreGroup = bkEl('div', 'form-group');
+            const ignoreToggle = bkEl('label', 'avail-toggle');
+            const ignoreInput = document.createElement('input');
+            ignoreInput.type = 'checkbox';
+            ignoreInput.checked = override.ignoreCalendarBusy === true;
+            ignoreToggle.appendChild(ignoreInput);
+            ignoreToggle.appendChild(bkEl('span', null, 'Ignore Google Calendar busy time on this date'));
+            ignoreGroup.appendChild(ignoreToggle);
+            const warning = bkEl('div', 'avail-warning');
+            warning.appendChild(bkIcon('fa-triangle-exclamation', 'margin-top: 0.15rem;'));
+            warning.appendChild(bkEl('span', null,
+                'Ticking this lets customers book straight over something already in your calendar. '
+                + 'Nothing will warn you at the time — you will be double-booked. Use it only when the '
+                + 'calendar entry is not something that stops you taking a drop-off.'));
+            ignoreGroup.appendChild(warning);
+            content.appendChild(ignoreGroup);
+
+            /* live preview of the resulting day */
+            const preview = bkEl('div', 'avail-preview');
+            content.appendChild(preview);
+
+            function updatePreview() {
+                const draft = {
+                    closed: closedInput.checked,
+                    opens: availReadIntervals(opensHost),
+                    blocks: availReadIntervals(blocksHost)
+                };
+                const intervals = availOpenIntervals(dateKey, draft);
+                preview.className = 'avail-preview' + (intervals.length ? '' : ' is-shut');
+                preview.textContent = intervals.length
+                    ? 'Bookable window: ' + availIntervalsLabel(intervals)
+                      + (ignoreInput.checked ? ' (calendar busy ignored)' : ' minus anything busy in your calendar')
+                    : 'Nothing bookable on this date.';
+            }
+            closedInput.addEventListener('change', updatePreview);
+            ignoreInput.addEventListener('change', updatePreview);
+            updatePreview();
+
+            /* footer */
+            const footer = bkEl('div', 'modal-footer');
+            if (availOverrides[dateKey]) {
+                const clear = bkButton('Remove overrides', 'btn btn-secondary', 'fa-trash', async () => {
+                    clear.disabled = true;
+                    try {
+                        await db.collection('availabilityOverrides').doc(dateKey).delete();
+                        delete availOverrides[dateKey];
+                        renderAvailabilityCalendar();
+                        modal.remove();
+                        showAlert(`Overrides cleared for ${dateKey} — the weekly hours apply again.`, 'success');
+                    } catch (error) {
+                        console.error('Clearing override failed:', error);
+                        showAlert('Could not clear that date: ' + (error.message || error), 'error');
+                        clear.disabled = false;
+                    }
+                });
+                clear.style.marginRight = 'auto';
+                footer.appendChild(clear);
+            }
+            footer.appendChild(bkButton('Cancel', 'btn btn-secondary', null, () => modal.remove()));
+            const save = bkButton('Save this date', 'btn btn-primary', 'fa-save', async () => {
+                const opens = availReadIntervals(opensHost);
+                const blocks = availReadIntervals(blocksHost);
+                const bad = opens.concat(blocks).find((iv) => {
+                    const start = availToMinutes(iv.start);
+                    const end = availToMinutes(iv.end);
+                    return start === null || end === null || end <= start;
+                });
+                if (bad) {
+                    showAlert(`"${bad.start} to ${bad.end}" is not a valid interval — the end must be after the start.`, 'error');
+                    return;
+                }
+
+                const payload = {
+                    closed: closedInput.checked,
+                    opens: opens,
+                    blocks: blocks,
+                    ignoreCalendarBusy: ignoreInput.checked,
+                    note: noteInput.value.trim(),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+
+                save.disabled = true;
+                try {
+                    const isEmpty = !payload.closed && !opens.length && !blocks.length
+                        && !payload.ignoreCalendarBusy && !payload.note;
+                    if (isEmpty) {
+                        await db.collection('availabilityOverrides').doc(dateKey).delete();
+                        delete availOverrides[dateKey];
+                    } else {
+                        await db.collection('availabilityOverrides').doc(dateKey).set(payload);
+                        availOverrides[dateKey] = payload;
+                    }
+                    renderAvailabilityCalendar();
+                    modal.remove();
+                    showAlert(isEmpty
+                        ? `${dateKey} is back on the normal weekly hours.`
+                        : `Saved ${dateKey}.`, 'success');
+                } catch (error) {
+                    console.error('Saving override failed:', error);
+                    showAlert('Could not save that date: ' + (error.message || error), 'error');
+                    save.disabled = false;
+                }
+            });
+            footer.appendChild(save);
+            content.appendChild(footer);
+
+            modal.appendChild(content);
+            document.body.appendChild(modal);
         }
     </script>
 </body>
