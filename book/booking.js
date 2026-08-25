@@ -73,6 +73,9 @@
 
     const DAY_KEYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 
+    // Cloud Functions region — must match setGlobalOptions in functions/index.js.
+    const FUNCTIONS_REGION = 'europe-west2';
+
     const DEFAULT_AVAILABILITY = {
         workingHours: {
             mon: { open: '10:00', close: '18:00', closed: false },
@@ -98,6 +101,9 @@
     const state = {
         step: 1,
         availability: null,
+        days: null,             // date -> server-computed day, when reachable
+        slotsSource: 'local',   // 'server' once getSlots has answered
+        calendarOk: true,
         photos: [],          // [{ id, file, sizeKB }]
         tempId: null,
         submitting: false,
@@ -108,6 +114,7 @@
         issue: '',
         preferredDate: '',
         preferredTime: '',
+        preferredStartIso: '',
         extraNotes: '',
         customerName: '',
         customerEmail: '',
@@ -443,6 +450,15 @@
     }
 
     // ---- Step 3: date + time ---------------------------------------------
+    /* Slot availability is computed on the server by the getSlots function,
+       because only the server can see the business Google Calendar. The whole
+       horizon arrives in one call and is cached, so changing date is instant.
+
+       If the backend cannot be reached we fall back to computing slots in the
+       browser from availability/settings, exactly as this page used to. That
+       fallback cannot know about calendar clashes, so it is deliberately
+       optimistic — but an approximate set of times beats an empty page, and
+       every booking is confirmed by hand before it becomes real. */
     async function loadAvailability() {
         try {
             const snap = await db.collection('availability').doc('settings').get();
@@ -451,17 +467,51 @@
             console.warn('Could not load availability/settings, using defaults:', err);
             state.availability = DEFAULT_AVAILABILITY;
         }
+
         const a = state.availability;
         const dateInput = $('#preferred-date');
         if (dateInput) {
-            const min = isoDate(addDays(new Date(), 0));
-            const max = isoDate(addDays(new Date(), a.maxFutureDays || 60));
-            dateInput.min = min;
-            dateInput.max = max;
+            dateInput.min = isoDate(new Date());
+            dateInput.max = isoDate(addDays(new Date(), a.maxFutureDays || 60));
         }
-        // If a date was already picked before availability finished loading,
-        // re-render slots with the now-loaded settings.
+
+        await loadServerSlots();
         if (state.preferredDate) renderTimeSlots(state.preferredDate);
+    }
+
+    /* Returns a callable, or null if the functions SDK is absent — which is
+       how this page stays working if the script fails to load. */
+    function callable(name) {
+        try {
+            if (typeof firebase.app !== 'function') return null;
+            const app = firebase.app();
+            if (typeof app.functions !== 'function') return null;
+            return app.functions(FUNCTIONS_REGION).httpsCallable(name);
+        } catch (err) {
+            return null;
+        }
+    }
+
+    async function loadServerSlots() {
+        const getSlots = callable('getSlots');
+        if (!getSlots) { state.slotsSource = 'local'; return; }
+        try {
+            const horizon = Math.min(Number(state.availability.maxFutureDays) || 60, 60);
+            const res = await getSlots({
+                from: isoDate(new Date()),
+                to: isoDate(addDays(new Date(), horizon))
+            });
+            const data = res && res.data;
+            if (!data || !data.ok || !Array.isArray(data.days)) throw new Error('Unexpected response');
+            state.days = {};
+            data.days.forEach((d) => { state.days[d.date] = d; });
+            state.slotsSource = 'server';
+            state.calendarOk = data.calendarOk !== false;
+        } catch (err) {
+            console.warn('Live availability unavailable, falling back to local rules:', err);
+            state.slotsSource = 'local';
+            state.days = null;
+        }
     }
 
     function wireDatePicker() {
@@ -470,9 +520,50 @@
         dateInput.addEventListener('change', (e) => {
             state.preferredDate = e.target.value;
             state.preferredTime = '';
+            state.preferredStartIso = '';
             clearError('preferred-date');
             renderTimeSlots(state.preferredDate);
         });
+    }
+
+    /* One shape of slot list regardless of which source produced it:
+       { closed, slots: [{ time, startIso, available, reason }] }. */
+    function slotsForDate(dateStr) {
+        if (state.slotsSource === 'server' && state.days) {
+            const day = state.days[dateStr];
+            if (!day) return { closed: true, slots: [] };
+            return { closed: !day.open, slots: day.slots || [] };
+        }
+        return localSlotsForDate(dateStr);
+    }
+
+    function localSlotsForDate(dateStr) {
+        const a = state.availability;
+        if (!a) return { closed: false, slots: [], loading: true };
+
+        // Built from the date parts directly — JS Date string parsing is a
+        // minefield and this has to agree with the server's day boundaries.
+        const [y, m, d] = dateStr.split('-').map((n) => parseInt(n, 10));
+        const date = new Date(y, m - 1, d);
+        if (isNaN(date.getTime())) return { closed: true, slots: [] };
+        if ((a.blockedDates || []).includes(dateStr)) return { closed: true, slots: [] };
+
+        const hours = (a.workingHours || {})[DAY_KEYS[date.getDay()]];
+        if (!hours || hours.closed) return { closed: true, slots: [] };
+
+        const earliest = new Date(Date.now() + (a.minNoticeHours || 0) * 3600 * 1000);
+        const slots = generateSlots(hours.open, hours.close, a.slotIntervalMinutes || 30)
+            .map((slot) => {
+                const start = new Date(y, m - 1, d, slot.h, slot.min, 0, 0);
+                const tooSoon = start < earliest;
+                return {
+                    time: slot.label,
+                    startIso: start.toISOString(),
+                    available: !tooSoon,
+                    reason: tooSoon ? 'notice' : null
+                };
+            });
+        return { closed: false, slots };
     }
 
     function renderTimeSlots(dateStr) {
@@ -490,51 +581,38 @@
         if (!state.availability) return renderEmpty('Loading availability…');
         if (!dateStr) return renderEmpty('Pick a date first.');
 
-        const a = state.availability;
-        // Compare on dates only (ignore time component) — JS Date parsing is
-        // a minefield, so build it from the YYYY-MM-DD parts directly.
-        const [y, m, d] = dateStr.split('-').map((n) => parseInt(n, 10));
-        const date = new Date(y, m - 1, d);
-        if (isNaN(date.getTime())) return renderEmpty('Invalid date.');
-
-        if ((a.blockedDates || []).includes(dateStr)) {
+        const result = slotsForDate(dateStr);
+        if (result.loading) return renderEmpty('Loading availability…');
+        if (result.closed || !result.slots.length) {
             return renderEmpty("We're closed that day. Pick another.");
         }
-
-        const dayKey = DAY_KEYS[date.getDay()];
-        const hours = (a.workingHours || {})[dayKey];
-        if (!hours || hours.closed) {
-            return renderEmpty("We're closed that day. Pick another.");
+        if (!result.slots.some((s) => s.available)) {
+            return renderEmpty('Fully booked that day. Pick another date.');
         }
 
-        const slots = generateSlots(hours.open, hours.close, a.slotIntervalMinutes || 30);
-        if (!slots.length) return renderEmpty('No slots available.');
-
-        const minNoticeMs = (a.minNoticeHours || 0) * 60 * 60 * 1000;
-        const earliest = new Date(Date.now() + minNoticeMs);
-
-        slots.forEach((slot) => {
-            const slotDate = new Date(y, m - 1, d, slot.h, slot.min, 0, 0);
-            const disabled = slotDate < earliest;
-            const isSelected = state.preferredTime === slot.label;
+        result.slots.forEach((slot) => {
+            const disabled = !slot.available;
+            const isSelected = state.preferredStartIso === slot.startIso;
 
             const label = document.createElement('label');
             label.className = 'time-slot' + (disabled ? ' disabled' : '') + (isSelected ? ' selected' : '');
-            label.dataset.slot = slot.label;
+            label.dataset.slot = slot.time;
+            if (disabled && slot.reason === 'taken') label.title = 'Already booked';
 
             const input = document.createElement('input');
             input.type = 'radio';
             input.name = 'preferred-time';
-            input.value = slot.label;
+            input.value = slot.time;
             if (disabled) input.disabled = true;
             if (isSelected) input.checked = true;
 
             label.appendChild(input);
-            label.appendChild(document.createTextNode(slot.label));
+            label.appendChild(document.createTextNode(slot.time));
 
             if (!disabled) {
                 label.addEventListener('click', () => {
-                    state.preferredTime = slot.label;
+                    state.preferredTime = slot.time;
+                    state.preferredStartIso = slot.startIso;
                     $$('label.time-slot', container).forEach((s) => s.classList.remove('selected'));
                     label.classList.add('selected');
                     clearError('preferred-time');
@@ -602,7 +680,7 @@
         }
         if (step === 3) {
             if (!state.preferredDate) fail('preferred-date', 'Pick a date.');
-            if (!state.preferredTime) fail('preferred-time', 'Pick a time slot.');
+            if (!state.preferredTime || !state.preferredStartIso) fail('preferred-time', 'Pick a time slot.');
         }
         if (step === 4) {
             if (!state.customerName || !state.customerName.trim()) fail('customer-name', 'Your name please.');
@@ -744,44 +822,29 @@
         state.submitting = true;
         const submitBtn = $('#submit-btn');
         const errEl = $('#submit-error');
-        if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Submitting&hellip;'; }
+        if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Submitting…'; }
         if (errEl) errEl.hidden = true;
 
         try {
-            // 1) Upload photos to Storage. Done sequentially so a partial
-            //    upload set is easy to clean up on the admin side later.
+            // 1) Upload photos to Storage. Sequential so a partial upload set
+            //    is easy to clean up on the admin side later.
             const photoUrls = [];
             const photoPaths = [];
             for (let i = 0; i < state.photos.length; i++) {
                 const p = state.photos[i];
-                const filename = `photo-${i + 1}.jpg`;
-                const path = `bookings/${state.tempId}/${filename}`;
+                const path = `bookings/${state.tempId}/photo-${i + 1}.jpg`;
                 const ref = storage.ref().child(path);
                 const snapshot = await ref.put(p.file, { contentType: 'image/jpeg' });
-                const url = await snapshot.ref.getDownloadURL();
-                photoUrls.push(url);
+                photoUrls.push(await snapshot.ref.getDownloadURL());
                 photoPaths.push(path);
             }
 
-            // 2) Build the booking doc. Field shape is locked in by the
-            //    Firestore rule (firestore.rules:46-67) — any drift here will
-            //    be rejected server-side.
-            const [y, m, d] = state.preferredDate.split('-').map(Number);
-            const [hh, mm] = state.preferredTime.split(':').map(Number);
-            const preferredAt = new Date(y, m - 1, d, hh, mm, 0, 0);
-
-            const issueText = state.extraNotes
-                ? `${state.issue}\n\n--- Additional notes ---\n${state.extraNotes}`
-                : state.issue;
-
-            const docData = {
-                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                status: 'pending',
-                respondedAt: null,
-                linkedRepairId: null,
-                adminNotes: '',
-                deleted: false,
-                tempId: state.tempId,
+            // 2) Hand the booking to the server. It re-checks the slot against
+            //    working hours, manual overrides, the live Google Calendar and
+            //    existing holds, then takes the slot in a transaction so two
+            //    people cannot win the same time.
+            const payload = {
+                slotStartIso: state.preferredStartIso,
                 customer: {
                     name: state.customerName.trim(),
                     email: state.customerEmail.trim(),
@@ -792,27 +855,39 @@
                     brand: state.brand,
                     model: state.model.trim()
                 },
-                issue: issueText.trim().slice(0, 1000),
-                preferredAt: firebase.firestore.Timestamp.fromDate(preferredAt),
+                issue: state.issue.trim(),
+                extraNotes: state.extraNotes.trim(),
                 photos: photoUrls,
-                photoPaths: photoPaths
+                photoPaths: photoPaths,
+                tempId: state.tempId
             };
 
-            const ref = await db.collection('bookings').add(docData);
+            const reference = await sendBooking(payload, photoUrls, photoPaths);
 
-            // 3) Show confirmation
-            const refId = ref.id.slice(-6).toUpperCase();
+            // 3) Confirmation
             const refEl = $('#reference-id');
-            if (refEl) refEl.textContent = refId;
+            if (refEl) refEl.textContent = reference;
             if (typeof window.gtag === 'function') {
                 window.gtag('event', 'booking_submitted', { category: state.category });
             }
+            // The slot just taken should not still be offered if they book again.
+            loadServerSlots();
             showStep(6);
         } catch (err) {
             console.error('Booking submit failed:', err);
             if (errEl) {
                 errEl.hidden = false;
-                errEl.textContent = friendlyError(err) + ' Your details are still here — try again, or call 07940 730537.';
+                errEl.textContent = friendlyError(err)
+                    + ' Your details are still here — try again, or call 07940 730537.';
+            }
+            // A slot conflict is worth re-rendering for: the times on screen
+            // are now out of date, and sending them back would just fail again.
+            if (isSlotConflict(err)) {
+                await loadServerSlots();
+                state.preferredTime = '';
+                state.preferredStartIso = '';
+                renderTimeSlots(state.preferredDate);
+                showStep(3);
             }
         } finally {
             state.submitting = false;
@@ -820,8 +895,79 @@
         }
     }
 
+    /* Prefers the backend. Falls back to the old direct Firestore write only
+       when the functions SDK or the deployed function is genuinely absent —
+       which keeps this page working whichever order the site, the rules and
+       the functions get deployed in. Once the tightened rules are live the
+       legacy write is rejected server-side and the customer is shown the
+       contact fallback instead, so this cannot become a quiet back door. */
+    async function sendBooking(payload, photoUrls, photoPaths) {
+        const submit = callable('submitBooking');
+        if (submit) {
+            try {
+                const res = await submit(payload);
+                const data = res && res.data;
+                if (!data || !data.ok) throw new Error('Unexpected response');
+                return data.reference;
+            } catch (err) {
+                if (!isBackendMissing(err)) throw err;
+                console.warn('submitBooking unavailable, using direct write:', err);
+            }
+        }
+        return legacyWrite(payload, photoUrls, photoPaths);
+    }
+
+    async function legacyWrite(payload, photoUrls, photoPaths) {
+        const issueText = payload.extraNotes
+            ? `${payload.issue}\n\n--- Additional notes ---\n${payload.extraNotes}`
+            : payload.issue;
+        const preferredAt = new Date(payload.slotStartIso);
+        const ref = await db.collection('bookings').add({
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            status: 'pending',
+            respondedAt: null,
+            linkedRepairId: null,
+            adminNotes: '',
+            deleted: false,
+            tempId: payload.tempId,
+            customer: payload.customer,
+            device: payload.device,
+            issue: issueText.trim().slice(0, 1000),
+            preferredAt: firebase.firestore.Timestamp.fromDate(preferredAt),
+            photos: photoUrls,
+            photoPaths: photoPaths
+        });
+        return ref.id.slice(-6).toUpperCase();
+    }
+
+    function isBackendMissing(err) {
+        const code = (err && err.code) || '';
+        return code === 'functions/not-found'
+            || code === 'functions/unavailable'
+            || code === 'functions/internal' && /network|fetch/i.test(err.message || '');
+    }
+
+    function isSlotConflict(err) {
+        const code = (err && err.code) || '';
+        return code === 'functions/already-exists' || code === 'functions/failed-precondition';
+    }
+
     function friendlyError(err) {
         const code = (err && err.code) || '';
+        // Callable errors carry the server's own message, which is written for
+        // the customer, so prefer it where it exists.
+        if (code === 'functions/already-exists') {
+            return 'Someone just took that slot.';
+        }
+        if (code === 'functions/failed-precondition') {
+            return 'That time is no longer available.';
+        }
+        if (code === 'functions/invalid-argument' || code === 'functions/resource-exhausted') {
+            return err.message || 'Please check your details.';
+        }
+        if (code === 'functions/deadline-exceeded' || code === 'functions/unavailable') {
+            return 'Network issue — couldn\'t reach the server.';
+        }
         if (code === 'permission-denied') return 'The server rejected the booking — most likely a validation issue.';
         if (code === 'unavailable' || code === 'deadline-exceeded') return 'Network issue — couldn\'t reach the server.';
         if (code.indexOf('storage/') === 0) return 'Photo upload failed.';
@@ -839,6 +985,7 @@
             issue: '',
             preferredDate: '',
             preferredTime: '',
+            preferredStartIso: '',
             extraNotes: '',
             customerName: '',
             customerEmail: '',
