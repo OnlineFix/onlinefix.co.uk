@@ -241,6 +241,7 @@ exports.submitBooking = onCall({ cors: true }, async (request) => {
     // same instant contend on the same lock document, so exactly one commits.
     await db.runTransaction(async (tx) => {
         const lock = await tx.get(lockRef);
+        let staleBookingRef = null;
         if (lock.exists) {
             const l = lock.data() || {};
             const expired = l.status === 'held'
@@ -248,6 +249,22 @@ exports.submitBooking = onCall({ cors: true }, async (request) => {
             if (l.status !== 'released' && !expired) {
                 throw new HttpsError('already-exists', 'That slot has just been taken.');
             }
+            // Taking over an expired hold: the booking that held it must stop
+            // being decidable in the same commit, or accepting it later would
+            // double-book the slot we are about to hand to this customer.
+            if (expired && l.bookingId) {
+                staleBookingRef = db.collection('bookings').doc(l.bookingId);
+                const staleSnap = await tx.get(staleBookingRef);
+                if (!staleSnap.exists || staleSnap.data().status !== 'held') {
+                    staleBookingRef = null;
+                }
+            }
+        }
+        if (staleBookingRef) {
+            tx.update(staleBookingRef, {
+                status: 'expired',
+                decidedAt: admin.firestore.Timestamp.now()
+            });
         }
 
         tx.set(lockRef, {
@@ -364,24 +381,49 @@ exports.decideBooking = onCall({ cors: true }, async (request) => {
                 `Could not create the calendar event: ${err.message}. The booking is unchanged.`);
         }
 
-        await bookingRef.update({
-            status: 'accepted',
-            calendarEventId,
-            decidedAt: now,
-            respondedAt: now,
-            slotStart: slot.start,
-            slotEnd: slot.end,
-            slotKey: lockKey,
-            adminNotes: typeof note === 'string' ? note.slice(0, 500) : (booking.adminNotes || '')
-        });
-        await lockRef.set({
-            bookingId,
-            status: 'accepted',
-            slotStart: slot.start,
-            slotEnd: slot.end,
-            expiresAt: null,
-            updatedAt: now
-        }, { merge: true });
+        // Claim the lock and flip the booking in one transaction, checking
+        // the lock still belongs to this booking. If this hold expired and
+        // another customer has since taken the slot, accepting the old
+        // request would double-book them — refuse it instead.
+        try {
+            await db.runTransaction(async (tx) => {
+                const lockSnap = await tx.get(lockRef);
+                if (lockSnap.exists) {
+                    const l = lockSnap.data() || {};
+                    const activeHold = l.status === 'held'
+                        && l.expiresAt && l.expiresAt.toDate().getTime() >= Date.now();
+                    if ((l.status === 'accepted' || activeHold)
+                        && l.bookingId && l.bookingId !== bookingId) {
+                        throw new HttpsError('failed-precondition',
+                            'That slot is now held by a different booking request. '
+                            + 'Decline this one, or decide the other request first.');
+                    }
+                }
+                tx.set(lockRef, {
+                    bookingId,
+                    status: 'accepted',
+                    slotStart: slot.start,
+                    slotEnd: slot.end,
+                    expiresAt: null,
+                    updatedAt: admin.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+                tx.update(bookingRef, {
+                    status: 'accepted',
+                    calendarEventId,
+                    decidedAt: admin.firestore.FieldValue.serverTimestamp(),
+                    respondedAt: admin.firestore.FieldValue.serverTimestamp(),
+                    slotStart: slot.start,
+                    slotEnd: slot.end,
+                    slotKey: lockKey,
+                    adminNotes: typeof note === 'string' ? note.slice(0, 500) : (booking.adminNotes || '')
+                });
+            });
+        } catch (err) {
+            // The event went in the diary before the claim failed — take it
+            // back out so the calendar matches what actually happened.
+            await deleteEvent({ calendarId: settings.calendarId, eventId: calendarEventId });
+            throw err;
+        }
 
         try {
             const fresh = await bookingRef.get();
@@ -482,15 +524,32 @@ exports.releaseExpiredHolds = onSchedule({
         return;
     }
 
+    // Read each lock before releasing it: an expired hold's slot may have
+    // been taken over by a newer booking, and releasing that newer lock
+    // would put a held slot back on sale.
+    const entries = stale.docs.map((doc) => ({
+        doc,
+        lockRef: (doc.data() || {}).slotKey
+            ? db.collection('slotLocks').doc(doc.data().slotKey)
+            : null
+    }));
+    const lockRefs = entries.filter((e) => e.lockRef).map((e) => e.lockRef);
+    const lockSnaps = lockRefs.length ? await db.getAll(...lockRefs) : [];
+    const lockById = {};
+    lockSnaps.forEach((snap) => { lockById[snap.ref.path] = snap; });
+
     const batch = db.batch();
-    stale.forEach((doc) => {
-        const d = doc.data() || {};
+    let released = 0;
+    entries.forEach(({ doc, lockRef }) => {
         batch.update(doc.ref, { status: 'expired', decidedAt: now });
-        if (d.slotKey) {
-            batch.set(db.collection('slotLocks').doc(d.slotKey),
-                { status: 'released', updatedAt: now }, { merge: true });
+        if (!lockRef) return;
+        const lockSnap = lockById[lockRef.path];
+        const l = (lockSnap && lockSnap.exists) ? lockSnap.data() : null;
+        if (!l || l.bookingId === doc.id) {
+            batch.set(lockRef, { status: 'released', updatedAt: now }, { merge: true });
+            released++;
         }
     });
     await batch.commit();
-    logger.info('Released expired holds', { count: stale.size });
+    logger.info('Released expired holds', { expired: stale.size, locksReleased: released });
 });

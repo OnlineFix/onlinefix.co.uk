@@ -2086,6 +2086,44 @@
             border-top: 1px solid var(--border-color);
         }
 
+        /* Accept carries the weight of the primary action; decline stays quiet
+           until the confirmation step, where it goes solid red. */
+        .btn-accept {
+            background: var(--success);
+            color: var(--white);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.25);
+        }
+
+        .btn-accept:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35);
+            filter: brightness(1.1);
+        }
+
+        .btn-accept:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-decline {
+            background: rgba(239, 68, 68, 0.15);
+            color: #F87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-decline:hover {
+            background: rgba(239, 68, 68, 0.25);
+        }
+
+        .modal-footer .btn:disabled,
+        .booking-actions .btn:disabled,
+        #avail-save-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         .booking-decision-note {
             margin-top: 1rem;
             padding: 0.75rem 1rem;
@@ -5221,28 +5259,29 @@
 
         /* ---- time helpers ------------------------------------------------- */
 
-        // Firestore Timestamp | {seconds} | Date | ISO string -> Date | null
+        // Firestore Timestamp | {seconds} | Date | ISO string -> Date | null.
+        // Anything that does not resolve to a real instant comes back null, so
+        // a half-migrated document cannot throw its way out of a render.
         function bkToDate(value) {
             if (!value) return null;
-            if (value instanceof Date) return isNaN(value.getTime()) ? null : value;
-            if (typeof value.toDate === 'function') {
-                try { return value.toDate(); } catch (_) { return null; }
-            }
-            if (typeof value.seconds === 'number') return new Date(value.seconds * 1000);
-            if (typeof value === 'string') {
-                const d = new Date(value);
-                return isNaN(d.getTime()) ? null : d;
-            }
-            return null;
+            let date = null;
+            if (value instanceof Date) date = value;
+            else if (typeof value.toDate === 'function') {
+                try { date = value.toDate(); } catch (_) { return null; }
+            } else if (typeof value.seconds === 'number') date = new Date(value.seconds * 1000);
+            else if (typeof value === 'string') date = new Date(value);
+            if (!(date instanceof Date) || isNaN(date.getTime())) return null;
+            return date;
         }
 
         function bkLondon(date, options) {
-            if (!date) return '';
+            if (!(date instanceof Date) || isNaN(date.getTime())) return '';
             return new Intl.DateTimeFormat('en-GB', Object.assign({ timeZone: BOOKING_TZ }, options)).format(date);
         }
 
         // Absolute instant -> the London calendar date it falls on.
         function bkDateKey(date) {
+            if (!(date instanceof Date) || isNaN(date.getTime())) return '';
             const parts = new Intl.DateTimeFormat('en-GB', {
                 timeZone: BOOKING_TZ, year: 'numeric', month: '2-digit', day: '2-digit'
             }).formatToParts(date);
@@ -5254,6 +5293,7 @@
         // A date key back to a Date safely parked at midday UTC, so formatting
         // it in London can never land on the previous day.
         function bkDateKeyToDate(dateKey) {
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(String(dateKey))) return null;
             const d = new Date(String(dateKey) + 'T12:00:00Z');
             return isNaN(d.getTime()) ? null : d;
         }
@@ -5653,11 +5693,17 @@
                 card.appendChild(strip);
             }
 
-            /* what was decided, once it has been */
+            /* what was decided, once it has been. decideBooking records the
+               decline as a map — declineReason: { id, label, message } — with
+               the flat fields kept as a fallback for anything older. */
             const decisionBits = [];
-            if (booking.declineReasonLabel) decisionBits.push('Reason sent: ' + booking.declineReasonLabel);
-            else if (booking.declineReasonId) decisionBits.push('Reason sent: ' + booking.declineReasonId);
-            if (booking.declineMessage) decisionBits.push(booking.declineMessage);
+            const declineInfo = (booking.declineReason && typeof booking.declineReason === 'object')
+                ? booking.declineReason : {};
+            const reasonLabel = declineInfo.label || booking.declineReasonLabel
+                || declineInfo.id || booking.declineReasonId;
+            if (reasonLabel) decisionBits.push('Reason sent: ' + reasonLabel);
+            const reasonMessage = declineInfo.message || booking.declineMessage;
+            if (reasonMessage) decisionBits.push(reasonMessage);
             const internalNote = booking.adminNote || booking.note || booking.adminNotes;
             if (internalNote) decisionBits.push('Your note: ' + internalNote);
             if (booking.calendarEventId) decisionBits.push('In your Google Calendar');
@@ -5668,9 +5714,9 @@
             /* actions - only a held booking can still be decided */
             if (status === 'held') {
                 const actions = bkEl('div', 'booking-actions');
-                actions.appendChild(bkButton('Accept', 'btn btn-success', 'fa-check',
+                actions.appendChild(bkButton('Accept', 'btn btn-accept', 'fa-check',
                     () => openBookingDecision(booking.id, 'accept')));
-                actions.appendChild(bkButton('Decline', 'btn btn-danger', 'fa-xmark',
+                actions.appendChild(bkButton('Decline', 'btn btn-decline', 'fa-xmark',
                     () => openBookingDecision(booking.id, 'decline')));
                 if (email) {
                     actions.appendChild(bkButton('Email', 'btn btn-email', 'fa-envelope',
@@ -5848,7 +5894,7 @@
                 chooseFooter.appendChild(note);
             }
             chooseFooter.appendChild(bkButton('Cancel', 'btn btn-secondary', null, () => modal.remove()));
-            const continueBtn = bkButton('Continue', isAccept ? 'btn btn-success' : 'btn btn-danger', 'fa-arrow-right', () => {
+            const continueBtn = bkButton('Continue', isAccept ? 'btn btn-accept' : 'btn btn-danger', 'fa-arrow-right', () => {
                 if (!isAccept) {
                     if (!selectedReason) {
                         showAlert('Pick a reason first.', 'error');
@@ -5906,7 +5952,7 @@
             confirmFooter.appendChild(backBtn);
 
             const confirmBtn = bkButton(isAccept ? 'Yes, accept' : 'Yes, decline',
-                isAccept ? 'btn btn-success' : 'btn btn-danger',
+                isAccept ? 'btn btn-accept' : 'btn btn-danger',
                 isAccept ? 'fa-check' : 'fa-xmark',
                 async () => {
                     const payload = { bookingId: booking.id, decision: isAccept ? 'accept' : 'decline' };
