@@ -3261,6 +3261,18 @@
         }
 
         // Utility for escaping HTML to prevent XSS
+        /* Money off a repair document, as a number.
+
+           Every current writer stores estimatedCost via parseFloat, so it is
+           a number or null. Older documents may predate that. A string slips
+           through `|| 0` intact, which turns the revenue reduce into string
+           concatenation (0 + "120" + "95" reads as 012095) and makes
+           .toFixed throw while building an invoice. Coerce once, here. */
+        function toAmount(value) {
+            const n = typeof value === 'number' ? value : parseFloat(value);
+            return Number.isFinite(n) ? n : 0;
+        }
+
         function escapeHTML(str) {
             if (str === null || str === undefined) return '';
             return String(str)
@@ -4472,7 +4484,7 @@
             if (customerRepairs.length === 0) return;
 
             const customer = customerRepairs[0];
-            const totalSpend = customerRepairs.reduce((sum, r) => sum + (r.estimatedCost || 0), 0);
+            const totalSpend = customerRepairs.reduce((sum, r) => sum + toAmount(r.estimatedCost), 0);
             const completedCount = customerRepairs.filter(r => r.currentStatus === 'completed').length;
 
             const modal = document.createElement('div');
@@ -4603,7 +4615,7 @@
                             <tr>
                                 <td><strong>Device Repair Service</strong></td>
                                 <td>${escapeHTML(repair.brand)} ${escapeHTML(repair.model)} (${escapeHTML(repair.deviceType)})</td>
-                                <td style="text-align: right;">£${(repair.estimatedCost || 0).toFixed(2)}</td>
+                                <td style="text-align: right;">£${toAmount(repair.estimatedCost).toFixed(2)}</td>
                             </tr>
                             <tr>
                                 <td colspan="2" style="color: #666;">${escapeHTML(repair.issueDescription || 'Repair service')}</td>
@@ -4611,7 +4623,7 @@
                             </tr>
                             <tr class="total-row">
                                 <td colspan="2" style="text-align: right;"><strong>TOTAL</strong></td>
-                                <td style="text-align: right;"><strong>£${(repair.estimatedCost || 0).toFixed(2)}</strong></td>
+                                <td style="text-align: right;"><strong>£${toAmount(repair.estimatedCost).toFixed(2)}</strong></td>
                             </tr>
                         </tbody>
                     </table>
@@ -4888,7 +4900,7 @@
             document.getElementById('avg-repair-time').textContent = avgDays;
 
             // Total estimated revenue
-            const totalRev = analyticsData.reduce((sum, r) => sum + (r.estimatedCost || 0), 0);
+            const totalRev = analyticsData.reduce((sum, r) => sum + toAmount(r.estimatedCost), 0);
             document.getElementById('total-revenue').textContent = '£' + totalRev.toLocaleString('en-GB', { minimumFractionDigits: 0 });
 
             // Completion rate
@@ -4958,7 +4970,7 @@
                     if (!r.dateReceived) return false;
                     const rd = new Date(r.dateReceived.seconds * 1000);
                     return rd.getMonth() === d.getMonth() && rd.getFullYear() === d.getFullYear();
-                }).reduce((sum, r) => sum + (r.estimatedCost || 0), 0);
+                }).reduce((sum, r) => sum + toAmount(r.estimatedCost), 0);
                 months.push({
                     label: d.toLocaleDateString('en-GB', { month: 'short' }),
                     value: revenue
