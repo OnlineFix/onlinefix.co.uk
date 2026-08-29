@@ -183,6 +183,19 @@
         }
 
         /* Buttons */
+        /* Icon-only row actions. These were 0.5rem of padding around a glyph —
+           about a 34px target, well under the 44pt minimum for a finger, and
+           six of them sit side by side. Sized for the shop iPad instead, with
+           a little margin so neighbours are not mis-tapped. */
+        .btn-action {
+            padding: 0.75rem;
+            min-width: 52px;
+            min-height: 52px;
+            justify-content: center;
+            font-size: 1.05rem;
+            margin: 0.15rem;
+        }
+
         .btn {
             display: inline-flex;
             align-items: center;
@@ -2760,16 +2773,16 @@
                 <td data-label="Status"><span class="status-badge ${status.class} ${statusClickable}" ${statusOnclick} ${statusTitle}>${status.label}</span>${overdueTag}</td>
                 <td data-label="Date">${date}<span class="repair-age ${ageClass}">${age}</span></td>
                 <td data-label="">
-                    <button class="btn btn-copy" style="padding: 0.5rem;" onclick="copyTrackingLink('${safeRepairId}', this)" title="Copy tracking link">
-                        <i class="fas fa-link"></i>
+                    <button class="btn btn-copy btn-action" onclick="openTrackingLink('${safeRepairId}')" title="Open tracking page">
+                        <i class="fas fa-external-link-alt"></i>
                     </button>
-                    <button class="btn btn-secondary" style="padding: 0.5rem;" onclick="viewRepair('${safeId}')" title="View details">
+                    <button class="btn btn-secondary btn-action" onclick="viewRepair('${safeId}')" title="View details">
                         <i class="fas fa-eye"></i>
                     </button>
-                    <button class="btn btn-primary" style="padding: 0.5rem;" onclick="editRepair('${safeId}')" title="Edit repair">
+                    <button class="btn btn-primary btn-action" onclick="editRepair('${safeId}')" title="Edit repair">
                         <i class="fas fa-edit"></i>
                     </button>
-                    <button class="btn btn-danger" style="padding: 0.5rem;" onclick="deleteRepair('${safeId}', '${safeRepairId}')" title="Delete repair">
+                    <button class="btn btn-danger btn-action" onclick="deleteRepair('${safeId}', '${safeRepairId}')" title="Delete repair">
                         <i class="fas fa-trash"></i>
                     </button>
                 </td>
@@ -3279,22 +3292,22 @@
                 <td data-label="Received">${dateReceived}<span class="repair-age ${ageClass}">${age}</span>${timerHTML}</td>
                 <td data-label="Est. Completion">${estCompletion}</td>
                 <td data-label="">
-                    <button class="btn btn-copy" style="padding: 0.5rem;" onclick="copyTrackingLink('${safeRepairId}', this)" title="Copy tracking link">
-                        <i class="fas fa-link"></i>
+                    <button class="btn btn-copy btn-action" onclick="openTrackingLink('${safeRepairId}')" title="Open tracking page">
+                        <i class="fas fa-external-link-alt"></i>
                     </button>
-                    <button class="btn btn-secondary" style="padding: 0.5rem;" onclick="viewRepair('${safeId}')" title="View details">
+                    <button class="btn btn-secondary btn-action" onclick="viewRepair('${safeId}')" title="View details">
                         <i class="fas fa-eye"></i>
                     </button>
-                    <button class="btn btn-primary" style="padding: 0.5rem;" onclick="editRepair('${safeId}')" title="Edit repair">
+                    <button class="btn btn-primary btn-action" onclick="editRepair('${safeId}')" title="Edit repair">
                         <i class="fas fa-edit"></i>
                     </button>
-                    <button class="btn btn-secondary" style="padding: 0.5rem;" onclick="generateInvoice('${safeId}')" title="Generate invoice">
+                    <button class="btn btn-secondary btn-action" onclick="generateInvoice('${safeId}')" title="Generate invoice">
                         <i class="fas fa-file-invoice"></i>
                     </button>
-                    <button class="btn btn-secondary" style="padding: 0.5rem;" onclick="reprintLabel('${safeId}')" title="Print label">
+                    <button class="btn btn-secondary btn-action" onclick="reprintLabel('${safeId}')" title="Print label">
                         <i class="fas fa-tag"></i>
                     </button>
-                    <button class="btn btn-danger" style="padding: 0.5rem;" onclick="deleteRepair('${safeId}', '${safeRepairId}')" title="Delete repair">
+                    <button class="btn btn-danger btn-action" onclick="deleteRepair('${safeId}', '${safeRepairId}')" title="Delete repair">
                         <i class="fas fa-trash"></i>
                     </button>
                 </td>
@@ -3303,29 +3316,11 @@
         }
 
         // Copy tracking link to clipboard
-        function copyTrackingLink(repairId, btn) {
-            const trackingUrl = `${window.location.origin}/track/?id=${repairId}`;
-            navigator.clipboard.writeText(trackingUrl).then(() => {
-                const icon = btn.querySelector('i');
-                icon.className = 'fas fa-check';
-                btn.classList.add('copied');
-                showAlert('Tracking link copied to clipboard!', 'info');
-                setTimeout(() => {
-                    icon.className = 'fas fa-link';
-                    btn.classList.remove('copied');
-                }, 2000);
-            }).catch(() => {
-                // Fallback for older browsers
-                const textArea = document.createElement('textarea');
-                textArea.value = trackingUrl;
-                textArea.style.position = 'fixed';
-                textArea.style.left = '-9999px';
-                document.body.appendChild(textArea);
-                textArea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textArea);
-                showAlert('Tracking link copied!', 'info');
-            });
+        // Opens the customer's tracking page in a new tab. This used to copy the
+        // URL to the clipboard, which meant a second manual step every time —
+        // on the iPad in particular, pasting it somewhere to open it.
+        function openTrackingLink(repairId) {
+            safeOpen(`${window.location.origin}/track/?id=${repairId}`);
         }
 
         // Toast notification system
