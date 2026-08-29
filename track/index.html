@@ -1109,54 +1109,8 @@
             // Build timeline only for used statuses
             const statusOrder = ['received', 'diagnosing', 'waiting-parts', 'in-repair', 'testing', 'ready', 'completed'];
 
-            statusOrder.forEach((statusKey) => {
-                // Skip if this status was never used
-                if (!usedStatuses.has(statusKey)) {
-                    return;
-                }
-
+            const renderItem = ({ statusKey, iconClass, timeText, notes, photos }) => {
                 const status = statusConfig[statusKey];
-                const progressItem = progress.find(p => p.status === statusKey);
-
-                let iconClass = 'pending';
-                let timeText = '';
-                let notes = '';
-                let photos = [];
-
-                // Check if this status is completed
-                const statusIndex = statusOrder.indexOf(statusKey);
-                const currentStatusIndex = statusOrder.indexOf(currentStatus);
-                const isCompleted = progressItem || statusIndex < currentStatusIndex;
-                const isCurrent = statusKey === currentStatus && !progressItem;
-
-                if (progressItem) {
-                    iconClass = `completed status-${statusKey}`;
-                    const date = new Date(progressItem.timestamp.seconds * 1000);
-                    timeText = date.toLocaleString('en-GB');
-                    notes = progressItem.notes || '';
-                    photos = progressItem.photos || [];
-                } else if (isCurrent) {
-                    iconClass = `current status-${statusKey}`;
-                    timeText = 'In Progress';
-                } else if (statusKey === 'received' && !progressItem) {
-                    // Always show received status with date
-                    iconClass = `completed status-${statusKey}`;
-                    if (dateReceived) {
-                        const date = new Date(dateReceived.seconds * 1000);
-                        timeText = date.toLocaleString('en-GB');
-                    } else {
-                        timeText = 'Device received';
-                    }
-                    notes = 'Device received and logged into system';
-                } else if (isCompleted) {
-                    iconClass = `completed status-${statusKey}`;
-                }
-
-                // For received status, include initial photos
-                if (statusKey === 'received' && initialPhotos && initialPhotos.length > 0) {
-                    photos = [...photos, ...initialPhotos];
-                }
-
                 const timelineItem = document.createElement('div');
                 timelineItem.className = 'timeline-item';
                 timelineItem.innerHTML = `
@@ -1171,15 +1125,83 @@
                             <div class="timeline-photos">
                                 ${photos.map(photo => `
                                     <div class="timeline-photo" onclick="showPhotoModal('${escapeJSStr(photo)}')">
-                                        <img src="${escapeHTML(photo)}" alt="Progress photo">
+                                        <img src="${escapeHTML(photo)}" alt="Progress photo" loading="lazy">
                                     </div>
                                 `).join('')}
                             </div>
                         ` : ''}
                     </div>
                 `;
-
                 timeline.appendChild(timelineItem);
+            };
+
+            statusOrder.forEach((statusKey) => {
+                // Skip if this status was never used
+                if (!usedStatuses.has(statusKey)) {
+                    return;
+                }
+
+                // Every update for this status, oldest first. A repair can pass
+                // through the same status more than once — a second round of
+                // work, or an update that adds photos without moving status on
+                // — and each of those is its own entry. Rendering only the
+                // first (the old .find) silently hid every later update and
+                // every photo attached to it.
+                const entries = progress
+                    .filter(p => p.status === statusKey)
+                    .sort((a, b) => (a.timestamp?.seconds || 0) - (b.timestamp?.seconds || 0));
+
+                const statusIndex = statusOrder.indexOf(statusKey);
+                const currentStatusIndex = statusOrder.indexOf(currentStatus);
+
+                if (entries.length > 0) {
+                    entries.forEach((entry, i) => {
+                        const photos = (entry.photos || []).slice();
+                        // Drop-off photos belong with the first "received" entry.
+                        if (statusKey === 'received' && i === 0 && initialPhotos && initialPhotos.length > 0) {
+                            photos.push(...initialPhotos);
+                        }
+                        renderItem({
+                            statusKey,
+                            iconClass: `completed status-${statusKey}`,
+                            timeText: entry.timestamp
+                                ? new Date(entry.timestamp.seconds * 1000).toLocaleString('en-GB')
+                                : '',
+                            notes: entry.notes || '',
+                            photos
+                        });
+                    });
+                    return;
+                }
+
+                // No recorded entry for this status: it is either where the
+                // repair is now, or a stage it passed through unlogged.
+                const isCurrent = statusKey === currentStatus;
+                const photos = [];
+                let timeText = '';
+                let notes = '';
+
+                if (statusKey === 'received') {
+                    timeText = dateReceived
+                        ? new Date(dateReceived.seconds * 1000).toLocaleString('en-GB')
+                        : 'Device received';
+                    notes = 'Device received and logged into system';
+                    if (initialPhotos && initialPhotos.length > 0) photos.push(...initialPhotos);
+                } else if (isCurrent) {
+                    timeText = 'In Progress';
+                }
+
+                renderItem({
+                    statusKey,
+                    iconClass: (isCurrent && statusKey !== 'received')
+                        ? `current status-${statusKey}`
+                        : (statusKey === 'received' || statusIndex < currentStatusIndex)
+                            ? `completed status-${statusKey}`
+                            : 'pending',
+                    timeText,
+                    notes,
+                    photos
+                });
             });
         }
 

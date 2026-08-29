@@ -1,12 +1,11 @@
 /* =====================================================================
    OnlineFix — in-store repair intake
    ---------------------------------------------------------------------
-   Two-handed workflow, one device:
+   Two-handed workflow, one device — one page per person:
 
-     Steps 1-3  technician, with the device in hand
-     Step  4    explicit handover screen
-     Steps 5-6  customer, entering their own details and signing
-     Step  7    confirmation, notifications, label
+     Step 1  technician, with the device in hand
+     Step 2  customer, entering their own details and signing
+     Step 3  thank-you, then notifications and label behind a Staff button
 
    Photos upload the moment they are taken, keyed on a repair ID minted at
    the start of the session, so evidence survives a crash or a closed lid
@@ -215,7 +214,7 @@
     // State
     // ------------------------------------------------------------------
 
-    var STEPS = ['tech', 'handover', 'customer', 'done'];
+    var STEPS = ['tech', 'customer', 'done'];
 
     var state = {
         repairId: newRepairId(),
@@ -299,17 +298,15 @@
             $('#actionbar').hidden = false;
         }
 
-        if (name === 'handover') {
-            next.innerHTML = 'Hand over to customer <svg class="icon" width="18" height="18"><use href="#i-arrow-right"/></svg>';
-            renderSummary($('#handover-summary'), false);
-        } else if (name === 'customer') {
+        if (name === 'customer') {
             next.innerHTML = 'Agree &amp; create repair <svg class="icon" width="18" height="18"><use href="#i-check"/></svg>';
             renderSummary($('#sign-summary'), true);
+            renderSummaryPhotos();
             $('#terms-body').innerHTML = TERMS_HTML;
             $('#terms-version').textContent = 'Version ' + TERMS_VERSION + ' · ' + TERMS_EFFECTIVE;
             sizeSignaturePad();
         } else if (name === 'tech') {
-            next.innerHTML = 'Continue <svg class="icon" width="18" height="18"><use href="#i-arrow-right"/></svg>';
+            next.innerHTML = 'Hand to customer <svg class="icon" width="18" height="18"><use href="#i-arrow-right"/></svg>';
             note.textContent = state.photos.length + ' photo' + (state.photos.length === 1 ? '' : 's') + ' captured';
         } else {
             next.innerHTML = 'Continue <svg class="icon" width="18" height="18"><use href="#i-arrow-right"/></svg>';
@@ -382,7 +379,6 @@
 
             var acks = ['#f-ack-owner', '#f-ack-backup', '#f-ack-terms'].every(function (id) { return $(id).checked; });
             if (!acks) { setFieldError('acks', true); ok = false; }
-            if (!requireText('#f-signed-name', 'signedName', 2)) fail($('#f-signed-name'));
             if (!state.signatureStrokes.length) { setFieldError('signature', true); ok = false; }
         }
 
@@ -836,6 +832,26 @@
         };
     }
 
+    function renderSummaryPhotos() {
+        var target = $('#sign-photos');
+        var saved = state.photos.filter(function (photo) { return photo.status === 'done'; });
+
+        if (!saved.length) {
+            target.hidden = true;
+            target.innerHTML = '';
+            return;
+        }
+
+        target.hidden = false;
+        target.innerHTML = '<p class="summary-photos__label">Photos we took of your device</p>' +
+            '<div class="summary-photos__grid">' +
+            saved.map(function (photo) {
+                return '<img class="summary-photos__item" src="' + escapeHTML(photo.previewUrl) +
+                    '" alt="Photo of your device">';
+            }).join('') +
+            '</div>';
+    }
+
     function renderSummary(target, forCustomer) {
         var d = collectDevice();
         var rows = [];
@@ -977,7 +993,7 @@
                 consent: {
                     termsVersion: TERMS_VERSION,
                     termsEffective: TERMS_EFFECTIVE,
-                    signedName: $('#f-signed-name').value.trim(),
+                    signedName: customerName,
                     signedAt: now,
                     signatureUrl: signature.url,
                     signaturePath: signature.path,

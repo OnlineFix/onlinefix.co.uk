@@ -494,25 +494,7 @@
             </div>
         </section>
 
-        <!-- ------------------------- 2. Handover ------------------------- -->
-        <section class="step" data-step="handover">
-            <div class="handover">
-                <div class="handover__icon">
-                    <svg class="icon" width="76" height="76"><use href="#i-handshake" /></svg>
-                </div>
-                <h1 class="handover__title">Pass the iPad over</h1>
-                <p class="handover__text">The device is logged and photographed. The next two screens are for the
-                    customer — their details, then the terms and a signature.</p>
-            </div>
-
-            <div class="card" style="margin-top:1.5rem;">
-                <h2 class="card__title"><svg class="icon" width="20" height="20"><use href="#i-clipboard" /></svg>Logged
-                    so far</h2>
-                <div class="summary" id="handover-summary"></div>
-            </div>
-        </section>
-
-        <!-- ------------------------- 3. Customer (single page) ------------------------- -->
+        <!-- ------------------------- 2. Customer (single page) ------------------------- -->
         <!-- Details, terms and signature all live on one scrolling page: the
              customer picks the iPad up once, works down it, and hands it back. -->
         <section class="step" data-step="customer">
@@ -607,6 +589,7 @@
                 <h2 class="card__title"><svg class="icon" width="20" height="20"><use href="#i-clipboard" /></svg>What
                     you're leaving with us</h2>
                 <div class="summary" id="sign-summary"></div>
+                <div class="summary-photos" id="sign-photos" hidden></div>
             </div>
 
             <div class="card">
@@ -645,12 +628,6 @@
             <div class="card">
                 <h2 class="card__title"><svg class="icon" width="20" height="20"><use
                             href="#i-pen" /></svg>Signature</h2>
-                <div class="field">
-                    <label class="field__label" for="f-signed-name">Your full name</label>
-                    <input class="input" id="f-signed-name" name="signedName" maxlength="120" autocapitalize="words"
-                        autocomplete="name" placeholder="Type your name as you'd sign it">
-                    <p class="field__error" data-error-for="signedName">Type your full name.</p>
-                </div>
                 <div class="sigpad" id="sigpad">
                     <canvas id="sig-canvas"></canvas>
                     <div class="sigpad__baseline"></div>
@@ -666,7 +643,7 @@
             </div>
         </section>
 
-        <!-- ------------------------- 4. Done ------------------------- -->
+        <!-- ------------------------- 3. Done ------------------------- -->
         <section class="step" data-step="done">
 
             <!-- Customer-facing. This is what the customer is looking at as they
