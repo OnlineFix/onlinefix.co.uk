@@ -3601,7 +3601,12 @@
             const date = repair.dateReceived ? new Date(repair.dateReceived.seconds * 1000).toLocaleDateString('en-GB') : 'N/A';
             const statusLabel = statusConfig[repair.currentStatus]?.label || repair.currentStatus;
 
-            const invoiceWindow = window.open('', '_blank', 'noopener');
+            // NOTE: no 'noopener' here. window.open() returns null when noopener
+            // is set — that is what the flag does — and this window has to be
+            // written into, so the handle is required. The opener reference is
+            // severed on the next line instead, which is the correct pattern
+            // when you need the handle back.
+            const invoiceWindow = window.open('', '_blank');
             if (!invoiceWindow) { showAlert('Pop-up blocked. Please allow pop-ups for this site.', 'error'); return; }
             invoiceWindow.opener = null;
             invoiceWindow.document.write(`
@@ -3697,7 +3702,12 @@
             const repair = allRepairs.find(r => r.id === repairId);
             if (!repair) return;
 
-            const labelWindow = window.open('', '_blank', 'width=400,height=300,noopener');
+            // NOTE: no 'noopener' here. window.open() returns null when noopener
+            // is set — that is what the flag does — and this window has to be
+            // written into, so the handle is required. The opener reference is
+            // severed on the next line instead, which is the correct pattern
+            // when you need the handle back.
+            const labelWindow = window.open('', '_blank', 'width=400,height=300');
             if (!labelWindow) { showAlert('Pop-up blocked. Please allow pop-ups for this site.', 'error'); return; }
             labelWindow.opener = null;
             labelWindow.document.write(`
