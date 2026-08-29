@@ -593,6 +593,36 @@ select.input {
 .summary__val { font-weight: 600; word-break: break-word; }
 .summary__val.is-price { color: var(--success); font-size: 1.15rem; }
 
+/* Photos the technician took, shown back to the customer above the terms so
+   they can see the condition record they are about to sign for. */
+.summary-photos { margin-top: 1.25rem; }
+
+.summary-photos__label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+}
+
+.summary-photos__grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+}
+
+.summary-photos__item {
+    width: 96px;
+    height: 96px;
+    object-fit: cover;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    background: var(--bg-input);
+}
+
+@media (max-width: 700px) {
+    .summary-photos__item { width: 76px; height: 76px; }
+}
+
 /* ============================ Terms + signature ============================ */
 
 .terms {
