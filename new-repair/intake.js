@@ -28,8 +28,8 @@
        consent records the version it agreed to, which is the whole point of
        collecting a signature — "which terms did they actually sign?" has to
        be answerable months later. */
-    var TERMS_VERSION = 'dropoff-1.0';
-    var TERMS_EFFECTIVE = '21 August 2026';
+    var TERMS_VERSION = 'dropoff-1.1';
+    var TERMS_EFFECTIVE = '29 August 2026';
 
     var MAX_PHOTO_BYTES = 10 * 1024 * 1024;
     var MAX_PHOTOS = 12;
@@ -93,7 +93,7 @@
         '<p>We may ask for proof of ownership, particularly for phones. We reserve the right to decline a repair where ownership cannot reasonably be established.</p>',
 
         '<h3>11. Your personal information</h3>',
-        '<p>We collect your name, contact details and address to carry out this repair, contact you about it, and keep a record of work done. We keep repair records for six years for warranty, accounting and dispute purposes, then delete them. We do not sell your details or share them with anyone outside the repair. You can ask to see, correct or delete your details at any time — email ' + SHOP_EMAIL + '. Full detail is in our privacy notice at ' + SITE_URL + '/privacy.html.</p>',
+        '<p>We collect your name and contact details to carry out this repair, contact you about it, and keep a record of work done. We keep repair records for six years for warranty, accounting and dispute purposes, then delete them. We do not sell your details or share them with anyone outside the repair. You can ask to see, correct or delete your details at any time — email ' + SHOP_EMAIL + '. Full detail is in our privacy notice at ' + SITE_URL + '/privacy.html.</p>',
 
         '<h3>12. Contact</h3>',
         '<p>OnlineFix, ' + SHOP_ADDRESS + '. Phone ' + SHOP_PHONE + '. Email ' + SHOP_EMAIL + '.</p>'
@@ -168,12 +168,6 @@
 
     function isValidEmail(raw) {
         return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(raw || '').trim());
-    }
-
-    function formatPostcode(raw) {
-        var value = String(raw || '').toUpperCase().replace(/\s+/g, '');
-        if (!/^[A-Z]{1,2}\d[A-Z\d]?\d[A-Z]{2}$/.test(value)) return String(raw || '').trim();
-        return value.slice(0, value.length - 3) + ' ' + value.slice(-3);
     }
 
     function money(value) {
@@ -676,12 +670,6 @@
         if (c.lastName) $('#f-last').value = c.lastName;
         if (c.email) $('#f-email').value = c.email;
         if (c.phone) $('#f-phone').value = c.phone;
-        if (c.address) {
-            $('#f-addr1').value = c.address.line1 || '';
-            $('#f-addr2').value = c.address.line2 || '';
-            $('#f-city').value = c.address.city || '';
-            $('#f-postcode').value = c.address.postcode || '';
-        }
         $('#recall').classList.remove('is-shown');
         clearAllErrors();
         toast('Details filled in — please check they are still right.', 'success');
@@ -938,12 +926,6 @@
             var email = $('#f-email').value.trim();
             var phone = $('#f-phone').value.trim();
             var customerName = (firstName + ' ' + lastName).trim();
-            var address = {
-                line1: $('#f-addr1').value.trim(),
-                line2: $('#f-addr2').value.trim(),
-                city: $('#f-city').value.trim(),
-                postcode: formatPostcode($('#f-postcode').value)
-            };
             var now = firebase.firestore.Timestamp.now();
             var photoUrls = state.photos.filter(function (p) { return p.status === 'done'; }).map(function (p) { return p.url; });
             var photoPaths = state.photos.filter(function (p) { return p.status === 'done'; }).map(function (p) { return p.path; });
@@ -987,7 +969,6 @@
                 depositPaid: d.deposit ? parseFloat(d.deposit) : null,
                 turnaround: d.turnaround,
                 photoPaths: photoPaths,
-                customerAddress: address,
                 customerId: state.matchedCustomerId || '',
                 marketingOptIn: !!$('#f-marketing').checked,
                 consent: {
@@ -1011,7 +992,7 @@
             try {
                 await upsertCustomer({
                     firstName: firstName, lastName: lastName, email: email, phone: phone,
-                    address: address, marketingOptIn: repairData.marketingOptIn
+                    marketingOptIn: repairData.marketingOptIn
                 });
             } catch (err) {
                 console.error('Customer record update failed', err);
@@ -1065,14 +1046,6 @@
             repairIds: firebase.firestore.FieldValue.arrayUnion(state.repairId),
             repairCount: firebase.firestore.FieldValue.increment(1)
         };
-
-        // Only write an address when one was actually given, so a returning
-        // customer who skips the optional fields keeps the address already on
-        // file rather than having it blanked.
-        var hasAddress = Object.keys(customer.address).some(function (key) {
-            return customer.address[key];
-        });
-        if (hasAddress) payload.address = customer.address;
 
         var id = state.matchedCustomerId;
         if (!id) {
@@ -1289,10 +1262,6 @@
             el.classList.remove('is-invalid');
             if (el.name) setFieldError(el.name, false);
         });
-    });
-
-    $('#f-postcode').addEventListener('blur', function () {
-        this.value = formatPostcode(this.value);
     });
 
     // Guard against a stray swipe binning a half-finished intake.
