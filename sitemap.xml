@@ -4,7 +4,7 @@
   <!-- Homepage - Highest priority, updated weekly -->
   <url>
     <loc>https://onlinefix.co.uk/</loc>
-    <lastmod>2026-08-27</lastmod>
+    <lastmod>2026-08-30</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
@@ -100,7 +100,7 @@
   <!-- Reviews page - Medium priority, updated monthly -->
   <url>
     <loc>https://onlinefix.co.uk/reviews.html</loc>
-    <lastmod>2026-08-27</lastmod>
+    <lastmod>2026-08-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
