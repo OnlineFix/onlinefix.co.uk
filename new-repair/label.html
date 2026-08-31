@@ -56,25 +56,54 @@
             transform: rotate(90deg) translateY(-100%);
         }
 
-        .label__top { display: flex; align-items: baseline; justify-content: space-between; gap: 2mm; }
-        .label__brand { font-weight: 800; letter-spacing: -0.02em; }
-        .label__ref { font-weight: 800; font-family: 'SF Mono', ui-monospace, Menlo, monospace; }
-        .label__name { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .label__device { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .label__issue {
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            line-height: 1.25;
+        /* Sticker layout. Everything is nowrap with ellipsis: a shelf label
+           that silently wraps to a second line pushes the rest off the sticker,
+           which is worse than a truncated device name. */
+        .lbl-top {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 1.5mm;
         }
-        .label__foot {
+
+        .lbl-ref {
+            font-weight: 800;
+            font-family: 'SF Mono', ui-monospace, Menlo, Consolas, monospace;
+            letter-spacing: -0.01em;
+            line-height: 1;
+        }
+
+        .lbl-brand {
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .lbl-name {
+            font-weight: 700;
+            line-height: 1.15;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .lbl-device {
+            font-weight: 500;
+            line-height: 1.15;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .lbl-foot {
             display: flex;
             justify-content: space-between;
-            gap: 2mm;
-            border-top: 0.3mm solid #000;
-            padding-top: 1mm;
+            gap: 1.5mm;
+            border-top: 0.25mm solid #000;
+            padding-top: 0.8mm;
             white-space: nowrap;
+            font-weight: 500;
         }
 
         @media print {
