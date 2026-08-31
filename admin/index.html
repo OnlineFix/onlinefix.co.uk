@@ -154,6 +154,13 @@
         /* Main Content */
         .main-content {
             flex: 1;
+            /* Flex items default to min-width:auto, which refuses to shrink
+               below the content's intrinsic width. The repairs table is far
+               wider than a phone, so without this the whole page grew to the
+               table's width and scrolled sideways instead of the table
+               scrolling inside .table-container (which already sets
+               overflow-x:auto and could never engage). */
+            min-width: 0;
             margin-left: 280px;
             padding: 2rem;
         }
@@ -200,6 +207,7 @@
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
+            min-height: 44px;
             padding: 0.75rem 1.5rem;
             border: none;
             border-radius: var(--radius-md);
@@ -650,8 +658,8 @@
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid var(--border-color);
             border-radius: 50%;
-            width: 36px;
-            height: 36px;
+            width: 44px;
+            height: 44px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -731,11 +739,17 @@
         /* Hamburger menu toggle */
         .menu-toggle {
             display: none;
+            align-items: center;
+            justify-content: center;
             background: none;
             border: none;
             font-size: 1.4rem;
             color: var(--text-main);
             cursor: pointer;
+            /* Sized explicitly rather than left to the glyph plus padding, so
+               the target holds even if the icon font fails to load. */
+            min-width: 44px;
+            min-height: 44px;
             padding: 0.5rem;
             border-radius: 8px;
             transition: background 0.2s ease;
@@ -764,7 +778,7 @@
         /* Responsive - Tablet */
         @media (max-width: 1024px) {
             .menu-toggle {
-                display: block;
+                display: inline-flex;
             }
 
             .sidebar {
@@ -783,6 +797,10 @@
 
         /* Responsive - Mobile */
         @media (max-width: 768px) {
+            .kbd-hint-toggle {
+                display: none;
+            }
+
             .main-content {
                 padding: 0.75rem;
             }
@@ -800,6 +818,11 @@
             .header-actions .btn {
                 padding: 0.6rem 1rem;
                 font-size: 0.85rem;
+                /* The label is hidden just below, so without a floor these
+                   collapse to the width of a single icon. */
+                min-width: 44px;
+                min-height: 44px;
+                justify-content: center;
             }
 
             .header-actions .btn-label {
@@ -1061,7 +1084,10 @@
             opacity: 0.6;
             font-size: 1.1rem;
             margin-left: auto;
-            padding: 0 0.25rem;
+            /* Dismissing a toast on a phone was a ~14px target. */
+            min-width: 44px;
+            min-height: 44px;
+            padding: 0 0.5rem;
         }
 
         .toast-close:hover {
@@ -1274,8 +1300,11 @@
         }
 
         .bulk-checkbox {
-            width: 18px;
-            height: 18px;
+            /* Row selection on a touch screen: 18px was a miss more often
+               than a hit. */
+            width: 24px;
+            height: 24px;
+            margin: 0.5rem;
             accent-color: var(--primary-blue);
             cursor: pointer;
         }
@@ -1780,7 +1809,14 @@
             z-index: 100;
         }
 
+        /* Keyboard shortcuts are a desktop affordance; hidden on touch
+           widths below rather than left as an 18px target nobody wants. */
         .kbd-hint-toggle {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 44px;
+            min-height: 44px;
             background: var(--bg-elevated);
             border: 1px solid var(--border-color);
             color: var(--text-dark);
