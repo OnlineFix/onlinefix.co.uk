@@ -87,7 +87,6 @@
 
         inner.style.width = size.w + 'mm';
         inner.style.height = size.h + 'mm';
-        inner.style.fontSize = (2.4 * size.scale) + 'mm';
         label.classList.toggle('is-rotated', rotated);
 
         $('#dims').textContent = size.w + ' × ' + size.h + ' mm' + (rotated ? ' · turned' : '');
@@ -97,28 +96,30 @@
             '@page { size: ' + (rotated ? size.h : size.w) + 'mm ' +
             (rotated ? size.w : size.h) + 'mm; margin: 0; }';
 
+        /* Type sized from the label's own height rather than a fixed scale, so
+           the sticker fills whichever roll is loaded instead of sitting tiny in
+           the middle of it. On the 32mm multipurpose roll this puts the
+           reference at about 6mm — readable across a workbench, which is the
+           whole job of a shelf label. */
+        var h = size.h;
+        var px = function (factor) { return (h * factor).toFixed(2) + 'mm'; };
+
         var received = repair.dateReceived && repair.dateReceived.seconds
             ? new Date(repair.dateReceived.seconds * 1000)
             : new Date();
 
-        var price = (typeof repair.estimatedCost === 'number' && isFinite(repair.estimatedCost))
-            ? '£' + repair.estimatedCost.toFixed(2)
-            : 'TBC';
-
         var device = repair.device || [repair.brand, repair.model].filter(Boolean).join(' ') || 'Device';
 
         inner.innerHTML =
-            '<div class="label__top">' +
-            '<span class="label__brand" style="font-size:' + (2.9 * size.scale) + 'mm">OnlineFix</span>' +
-            '<span class="label__ref" style="font-size:' + (3.4 * size.scale) + 'mm">' + escapeHTML(shortRef(repair.repairId)) + '</span>' +
+            '<div class="lbl-top">' +
+            '<span class="lbl-ref" style="font-size:' + px(0.20) + '">' + escapeHTML(shortRef(repair.repairId)) + '</span>' +
+            '<span class="lbl-brand" style="font-size:' + px(0.085) + '">OnlineFix</span>' +
             '</div>' +
-            '<div class="label__name" style="font-size:' + (3.1 * size.scale) + 'mm">' + escapeHTML(repair.customerName || '—') + '</div>' +
-            '<div class="label__device" style="font-size:' + (2.6 * size.scale) + 'mm">' + escapeHTML(device) + '</div>' +
-            '<div class="label__issue" style="font-size:' + (2.2 * size.scale) + 'mm">' + escapeHTML(repair.issueDescription || '') + '</div>' +
-            '<div class="label__foot" style="font-size:' + (2 * size.scale) + 'mm">' +
-            '<span>' + escapeHTML(repair.customerPhone || '') + '</span>' +
-            '<span>' + escapeHTML(price) + '</span>' +
+            '<div class="lbl-name" style="font-size:' + px(0.135) + '">' + escapeHTML(repair.customerName || '—') + '</div>' +
+            '<div class="lbl-device" style="font-size:' + px(0.115) + '">' + escapeHTML(device) + '</div>' +
+            '<div class="lbl-foot" style="font-size:' + px(0.082) + '">' +
             '<span>' + received.toLocaleDateString('en-GB') + '</span>' +
+            '<span>' + escapeHTML(repair.customerPhone || '') + '</span>' +
             '</div>';
     }
 
