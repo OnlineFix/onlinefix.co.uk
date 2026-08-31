@@ -17,12 +17,20 @@
     /* Genuine DYMO rolls the 550 accepts, measured landscape
        (width = the direction the label feeds). */
     var LABEL_SIZES = [
+        { id: '11354', name: '11354 / S0722540 — Multipurpose', w: 57, h: 32, scale: 0.78 },
         { id: '99012', name: '99012 / S0722400 — Large address', w: 89, h: 36, scale: 1 },
         { id: '30252', name: '30252 — Address', w: 89, h: 28, scale: 0.9 },
-        { id: '11354', name: '11354 / S0722540 — Multipurpose', w: 57, h: 32, scale: 0.8 },
         { id: '30336', name: '30336 — Small multipurpose', w: 54, h: 25, scale: 0.7 },
         { id: '11356', name: '11356 — Name badge', w: 101, h: 54, scale: 1.3 }
     ];
+
+    /* A LabelWriter feeds the label under a fixed-width head, and the Windows
+       driver decides which way round that is. When the driver's idea of the
+       paper disagrees with the @page rule below, the label prints sideways.
+       Rather than send people into Windows print settings, this rotates the
+       artwork a quarter turn and swaps the page box, which corrects it from
+       the page itself. The choice is remembered per machine. */
+    var rotated = false;
 
     var firebaseConfig = {
         apiKey: 'AIzaSyCKBlO4aHTVSjwyevg1OYZ0NWy3Y62HJuU',
@@ -70,16 +78,24 @@
     function renderLabel() {
         var size = selectedSize();
         var label = $('#label');
+        var inner = $('#label-inner');
 
-        label.style.width = size.w + 'mm';
-        label.style.height = size.h + 'mm';
-        label.style.fontSize = (2.4 * size.scale) + 'mm';
+        // The page box follows the rotation; the artwork inside never changes
+        // shape, it is just turned within that box.
+        label.style.width = (rotated ? size.h : size.w) + 'mm';
+        label.style.height = (rotated ? size.w : size.h) + 'mm';
 
-        $('#dims').textContent = size.w + ' × ' + size.h + ' mm';
+        inner.style.width = size.w + 'mm';
+        inner.style.height = size.h + 'mm';
+        inner.style.fontSize = (2.4 * size.scale) + 'mm';
+        label.classList.toggle('is-rotated', rotated);
+
+        $('#dims').textContent = size.w + ' × ' + size.h + ' mm' + (rotated ? ' · turned' : '');
 
         // @page has to match the roll or the driver scales or clips the output.
         $('#page-rule').textContent =
-            '@page { size: ' + size.w + 'mm ' + size.h + 'mm; margin: 0; }';
+            '@page { size: ' + (rotated ? size.h : size.w) + 'mm ' +
+            (rotated ? size.w : size.h) + 'mm; margin: 0; }';
 
         var received = repair.dateReceived && repair.dateReceived.seconds
             ? new Date(repair.dateReceived.seconds * 1000)
@@ -91,7 +107,7 @@
 
         var device = repair.device || [repair.brand, repair.model].filter(Boolean).join(' ') || 'Device';
 
-        label.innerHTML =
+        inner.innerHTML =
             '<div class="label__top">' +
             '<span class="label__brand" style="font-size:' + (2.9 * size.scale) + 'mm">OnlineFix</span>' +
             '<span class="label__ref" style="font-size:' + (3.4 * size.scale) + 'mm">' + escapeHTML(shortRef(repair.repairId)) + '</span>' +
@@ -123,6 +139,13 @@
 
         select.addEventListener('change', function () {
             try { localStorage.setItem('onlinefix.labelSize', select.value); } catch (err) { /* private mode */ }
+            renderLabel();
+        });
+
+        try { rotated = localStorage.getItem('onlinefix.labelRotated') === '1'; } catch (err) { /* private mode */ }
+        $('#btn-rotate').addEventListener('click', function () {
+            rotated = !rotated;
+            try { localStorage.setItem('onlinefix.labelRotated', rotated ? '1' : '0'); } catch (err) { /* private mode */ }
             renderLabel();
         });
     }

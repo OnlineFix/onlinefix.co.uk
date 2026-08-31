@@ -28,6 +28,17 @@
         }
 
         .label {
+            position: relative;
+            background: #FFFFFF;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, .18);
+        }
+
+        .label__inner {
+            position: absolute;
+            top: 0;
+            left: 0;
+            transform-origin: top left;
             background: #FFFFFF;
             color: #000000;
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -37,7 +48,12 @@
             flex-direction: column;
             justify-content: space-between;
             overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, .18);
+        }
+
+        /* A quarter turn about the top-left corner, then pulled back up by its
+           own height so it lands square inside the swapped page box. */
+        .label.is-rotated .label__inner {
+            transform: rotate(90deg) translateY(-100%);
         }
 
         .label__top { display: flex; align-items: baseline; justify-content: space-between; gap: 2mm; }
@@ -104,6 +120,11 @@
             <rect x="4" y="10.5" width="16" height="11" rx="2" />
             <path d="M8 10.5V7a4 4 0 0 1 8 0v3.5" />
         </symbol>
+        <symbol id="i-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 12a8 8 0 1 1-2.6-5.9" />
+            <path d="M20 3.5V9h-5.5" />
+        </symbol>
         <symbol id="i-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
             stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="9.5" />
@@ -157,20 +178,27 @@
             <div class="card">
                 <h2 class="card__title">Preview <span class="card__hint" id="dims"></span></h2>
                 <div class="label-stage">
-                    <div class="label" id="label"></div>
+                    <div class="label" id="label"><div class="label__inner" id="label-inner"></div></div>
                 </div>
             </div>
 
             <div class="banner banner--info">
                 <svg class="icon" width="18" height="18"><use href="#i-info" /></svg>
-                <div>In the print dialog choose <strong>DYMO LabelWriter 550</strong>, set paper size to the roll you
-                    picked above, scale to <strong>100%</strong>, and turn margins <strong>off</strong>. Safari and
-                    Chrome both remember it after the first time.</div>
+                <div>In the print dialog: <strong>DYMO LabelWriter 550</strong>, paper size set to the roll picked
+                    above, scale <strong>100%</strong>, margins <strong>None</strong>, and <strong>Headers and
+                        footers off</strong>. If it still comes out sideways, use the turn button below rather than
+                    changing Windows settings — the browser remembers both after the first print.</div>
             </div>
 
-            <button type="button" class="btn btn--primary btn--lg btn--block" id="btn-print">
-                <svg class="icon" width="20" height="20"><use href="#i-printer" /></svg>Print label
-            </button>
+            <div style="display:grid;gap:0.85rem;">
+                <button type="button" class="btn btn--primary btn--lg btn--block" id="btn-print">
+                    <svg class="icon" width="20" height="20"><use href="#i-printer" /></svg>Print label
+                </button>
+                <button type="button" class="btn btn--ghost btn--block" id="btn-rotate">
+                    <svg class="icon" width="18" height="18"><use href="#i-refresh" /></svg>Printed sideways? Turn it a
+                    quarter turn
+                </button>
+            </div>
         </div>
     </main>
 
