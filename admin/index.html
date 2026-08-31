@@ -3734,50 +3734,16 @@
         }
 
         // === PRINT LABEL FROM ADMIN ===
+        // Opens the shared label page rather than writing a second label here.
+        // That page sets an @page rule matching the loaded roll, which is what
+        // stops the LabelWriter rotating or scaling the output; this function
+        // used to write its own markup with no @page rule at all, so Windows
+        // fell back to A4 and the driver turned a 57x32mm box sideways to fit.
+        // One label implementation, one place to change it.
         function reprintLabel(repairId) {
             const repair = allRepairs.find(r => r.id === repairId);
             if (!repair) return;
-
-            // NOTE: no 'noopener' here. window.open() returns null when noopener
-            // is set — that is what the flag does — and this window has to be
-            // written into, so the handle is required. The opener reference is
-            // severed on the next line instead, which is the correct pattern
-            // when you need the handle back.
-            const labelWindow = window.open('', '_blank', 'width=400,height=300');
-            if (!labelWindow) { showAlert('Pop-up blocked. Please allow pop-ups for this site.', 'error'); return; }
-            labelWindow.opener = null;
-            labelWindow.document.write(`
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline';">
-                    <title>Label - ${escapeHTML(repair.repairId)}</title>
-                    <style>
-                        * { margin: 0; padding: 0; box-sizing: border-box; }
-                        body { font-family: 'Arial', sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; background: #f5f5f5; }
-                        .label { width: 2.25in; height: 1.25in; background: white; padding: 0.15in; border: 1px solid #ccc; display: flex; flex-direction: column; justify-content: center; }
-                        .label-header { font-size: 10pt; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #000; padding-bottom: 2px; margin-bottom: 3px; }
-                        .label-id { font-size: 9pt; font-weight: 700; }
-                        .label-customer { font-size: 7pt; margin-top: 2px; }
-                        .label-device { font-size: 7pt; color: #333; }
-                        .label-date { font-size: 6pt; color: #666; margin-top: 3px; }
-                        .print-btn { position: fixed; bottom: 1rem; right: 1rem; padding: 0.5rem 1.5rem; background: #0033FF; color: white; border: none; border-radius: 6px; cursor: pointer; }
-                        @media print { .print-btn { display: none; } body { background: white; } }
-                    </style>
-                </head>
-                <body>
-                    <button class="print-btn" onclick="window.print()">Print Label</button>
-                    <div class="label">
-                        <div class="label-header">OnlineFix</div>
-                        <div class="label-id">${escapeHTML(repair.repairId)}</div>
-                        <div class="label-customer">${escapeHTML(repair.customerName)}</div>
-                        <div class="label-device">${escapeHTML(repair.brand)} ${escapeHTML(repair.model)}</div>
-                        <div class="label-date">${repair.dateReceived ? new Date(repair.dateReceived.seconds * 1000).toLocaleDateString('en-GB') : ''}</div>
-                    </div>
-                </body>
-                </html>
-            `);
-            labelWindow.document.close();
+            safeOpen(`${window.location.origin}/new-repair/label.html?id=${encodeURIComponent(repair.repairId)}`);
         }
 
         // === DATE RANGE FILTER FOR ANALYTICS ===
