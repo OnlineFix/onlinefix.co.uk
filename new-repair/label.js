@@ -52,7 +52,7 @@
     var db = firebase.firestore();
     var auth = firebase.auth();
 
-    function $(sel) { return document.querySelector(sel); }
+    function $(sel, root) { return (root || document).querySelector(sel); }
 
     function escapeHTML(value) {
         if (value === null || value === undefined) return '';
@@ -73,6 +73,21 @@
     function selectedSize() {
         var id = $('#size').value;
         return LABEL_SIZES.filter(function (s) { return s.id === id; })[0] || LABEL_SIZES[0];
+    }
+
+    /* Steps a single line down until it fits its width. The customer name is
+       the thing you scan a shelf for, so losing the surname to an ellipsis is
+       worse than setting a long name slightly smaller. Bounded by a floor so a
+       very long name stays legible rather than shrinking away, and by a guard
+       so a zero-width box cannot spin this. */
+    function fitLine(el, startMm, floorMm) {
+        var mm = startMm;
+        el.style.fontSize = mm.toFixed(2) + 'mm';
+        for (var i = 0; i < 40 && mm > floorMm; i++) {
+            if (el.scrollWidth <= el.clientWidth + 1) break;
+            mm -= startMm * 0.04;
+            el.style.fontSize = mm.toFixed(2) + 'mm';
+        }
     }
 
     function renderLabel() {
@@ -96,31 +111,24 @@
             '@page { size: ' + (rotated ? size.h : size.w) + 'mm ' +
             (rotated ? size.w : size.h) + 'mm; margin: 0; }';
 
-        /* Type sized from the label's own height rather than a fixed scale, so
-           the sticker fills whichever roll is loaded instead of sitting tiny in
-           the middle of it. On the 32mm multipurpose roll this puts the
-           reference at about 6mm — readable across a workbench, which is the
-           whole job of a shelf label. */
+        /* Three things only — who, what, and the number to ring — so each can
+           be set large enough to read at arm's length on a shelf. Sized from
+           the label's own height so it fills whichever roll is loaded. */
         var h = size.h;
-        var px = function (factor) { return (h * factor).toFixed(2) + 'mm'; };
-
-        var received = repair.dateReceived && repair.dateReceived.seconds
-            ? new Date(repair.dateReceived.seconds * 1000)
-            : new Date();
+        var mm = function (factor) { return (h * factor).toFixed(2) + 'mm'; };
 
         var device = repair.device || [repair.brand, repair.model].filter(Boolean).join(' ') || 'Device';
+        var job = repair.issueDescription || device;
 
         inner.innerHTML =
-            '<div class="lbl-top">' +
-            '<span class="lbl-ref" style="font-size:' + px(0.20) + '">' + escapeHTML(shortRef(repair.repairId)) + '</span>' +
-            '<span class="lbl-brand" style="font-size:' + px(0.085) + '">OnlineFix</span>' +
-            '</div>' +
-            '<div class="lbl-name" style="font-size:' + px(0.135) + '">' + escapeHTML(repair.customerName || '—') + '</div>' +
-            '<div class="lbl-device" style="font-size:' + px(0.115) + '">' + escapeHTML(device) + '</div>' +
-            '<div class="lbl-foot" style="font-size:' + px(0.082) + '">' +
-            '<span>' + received.toLocaleDateString('en-GB') + '</span>' +
-            '<span>' + escapeHTML(repair.customerPhone || '') + '</span>' +
-            '</div>';
+            '<div class="lbl-name">' + escapeHTML(repair.customerName || '—') + '</div>' +
+            '<div class="lbl-job" style="font-size:' + mm(0.155) + '">' +
+            escapeHTML(job) + '</div>' +
+            '<div class="lbl-phone">' + escapeHTML(repair.customerPhone || '') + '</div>';
+
+        // Both of these are single lines that must survive intact.
+        fitLine($('.lbl-name', inner), h * 0.215, h * 0.135);
+        fitLine($('.lbl-phone', inner), h * 0.20, h * 0.135);
     }
 
     function buildSizeOptions() {
@@ -168,9 +176,13 @@
 
                 $('#who').textContent = repair.customerName || 'Customer';
                 buildSizeOptions();
-                renderLabel();
 
+                // Reveal before rendering. renderLabel measures text to shrink
+                // long lines to fit, and an element inside a hidden container
+                // has no layout — every measurement comes back 0, so the fit
+                // loop exited immediately and long names stayed clipped.
                 $('#content').hidden = false;
+                renderLabel();
                 $('#error').hidden = true;
                 $('#gate').hidden = true;
             })
