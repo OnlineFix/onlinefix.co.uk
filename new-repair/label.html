@@ -11,7 +11,7 @@
         content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://www.google.com https://www.recaptcha.net; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://www.google.com https://www.recaptcha.net; font-src 'self' data:; frame-src https://www.google.com https://www.recaptcha.net; base-uri 'none'; form-action 'none';">
     <title>Device label — OnlineFix</title>
 
-    <link rel="stylesheet" href="intake.css?v=20260829">
+    <link rel="stylesheet" href="intake.css?v=20260831">
     <style>
         .shell { max-width: 680px; padding-bottom: 3rem; }
         .actionbar { display: none; }
@@ -56,45 +56,29 @@
             transform: rotate(90deg) translateY(-100%);
         }
 
-        /* Sticker layout: three lines, as large as the roll allows.
-           Padding is deliberately generous at the sides — a LabelWriter has an
+        /* Sticker layout: four lines, each as large as the roll allows.
+           Side padding is deliberately generous — a LabelWriter has an
            unprintable margin on every edge, and designing to the full 57mm is
-           what clipped "ONLINEFIX" to "ONLINEF" and ate the end of the phone
-           number. Pulling the content in costs a couple of millimetres and
-           guarantees nothing is lost. */
+           what clipped "ONLINEFIX" to "ONLINEF" and ate the end of a phone
+           number. Pulling in costs a couple of millimetres and guarantees
+           nothing is lost. space-evenly spreads the four lines down the label
+           so there is no dead band at the bottom. */
         .label__inner {
-            padding: 2mm 3.5mm;
+            padding: 1.5mm 3.5mm;
             justify-content: space-evenly;
         }
 
-        .lbl-name {
-            font-weight: 800;
-            line-height: 1.08;
-            letter-spacing: -0.01em;
+        .lbl-line {
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            line-height: 1.1;
         }
 
-        /* The job can be a sentence, so it gets two lines and then truncates,
-           rather than pushing the phone number off the sticker. */
-        .lbl-job {
-            font-weight: 500;
-            line-height: 1.18;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .lbl-phone {
-            font-weight: 700;
-            line-height: 1.08;
-            letter-spacing: 0.01em;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
+        .lbl-name { font-weight: 800; letter-spacing: -0.01em; }
+        .lbl-job { font-weight: 500; }
+        .lbl-phone { font-weight: 700; letter-spacing: 0.01em; }
+        .lbl-date { font-weight: 500; }
 
         @media print {
             html, body { background: #fff !important; margin: 0 !important; padding: 0 !important; }
@@ -115,7 +99,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-check-compat.js"></script>
-    <script defer src="label.js?v=20260829"></script>
+    <script defer src="label.js?v=20260831"></script>
 </head>
 
 <body>

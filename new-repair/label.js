@@ -111,24 +111,36 @@
             '@page { size: ' + (rotated ? size.h : size.w) + 'mm ' +
             (rotated ? size.w : size.h) + 'mm; margin: 0; }';
 
-        /* Three things only — who, what, and the number to ring — so each can
-           be set large enough to read at arm's length on a shelf. Sized from
-           the label's own height so it fills whichever roll is loaded. */
         var h = size.h;
-        var mm = function (factor) { return (h * factor).toFixed(2) + 'mm'; };
-
         var device = repair.device || [repair.brand, repair.model].filter(Boolean).join(' ') || 'Device';
         var job = repair.issueDescription || device;
+        var received = repair.dateReceived && repair.dateReceived.seconds
+            ? new Date(repair.dateReceived.seconds * 1000)
+            : new Date();
 
         inner.innerHTML =
-            '<div class="lbl-name">' + escapeHTML(repair.customerName || '—') + '</div>' +
-            '<div class="lbl-job" style="font-size:' + mm(0.155) + '">' +
-            escapeHTML(job) + '</div>' +
-            '<div class="lbl-phone">' + escapeHTML(repair.customerPhone || '') + '</div>';
+            '<div class="lbl-line lbl-name"></div>' +
+            '<div class="lbl-line lbl-job"></div>' +
+            '<div class="lbl-line lbl-phone"></div>' +
+            '<div class="lbl-line lbl-date"></div>';
 
-        // Both of these are single lines that must survive intact.
-        fitLine($('.lbl-name', inner), h * 0.215, h * 0.135);
-        fitLine($('.lbl-phone', inner), h * 0.20, h * 0.135);
+        /* Every line is single-line and shrinks to fit. Keeping them all to one
+           line makes the total height predictable, which is what lets the four
+           of them be set large enough to fill the label rather than hedging
+           against a wrapped line pushing the last one off the bottom. */
+        [['.lbl-name', repair.customerName || '—', 0.200, 0.125],
+         // Higher floor than the others on purpose: a long fault description
+         // shrinking all the way down ends up both tiny AND clipped, which is
+         // the worst of both. Better to stop shrinking while it is still
+         // readable and let the tail ellipsise.
+         ['.lbl-job', job, 0.150, 0.120],
+         ['.lbl-phone', repair.customerPhone || '', 0.185, 0.120],
+         ['.lbl-date', received.toLocaleDateString('en-GB'), 0.130, 0.095]
+        ].forEach(function (row) {
+            var el = $(row[0], inner);
+            el.textContent = row[1];
+            fitLine(el, h * row[2], h * row[3]);
+        });
     }
 
     function buildSizeOptions() {
