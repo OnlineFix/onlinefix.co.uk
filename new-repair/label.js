@@ -84,10 +84,76 @@
         var mm = startMm;
         el.style.fontSize = mm.toFixed(2) + 'mm';
         for (var i = 0; i < 40 && mm > floorMm; i++) {
-            if (el.scrollWidth <= el.clientWidth + 1) break;
+            if (fitsWidth(el)) break;
             mm -= startMm * 0.04;
             el.style.fontSize = mm.toFixed(2) + 'mm';
         }
+    }
+
+    /* Measures the text itself rather than the box around it. scrollWidth is
+       no use here: it never reports less than clientWidth, so an element that
+       fills its row always looks exactly full whether the text needs 100px or
+       200px — which pinned the phone number to its size floor no matter how
+       much room the row actually had.
+
+       The 1px margin is deliberate. text-overflow has to make room for the
+       ellipsis glyph, so a single pixel of overrun swallows two or three
+       characters: a number one pixel too wide printed as "07376 9122…". */
+    function fitsWidth(el) {
+        return textWidth(el) <= el.clientWidth - 1;
+    }
+
+    /* Measures in a scratch span parked on the body, outside the label. A
+       rect read inside the label is no good in turned mode: the container is
+       rotated 90deg, so a rect taken there reports the line's height as its
+       width and every line "fits" however long it is. clientWidth, being
+       layout-space, is unaffected by the rotation and stays comparable. */
+    var gauge = null;
+    function textWidth(el) {
+        if (!gauge) {
+            gauge = document.createElement('span');
+            gauge.style.cssText =
+                'position:absolute;left:-9999px;top:0;white-space:pre;visibility:hidden';
+            document.body.appendChild(gauge);
+        }
+        var cs = window.getComputedStyle(el);
+        gauge.style.font = cs.font;
+        gauge.style.letterSpacing = cs.letterSpacing;
+        gauge.textContent = el.textContent;
+        return gauge.getBoundingClientRect().width;
+    }
+
+    /* Same idea as fitLine, but for a block that is allowed to wrap: shrink
+       until the wrapped text fits inside its clamped height. Truncating the
+       job loses what the repair actually is, which is half the point of the
+       sticker, so it is worth a smaller size to keep it whole. */
+    function fitBlock(el, startMm, floorMm) {
+        var mm = startMm;
+        el.style.fontSize = mm.toFixed(2) + 'mm';
+        for (var i = 0; i < 40 && mm > floorMm; i++) {
+            // Width matters as well as height: a single long word cannot wrap
+            // away, so "Featherstonehaugh" overran the roll while the block's
+            // height stayed within its two lines.
+            // No safety margin on width here: a block that wraps fills its
+            // width exactly, so scrollWidth == clientWidth is the normal
+            // fitting state. Only an unbreakable word overruns it.
+            if (el.scrollHeight <= el.clientHeight &&
+                el.scrollWidth <= el.clientWidth) break;
+            mm -= startMm * 0.05;
+            el.style.fontSize = mm.toFixed(2) + 'mm';
+        }
+    }
+
+    /* Labels show the number a person would actually dial. Intake stores
+       E.164 ("+447911123456"), which is both longer than the roll can set at a
+       readable size and not how anyone reads a number back over the counter. */
+    function phoneForLabel(raw) {
+        var text = String(raw || '').trim();
+        if (!text) return '';
+        var digits = text.replace(/[^\d+]/g, '');
+        if (digits.indexOf('+44') === 0) digits = '0' + digits.slice(3);
+        if (/^07\d{9}$/.test(digits)) return digits.slice(0, 5) + ' ' + digits.slice(5);
+        return digits.indexOf('+') === 0 ? text : digits || text;
     }
 
     function renderLabel() {
@@ -119,28 +185,50 @@
             : new Date();
 
         inner.innerHTML =
-            '<div class="lbl-line lbl-name"></div>' +
-            '<div class="lbl-line lbl-job"></div>' +
-            '<div class="lbl-line lbl-phone"></div>' +
-            '<div class="lbl-line lbl-date"></div>';
+            '<div class="lbl-name"></div>' +
+            '<div class="lbl-job"></div>' +
+            '<div class="lbl-foot">' +
+            '<span class="lbl-phone"></span><span class="lbl-date"></span>' +
+            '</div>';
 
-        /* Every line is single-line and shrinks to fit. Keeping them all to one
-           line makes the total height predictable, which is what lets the four
-           of them be set large enough to fill the label rather than hedging
-           against a wrapped line pushing the last one off the bottom. */
-        [['.lbl-name', repair.customerName || '—', 0.200, 0.125],
-         // Higher floor than the others on purpose: a long fault description
-         // shrinking all the way down ends up both tiny AND clipped, which is
-         // the worst of both. Better to stop shrinking while it is still
-         // readable and let the tail ellipsise.
-         ['.lbl-job', job, 0.150, 0.120],
-         ['.lbl-phone', repair.customerPhone || '', 0.185, 0.120],
-         ['.lbl-date', received.toLocaleDateString('en-GB'), 0.130, 0.095]
-        ].forEach(function (row) {
-            var el = $(row[0], inner);
-            el.textContent = row[1];
-            fitLine(el, h * row[2], h * row[3]);
+        $('.lbl-name', inner).textContent = repair.customerName || '—';
+        $('.lbl-phone', inner).textContent = phoneForLabel(repair.customerPhone);
+
+        // "22 Aug 26", not "22/08/2026". Four fewer characters on the row the
+        // phone number has to share, and easier to read at a glance besides.
+        $('.lbl-date', inner).textContent = received.toLocaleDateString('en-GB', {
+            day: 'numeric', month: 'short', year: '2-digit'
         });
+
+        var jobEl = $('.lbl-job', inner);
+        jobEl.textContent = job;
+
+        // Each block is measured against its own box. Measuring a row instead
+        // was silently useless: the text inside clips itself to an ellipsis,
+        // so the row never overflows and the loop exited on its first pass —
+        // which is how "Alfie Ri…" reached the roll.
+        var nameEl = $('.lbl-name', inner);
+        var phoneEl = $('.lbl-phone', inner);
+
+        fitBlock(nameEl, h * 0.205, h * 0.100);
+        // The date is set small deliberately. It shares the row with the phone
+        // number, and every millimetre it takes is a millimetre the phone
+        // loses — at 0.115 the phone was pinned to its floor. A date is read
+        // once for reference; a phone number is read across a workbench.
+        $('.lbl-date', inner).style.fontSize = (h * 0.093).toFixed(2) + 'mm';
+        fitLine(phoneEl, h * 0.190, h * 0.130);
+
+        fitBlock(jobEl, h * 0.145, h * 0.085);
+
+        // Last pass: the three blocks each fit their own box but can still
+        // overrun the label together — a name that wrapped to two lines takes
+        // the room the job was fitted into. The job is the only one that can
+        // give ground without costing legibility of a name or a phone number.
+        for (var i = 0; i < 30 && inner.scrollHeight > inner.clientHeight + 1; i++) {
+            var mm = parseFloat(jobEl.style.fontSize);
+            if (mm <= h * 0.070) break;
+            jobEl.style.fontSize = (mm - h * 0.006).toFixed(2) + 'mm';
+        }
     }
 
     function buildSizeOptions() {
