@@ -183,7 +183,12 @@ body {
     z-index: 1;
     max-width: 880px;
     margin: 0 auto;
-    padding: calc(var(--topbar-h) + 1.75rem) 1.5rem calc(var(--actionbar-h) + 2rem);
+    /* --actionbar-real-h is measured from the bar itself in intake.js and kept
+       current by a ResizeObserver. The bar is not a fixed height: it grows a
+       row for the customer checklist, and that row rewraps as items are ticked
+       off and on rotation. Padding to a constant left ~100px of dead page
+       between the last card and the bar at the bottom of the scroll. */
+    padding: calc(var(--topbar-h) + 1.75rem) 1.5rem calc(var(--actionbar-real-h, var(--actionbar-h)) + 1.75rem);
 }
 
 .step { display: none; animation: rise 0.28s ease both; }
@@ -237,6 +242,10 @@ body {
     padding: 1.75rem;
     margin-bottom: 1.5rem;
 }
+
+/* The last card's own bottom margin sits on top of the page padding, which
+   doubled the space between it and the action bar. */
+.step .card:last-child { margin-bottom: 0; }
 
 .card__title {
     font-size: 1.2rem;
@@ -648,9 +657,6 @@ body[data-step="customer"] .actionbar {
     padding-bottom: calc(0.85rem + env(safe-area-inset-bottom, 0px));
 }
 
-body[data-step="customer"] .shell {
-    padding-bottom: calc(var(--actionbar-h) + 9rem);
-}
 
 /* Brief highlight on the card the Continue button jumped to, so it is
    obvious which one still needs attention. */
@@ -1057,10 +1063,6 @@ body[data-step="done"] .steprail { display: none; }
     body[data-step="customer"] .actionbar {
         padding-top: 0.6rem;
         padding-bottom: calc(0.6rem + env(safe-area-inset-bottom, 0px));
-    }
-
-    body[data-step="customer"] .shell {
-        padding-bottom: calc(var(--actionbar-h) + 6rem);
     }
 }
 
