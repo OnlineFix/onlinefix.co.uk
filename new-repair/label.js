@@ -1,36 +1,16 @@
 /* =====================================================================
-   OnlineFix — DYMO LabelWriter 550 device label
+   OnlineFix — device label page
    ---------------------------------------------------------------------
-   Prints through the ordinary browser print path rather than the DYMO
-   Connect SDK. That matters practically: the 550 is USB-only with no
-   AirPrint, so labels have to come off the computer it is plugged into,
-   and the SDK route would need a local helper service running as well.
-   A correctly sized @page rule gets the same result with nothing to
-   install.
+   The page around the label: sign-in, ticket lookup, roll picker and the
+   turn control. The sticker itself is drawn by label-render.js, which the
+   dashboard's Print label button also uses, so there is one design rather
+   than two that drift apart.
    ===================================================================== */
 
 (function () {
     'use strict';
 
-    var SITE_URL = 'https://onlinefix.co.uk';
-
-    /* Genuine DYMO rolls the 550 accepts, measured landscape
-       (width = the direction the label feeds). */
-    var LABEL_SIZES = [
-        { id: '11354', name: '11354 / S0722540 — Multipurpose', w: 57, h: 32, scale: 0.78 },
-        { id: '99012', name: '99012 / S0722400 — Large address', w: 89, h: 36, scale: 1 },
-        { id: '30252', name: '30252 — Address', w: 89, h: 28, scale: 0.9 },
-        { id: '30336', name: '30336 — Small multipurpose', w: 54, h: 25, scale: 0.7 },
-        { id: '11356', name: '11356 — Name badge', w: 101, h: 54, scale: 1.3 }
-    ];
-
-    /* A LabelWriter feeds the label under a fixed-width head, and the Windows
-       driver decides which way round that is. When the driver's idea of the
-       paper disagrees with the @page rule below, the label prints sideways.
-       Rather than send people into Windows print settings, this rotates the
-       artwork a quarter turn and swaps the page box, which corrects it from
-       the page itself. The choice is remembered per machine. */
-    var rotated = false;
+    var Label = window.OnlineFixLabel;
 
     var firebaseConfig = {
         apiKey: 'AIzaSyCKBlO4aHTVSjwyevg1OYZ0NWy3Y62HJuU',
@@ -61,117 +41,53 @@
             .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
     }
 
-    /* Bench shorthand. The full 128-bit ID is what guards the tracking page;
-       the last six characters are plenty to tell two devices apart on a
-       shelf, which is all a physical label has to do. */
-    function shortRef(repairId) {
-        return '#' + String(repairId || '').slice(-6).toUpperCase();
-    }
-
     var repair = null;
+    var rotated = false;
 
     function selectedSize() {
-        var id = $('#size').value;
-        return LABEL_SIZES.filter(function (s) { return s.id === id; })[0] || LABEL_SIZES[0];
+        return Label.sizeById($('#size').value);
     }
 
-    /* Steps a single line down until it fits its width. The customer name is
-       the thing you scan a shelf for, so losing the surname to an ellipsis is
-       worse than setting a long name slightly smaller. Bounded by a floor so a
-       very long name stays legible rather than shrinking away, and by a guard
-       so a zero-width box cannot spin this. */
-    function fitLine(el, startMm, floorMm) {
-        var mm = startMm;
-        el.style.fontSize = mm.toFixed(2) + 'mm';
-        for (var i = 0; i < 40 && mm > floorMm; i++) {
-            if (el.scrollWidth <= el.clientWidth + 1) break;
-            mm -= startMm * 0.04;
-            el.style.fontSize = mm.toFixed(2) + 'mm';
-        }
-    }
-
-    function renderLabel() {
+    function draw() {
         var size = selectedSize();
-        var label = $('#label');
-        var inner = $('#label-inner');
-
-        // The page box follows the rotation; the artwork inside never changes
-        // shape, it is just turned within that box.
-        label.style.width = (rotated ? size.h : size.w) + 'mm';
-        label.style.height = (rotated ? size.w : size.h) + 'mm';
-
-        inner.style.width = size.w + 'mm';
-        inner.style.height = size.h + 'mm';
-        label.classList.toggle('is-rotated', rotated);
-
+        Label.render($('#label'), repair, { size: size, rotated: rotated });
+        Label.applyPageRule(document, size, rotated);
         $('#dims').textContent = size.w + ' × ' + size.h + ' mm' + (rotated ? ' · turned' : '');
-
-        // @page has to match the roll or the driver scales or clips the output.
-        $('#page-rule').textContent =
-            '@page { size: ' + (rotated ? size.h : size.w) + 'mm ' +
-            (rotated ? size.w : size.h) + 'mm; margin: 0; }';
-
-        var h = size.h;
-        var device = repair.device || [repair.brand, repair.model].filter(Boolean).join(' ') || 'Device';
-        var job = repair.issueDescription || device;
-        var received = repair.dateReceived && repair.dateReceived.seconds
-            ? new Date(repair.dateReceived.seconds * 1000)
-            : new Date();
-
-        inner.innerHTML =
-            '<div class="lbl-line lbl-name"></div>' +
-            '<div class="lbl-line lbl-job"></div>' +
-            '<div class="lbl-line lbl-phone"></div>' +
-            '<div class="lbl-line lbl-date"></div>';
-
-        /* Every line is single-line and shrinks to fit. Keeping them all to one
-           line makes the total height predictable, which is what lets the four
-           of them be set large enough to fill the label rather than hedging
-           against a wrapped line pushing the last one off the bottom. */
-        [['.lbl-name', repair.customerName || '—', 0.200, 0.125],
-         // Higher floor than the others on purpose: a long fault description
-         // shrinking all the way down ends up both tiny AND clipped, which is
-         // the worst of both. Better to stop shrinking while it is still
-         // readable and let the tail ellipsise.
-         ['.lbl-job', job, 0.150, 0.120],
-         ['.lbl-phone', repair.customerPhone || '', 0.185, 0.120],
-         ['.lbl-date', received.toLocaleDateString('en-GB'), 0.130, 0.095]
-        ].forEach(function (row) {
-            var el = $(row[0], inner);
-            el.textContent = row[1];
-            fitLine(el, h * row[2], h * row[3]);
-        });
     }
 
     function buildSizeOptions() {
         var select = $('#size');
         select.innerHTML = '';
-        LABEL_SIZES.forEach(function (size) {
+        Label.SIZES.forEach(function (size) {
             var option = document.createElement('option');
             option.value = size.id;
             option.textContent = size.name + ' (' + size.w + ' × ' + size.h + ' mm)';
             select.appendChild(option);
         });
 
-        // Remember the roll actually loaded in the shop between visits.
-        var saved = null;
-        try { saved = localStorage.getItem('onlinefix.labelSize'); } catch (err) { /* private mode */ }
-        if (saved && LABEL_SIZES.some(function (s) { return s.id === saved; })) select.value = saved;
+        // The roll loaded in the shop and the turn that came out right way up
+        // are properties of this machine, and the dashboard's Print label
+        // button reads the same two settings.
+        select.value = Label.savedSizeId();
+        rotated = Label.savedRotated();
 
         select.addEventListener('change', function () {
-            try { localStorage.setItem('onlinefix.labelSize', select.value); } catch (err) { /* private mode */ }
-            renderLabel();
+            Label.saveSizeId(select.value);
+            draw();
         });
 
-        try { rotated = localStorage.getItem('onlinefix.labelRotated') === '1'; } catch (err) { /* private mode */ }
         $('#btn-rotate').addEventListener('click', function () {
             rotated = !rotated;
-            try { localStorage.setItem('onlinefix.labelRotated', rotated ? '1' : '0'); } catch (err) { /* private mode */ }
-            renderLabel();
+            Label.saveRotated(rotated);
+            draw();
         });
     }
 
-    $('#btn-print').addEventListener('click', function () { window.print(); });
+    $('#btn-print').addEventListener('click', function () {
+        Label.printLabel($('#label'), {
+            repair: repair, size: selectedSize(), rotated: rotated
+        });
+    });
 
     function showError(message) {
         $('#error-text').textContent = message;
@@ -189,12 +105,12 @@
                 $('#who').textContent = repair.customerName || 'Customer';
                 buildSizeOptions();
 
-                // Reveal before rendering. renderLabel measures text to shrink
+                // Reveal before drawing. The renderer measures text to shrink
                 // long lines to fit, and an element inside a hidden container
                 // has no layout — every measurement comes back 0, so the fit
-                // loop exited immediately and long names stayed clipped.
+                // loops exit immediately and long names stay clipped.
                 $('#content').hidden = false;
-                renderLabel();
+                draw();
                 $('#error').hidden = true;
                 $('#gate').hidden = true;
             })

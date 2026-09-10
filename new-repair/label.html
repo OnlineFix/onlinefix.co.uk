@@ -11,7 +11,8 @@
         content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://www.google.com https://www.recaptcha.net; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://www.google.com https://www.recaptcha.net; font-src 'self' data:; frame-src https://www.google.com https://www.recaptcha.net; base-uri 'none'; form-action 'none';">
     <title>Device label — OnlineFix</title>
 
-    <link rel="stylesheet" href="intake.css?v=20260831">
+    <link rel="stylesheet" href="intake.css?v=20260901">
+    <link rel="stylesheet" href="label.css?v=20260910">
     <style>
         .shell { max-width: 680px; padding-bottom: 3rem; }
         .actionbar { display: none; }
@@ -27,79 +28,14 @@
             overflow-x: auto;
         }
 
-        .label {
-            position: relative;
-            background: #FFFFFF;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, .18);
-        }
-
-        .label__inner {
-            position: absolute;
-            top: 0;
-            left: 0;
-            transform-origin: top left;
-            background: #FFFFFF;
-            color: #000000;
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            box-sizing: border-box;
-            padding: 2mm 2.5mm;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            overflow: hidden;
-        }
-
-        /* A quarter turn about the top-left corner, then pulled back up by its
-           own height so it lands square inside the swapped page box. */
-        .label.is-rotated .label__inner {
-            transform: rotate(90deg) translateY(-100%);
-        }
-
-        /* Sticker layout: four lines, each as large as the roll allows.
-           Side padding is deliberately generous — a LabelWriter has an
-           unprintable margin on every edge, and designing to the full 57mm is
-           what clipped "ONLINEFIX" to "ONLINEF" and ate the end of a phone
-           number. Pulling in costs a couple of millimetres and guarantees
-           nothing is lost. space-evenly spreads the four lines down the label
-           so there is no dead band at the bottom. */
-        .label__inner {
-            padding: 1.5mm 3.5mm;
-            justify-content: space-evenly;
-        }
-
-        .lbl-line {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            line-height: 1.1;
-        }
-
-        .lbl-name { font-weight: 800; letter-spacing: -0.01em; }
-        .lbl-job { font-weight: 500; }
-        .lbl-phone { font-weight: 700; letter-spacing: 0.01em; }
-        .lbl-date { font-weight: 500; }
-
-        @media print {
-            html, body { background: #fff !important; margin: 0 !important; padding: 0 !important; }
-            body * { visibility: hidden; }
-            .label, .label * { visibility: visible; }
-            .label {
-                position: absolute;
-                inset: 0;
-                margin: 0;
-                box-shadow: none;
-                page-break-after: always;
-                break-after: page;
-            }
-        }
     </style>
 
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-check-compat.js"></script>
-    <script defer src="label.js?v=20260831"></script>
+    <script defer src="label-render.js?v=20260910"></script>
+    <script defer src="label.js?v=20260910"></script>
 </head>
 
 <body>
@@ -166,7 +102,9 @@
         <div id="content" hidden>
             <p class="step__eyebrow">Device label</p>
             <h1 class="step__title" id="who">—</h1>
-            <p class="step__lede">Print this and stick it on the device before it goes on the shelf.</p>
+            <p class="step__lede">Print this and stick it on the device before it goes on the shelf. The roll and
+                turn you pick here are what the dashboard's printer button uses, so you only need this page when
+                something changes.</p>
 
             <div class="card">
                 <h2 class="card__title">Label roll</h2>
@@ -205,7 +143,6 @@
         </div>
     </main>
 
-    <style id="page-rule"></style>
 </body>
 
 </html>
