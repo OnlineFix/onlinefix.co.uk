@@ -222,23 +222,65 @@ on the computer, you press the printer button.
 
 ### Making it print with no dialog at all
 
-Out of the box the browser still shows a print dialog. One Chrome flag removes
-it, so the button prints in one click:
+Out of the box Chrome still shows the print box every time. There is no way for
+a website to skip that — it has to be turned off on the computer. Chrome has a
+setting for it, but it is not in the menus: you add it to the **icon you click
+to open Chrome**.
 
-1. Set the DYMO as the **default printer**. Windows Settings → *Bluetooth &
-   devices* → *Printers & scanners*. Turn **off** "Let Windows manage my
-   default printer", then open the DYMO and choose **Set as default**.
-2. Right-click your Chrome shortcut → **Properties**.
-3. In the **Target** box, after the closing quote, add a space and then:
-   `--kiosk-printing`
-4. Click **OK**, then open Chrome from that shortcut.
+We make a *second* Chrome icon just for the dashboard, so your normal Chrome
+carries on behaving normally.
 
-From then on, the printer button prints silently to the DYMO.
+**Step 1 — make the DYMO the default printer**
 
-**Use a separate shortcut for this.** With that flag on, *everything* printed
-from that Chrome window goes straight to the default printer with no dialog —
-including invoices. Keep one shortcut with the flag for the dashboard, and
-your normal Chrome for everything else.
+1. Windows **Start** → **Settings**.
+2. **Bluetooth & devices** → **Printers & scanners**.
+3. Scroll to the bottom and turn **off** "Let Windows manage my default
+   printer". This matters — if it is on, Windows keeps changing the default
+   back to whatever you used last.
+4. Click **DYMO LabelWriter 550** → **Set as default**.
+
+**Step 2 — make the label-printing Chrome icon**
+
+1. Right-click an empty part of the **desktop** → **New** → **Shortcut**.
+2. It asks for a location. Copy this in exactly, all on one line:
+
+   ```
+   "C:\Program Files\Google\Chrome\Application\chrome.exe" --kiosk-printing --user-data-dir="C:\LabelPrinting" https://onlinefix.co.uk/admin/
+   ```
+
+3. Click **Next**, name it `Label printing`, click **Finish**.
+
+If Windows says it cannot find the file, Chrome is in the other Program Files
+folder — use this line instead:
+
+```
+"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" --kiosk-printing --user-data-dir="C:\LabelPrinting" https://onlinefix.co.uk/admin/
+```
+
+**Step 3 — use it**
+
+Double-click **Label printing**. It opens the dashboard in its own Chrome
+window. Sign in once — this window has its own separate login, so it will ask
+even though you are signed in elsewhere. It stays signed in after that.
+
+From then on, the printer button on a job prints straight to the DYMO with no
+print box at all.
+
+**What each bit of that line does**
+
+| Part | What it does |
+| --- | --- |
+| `--kiosk-printing` | The actual "no print box" switch. Two dashes, no spaces inside it. |
+| `--user-data-dir="C:\LabelPrinting"` | Runs this window as its own separate Chrome. Without it the switch is **silently ignored** whenever Chrome is already open, which is most of the time. |
+| `https://onlinefix.co.uk/admin/` | Opens the dashboard straight away. |
+
+**Two things to know**
+
+- Everything printed from *this* window skips the print box, invoices
+  included. That is why it is a separate icon — keep using normal Chrome for
+  everything else.
+- If a label ever comes out wrong, print from normal Chrome instead. You get
+  the print box back and can see what the settings actually are.
 
 ### Changing the roll, or if it prints sideways
 
