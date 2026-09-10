@@ -194,17 +194,37 @@
         }
 
         /* Buttons */
-        /* Icon-only row actions. These were 0.5rem of padding around a glyph —
-           about a 34px target, well under the 44pt minimum for a finger, and
-           six of them sit side by side. Sized for the shop iPad instead, with
-           a little margin so neighbours are not mis-tapped. */
+        /* Icon-only row actions on the desktop table. Laid out as a fixed
+           four-column grid rather than an inline row: seven buttons in one
+           line no longer fit the Actions column, and left to wrap they went
+           one per line and stretched every row to about 370px tall. Two tidy
+           rows of four instead. Touch sizing is handled in card mode, which
+           is what the iPad and phone get. */
+        .cell-actions {
+            display: grid;
+            grid-template-columns: repeat(4, 44px);
+            gap: 0.25rem;
+            justify-content: start;
+        }
+
         .btn-action {
-            padding: 0.75rem;
-            min-width: 52px;
-            min-height: 52px;
+            padding: 0.5rem;
+            min-width: 44px;
+            min-height: 44px;
             justify-content: center;
-            font-size: 1.05rem;
-            margin: 0.15rem;
+            font-size: 1rem;
+            margin: 0;
+        }
+
+        /* Shown only in card mode, where the buttons stack into a labelled
+           grid; the desktop table has no room for text beside the glyph. */
+        .btn-action__label {
+            display: none;
+            font-size: 0.66rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            line-height: 1;
         }
 
         .btn {
@@ -658,6 +678,41 @@
             color: var(--text-main);
         }
 
+        /* Footer row shared by the modal forms. On a phone the buttons stop
+           sitting in one line and stack full width, which is the only way
+           three of them fit a 390px screen at a thumb-sized height. */
+        .modal-actions {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.75rem;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .modal-actions__spacer {
+            flex: 1;
+        }
+
+        @media (max-width: 640px) {
+            .modal-actions {
+                flex-direction: column-reverse;
+                align-items: stretch;
+                gap: 0.6rem;
+            }
+
+            .modal-actions .btn {
+                width: 100%;
+                justify-content: center;
+                min-height: 52px;
+            }
+
+            .modal-actions__spacer {
+                display: none;
+            }
+        }
+
         .close-btn {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid var(--border-color);
@@ -799,6 +854,392 @@
             }
         }
 
+        /* Desktop-only column balance for the nine-column repairs table.
+           Scoped above the card-mode breakpoint on purpose: these are ID-level
+           selectors and would otherwise outrank the card rules that strip cell
+           padding. Nine columns of 1rem side padding left the fault
+           description about 100px wide, so 50 characters wrapped onto six
+           lines and every row stood 250px tall. */
+        @media (min-width: 1181px) {
+            #all-repairs-table th,
+            #all-repairs-table td {
+                padding: 1rem 0.6rem;
+            }
+
+            #all-repairs-table th:first-child,
+            #all-repairs-table td.cell-select {
+                padding-left: 1rem;
+            }
+
+            #all-repairs-table .bulk-checkbox {
+                margin: 0;
+            }
+
+            #all-repairs-table td.cell-issue {
+                min-width: 190px;
+            }
+        }
+
+        /* Search / filter / action toolbar above the repairs table. */
+        .repairs-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .repairs-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .repairs-toolbar__actions {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        /* Phone-only; the filters sit open at every other width. */
+        .filters-toggle {
+            display: none;
+        }
+
+        .filters-toggle__count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 20px;
+            height: 20px;
+            padding: 0 0.35rem;
+            border-radius: 10px;
+            background: var(--primary-blue);
+            color: var(--white);
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+
+        /* ==================================================================
+           Card mode for the repair tables.
+
+           The all-repairs table is nine columns wide. An iPad in portrait is
+           820px, so the table used to scroll sideways inside
+           .table-container — which put the status, both dates and every
+           action button off the right-hand edge, reachable only by
+           discovering a horizontal scroll inside a vertically scrolling
+           page. Below 1180px each row becomes a self-contained card instead —
+           the ceiling is an iPad in landscape: 1180px wide, and with the
+           280px sidebar alongside it still lost the last two columns.
+
+           Layout is by grid-template-areas rather than source order, so a
+           card reads ID / status / customer / device / fault / dates /
+           actions however the columns are ordered for the desktop table.
+           ================================================================== */
+        @media (max-width: 1180px) {
+
+            .table-container {
+                /* Rows are no longer wider than the screen, so a horizontal
+                   scroll here could only ever be an accident. */
+                overflow-x: visible;
+            }
+
+            .table-container table thead {
+                display: none;
+            }
+
+            .table-container table {
+                display: block;
+                width: 100%;
+            }
+
+            /* Two cards abreast on an iPad, one on a phone. */
+            .table-container table tbody {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+                gap: 0.75rem;
+                width: 100%;
+            }
+
+            .table-container table tr {
+                display: grid;
+                position: relative;
+                align-items: start;
+                column-gap: 0.6rem;
+                row-gap: 0.3rem;
+                background: var(--bg-elevated);
+                border: 1px solid var(--border-color);
+                border-radius: var(--radius-md);
+                padding: 0.85rem 1rem 0.7rem;
+            }
+
+            /* Specificity here is deliberately just the `td` type selector:
+               enough to beat the base `th, td` padding rule on source order,
+               but low enough that the single-class .cell-* rules below can
+               each set their own display value without being reset to block. */
+            :where(.table-container table) td {
+                display: block;
+                min-width: 0;
+                padding: 0;
+                border-bottom: none;
+                text-align: left;
+            }
+
+            /* An uppercase caption above all nine values was most of a card's
+               height and told a technician nothing the value itself did not.
+               Only the dates keep one: a bare 09/09/2026 does not say whether
+               it is the day it came in or the day it is due. */
+            :where(.table-container table) td::before {
+                content: none;
+            }
+
+            /* Grid rows, top to bottom. Status has a line to itself: sharing
+               one with the ID let the badges squeeze "OF-2026-1000" into three
+               lines. The select box is taken out of flow entirely — as a grid
+               column it shared a track with the received date and inherited
+               that cell's 68px width. */
+            #all-repairs-table tbody tr {
+                padding-left: 2.6rem;
+            }
+
+            .table-container table tbody tr {
+                grid-template-columns: minmax(0, 1fr) auto;
+                grid-template-areas:
+                    "id     id"
+                    "status status"
+                    "cust   cust"
+                    "dev    dev"
+                    "iss    iss"
+                    "rec    est"
+                    "act    act";
+            }
+
+            .cell-select {
+                position: absolute;
+                left: 0.85rem;
+                top: 0.9rem;
+            }
+
+            .cell-select .bulk-checkbox {
+                margin: 0;
+            }
+
+            .cell-id {
+                grid-area: id;
+                display: flex;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 0.4rem;
+                font-size: 1.05rem;
+            }
+
+            .cell-id strong {
+                white-space: nowrap;
+            }
+
+            .cell-status {
+                grid-area: status;
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: 0.35rem;
+                margin-bottom: 0.2rem;
+            }
+
+            .cell-customer {
+                grid-area: cust;
+                font-size: 1rem;
+            }
+
+            .cell-device {
+                grid-area: dev;
+                color: var(--text-muted);
+                font-size: 0.9rem;
+            }
+
+            .cell-issue {
+                grid-area: iss;
+                color: var(--text-muted);
+                font-size: 0.88rem;
+                line-height: 1.45;
+                /* Two lines is enough to recognise a job you logged yourself;
+                   the whole description is on the View screen. */
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
+
+            .cell-received {
+                grid-area: rec;
+            }
+
+            .cell-est {
+                grid-area: est;
+                text-align: right;
+            }
+
+            .cell-received,
+            .cell-est {
+                margin-top: 0.4rem;
+                font-size: 0.85rem;
+                color: var(--text-muted);
+            }
+
+            .cell-received::before,
+            .cell-est::before {
+                content: attr(data-label);
+                display: block;
+                margin-bottom: 0.1rem;
+                font-size: 0.65rem;
+                font-weight: 700;
+                letter-spacing: 0.06em;
+                text-transform: uppercase;
+                color: var(--text-dark);
+            }
+
+            .cell-est:empty::before {
+                content: none;
+            }
+
+            .cell-received .repair-age {
+                display: inline;
+                margin-left: 0.4rem;
+            }
+
+            .cell-received .repair-timer {
+                display: inline-flex;
+                margin-left: 0.4rem;
+            }
+
+            /* Actions become a labelled grid. Six identical glyphs in a row
+               are a guessing game, and at 52px apiece they overflowed a
+               phone-width card and pushed Delete off the edge. */
+            .cell-actions {
+                grid-area: act;
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(68px, 1fr));
+                gap: 0.4rem;
+                margin-top: 0.7rem;
+                padding-top: 0.7rem;
+                border-top: 1px solid var(--border-color);
+            }
+
+            .cell-actions .btn-action {
+                flex-direction: column;
+                justify-content: center;
+                gap: 0.25rem;
+                min-width: 0;
+                min-height: 60px;
+                margin: 0;
+                padding: 0.5rem 0.2rem;
+                font-size: 1rem;
+            }
+
+            .cell-actions .btn-action__label {
+                display: block;
+            }
+
+            /* Solid red beside six neutral buttons draws the thumb to the one
+               action that cannot be undone. Outlined in card mode instead. */
+            .cell-actions .btn-danger {
+                background: rgba(239, 68, 68, 0.12);
+                color: var(--danger);
+                border: 1px solid rgba(239, 68, 68, 0.35);
+            }
+
+            /* The toolbar stays a wrapping flex row here. The original bug was
+               not the row: it was that .search-bar had flex:1 with no floor, so
+               against three selects and two buttons it shrank to about two
+               characters ("Se") on an iPad. Floors on each control let the row
+               wrap instead of crushing anything. */
+            #repairs-section .section-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.75rem;
+            }
+
+            .repairs-toolbar {
+                width: 100%;
+            }
+
+            .repairs-toolbar .search-bar {
+                flex: 1 1 260px;
+                min-width: 240px;
+                max-width: none;
+            }
+
+            .repairs-filters {
+                flex: 1 1 auto;
+            }
+
+            .repairs-filters select.form-input {
+                flex: 1 1 160px;
+                width: auto !important;
+                min-width: 150px;
+                min-height: 48px;
+            }
+
+            .repairs-toolbar__actions .btn {
+                justify-content: center;
+                min-height: 48px;
+            }
+        }
+
+        /* On a phone-width card auto-fit only fits three tiles per row, so
+           seven actions became three rows and half the card. Four fixed
+           columns hold every action to two rows without hiding any of them
+           behind a menu — the shop needs all seven within one tap. */
+        @media (max-width: 640px) {
+            .repairs-toolbar {
+                display: grid;
+                grid-template-columns: 1fr;
+                gap: 0.6rem;
+            }
+
+            .filters-toggle {
+                display: inline-flex;
+                justify-content: center;
+                min-height: 48px;
+            }
+
+            .repairs-filters {
+                display: none;
+            }
+
+            .repairs-filters.is-open {
+                display: grid;
+                grid-template-columns: 1fr;
+            }
+
+            .repairs-filters select.form-input {
+                width: 100% !important;
+                min-width: 0;
+            }
+
+            .repairs-toolbar__actions {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 0.6rem;
+            }
+
+            .cell-actions {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+                gap: 0.35rem;
+            }
+
+            .cell-actions .btn-action {
+                min-height: 54px;
+                padding: 0.4rem 0.1rem;
+                font-size: 0.95rem;
+            }
+
+            .cell-actions .btn-action__label {
+                font-size: 0.6rem;
+                letter-spacing: 0;
+            }
+        }
+
         /* Responsive - Mobile */
         @media (max-width: 768px) {
             .kbd-hint-toggle {
@@ -866,7 +1307,10 @@
                 align-items: flex-start;
             }
 
-            .section-header > div {
+            /* :not() keeps this generic stacking rule off the repairs
+               toolbar, which lays its own controls out on a grid. Without it
+               this selector outranks .repairs-toolbar and forces flex back. */
+            .section-header > div:not(.repairs-toolbar):not(.repairs-filters):not(.repairs-toolbar__actions) {
                 width: 100%;
                 display: flex;
                 flex-wrap: wrap;
@@ -881,56 +1325,6 @@
 
             .section-content {
                 padding: 0.75rem;
-            }
-
-            /* Tables - card layout on mobile */
-            .table-container table thead {
-                display: none;
-            }
-
-            .table-container table,
-            .table-container table tbody,
-            .table-container table tr,
-            .table-container table td {
-                display: block;
-                width: 100%;
-            }
-
-            .table-container table tr {
-                background: var(--bg-elevated);
-                border: 1px solid var(--border-color);
-                border-radius: var(--radius-md);
-                padding: 1rem;
-                margin-bottom: 0.75rem;
-            }
-
-            .table-container table td {
-                padding: 0.25rem 0;
-                border-bottom: none;
-                text-align: left;
-            }
-
-            .table-container table td:before {
-                content: attr(data-label);
-                font-weight: 600;
-                font-size: 0.75rem;
-                color: var(--text-muted);
-                text-transform: uppercase;
-                display: block;
-                margin-bottom: 0.15rem;
-            }
-
-            .table-container table td:last-child {
-                padding-top: 0.75rem;
-                margin-top: 0.5rem;
-                border-top: 1px solid var(--border-color);
-                display: flex;
-                gap: 0.5rem;
-            }
-
-            .table-container table td:last-child .btn {
-                flex: 1;
-                justify-content: center;
             }
 
             /* Forms */
@@ -1314,6 +1708,16 @@
         }
 
         /* Repair Age */
+        .cell-customer__phone {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            text-decoration: none;
+        }
+
+        .cell-customer__phone:hover {
+            color: var(--accent-cyan);
+        }
+
         .repair-age {
             font-size: 0.75rem;
             color: var(--text-dark);
@@ -1969,6 +2373,18 @@
                 width: 100%;
             }
         }
+
+        /* Touch cleanup, kept at the end of the sheet on purpose: the rules it
+           overrides are declared after the earlier media queries and win those
+           on source order. */
+        @media (max-width: 1180px) {
+            /* A floating shortcut key legend on a device with no keyboard. It
+               sat over the bottom-right corner of the last repair card and
+               took the taps meant for its action buttons. */
+            .kbd-hint {
+                display: none;
+            }
+        }
     </style>
 </head>
 
@@ -2171,12 +2587,23 @@
             <div id="repairs-section" class="content-section hidden">
                 <div class="section-header" style="flex-wrap: wrap; gap: 0.75rem;">
                     <h2 class="section-title">All Repairs <span class="results-count" id="results-count"></span></h2>
-                    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;">
+                    <div class="repairs-toolbar">
                         <div class="search-bar">
                             <i class="fas fa-search"></i>
                             <input type="text" id="repair-search" placeholder="Search by name, ID, device, phone..." oninput="loadAllRepairs()">
                             <button class="search-clear" id="search-clear" onclick="document.getElementById('repair-search').value=''; this.style.display='none'; loadAllRepairs();">&times;</button>
                         </div>
+                        <!-- Phone-only disclosure. Three full-width selects sat
+                             between the search box and the first repair, so on a
+                             phone every visit to this screen started with a
+                             scroll past filters that are rarely changed. -->
+                        <button type="button" class="btn btn-secondary filters-toggle" id="filters-toggle"
+                            onclick="toggleRepairFilters()" aria-expanded="false" aria-controls="repair-filters">
+                            <i class="fas fa-sliders"></i>
+                            <span>Filters</span>
+                            <span class="filters-toggle__count hidden" id="filters-active-count">0</span>
+                        </button>
+                        <div class="repairs-filters" id="repair-filters">
                         <select id="common-repair-filter" class="form-input"
                             style="display: inline-block; width: auto;">
                             <option value="">All Services</option>
@@ -2203,14 +2630,17 @@
                             <option value="normal">Normal</option>
                             <option value="low">Low</option>
                         </select>
-                        <button class="btn btn-export" onclick="exportToCSV()" title="Export to CSV">
-                            <i class="fas fa-file-csv"></i>
-                            <span class="btn-label">Export</span>
-                        </button>
-                        <a href="../new-repair/" class="btn btn-primary">
-                            <i class="fas fa-plus"></i>
-                            New Repair
-                        </a>
+                        </div>
+                        <div class="repairs-toolbar__actions">
+                            <button class="btn btn-export" onclick="exportToCSV()" title="Export to CSV">
+                                <i class="fas fa-file-csv"></i>
+                                <span class="btn-label">Export</span>
+                            </button>
+                            <a href="../new-repair/" class="btn btn-primary">
+                                <i class="fas fa-plus"></i>
+                                New Repair
+                            </a>
+                        </div>
                     </div>
                 </div>
                 <div class="section-content">
@@ -2393,6 +2823,27 @@
     </div>
 
     <script>
+        // Phone-only filter disclosure. The panel is CSS-hidden below 640px
+        // only, so this class is inert at every other width and the filters
+        // stay open on tablet and desktop regardless of what was toggled.
+        function toggleRepairFilters() {
+            const panel = document.getElementById('repair-filters');
+            const btn = document.getElementById('filters-toggle');
+            const open = panel.classList.toggle('is-open');
+            btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        }
+
+        // Collapsed filters must never silently hide results, so the toggle
+        // carries a count of how many are currently narrowing the list.
+        function updateFilterCount() {
+            const ids = ['common-repair-filter', 'status-filter', 'priority-filter'];
+            const active = ids.filter(id => (document.getElementById(id)?.value || '') !== '').length;
+            const badge = document.getElementById('filters-active-count');
+            if (!badge) return;
+            badge.textContent = active;
+            badge.classList.toggle('hidden', active === 0);
+        }
+
         // Mobile sidebar toggle
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('show');
@@ -2812,26 +3263,29 @@
             const statusTitle = canAdvance ? `title="Click to advance to ${escapeHTML(statusConfig[getNextStatus(repair.currentStatus)]?.label || 'next')}"` : '';
 
             row.innerHTML = `
-                <td data-label="Repair ID"><strong>${escapeHTML(repair.repairId)}</strong></td>
-                <td data-label="Customer">${escapeHTML(repair.customerName)}</td>
-                <td data-label="Device">${escapeHTML(repair.brand)} ${escapeHTML(repair.model)}</td>
-                <td data-label="Status"><span class="status-badge ${status.class} ${statusClickable}" ${statusOnclick} ${statusTitle}>${status.label}</span>${overdueTag}</td>
-                <td data-label="Date">${date}<span class="repair-age ${ageClass}">${age}</span></td>
-                <td data-label="">
+                <td class="cell-id" data-label="Repair ID"><strong>${escapeHTML(repair.repairId)}</strong></td>
+                <td class="cell-customer" data-label="Customer">${escapeHTML(repair.customerName)}</td>
+                <td class="cell-device" data-label="Device">${escapeHTML(repair.brand)} ${escapeHTML(repair.model)}</td>
+                <td class="cell-status" data-label="Status"><span class="status-badge ${status.class} ${statusClickable}" ${statusOnclick} ${statusTitle}>${status.label}</span>${overdueTag}</td>
+                <td class="cell-received" data-label="Date">${date}<span class="repair-age ${ageClass}">${age}</span></td>
+                <td class="cell-actions" data-label="">
+                    <button class="btn btn-secondary btn-action" onclick="viewRepair('${safeId}')" title="View details">
+                        <i class="fas fa-eye"></i><span class="btn-action__label">View</span>
+                    </button>
+                    <button class="btn btn-primary btn-action" onclick="editRepair('${safeId}')" title="Update status, notes and photos">
+                        <i class="fas fa-edit"></i><span class="btn-action__label">Update</span>
+                    </button>
+                    <button class="btn btn-secondary btn-action" onclick="editCustomer('${safeId}')" title="Correct name, email or phone">
+                        <i class="fas fa-user-pen"></i><span class="btn-action__label">Customer</span>
+                    </button>
                     <button class="btn btn-copy btn-action" onclick="openTrackingLink('${safeRepairId}')" title="Open tracking page">
-                        <i class="fas fa-external-link-alt"></i>
+                        <i class="fas fa-external-link-alt"></i><span class="btn-action__label">Track</span>
                     </button>
                     <button class="btn btn-secondary btn-action" onclick="reprintLabel('${safeId}')" title="Print label">
-                        <i class="fas fa-tag"></i>
-                    </button>
-                    <button class="btn btn-secondary btn-action" onclick="viewRepair('${safeId}')" title="View details">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                    <button class="btn btn-primary btn-action" onclick="editRepair('${safeId}')" title="Edit repair">
-                        <i class="fas fa-edit"></i>
+                        <i class="fas fa-tag"></i><span class="btn-action__label">Label</span>
                     </button>
                     <button class="btn btn-danger btn-action" onclick="deleteRepair('${safeId}', '${safeRepairId}')" title="Delete repair">
-                        <i class="fas fa-trash"></i>
+                        <i class="fas fa-trash"></i><span class="btn-action__label">Delete</span>
                     </button>
                 </td>
             `;
@@ -2941,6 +3395,225 @@
                 viewRepair(repairId);
             } catch (error) {
                 showAlert('Error removing entry: ' + error.message, 'error');
+            }
+        }
+
+        // ------------------------------------------------------------------
+        // Correcting customer details after intake.
+        //
+        // The intake form is filled in at the counter, often by the customer
+        // on the iPad, so a mistyped email is common and used to be
+        // uncorrectable — the update modal showed the name and device as
+        // read-only text. A wrong address means the confirmation and its
+        // tracking link never arrive, so this also offers to send that email
+        // again once the address is fixed.
+        // ------------------------------------------------------------------
+
+        // Shop details for outgoing mail. The intake page holds its own copy;
+        // these two files are the only places they appear.
+        const SHOP_EMAIL = 'hello@onlinefix.uk';
+        const SHOP_PHONE = '07940 730537';
+        const SHOP_ADDRESS = '13 Quarry Street, Guildford GU1 3UY';
+
+        function isValidEmail(raw) {
+            const v = String(raw || '').trim();
+            return v.length > 3 && v.length < 200 && /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
+        }
+
+        function editCustomer(repairId) {
+            const repair = allRepairs.find(r => r.id === repairId);
+            if (!repair) return;
+
+            // Older tickets predate firstName/lastName, so fall back to
+            // splitting the display name rather than showing empty fields.
+            const parts = String(repair.customerName || '').trim().split(/\s+/);
+            const first = repair.firstName || parts[0] || '';
+            const last = repair.lastName || parts.slice(1).join(' ') || '';
+
+            const modal = document.createElement('div');
+            modal.className = 'modal show';
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width: 560px;">
+                    <div class="modal-header">
+                        <h2 class="modal-title">Customer details - ${escapeHTML(repair.repairId)}</h2>
+                        <button class="close-btn" onclick="this.closest('.modal').remove()">&times;</button>
+                    </div>
+                    <!-- novalidate: the checks below are richer than the
+                         browser's (either an email or a phone will do) and the
+                         inline message stays on screen, where a native bubble
+                         on a tablet is easy to miss. -->
+                    <form id="edit-customer-form" data-repair-id="${escapeHTML(repairId)}" novalidate>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label" for="ec-first">First name</label>
+                                <input type="text" class="form-input" id="ec-first" name="firstName" maxlength="60"
+                                    autocomplete="off" autocapitalize="words" value="${escapeHTML(first)}" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="ec-last">Last name</label>
+                                <input type="text" class="form-input" id="ec-last" name="lastName" maxlength="60"
+                                    autocomplete="off" autocapitalize="words" value="${escapeHTML(last)}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="ec-email">Email</label>
+                            <input type="email" class="form-input" id="ec-email" name="customerEmail" maxlength="200"
+                                inputmode="email" autocapitalize="off" spellcheck="false"
+                                value="${escapeHTML(repair.customerEmail || '')}" placeholder="jane@example.com">
+                            <small style="color: var(--text-muted);">Where the confirmation and tracking link go.</small>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="ec-phone">Mobile number</label>
+                            <input type="tel" class="form-input" id="ec-phone" name="customerPhone" maxlength="24"
+                                inputmode="tel" value="${escapeHTML(repair.customerPhone || '')}" placeholder="07700 900123">
+                        </div>
+                        <div class="alert alert-error hidden" id="ec-error" style="margin-bottom: 1rem;"></div>
+                        <div class="modal-actions">
+                            <button type="button" class="btn btn-email" onclick="resendTrackingEmail('${escapeJSStr(repairId)}', this)"
+                                title="Email the tracking link to the address above">
+                                <i class="fas fa-paper-plane"></i>
+                                <span>Send tracking email</span>
+                            </button>
+                            <span class="modal-actions__spacer"></span>
+                            <button type="button" class="btn btn-secondary" onclick="this.closest('.modal').remove()">Cancel</button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i>
+                                Save changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+
+            document.getElementById('edit-customer-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const err = document.getElementById('ec-error');
+                const firstName = document.getElementById('ec-first').value.trim();
+                const lastName = document.getElementById('ec-last').value.trim();
+                const email = document.getElementById('ec-email').value.trim();
+                const phone = document.getElementById('ec-phone').value.trim();
+
+                const fail = (msg) => {
+                    err.textContent = msg;
+                    err.classList.remove('hidden');
+                };
+
+                if (!firstName) return fail('A first name is needed.');
+                if (email && !isValidEmail(email)) return fail('That email address does not look right.');
+                if (!email && !phone) return fail('Give at least an email address or a mobile number.');
+                err.classList.add('hidden');
+
+                const customerName = (firstName + ' ' + lastName).trim();
+                try {
+                    await db.collection('repairs').doc(repairId).update({
+                        firstName: firstName,
+                        lastName: lastName,
+                        customerName: customerName,
+                        customerEmail: email,
+                        customerPhone: phone,
+                        customerUpdatedAt: firebase.firestore.Timestamp.now(),
+                        customerUpdatedBy: currentUser ? currentUser.email : 'unknown'
+                    });
+
+                    // Keep the customer directory in step where the ticket is
+                    // linked to one. Non-fatal: the ticket itself is corrected
+                    // either way, and that is what the tracking page reads.
+                    if (repair.customerId) {
+                        try {
+                            await db.collection('customers').doc(repair.customerId).update({
+                                firstName: firstName,
+                                lastName: lastName,
+                                email: email,
+                                emailLower: email.toLowerCase(),
+                                phone: phone
+                            });
+                        } catch (err2) {
+                            console.warn('Customer directory not updated:', err2);
+                        }
+                    }
+
+                    modal.remove();
+                    showAlert('Customer details updated. Send the tracking email if the address changed.', 'success');
+                } catch (error) {
+                    fail('Could not save: ' + error.message);
+                }
+            });
+        }
+
+        // Queue the confirmation email again, to whatever address is currently
+        // on the ticket. Reads the live field rather than the form so it can
+        // never send to an address that was typed but not saved.
+        async function resendTrackingEmail(repairId, btn) {
+            const repair = allRepairs.find(r => r.id === repairId);
+            if (!repair) return;
+
+            const email = (repair.customerEmail || '').trim();
+            if (!isValidEmail(email)) {
+                showAlert('Save a valid email address first, then send.', 'error');
+                return;
+            }
+            if (!confirm(`Send the tracking link to ${email}?`)) return;
+
+            const original = btn ? btn.innerHTML : '';
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Sending…</span>';
+            }
+
+            const trackUrl = `${window.location.origin}/track/?id=${encodeURIComponent(repair.repairId)}`;
+            const device = [repair.brand, repair.model].filter(Boolean).join(' ') || repair.deviceType || 'your device';
+            const greeting = repair.firstName || repair.customerName || 'there';
+
+            const html =
+                '<div style="font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;max-width:600px;margin:0 auto;' +
+                'background:#0B0E14;color:#E5E9F0;padding:32px 28px;border-radius:16px;">' +
+                '<div style="font-size:22px;font-weight:800;margin-bottom:24px;">Online<span style="color:#00E4FF;">Fix</span></div>' +
+                '<p style="font-size:16px;margin:0 0 16px;">Hi ' + escapeHTML(greeting) + ',</p>' +
+                '<p style="line-height:1.6;margin:0 0 20px;">Here is the tracking link for your repair with us.</p>' +
+                '<table style="width:100%;border-collapse:collapse;font-size:14px;margin-bottom:24px;">' +
+                '<tr><td style="padding:6px 0;color:#94A3B8;">Repair reference</td><td style="padding:6px 0;text-align:right;">' + escapeHTML(repair.repairId) + '</td></tr>' +
+                '<tr><td style="padding:6px 0;color:#94A3B8;">Device</td><td style="padding:6px 0;text-align:right;">' + escapeHTML(device) + '</td></tr>' +
+                '</table>' +
+                '<a href="' + escapeHTML(trackUrl) + '" style="display:inline-block;background:#0033FF;color:#fff;' +
+                'text-decoration:none;padding:14px 28px;border-radius:10px;font-weight:700;">Track your repair</a>' +
+                '<p style="font-size:13px;color:#94A3B8;line-height:1.6;margin:24px 0 0;">Keep this email — the link above is how you check progress at any time.</p>' +
+                '<hr style="border:none;border-top:1px solid rgba(255,255,255,.12);margin:28px 0;">' +
+                '<p style="font-size:12px;color:#94A3B8;line-height:1.6;margin:0;">OnlineFix · ' + escapeHTML(SHOP_ADDRESS) +
+                '<br>' + escapeHTML(SHOP_PHONE) + ' · ' + escapeHTML(SHOP_EMAIL) + '</p></div>';
+
+            const text = 'Hi ' + greeting + ',\n\n' +
+                'Here is the tracking link for your repair with us.\n\n' +
+                'Repair reference: ' + repair.repairId + '\n' +
+                'Device: ' + device + '\n\n' +
+                'Track your repair: ' + trackUrl + '\n\n' +
+                'OnlineFix · ' + SHOP_ADDRESS + '\n' + SHOP_PHONE + ' · ' + SHOP_EMAIL + '\n';
+
+            try {
+                await db.collection('mail').add({
+                    to: [email],
+                    replyTo: SHOP_EMAIL,
+                    message: {
+                        subject: 'Your repair tracking link — ' + repair.repairId,
+                        text: text,
+                        html: html
+                    },
+                    meta: {
+                        kind: 'tracking-link-resend',
+                        repairId: repair.repairId,
+                        sentBy: currentUser ? currentUser.email : 'unknown',
+                        createdAt: firebase.firestore.Timestamp.now()
+                    }
+                });
+                showAlert('Tracking email queued to ' + email, 'success');
+            } catch (error) {
+                showAlert('Could not queue the email: ' + error.message, 'error');
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = original;
+                }
             }
         }
 
@@ -3221,6 +3894,7 @@
         // Load all repairs with search, filter, sort, and pagination
         function loadAllRepairs(resetPage) {
             if (resetPage !== false) currentPage = 1;
+            updateFilterCount();
             const filteredRepairs = getFilteredRepairs();
             lastFilteredRepairs = filteredRepairs;
 
@@ -3331,32 +4005,35 @@
             const statusTitle = canAdvance ? `title="Click to advance to ${escapeHTML(statusConfig[getNextStatus(repair.currentStatus)]?.label || 'next')}"` : '';
 
             row.innerHTML = `
-                <td><input type="checkbox" class="bulk-checkbox row-checkbox" data-repair-id="${escapeHTML(repair.id)}" onchange="updateBulkSelection()"></td>
-                <td data-label="Repair ID"><strong>${escapeHTML(repair.repairId)}</strong>${priorityBadge}</td>
-                <td data-label="Customer"><a href="#" onclick="showCustomerHistory('${safeCustomerKey}', event)" style="color: var(--text-main); text-decoration: none; border-bottom: 1px dashed var(--text-dark);">${escapeHTML(repair.customerName)}</a><br><small style="color: var(--text-muted);">${escapeHTML(repair.customerPhone)}</small></td>
-                <td data-label="Device">${escapeHTML(repair.deviceType)}<br><small style="color: var(--text-muted);">${escapeHTML(repair.brand)} ${escapeHTML(repair.model)}</small></td>
-                <td data-label="Issue" title="${escapeHTML(repair.issueDescription)}">${escapeHTML(repair.issueDescription).substring(0, 50)}${(repair.issueDescription || '').length > 50 ? '...' : ''}</td>
-                <td data-label="Status"><span class="status-badge ${status.class} ${statusClickable}" ${statusOnclick} ${statusTitle}>${status.label}</span>${overdueTag}${warrantyTag}</td>
-                <td data-label="Received">${dateReceived}<span class="repair-age ${ageClass}">${age}</span>${timerHTML}</td>
-                <td data-label="Est. Completion">${estCompletion}</td>
-                <td data-label="">
-                    <button class="btn btn-copy btn-action" onclick="openTrackingLink('${safeRepairId}')" title="Open tracking page">
-                        <i class="fas fa-external-link-alt"></i>
-                    </button>
+                <td class="cell-select"><input type="checkbox" class="bulk-checkbox row-checkbox" data-repair-id="${escapeHTML(repair.id)}" onchange="updateBulkSelection()"></td>
+                <td class="cell-id" data-label="Repair ID"><strong>${escapeHTML(repair.repairId)}</strong>${priorityBadge}</td>
+                <td class="cell-customer" data-label="Customer"><a href="#" onclick="showCustomerHistory('${safeCustomerKey}', event)" style="color: var(--text-main); text-decoration: none; border-bottom: 1px dashed var(--text-dark);">${escapeHTML(repair.customerName)}</a><br><a class="cell-customer__phone" href="tel:${escapeHTML((repair.customerPhone || '').replace(/[^+\d]/g, ''))}">${escapeHTML(repair.customerPhone)}</a></td>
+                <td class="cell-device" data-label="Device">${escapeHTML(repair.deviceType)}<br><small style="color: var(--text-muted);">${escapeHTML(repair.brand)} ${escapeHTML(repair.model)}</small></td>
+                <td class="cell-issue" data-label="Issue" title="${escapeHTML(repair.issueDescription)}">${escapeHTML(repair.issueDescription).substring(0, 50)}${(repair.issueDescription || '').length > 50 ? '...' : ''}</td>
+                <td class="cell-status" data-label="Status"><span class="status-badge ${status.class} ${statusClickable}" ${statusOnclick} ${statusTitle}>${status.label}</span>${overdueTag}${warrantyTag}</td>
+                <td class="cell-received" data-label="Received">${dateReceived}<span class="repair-age ${ageClass}">${age}</span>${timerHTML}</td>
+                <td class="cell-est" data-label="Due">${estCompletion}</td>
+                <td class="cell-actions" data-label="">
                     <button class="btn btn-secondary btn-action" onclick="viewRepair('${safeId}')" title="View details">
-                        <i class="fas fa-eye"></i>
+                        <i class="fas fa-eye"></i><span class="btn-action__label">View</span>
                     </button>
-                    <button class="btn btn-primary btn-action" onclick="editRepair('${safeId}')" title="Edit repair">
-                        <i class="fas fa-edit"></i>
+                    <button class="btn btn-primary btn-action" onclick="editRepair('${safeId}')" title="Update status, notes and photos">
+                        <i class="fas fa-edit"></i><span class="btn-action__label">Update</span>
+                    </button>
+                    <button class="btn btn-secondary btn-action" onclick="editCustomer('${safeId}')" title="Correct name, email or phone">
+                        <i class="fas fa-user-pen"></i><span class="btn-action__label">Customer</span>
+                    </button>
+                    <button class="btn btn-copy btn-action" onclick="openTrackingLink('${safeRepairId}')" title="Open tracking page">
+                        <i class="fas fa-external-link-alt"></i><span class="btn-action__label">Track</span>
                     </button>
                     <button class="btn btn-secondary btn-action" onclick="generateInvoice('${safeId}')" title="Generate invoice">
-                        <i class="fas fa-file-invoice"></i>
+                        <i class="fas fa-file-invoice"></i><span class="btn-action__label">Invoice</span>
                     </button>
                     <button class="btn btn-secondary btn-action" onclick="reprintLabel('${safeId}')" title="Print label">
-                        <i class="fas fa-tag"></i>
+                        <i class="fas fa-tag"></i><span class="btn-action__label">Label</span>
                     </button>
                     <button class="btn btn-danger btn-action" onclick="deleteRepair('${safeId}', '${safeRepairId}')" title="Delete repair">
-                        <i class="fas fa-trash"></i>
+                        <i class="fas fa-trash"></i><span class="btn-action__label">Delete</span>
                     </button>
                 </td>
             `;

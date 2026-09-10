@@ -285,6 +285,7 @@
 
         back.hidden = (state.stepIndex === 0 || name === 'done');
         note.textContent = '';
+        $('#checklist').hidden = (name !== 'customer');
 
         if (name === 'done') {
             $('#actionbar').hidden = true;
@@ -299,6 +300,7 @@
             $('#terms-body').innerHTML = TERMS_HTML;
             $('#terms-version').textContent = 'Version ' + TERMS_VERSION + ' · ' + TERMS_EFFECTIVE;
             sizeSignaturePad();
+            refreshChecklist();
         } else if (name === 'tech') {
             next.innerHTML = 'Hand to customer <svg class="icon" width="18" height="18"><use href="#i-arrow-right"/></svg>';
             note.textContent = state.photos.length + ' photo' + (state.photos.length === 1 ? '' : 's') + ' captured';
@@ -309,8 +311,113 @@
         window.scrollTo({ top: 0, behavior: 'instant' in window ? 'instant' : 'auto' });
     }
 
+    // ------------------------------------------------------------------
+    // Customer-step checklist
+    //
+    // The customer page is one long scroll: details, terms, tick boxes,
+    // signature. People were filling in the four contact fields at the top
+    // and handing the iPad back, having never scrolled far enough to know
+    // the rest existed. The bar below keeps the outstanding items on screen
+    // wherever they are on the page, and Continue takes them to the next
+    // unfinished card instead of only refusing to move on.
+    // ------------------------------------------------------------------
+
+    function customerTasks() {
+        var detailsDone = $('#f-first').value.trim().length > 0 &&
+            $('#f-last').value.trim().length > 0 &&
+            isValidEmail($('#f-email').value) &&
+            isValidPhone($('#f-phone').value);
+
+        var acksDone = ['#f-ack-owner', '#f-ack-backup', '#f-ack-terms'].every(function (id) {
+            return $(id).checked;
+        });
+
+        // `short` is what the Continue button says. The full label stays on
+        // the chip: "Next: Tick the 3 boxes" plus a Back button is wider than
+        // a 390px phone, and the button then ran off the screen edge.
+        return [
+            { key: 'details', label: 'Your details', short: 'Your details', done: detailsDone, anchor: '#card-details' },
+            { key: 'acks', label: 'Tick the 3 boxes', short: 'Tick boxes', done: acksDone, anchor: '#card-acks' },
+            { key: 'signature', label: 'Sign', short: 'Sign', done: state.signatureStrokes.length > 0, anchor: '#card-signature' }
+        ];
+    }
+
+    function refreshChecklist() {
+        var bar = $('#checklist');
+        if (currentStep() !== 'customer') {
+            bar.hidden = true;
+            return;
+        }
+        bar.hidden = false;
+
+        var tasks = customerTasks();
+        var outstanding = tasks.filter(function (t) { return !t.done; });
+
+        $('#checklist-lead').textContent = outstanding.length === 0
+            ? 'All done — you can finish.'
+            : outstanding.length + ' still to do:';
+
+        var items = $('#checklist-items');
+        items.innerHTML = '';
+        tasks.forEach(function (task) {
+            var li = document.createElement('li');
+            li.className = 'checklist__item' + (task.done ? ' is-done' : '');
+            var mark = document.createElement('span');
+            mark.className = 'checklist__mark';
+            mark.setAttribute('aria-hidden', 'true');
+            mark.textContent = task.done ? '\u2713' : '';
+            var text = document.createElement('span');
+            text.textContent = task.label;
+            li.appendChild(mark);
+            li.appendChild(text);
+            li.setAttribute('aria-label', task.label + (task.done ? ' — done' : ' — still to do'));
+            items.appendChild(li);
+        });
+
+        var next = $('#btn-next');
+        if (outstanding.length === 0) {
+            next.innerHTML = 'Agree &amp; create repair <svg class="icon" width="18" height="18"><use href="#i-check"/></svg>';
+        } else {
+            next.innerHTML = 'Next: ' + escapeHTML(outstanding[0].short || outstanding[0].label) +
+                ' <svg class="icon" width="18" height="18"><use href="#i-arrow-right"/></svg>';
+        }
+    }
+
+    // Move to the card holding the next unfinished item and mark it, rather
+    // than leaving someone staring at a button that will not advance.
+    function jumpToTask(task) {
+        var card = $(task.anchor);
+        if (!card) return;
+        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        card.classList.add('is-flagged');
+        setTimeout(function () { card.classList.remove('is-flagged'); }, 2400);
+    }
+
+    // Any edit on the customer step can change what is outstanding, so the
+    // bar is refreshed from one delegated listener rather than a per-field one.
+    ['input', 'change'].forEach(function (type) {
+        document.addEventListener(type, function (event) {
+            if (currentStep() !== 'customer') return;
+            if (!event.target.closest('.step[data-step="customer"]')) return;
+            refreshChecklist();
+        });
+    });
+
     function goNext() {
         clearAllErrors();
+
+        // On the customer step the button doubles as "take me to what is
+        // left". Only once nothing is outstanding does it submit.
+        if (currentStep() === 'customer') {
+            var outstanding = customerTasks().filter(function (t) { return !t.done; });
+            if (outstanding.length) {
+                validateStep('customer');
+                refreshChecklist();
+                jumpToTask(outstanding[0]);
+                return;
+            }
+        }
+
         if (!validateStep(currentStep())) return;
 
         if (currentStep() === 'customer') { submitIntake(); return; }
@@ -731,6 +838,9 @@
         });
 
         $('#sigpad').classList.toggle('has-ink', state.signatureStrokes.length > 0);
+        // Signing is a canvas gesture, not an input event, so the checklist
+        // is nudged from here as well as from the delegated listener.
+        if (currentStep() === 'customer') refreshChecklist();
     }
 
     function pointFrom(event) {

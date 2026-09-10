@@ -28,8 +28,11 @@
     --accent-cyan: #00E4FF;
 
     --text-main: #FFFFFF;
-    --text-muted: #94A3B8;
-    --text-dark: #64748B;
+    --text-muted: #B4C0D0;
+    /* Was #64748B — about 4:1 on this background, and it carried the field
+       hints and the terms small print, which are exactly the words a customer
+       has to be able to read before signing. */
+    --text-dark: #94A3B8;
 
     --border-color: rgba(255, 255, 255, 0.10);
     --border-strong: rgba(255, 255, 255, 0.18);
@@ -55,8 +58,10 @@ body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     background: var(--bg-base);
     color: var(--text-main);
-    line-height: 1.55;
-    font-size: 17px;
+    line-height: 1.6;
+    /* Raised from 17px. This is a counter iPad held at arm's length, often by
+       someone who did not bring their reading glasses to a repair shop. */
+    font-size: 19px;
     min-height: 100vh;
     /* Stop the whole page rubber-banding while a customer signs */
     overscroll-behavior-y: none;
@@ -214,7 +219,7 @@ body {
 
 .step__lede {
     color: var(--text-muted);
-    font-size: 1.05rem;
+    font-size: 1.12rem;
     margin-bottom: 2rem;
     max-width: 60ch;
 }
@@ -234,7 +239,7 @@ body {
 }
 
 .card__title {
-    font-size: 1.05rem;
+    font-size: 1.2rem;
     font-weight: 700;
     margin-bottom: 1.25rem;
     display: flex;
@@ -257,9 +262,9 @@ body {
 
 .field__label {
     display: block;
-    font-size: 0.9rem;
+    font-size: 1rem;
     font-weight: 600;
-    color: var(--text-muted);
+    color: var(--text-main);
     margin-bottom: 0.5rem;
 }
 .field__label .opt {
@@ -270,10 +275,10 @@ body {
 }
 
 .field__help {
-    font-size: 0.82rem;
+    font-size: 0.92rem;
     color: var(--text-dark);
-    margin-top: 0.45rem;
-    line-height: 1.45;
+    margin-top: 0.5rem;
+    line-height: 1.5;
 }
 
 .input,
@@ -285,9 +290,9 @@ select.input {
     border-radius: var(--radius-md);
     color: var(--text-main);
     font-family: inherit;
-    font-size: 1.05rem;
-    padding: 0.95rem 1.1rem;
-    min-height: 58px;
+    font-size: 1.1rem;
+    padding: 1.05rem 1.15rem;
+    min-height: 66px;
     transition: border-color 0.18s ease, box-shadow 0.18s ease;
 }
 
@@ -301,7 +306,7 @@ select.input {
     padding-right: 3rem;
 }
 
-.textarea { min-height: 130px; resize: vertical; line-height: 1.5; }
+.textarea { min-height: 150px; resize: vertical; line-height: 1.55; }
 
 .input:focus, .textarea:focus {
     outline: none;
@@ -337,7 +342,7 @@ select.input {
     display: inline-flex;
     align-items: center;
     gap: 0.55rem;
-    min-height: 56px;
+    min-height: 62px;
     padding: 0.6rem 1.25rem;
     background: var(--bg-input);
     border: 1.5px solid var(--border-color);
@@ -364,8 +369,8 @@ select.input {
     display: flex;
     align-items: flex-start;
     gap: 0.85rem;
-    min-height: 58px;
-    padding: 1rem 1.1rem;
+    min-height: 66px;
+    padding: 1.1rem 1.15rem;
     background: var(--bg-input);
     border: 1.5px solid var(--border-color);
     border-radius: var(--radius-md);
@@ -378,8 +383,8 @@ select.input {
 .checkbox input { position: absolute; opacity: 0; pointer-events: none; }
 
 .checkbox__box {
-    flex: 0 0 26px;
-    width: 26px; height: 26px;
+    flex: 0 0 30px;
+    width: 30px; height: 30px;
     margin-top: 1px;
     border: 2px solid var(--border-strong);
     border-radius: 7px;
@@ -396,13 +401,13 @@ select.input {
 .checkbox__box i { opacity: 0; }
 .checkbox.is-checked .checkbox__box i { opacity: 1; }
 
-.checkbox__text { font-size: 0.98rem; font-weight: 600; line-height: 1.4; }
+.checkbox__text { font-size: 1.05rem; font-weight: 600; line-height: 1.45; }
 .checkbox__text small {
     display: block;
     font-weight: 500;
-    font-size: 0.82rem;
+    font-size: 0.92rem;
     color: var(--text-dark);
-    margin-top: 0.15rem;
+    margin-top: 0.2rem;
 }
 
 /* Full-width consent rows on the signing step */
@@ -554,11 +559,106 @@ select.input {
     margin: 0 auto;
     width: 100%;
     display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.7rem;
+}
+.actionbar__row {
+    display: flex;
     align-items: center;
     gap: 1rem;
+    width: 100%;
 }
 .actionbar__spacer { flex: 1; }
-.actionbar__note { font-size: 0.82rem; color: var(--text-dark); }
+.actionbar__note { font-size: 0.9rem; color: var(--text-muted); }
+
+/* ---------------------------------------------------------------------
+   Outstanding-work checklist (customer step only)
+   --------------------------------------------------------------------- */
+.checklist {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    width: 100%;
+}
+
+.checklist__lead {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.checklist__items {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.checklist__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.3rem 0.7rem 0.3rem 0.45rem;
+    border: 1px solid var(--border-strong);
+    border-radius: 999px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+.checklist__item.is-done {
+    border-color: rgba(16, 185, 129, 0.45);
+    background: rgba(16, 185, 129, 0.12);
+    color: var(--success);
+}
+
+/* The marker is a text glyph rather than an icon sprite so it still reads
+   as done / not done if the SVG defs fail for any reason. */
+.checklist__mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid currentColor;
+    font-size: 0.72rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.checklist__item.is-done .checklist__mark {
+    background: var(--success);
+    border-color: var(--success);
+    color: #06251A;
+}
+
+/* The bar grows by a row on the customer step, so the page has to end
+   further up or the signature card hides behind it. */
+body[data-step="customer"] .actionbar {
+    height: auto;
+    min-height: var(--actionbar-h);
+    padding-top: 0.85rem;
+    padding-bottom: calc(0.85rem + env(safe-area-inset-bottom, 0px));
+}
+
+body[data-step="customer"] .shell {
+    padding-bottom: calc(var(--actionbar-h) + 9rem);
+}
+
+/* Brief highlight on the card the Continue button jumped to, so it is
+   obvious which one still needs attention. */
+.card.is-flagged {
+    border-color: var(--accent-cyan);
+    box-shadow: 0 0 0 3px rgba(0, 228, 255, 0.18);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
 
 /* ============================ Handover screen ============================ */
 
@@ -589,7 +689,7 @@ select.input {
 }
 .summary__row:last-child { border-bottom: none; }
 .summary__row:nth-child(odd) { background: rgba(255, 255, 255, 0.02); }
-.summary__key { color: var(--text-muted); font-size: 0.92rem; font-weight: 600; }
+.summary__key { color: var(--text-muted); font-size: 1rem; font-weight: 600; }
 .summary__val { font-weight: 600; word-break: break-word; }
 .summary__val.is-price { color: var(--success); font-size: 1.15rem; }
 
@@ -634,12 +734,12 @@ select.input {
     border: 1.5px solid var(--border-color);
     border-radius: var(--radius-md);
     padding: 1.5rem;
-    font-size: 0.95rem;
-    line-height: 1.65;
+    font-size: 1.02rem;
+    line-height: 1.7;
     color: var(--text-muted);
 }
 .terms h3 {
-    font-size: 0.95rem;
+    font-size: 1.05rem;
     color: var(--text-main);
     margin: 1.5rem 0 0.5rem;
     font-weight: 700;
@@ -921,6 +1021,47 @@ body[data-step="done"] .steprail { display: none; }
     .shell { padding-left: 1rem; padding-right: 1rem; }
     .topbar { padding: 0 1rem; }
     .steprail { display: none; }
+
+    /* The checklist wrapping to two rows made the action bar about a third
+       of a phone screen and buried the signature pad underneath it. One
+       scrollable row instead; the button already spells out what is next, so
+       the lead sentence is redundant here. */
+    .checklist__lead { display: none; }
+
+    .checklist__items {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        gap: 0.4rem;
+        padding-bottom: 2px;
+    }
+
+    .checklist__items::-webkit-scrollbar { display: none; }
+
+    .checklist__item {
+        font-size: 0.82rem;
+        padding: 0.25rem 0.6rem 0.25rem 0.35rem;
+        gap: 0.3rem;
+    }
+
+    .checklist__mark { width: 17px; height: 17px; font-size: 0.62rem; border-width: 1.5px; }
+
+    .actionbar__inner { gap: 0.55rem; }
+    .btn--lg { min-height: 58px; font-size: 1.02rem; padding: 0 1.3rem; }
+
+    /* Back is the rarely used half of the pair, so it gives up the width. */
+    .actionbar__row #btn-back { padding: 0 1rem; font-size: 0.95rem; }
+    .actionbar { padding-left: 1rem; padding-right: 1rem; }
+
+    body[data-step="customer"] .actionbar {
+        padding-top: 0.6rem;
+        padding-bottom: calc(0.6rem + env(safe-area-inset-bottom, 0px));
+    }
+
+    body[data-step="customer"] .shell {
+        padding-bottom: calc(var(--actionbar-h) + 6rem);
+    }
 }
 
 /* iPad landscape — more width, so let the signature box breathe */
