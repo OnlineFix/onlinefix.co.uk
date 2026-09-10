@@ -19,6 +19,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"
         integrity="sha512-fD9DI5bZwQxOi7MhYWnnNPlvXdp/2Pj3XSTRrFs5FQa4mizyGLnJcN6tuvUS6LbmgN1ut+XGSABKvjN0H6Aoow=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <!-- One label design, shared with /new-repair/label.html -->
+    <link rel="stylesheet" href="/new-repair/label.css?v=20260910">
+    <script src="/new-repair/label-render.js?v=20260910"></script>
     <style>
         * {
             margin: 0;
@@ -1751,10 +1755,15 @@
             margin: 0 auto;
         }
 
+        /* Scoped to a normal print. Printing a label sets .printing-label on
+           the root for the duration, and label.css takes over from there —
+           unscoped, these rules would reveal the invoice area behind the
+           sticker. */
         @media print {
-            body * { visibility: hidden; }
-            .invoice-print-area, .invoice-print-area * { visibility: visible; }
-            .invoice-print-area { position: absolute; left: 0; top: 0; width: 100%; }
+            html:not(.printing-label) body * { visibility: hidden; }
+            html:not(.printing-label) .invoice-print-area,
+            html:not(.printing-label) .invoice-print-area * { visibility: visible; }
+            html:not(.printing-label) .invoice-print-area { position: absolute; left: 0; top: 0; width: 100%; }
             .no-print { display: none !important; }
         }
 
@@ -3737,16 +3746,31 @@
         }
 
         // === PRINT LABEL FROM ADMIN ===
-        // Opens the shared label page rather than writing a second label here.
-        // That page sets an @page rule matching the loaded roll, which is what
-        // stops the LabelWriter rotating or scaling the output; this function
-        // used to write its own markup with no @page rule at all, so Windows
-        // fell back to A4 and the driver turned a 57x32mm box sideways to fit.
-        // One label implementation, one place to change it.
+        // Prints straight from here. The label page is still the place to
+        // change which roll is loaded or to turn the artwork a quarter turn,
+        // but those settings barely ever change, so routing every print
+        // through it meant opening a tab and clicking Print for a sticker
+        // whose settings were already correct.
+        //
+        // The drawing itself comes from label-render.js, shared with that
+        // page — writing a second label here is what once printed a 57x32mm
+        // box sideways on A4, because the copy had no @page rule at all.
         function reprintLabel(repairId) {
             const repair = allRepairs.find(r => r.id === repairId);
             if (!repair) return;
-            safeOpen(`${window.location.origin}/new-repair/label.html?id=${encodeURIComponent(repair.repairId)}`);
+
+            if (!window.OnlineFixLabel) {
+                showAlert('Label printer script did not load — reload the page', 'error');
+                return;
+            }
+
+            try {
+                const { size, rotated } = OnlineFixLabel.printRepair(repair);
+                showAlert(`Label sent — ${size.w} × ${size.h} mm${rotated ? ', turned' : ''}`, 'success');
+            } catch (err) {
+                console.error('Label print failed', err);
+                showAlert('Could not print that label', 'error');
+            }
         }
 
         // === DATE RANGE FILTER FOR ANALYTICS ===

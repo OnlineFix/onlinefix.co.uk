@@ -206,34 +206,67 @@ claims. Budget for real DYMO rolls.
 1. Plug the 550 into the **computer**, not the iPad. The 550 is USB-only with
    no AirPrint, so the iPad cannot print to it at all.
 2. Install the DYMO driver from dymo.com for that computer.
-3. Load a roll. **99012 (89 × 36 mm)** is the size the label page defaults to
-   and the one that fits a device best.
+3. Load a roll. **11354 (57 × 32 mm) multipurpose** is what the label page
+   defaults to and what the shop uses.
 
 ### Printing a label
 
-From the confirmation screen, **Print device label**. Or open it directly:
+On the dashboard, the **printer button** on any job prints that label straight
+away. No extra page, no picking settings — it uses the roll and orientation
+you last chose, which the browser remembers per computer.
+
+The iPad cannot print to the 550 at all (USB-only, no AirPrint), so labels
+come off the shop computer. The dashboard shows a new job the moment the iPad
+creates it, so the sequence is: customer finishes on the iPad, the job appears
+on the computer, you press the printer button.
+
+### Making it print with no dialog at all
+
+Out of the box the browser still shows a print dialog. One Chrome flag removes
+it, so the button prints in one click:
+
+1. Set the DYMO as the **default printer**. Windows Settings → *Bluetooth &
+   devices* → *Printers & scanners*. Turn **off** "Let Windows manage my
+   default printer", then open the DYMO and choose **Set as default**.
+2. Right-click your Chrome shortcut → **Properties**.
+3. In the **Target** box, after the closing quote, add a space and then:
+   `--kiosk-printing`
+4. Click **OK**, then open Chrome from that shortcut.
+
+From then on, the printer button prints silently to the DYMO.
+
+**Use a separate shortcut for this.** With that flag on, *everything* printed
+from that Chrome window goes straight to the default printer with no dialog —
+including invoices. Keep one shortcut with the flag for the dashboard, and
+your normal Chrome for everything else.
+
+### Changing the roll, or if it prints sideways
+
+Open the label page for any job:
 
 ```
 https://onlinefix.co.uk/new-repair/label.html?id=REP_...
 ```
 
-First time only, in the print dialog:
+It has the roll picker, a preview, and a **turn it a quarter turn** button for
+when the driver feeds the label the other way round. Both choices are saved
+for that computer and are what the dashboard button then uses, so this page is
+only needed when something changes.
 
-- Printer: **DYMO LabelWriter 550**
-- Paper size: the roll you have loaded
-- Scale: **100%**
-- Margins: **off** / none
+If you are not using the flag above, set these in the print dialog the first
+time: printer **DYMO LabelWriter 550**, paper size the roll you have loaded,
+scale **100%**, margins **off**. Chrome remembers them afterwards.
 
-Both Safari and Chrome remember these afterwards. The page also remembers which
-roll you picked.
+### What is on the label
 
-The label carries the short reference (`#28FAEB`), customer name, device,
-fault, phone, price and date — enough to identify any device on the shelf
-without opening the system.
+Customer name, the repair, phone number and the date it came in. That is
+deliberately all of it — a 57 × 32 mm roll only holds so much, and every extra
+line shrinks the rest. Phone numbers print as you would dial them
+(`07700 900456`), not in the `+44` form the system stores.
 
-**Not on the label yet:** a QR code. It was left out deliberately rather than
-shipped unverified — a QR that scans to the wrong place is worse than no QR.
-Worth adding as a small follow-up.
+**Not on the label:** a QR code, and the short reference. Both were left out to
+keep the four lines above readable. Say the word if you want the reference
+back — it is the only thing on the sticker that links to the ticket.
 
 ---
 

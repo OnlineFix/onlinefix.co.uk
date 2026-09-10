@@ -12,6 +12,7 @@
     <title>Device label — OnlineFix</title>
 
     <link rel="stylesheet" href="intake.css?v=20260901">
+    <link rel="stylesheet" href="label.css?v=20260910">
     <style>
         .shell { max-width: 680px; padding-bottom: 3rem; }
         .actionbar { display: none; }
@@ -27,142 +28,14 @@
             overflow-x: auto;
         }
 
-        .label {
-            position: relative;
-            background: #FFFFFF;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, .18);
-        }
-
-        .label__inner {
-            position: absolute;
-            top: 0;
-            left: 0;
-            transform-origin: top left;
-            background: #FFFFFF;
-            color: #000000;
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            box-sizing: border-box;
-            padding: 2mm 2.5mm;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            overflow: hidden;
-        }
-
-        /* A quarter turn about the top-left corner, then pulled back up by its
-           own height so it lands square inside the swapped page box. */
-        .label.is-rotated .label__inner {
-            transform: rotate(90deg) translateY(-100%);
-        }
-
-        /* Sticker layout. Three blocks, not four: the phone and date share a
-           row, which buys the job an extra line without losing either. Side
-           padding is generous because a LabelWriter cannot print to the edge —
-           designing to the full 57mm is what clipped "ONLINEFIX" to "ONLINEF"
-           and ate the end of a phone number. */
-        .label__inner {
-            padding: 1.5mm 3.5mm;
-            justify-content: space-evenly;
-        }
-
-        /* Nothing may be squeezed. Without this, flex compresses the lines to
-           fit and text is clipped vertically inside its own box. */
-        .label__inner > * { flex: 0 0 auto; }
-
-        /* The name owns a full-width block and may wrap onto a second line.
-           Sharing a row with the date cost it so much width that
-           "Christopher Featherstonehaugh" hit the size floor and still lost
-           its surname to an ellipsis. Two lines at a readable size beats one
-           line you cannot read. */
-        .lbl-name {
-            font-weight: 800;
-            letter-spacing: -0.01em;
-            line-height: 1.1;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            overflow-wrap: anywhere;
-        }
-
-        /* The job is the one thing worth wrapping: truncating "Overheating /
-           loud fan. Full strip-down, dust removal" loses what the repair
-           actually is. Up to four lines, shrinking to fit first. */
-        .lbl-job {
-            font-weight: 500;
-            line-height: 1.16;
-            display: -webkit-box;
-            -webkit-line-clamp: 4;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        /* Phone and date share the bottom row. The phone keeps its size and
-           the date gives way, which is only affordable because the date is
-           set short ("22 Aug 26"); the full 22/08/2026 is what previously
-           squeezed one or the other down to an unreadable size. */
-        .lbl-foot {
-            display: flex;
-            align-items: baseline;
-            justify-content: space-between;
-            gap: 2mm;
-            white-space: nowrap;
-        }
-
-        .lbl-phone {
-            font-weight: 700;
-            letter-spacing: 0.01em;
-            line-height: 1.1;
-            /* Grows to fill the row so there is a real width to measure the
-               text against. Left shrink-to-fit, its box always equalled its
-               content, so the fit test could never pass and the number sat at
-               its size floor no matter how much room the row had. */
-            flex: 1 1 auto;
-            min-width: 0;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        /* The date holds its width so the phone has a definite space to be
-           fitted into. With both of them shrinkable they competed for the row
-           and neither ever fitted — both came out ellipsised. */
-        .lbl-date { font-weight: 500; line-height: 1.1; flex: 0 0 auto; }
-
-        @media print {
-            /* Fill the page the driver actually gives us rather than the box we
-               sized to. When the printer's page is taller than the roll we
-               designed for, a fixed height leaves content stranded at the top
-               with a dead band beneath — which is exactly what came off the
-               LabelWriter. Stretching to 100% makes space-evenly spread the
-               lines down the real printable area, whatever its height.
-               Excluded when turned, because the rotation maths depends on the
-               inner box keeping the roll's dimensions. */
-            .label:not(.is-rotated),
-            .label:not(.is-rotated) .label__inner {
-                width: 100% !important;
-                height: 100% !important;
-            }
-
-            html, body { background: #fff !important; margin: 0 !important; padding: 0 !important; }
-            body * { visibility: hidden; }
-            .label, .label * { visibility: visible; }
-            .label {
-                position: absolute;
-                inset: 0;
-                margin: 0;
-                box-shadow: none;
-                page-break-after: always;
-                break-after: page;
-            }
-        }
     </style>
 
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-check-compat.js"></script>
-    <script defer src="label.js?v=20260901b"></script>
+    <script defer src="label-render.js?v=20260910"></script>
+    <script defer src="label.js?v=20260910"></script>
 </head>
 
 <body>
@@ -229,7 +102,9 @@
         <div id="content" hidden>
             <p class="step__eyebrow">Device label</p>
             <h1 class="step__title" id="who">—</h1>
-            <p class="step__lede">Print this and stick it on the device before it goes on the shelf.</p>
+            <p class="step__lede">Print this and stick it on the device before it goes on the shelf. The roll and
+                turn you pick here are what the dashboard's printer button uses, so you only need this page when
+                something changes.</p>
 
             <div class="card">
                 <h2 class="card__title">Label roll</h2>
@@ -268,7 +143,6 @@
         </div>
     </main>
 
-    <style id="page-rule"></style>
 </body>
 
 </html>
