@@ -104,9 +104,9 @@
    ever fitted — both came out ellipsised. */
 .lbl-date { font-weight: 500; line-height: 1.1; flex: 0 0 auto; }
 
-/* The host the dashboard renders into. Off-screen rather than hidden: the
-   fit loops measure text, and an element with no layout measures 0, so a
-   display:none host would print every line at its starting size. */
+/* The host every print renders into, on both pages. Off-screen rather than
+   hidden: the fit loops measure text, and an element with no layout measures
+   0, so a display:none host would print every line at its starting size. */
 .label-print-host {
     position: fixed;
     left: -10000px;
@@ -126,22 +126,19 @@
         padding: 0 !important;
     }
 
-    /* Transitions off first. The dashboard's buttons carry `transition: all`
-       and visibility is an animatable property, so the rule below would take
-       effect 300ms late — long enough for a row of buttons to be caught in
-       the print snapshot and land on the sticker. */
-    html.printing-label * {
-        transition: none !important;
-        animation: none !important;
+    /* display:none, not visibility:hidden. Hidden elements still take up
+       layout, so the rest of the page was still there, silently sliced into
+       32mm pages — one print came out as twelve labels, the first carrying
+       the sticker and the rest carrying invisible dashboard. Removing them
+       from flow is what makes the document exactly one label long. */
+    html.printing-label body > *:not(#onlinefix-label-host) {
+        display: none !important;
     }
-
-    html.printing-label body * { visibility: hidden; }
-    html.printing-label .label,
-    html.printing-label .label * { visibility: visible; }
 
     /* The off-screen host must stop being a containing block, or the label
        positions itself against a box parked 10000px to the left. */
-    html.printing-label .label-print-host {
+    html.printing-label #onlinefix-label-host {
+        display: block !important;
         position: static;
         left: auto;
     }
@@ -151,8 +148,6 @@
         inset: 0;
         margin: 0;
         box-shadow: none;
-        page-break-after: always;
-        break-after: page;
     }
 
     /* Fill the page the driver actually gives us rather than the box we
