@@ -262,54 +262,55 @@
         style.textContent = pageRuleText(size, rotated);
     }
 
-    /* Prints the given label and nothing else. The class is what scopes the
-       print stylesheet, and it comes off again afterwards so the page can
-       still print other things — the dashboard also prints invoices. */
-    function printLabel(labelEl, options) {
-        var doc = labelEl.ownerDocument;
-        var win = doc.defaultView;
-        var applied = render(labelEl, (options || {}).repair || {}, options);
-        applyPageRule(doc, applied.size, applied.rotated);
+    /* The element every print renders into: one `.label`, always a direct
+       child of <body>. That position is load-bearing, not tidiness — the
+       print stylesheet clears the page by hiding body's other children, and
+       it can only do that if the label is not buried inside them.
 
-        var root = doc.documentElement;
+       Off-screen rather than hidden, because the fit loops measure text and
+       an element with no layout measures 0. */
+    function ensureHost() {
+        var host = document.getElementById('onlinefix-label-host');
+        if (!host) {
+            host = document.createElement('div');
+            host.id = 'onlinefix-label-host';
+            host.className = 'label-print-host';
+            host.innerHTML = '<div class="label"></div>';
+            document.body.appendChild(host);
+        }
+        return host;
+    }
+
+    /* Renders a repair and prints it, and nothing else on the page with it.
+       This is the whole of what the dashboard's Print label button needs. */
+    function printRepair(repair, options) {
+        var host = ensureHost();
+        var applied = render(host.querySelector('.label'), repair || {}, options);
+        applyPageRule(document, applied.size, applied.rotated);
+
+        var root = document.documentElement;
         root.classList.add('printing-label');
 
         // The class has to stay for as long as the print session lasts, not
         // for a fixed spell. Chrome re-renders the preview when a setting is
         // changed in the dialog, so dropping it on a timer while the dialog is
         // still open would reprint the whole dashboard onto the roll.
-        var media = win.matchMedia && win.matchMedia('print');
+        var media = window.matchMedia && window.matchMedia('print');
 
         var cleanup = function () {
             root.classList.remove('printing-label');
-            win.removeEventListener('afterprint', cleanup);
+            window.removeEventListener('afterprint', cleanup);
             if (media && media.removeEventListener) media.removeEventListener('change', onMedia);
         };
 
         function onMedia(event) { if (!event.matches) cleanup(); }
 
-        win.addEventListener('afterprint', cleanup);
+        window.addEventListener('afterprint', cleanup);
         if (media && media.addEventListener) media.addEventListener('change', onMedia);
 
-        win.print();
+        window.print();
 
         return applied;
-    }
-
-    /* Renders a repair into a host element created on demand, then prints it.
-       This is the whole of what the dashboard's Print label button needs. */
-    function printRepair(repair, options) {
-        var host = document.getElementById('onlinefix-label-host');
-        if (!host) {
-            host = document.createElement('div');
-            host.id = 'onlinefix-label-host';
-            host.className = 'label-print-host';
-            host.innerHTML = '<div class="label"><div class="label__inner"></div></div>';
-            document.body.appendChild(host);
-        }
-        var opts = options || {};
-        opts.repair = repair;
-        return printLabel(host.querySelector('.label'), opts);
     }
 
     global.OnlineFixLabel = {
@@ -323,7 +324,6 @@
         pageRuleText: pageRuleText,
         applyPageRule: applyPageRule,
         render: render,
-        printLabel: printLabel,
         printRepair: printRepair
     };
 

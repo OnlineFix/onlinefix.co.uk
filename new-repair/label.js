@@ -83,10 +83,12 @@
         });
     }
 
+    // Prints through the shared host rather than the preview above it. The
+    // preview sits deep inside the page, and the print stylesheet clears the
+    // page by hiding body's other children — printing it where it sits left
+    // the whole page in the document, sliced into 32mm pages.
     $('#btn-print').addEventListener('click', function () {
-        Label.printLabel($('#label'), {
-            repair: repair, size: selectedSize(), rotated: rotated
-        });
+        Label.printRepair(repair, { size: selectedSize(), rotated: rotated });
     });
 
     function showError(message) {
