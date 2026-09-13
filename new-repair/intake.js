@@ -308,6 +308,7 @@
             next.innerHTML = 'Continue <svg class="icon" width="18" height="18"><use href="#i-arrow-right"/></svg>';
         }
 
+        syncActionbarHeight();
         window.scrollTo({ top: 0, behavior: 'instant' in window ? 'instant' : 'auto' });
     }
 
@@ -340,6 +341,35 @@
             { key: 'acks', label: 'Tick the 3 boxes', short: 'Tick boxes', done: acksDone, anchor: '#card-acks' },
             { key: 'signature', label: 'Sign', short: 'Sign', done: state.signatureStrokes.length > 0, anchor: '#card-signature' }
         ];
+    }
+
+    // The bar is fixed to the bottom and its height is not constant: the
+    // customer step adds a checklist row, and that row rewraps as items are
+    // ticked off, as the step changes, and on rotation. The page's bottom
+    // padding is driven from the measured height so the last card always ends
+    // just above the bar — padding to a guessed constant left roughly 100px of
+    // dead page showing between the two at the end of the scroll.
+    var lastBarH = null;
+
+    function syncActionbarHeight() {
+        var bar = $('#actionbar');
+        if (!bar) return;
+        var h = bar.hidden ? 0 : Math.round(bar.getBoundingClientRect().height);
+        // Writing the variable changes .shell's padding, which changes page
+        // height, which can change whether a scrollbar is present and so the
+        // bar's own width. Only writing on a real change stops that becoming a
+        // resize loop.
+        if (h === lastBarH) return;
+        lastBarH = h;
+        document.documentElement.style.setProperty('--actionbar-real-h', h + 'px');
+    }
+
+    if (window.ResizeObserver) {
+        new ResizeObserver(syncActionbarHeight).observe($('#actionbar'));
+    } else {
+        // No observer: catch the two moments the height actually changes.
+        window.addEventListener('resize', syncActionbarHeight);
+        window.addEventListener('orientationchange', syncActionbarHeight);
     }
 
     function refreshChecklist() {
@@ -375,6 +405,9 @@
         });
 
         var next = $('#btn-next');
+        // Chip text and the lead sentence both change here, either of which can
+        // change how the row wraps.
+        setTimeout(syncActionbarHeight, 0);
         if (outstanding.length === 0) {
             next.innerHTML = 'Agree &amp; create repair <svg class="icon" width="18" height="18"><use href="#i-check"/></svg>';
         } else {

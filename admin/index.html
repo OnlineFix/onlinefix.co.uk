@@ -1365,6 +1365,86 @@
             }
         }
 
+        /* Contact details on the job sheet, sized to be tapped. */
+        .contact-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .contact-actions .btn {
+            font-size: 0.9rem;
+            padding: 0.6rem 0.9rem;
+            word-break: break-all;
+            text-align: left;
+        }
+
+        /* How long the job has been in its current status, beside the badge. */
+        .status-dwell {
+            display: inline-block;
+            margin-left: 0.4rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .status-dwell.is-warn { color: var(--warning); }
+        .status-dwell.is-stale { color: var(--danger); }
+
+        /* Header and actions pinned, detail scrolls between them. The body
+           used to be a 70vh box inside a 90vh modal with the buttons after it,
+           so on a laptop the action row was cut off by the modal's own edge —
+           and these buttons are now the main way to act on a job. */
+        .modal-content--job {
+            display: flex;
+            flex-direction: column;
+            max-height: 90vh;
+        }
+
+        .modal-content--job .job-body {
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            padding-right: 1rem;
+        }
+
+        .modal-content--job .job-actions {
+            flex: none;
+        }
+
+        .job-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            align-items: center;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .job-actions__spacer { flex: 1; }
+
+        @media (max-width: 640px) {
+            .job-actions {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .job-actions .btn {
+                justify-content: center;
+                min-height: 52px;
+                font-size: 0.85rem;
+            }
+
+            .job-actions__spacer { display: none; }
+
+            .contact-actions .btn {
+                width: 100%;
+                min-height: 52px;
+            }
+        }
+
         /* Helper Classes */
         .hidden {
             display: none !important;
@@ -1972,11 +2052,73 @@
             overflow-x: auto;
             padding-bottom: 1rem;
             min-height: 400px;
+            /* One column at a time settles under the thumb on a phone instead
+               of stopping halfway between two. */
+            scroll-snap-type: x proximity;
+            overscroll-behavior-x: contain;
         }
 
-        .kanban-column {
-            min-width: 220px;
+        /* Overview is the board now, so it gets the screen rather than sitting
+           in a card between a stats row and a list. */
+        .content-section.is-board {
+            display: flex;
+            flex-direction: column;
+            min-height: calc(100vh - 4rem - 5.5rem);
+        }
+
+        .board-content {
             flex: 1;
+            min-height: 0;
+            padding: 0.75rem;
+            display: flex;
+        }
+
+        .content-section.is-board .kanban-container {
+            flex: 1;
+            min-height: 0;
+        }
+
+        .content-section.is-board .kanban-cards {
+            max-height: none;
+        }
+
+        .board-legend {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.4rem 0.9rem;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
+        .board-legend__item {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .board-legend__note {
+            color: var(--text-dark);
+        }
+
+        .board-flag {
+            width: 10px;
+            height: 10px;
+            border-radius: 3px;
+            display: inline-block;
+        }
+
+        .board-flag--warn { background: var(--warning); }
+        .board-flag--stale { background: var(--danger); }
+
+        .kanban-column {
+            /* Wide enough to read on a touch screen, where the board scrolls
+               sideways one column at a time. Narrowed on the desktop below so
+               all six statuses are on screen at once — the board is the main
+               screen now, and two columns hanging off the right edge is the
+               problem it was brought in to solve. */
+            min-width: 250px;
+            flex: 1 0 auto;
             background: var(--bg-surface);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-md);
@@ -2031,9 +2173,62 @@
             cursor: grabbing;
         }
 
-        .kanban-card:hover {
+        .kanban-card:hover,
+        .kanban-card:focus-visible {
             border-color: var(--primary-blue);
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            outline: none;
+        }
+
+        /* How long the job has sat in this column. A left edge rather than a
+           badge, so a column of stuck work reads at a glance from across the
+           counter. */
+        .kanban-card.is-warn { border-left: 3px solid var(--warning); }
+        .kanban-card.is-stale { border-left: 3px solid var(--danger); }
+
+        .kanban-card-stuck {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            margin-top: 0.5rem;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--warning);
+        }
+
+        .kanban-card.is-stale .kanban-card-stuck { color: var(--danger); }
+
+        /* Snap target, so a swipe lands on a column edge. */
+        .kanban-column { scroll-snap-align: start; }
+
+        /* Desktop: let the six columns share the width instead of running off
+           the right edge. Must sit after the .kanban-column base rule — equal
+           specificity, so source order decides. */
+        /* Desktop: let the six columns share the width instead of running off
+           the right edge, and let the board fill the screen. */
+        @media (min-width: 1181px) {
+            .kanban-column {
+                min-width: 0;
+                flex: 1 1 0;
+            }
+        }
+
+        /* Touch: the board is as tall as its fullest column, not as tall as the
+           screen. Stretching to the viewport left a swipeable column with two
+           cards in it and a screenful of empty below them. */
+        @media (max-width: 1180px) {
+            .content-section.is-board {
+                min-height: 0;
+            }
+
+            .content-section.is-board .kanban-container {
+                min-height: 0;
+            }
+
+            .kanban-cards {
+                /* Still a target worth dropping onto when a column is empty. */
+                min-height: 120px;
+            }
         }
 
         .kanban-card.dragging {
@@ -2466,12 +2661,6 @@
                     </a>
                 </div>
                 <div class="nav-item">
-                    <a href="#" class="nav-link" data-section="kanban">
-                        <i class="fas fa-columns"></i>
-                        Kanban Board
-                    </a>
-                </div>
-                <div class="nav-item">
                     <a href="#" class="nav-link" data-section="analytics">
                         <i class="fas fa-chart-bar"></i>
                         Analytics
@@ -2509,76 +2698,22 @@
             </div>
 
             <!-- Overview Section -->
-            <div id="overview-section" class="content-section">
-                <!-- Stats -->
-                <div class="stats-grid" id="overview-stats-grid">
-                    <div class="stat-card clickable" onclick="showSection('repairs'); document.getElementById('status-filter').value=''; document.getElementById('common-repair-filter').value=''; loadAllRepairs();" title="View all repairs">
-                        <div class="stat-icon" style="background: var(--primary-blue);">
-                            <i class="fas fa-tools"></i>
-                        </div>
-                        <div class="stat-number" id="total-repairs">0</div>
-                        <div class="stat-label">Total Repairs</div>
-                    </div>
-                    <div class="stat-card clickable" onclick="showSection('repairs'); document.getElementById('status-filter').value='in-repair'; document.getElementById('common-repair-filter').value=''; loadAllRepairs();" title="View active repairs">
-                        <div class="stat-icon" style="background: var(--warning);">
-                            <i class="fas fa-clock"></i>
-                        </div>
-                        <div class="stat-number" id="active-repairs">0</div>
-                        <div class="stat-label">Active Repairs</div>
-                    </div>
-                    <div class="stat-card clickable" onclick="showSection('repairs'); document.getElementById('status-filter').value='ready'; document.getElementById('common-repair-filter').value=''; loadAllRepairs();" title="View ready for collection">
-                        <div class="stat-icon" style="background: var(--success);">
-                            <i class="fas fa-check-circle"></i>
-                        </div>
-                        <div class="stat-number" id="ready-repairs">0</div>
-                        <div class="stat-label">Ready for Collection</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background: rgba(0, 228, 255, 0.3);">
-                            <i class="fas fa-users"></i>
-                        </div>
-                        <div class="stat-number" id="total-customers">0</div>
-                        <div class="stat-label">Total Customers</div>
+            <!-- The board is the whole screen. It replaced a row of totals
+                 (repairs, customers) that answered nothing anyone acts on
+                 during a shift, and a Recent Repairs list that duplicated the
+                 top of All Repairs. -->
+            <div id="overview-section" class="content-section is-board">
+                <div class="section-header">
+                    <h2 class="section-title">Workflow</h2>
+                    <div class="board-legend">
+                        <span class="board-legend__item"><span class="board-flag board-flag--warn"></span>3+ days</span>
+                        <span class="board-legend__item"><span class="board-flag board-flag--stale"></span>7+ days</span>
+                        <span class="board-legend__note">in the same status</span>
                     </div>
                 </div>
-
-                <!-- Workflow Kanban (at-a-glance) -->
-                <div class="recent-repairs-section" style="margin-bottom: 1.5rem;">
-                    <div class="section-header">
-                        <h2 class="section-title">Workflow</h2>
-                        <button class="btn btn-secondary" onclick="showSection('kanban')">Open Kanban</button>
-                    </div>
-                    <div class="section-content" style="padding: 0.75rem;">
-                        <div class="kanban-container" id="overview-kanban-container">
-                            <!-- Populated by JS -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Recent Repairs -->
-                <div class="recent-repairs-section">
-                    <div class="section-header">
-                        <h2 class="section-title">Recent Repairs</h2>
-                        <button class="btn btn-secondary" onclick="showSection('repairs')">View All</button>
-                    </div>
-                    <div class="section-content">
-                        <div class="table-container">
-                            <table id="recent-repairs-table">
-                                <thead>
-                                    <tr>
-                                        <th>Repair ID</th>
-                                        <th>Customer</th>
-                                        <th>Device</th>
-                                        <th>Status</th>
-                                        <th>Date</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- Populated by JavaScript -->
-                                </tbody>
-                            </table>
-                        </div>
+                <div class="section-content board-content">
+                    <div class="kanban-container" id="overview-kanban-container">
+                        <!-- Populated by JS -->
                     </div>
                 </div>
             </div>
@@ -2693,18 +2828,6 @@
                 </div>
             </div>
 
-            <!-- Kanban Board Section -->
-            <div id="kanban-section" class="content-section hidden">
-                <div class="section-header">
-                    <h2 class="section-title">Kanban Board</h2>
-                </div>
-                <div class="section-content">
-                    <div class="kanban-container" id="kanban-container">
-                        <!-- Populated by JS -->
-                    </div>
-                </div>
-            </div>
-
             <!-- Analytics Section -->
             <div id="analytics-section" class="content-section hidden">
                 <div class="section-header" style="flex-wrap: wrap; gap: 0.75rem;">
@@ -2813,7 +2936,7 @@
                 <div class="kbd-row"><span>Navigate rows</span> <kbd>J</kbd> <kbd>K</kbd></div>
                 <div class="kbd-row"><span>Edit selected</span> <kbd>E</kbd></div>
                 <div class="kbd-row"><span>View selected</span> <kbd>V</kbd></div>
-                <div class="kbd-row"><span>Kanban view</span> <kbd>B</kbd></div>
+                <div class="kbd-row"><span>Board</span> <kbd>B</kbd></div>
                 <div class="kbd-row"><span>Close modal</span> <kbd>Esc</kbd></div>
             </div>
             <button class="kbd-hint-toggle" onclick="document.getElementById('kbd-panel').classList.toggle('hidden')" title="Keyboard shortcuts">
@@ -3058,7 +3181,6 @@
             const titles = {
                 'overview': 'Dashboard Overview',
                 'repairs': 'All Repairs',
-                'kanban': 'Kanban Board',
                 'analytics': 'Business Analytics'
             };
             document.getElementById('page-title').textContent = titles[sectionName] || 'Dashboard';
@@ -3068,10 +3190,7 @@
                 loadAllRepairs();
             } else if (sectionName === 'overview') {
                 updateStats();
-                loadRecentRepairs();
                 renderKanban('overview-kanban-container');
-            } else if (sectionName === 'kanban') {
-                renderKanban('kanban-container');
             } else if (sectionName === 'analytics') {
                 renderAnalytics();
             }
@@ -3095,16 +3214,12 @@
 
                 // Update everything
                 updateStats();
-                loadRecentRepairs();
                 loadAllRepairs();
 
                 // Re-render any visible kanban so drag-drop and status changes
                 // reflect immediately without manual section switching.
                 if (document.getElementById('overview-kanban-container')?.offsetParent) {
                     renderKanban('overview-kanban-container');
-                }
-                if (document.getElementById('kanban-container')?.offsetParent) {
-                    renderKanban('kanban-container');
                 }
 
                 document.getElementById('loading').style.display = 'none';
@@ -3130,6 +3245,27 @@
             return `${Math.floor(days / 30)} months ago`;
         }
 
+        // When the repair entered the status it is sitting in now. Read off the
+        // progress log rather than dateReceived, which is the whole point: a job
+        // booked in three weeks ago but moved to Testing yesterday is fine, and
+        // one booked in last week that never left Diagnosing is not. Entries are
+        // not guaranteed to be in order, so take the latest match.
+        function statusSinceSeconds(repair) {
+            let latest = 0;
+            (repair.progress || []).forEach(p => {
+                if (p && p.status === repair.currentStatus && p.timestamp && p.timestamp.seconds > latest) {
+                    latest = p.timestamp.seconds;
+                }
+            });
+            return latest || repair.dateReceived?.seconds || 0;
+        }
+
+        function daysInStatus(repair) {
+            const since = statusSinceSeconds(repair);
+            if (!since) return null;
+            return Math.floor((Date.now() - since * 1000) / 86400000);
+        }
+
         function getAgeClass(seconds) {
             if (!seconds) return '';
             const days = Math.floor((Date.now() - seconds * 1000) / (1000 * 60 * 60 * 24));
@@ -3138,28 +3274,16 @@
             return '';
         }
 
-        // Update stats with overdue counter
+        // Overdue counter. The totals this used to publish (repairs, active,
+        // ready, customers) went with the stats row: a running count of every
+        // customer the shop has ever had is not something anyone acts on
+        // mid-shift, whereas an overdue count is.
         function updateStats() {
-            const activeRepairs = allRepairs.filter(r =>
-                !['completed'].includes(r.currentStatus)
-            ).length;
-
-            const readyRepairs = allRepairs.filter(r =>
-                r.currentStatus === 'ready'
-            ).length;
-
             const overdueRepairs = allRepairs.filter(r =>
                 r.estimatedCompletion &&
                 !['completed', 'ready'].includes(r.currentStatus) &&
                 new Date(r.estimatedCompletion.seconds * 1000) < new Date()
             ).length;
-
-            const customers = new Set(allRepairs.map(r => r.customerEmail || r.customerPhone)).size;
-
-            document.getElementById('total-repairs').textContent = allRepairs.length;
-            document.getElementById('active-repairs').textContent = activeRepairs;
-            document.getElementById('ready-repairs').textContent = readyRepairs;
-            document.getElementById('total-customers').textContent = customers;
 
             // Update overdue badges
             const navBadge = document.getElementById('nav-overdue-badge');
@@ -3177,24 +3301,6 @@
             }
         }
 
-        // Load recent repairs
-        function loadRecentRepairs() {
-            const recent = allRepairs
-                .sort((a, b) => {
-                    const aTime = a.dateReceived?.seconds || 0;
-                    const bTime = b.dateReceived?.seconds || 0;
-                    return bTime - aTime;
-                })
-                .slice(0, 10);
-
-            const tbody = document.querySelector('#recent-repairs-table tbody');
-            tbody.innerHTML = '';
-
-            recent.forEach(repair => {
-                const row = createRepairRow(repair);
-                tbody.appendChild(row);
-            });
-        }
 
         // Status progression order
         const statusOrder = ['received', 'diagnosing', 'waiting-parts', 'in-repair', 'testing', 'ready', 'completed'];
@@ -3242,55 +3348,6 @@
         }
 
         // Create repair table row
-        function createRepairRow(repair) {
-            const row = document.createElement('tr');
-            const status = statusConfig[repair.currentStatus] || statusConfig['received'];
-            const date = repair.dateReceived ? new Date(repair.dateReceived.seconds * 1000).toLocaleDateString('en-GB') : 'N/A';
-            const age = timeAgo(repair.dateReceived?.seconds);
-            const ageClass = getAgeClass(repair.dateReceived?.seconds);
-
-            // Check if overdue
-            const isOverdue = repair.estimatedCompletion &&
-                !['completed', 'ready'].includes(repair.currentStatus) &&
-                new Date(repair.estimatedCompletion.seconds * 1000) < new Date();
-            const overdueTag = isOverdue ? ' <span class="overdue-badge"><i class="fas fa-exclamation-triangle"></i> Overdue</span>' : '';
-
-            const safeId = escapeJSStr(repair.id);
-            const safeRepairId = escapeJSStr(repair.repairId);
-            const canAdvance = repair.currentStatus !== 'completed';
-            const statusClickable = canAdvance ? 'clickable-status' : '';
-            const statusOnclick = canAdvance ? `onclick="quickAdvanceStatus('${safeId}', event)"` : '';
-            const statusTitle = canAdvance ? `title="Click to advance to ${escapeHTML(statusConfig[getNextStatus(repair.currentStatus)]?.label || 'next')}"` : '';
-
-            row.innerHTML = `
-                <td class="cell-id" data-label="Repair ID"><strong>${escapeHTML(repair.repairId)}</strong></td>
-                <td class="cell-customer" data-label="Customer">${escapeHTML(repair.customerName)}</td>
-                <td class="cell-device" data-label="Device">${escapeHTML(repair.brand)} ${escapeHTML(repair.model)}</td>
-                <td class="cell-status" data-label="Status"><span class="status-badge ${status.class} ${statusClickable}" ${statusOnclick} ${statusTitle}>${status.label}</span>${overdueTag}</td>
-                <td class="cell-received" data-label="Date">${date}<span class="repair-age ${ageClass}">${age}</span></td>
-                <td class="cell-actions" data-label="">
-                    <button class="btn btn-secondary btn-action" onclick="viewRepair('${safeId}')" title="View details">
-                        <i class="fas fa-eye"></i><span class="btn-action__label">View</span>
-                    </button>
-                    <button class="btn btn-primary btn-action" onclick="editRepair('${safeId}')" title="Update status, notes and photos">
-                        <i class="fas fa-edit"></i><span class="btn-action__label">Update</span>
-                    </button>
-                    <button class="btn btn-secondary btn-action" onclick="editCustomer('${safeId}')" title="Correct name, email or phone">
-                        <i class="fas fa-user-pen"></i><span class="btn-action__label">Customer</span>
-                    </button>
-                    <button class="btn btn-copy btn-action" onclick="openTrackingLink('${safeRepairId}')" title="Open tracking page">
-                        <i class="fas fa-external-link-alt"></i><span class="btn-action__label">Track</span>
-                    </button>
-                    <button class="btn btn-secondary btn-action" onclick="reprintLabel('${safeId}')" title="Print label">
-                        <i class="fas fa-tag"></i><span class="btn-action__label">Label</span>
-                    </button>
-                    <button class="btn btn-danger btn-action" onclick="deleteRepair('${safeId}', '${safeRepairId}')" title="Delete repair">
-                        <i class="fas fa-trash"></i><span class="btn-action__label">Delete</span>
-                    </button>
-                </td>
-            `;
-            return row;
-        }
 
         // View repair details
         function viewRepair(repairId) {
@@ -3300,19 +3357,31 @@
             const modal = document.createElement('div');
             modal.className = 'modal show';
             modal.innerHTML = `
-                <div class="modal-content" style="max-width: 800px;">
+                <div class="modal-content modal-content--job" style="max-width: 800px;">
                     <div class="modal-header">
                         <h2 class="modal-title">Repair Details - ${escapeHTML(repair.repairId)}</h2>
                         <button class="close-btn" onclick="this.closest('.modal').remove()">&times;</button>
                     </div>
-                    <div style="max-height: 70vh; overflow-y: auto; padding-right: 1rem;">
+                    <div class="job-body">
                         <div class="form-grid" style="margin-bottom: 2rem;">
                             <div style="background: var(--bg-surface); border: 1px solid var(--border-color); padding: 1.5rem; border-radius: var(--radius-lg);">
-                                <h3 style="color: var(--text-main); margin-bottom: 1rem;">Customer Information</h3>
+                                <h3 style="color: var(--text-main); margin-bottom: 1rem;">Customer</h3>
                                 <p><strong>Name:</strong> <span style="color: var(--text-muted);">${escapeHTML(repair.customerName)}</span></p>
-                                <p><strong>Phone:</strong> <span style="color: var(--text-muted);">${escapeHTML(repair.customerPhone)}</span></p>
-                                ${repair.customerEmail ? `<p><strong>Email:</strong> <span style="color: var(--text-muted);">${escapeHTML(repair.customerEmail)}</span></p>` : ''}
                                 ${repair.customerAddress ? `<p><strong>Address:</strong> <span style="color: var(--text-muted);">${escapeHTML(repair.customerAddress)}</span></p>` : ''}
+                                <!-- Tap to ring or mail. This screen gets opened
+                                     mid-shift to chase someone, so the contact
+                                     details are actions rather than text to
+                                     copy out by hand. -->
+                                <div class="contact-actions">
+                                    ${repair.customerPhone ? `
+                                        <a class="btn btn-secondary" href="tel:${escapeHTML(String(repair.customerPhone).replace(/[^+\d]/g, ''))}">
+                                            <i class="fas fa-phone"></i> ${escapeHTML(repair.customerPhone)}
+                                        </a>` : ''}
+                                    ${repair.customerEmail ? `
+                                        <a class="btn btn-secondary" href="mailto:${escapeHTML(repair.customerEmail)}">
+                                            <i class="fas fa-envelope"></i> ${escapeHTML(repair.customerEmail)}
+                                        </a>` : ''}
+                                </div>
                             </div>
                             <div style="background: var(--bg-surface); border: 1px solid var(--border-color); padding: 1.5rem; border-radius: var(--radius-lg);">
                                 <h3 style="color: var(--text-main); margin-bottom: 1rem;">Device Information</h3>
@@ -3326,7 +3395,11 @@
                         <div style="background: var(--bg-surface); border: 1px solid var(--border-color); padding: 1.5rem; border-radius: var(--radius-lg); margin-bottom: 2rem;">
                             <h3 style="color: var(--text-main); margin-bottom: 1rem;">Repair Details</h3>
                             <p><strong>Issue:</strong> <span style="color: var(--text-muted);">${escapeHTML(repair.issueDescription)}</span></p>
-                            <p><strong>Current Status:</strong> <span class="status-badge ${statusConfig[repair.currentStatus]?.class || 'status-received'}">${escapeHTML(statusConfig[repair.currentStatus]?.label || 'Received')}</span></p>
+                            <p><strong>Current Status:</strong> <span class="status-badge ${statusConfig[repair.currentStatus]?.class || 'status-received'}">${escapeHTML(statusConfig[repair.currentStatus]?.label || 'Received')}</span>${(() => {
+                                const d = daysInStatus(repair);
+                                if (d === null) return '';
+                                return ` <span class="status-dwell ${d >= 7 ? 'is-stale' : d >= 3 ? 'is-warn' : ''}">${d} day${d === 1 ? '' : 's'} in this status</span>`;
+                            })()}</p>
                             <p><strong>Date Received:</strong> <span style="color: var(--text-muted);">${repair.dateReceived ? new Date(repair.dateReceived.seconds * 1000).toLocaleString('en-GB') : 'N/A'}</span></p>
                             ${repair.estimatedCompletion ? `<p><strong>Est. Completion:</strong> <span style="color: var(--text-muted);">${new Date(repair.estimatedCompletion.seconds * 1000).toLocaleDateString('en-GB')}</span></p>` : ''}
                             ${repair.estimatedCost ? `<p><strong>Est. Cost:</strong> <span style="color: var(--text-muted);">£${escapeHTML(repair.estimatedCost)}</span></p>` : ''}
@@ -3360,11 +3433,27 @@
                             </div>
                         ` : ''}
                     </div>
-                    <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border-color);">
+                    <!-- The board opens this screen, so everything a job needs
+                         has to be reachable from it. It used to offer Edit and
+                         Close, and anything else meant finding the row again in
+                         All Repairs. -->
+                    <div class="job-actions">
                         <button class="btn btn-primary" onclick="editRepair('${escapeJSStr(repairId)}'); this.closest('.modal').remove();">
-                            <i class="fas fa-edit"></i>
-                            Edit Repair
+                            <i class="fas fa-edit"></i> Update status
                         </button>
+                        <button class="btn btn-secondary" onclick="editCustomer('${escapeJSStr(repairId)}'); this.closest('.modal').remove();">
+                            <i class="fas fa-user-pen"></i> Customer details
+                        </button>
+                        <button class="btn btn-copy" onclick="openTrackingLink('${escapeJSStr(repair.repairId)}')">
+                            <i class="fas fa-external-link-alt"></i> Tracking page
+                        </button>
+                        <button class="btn btn-secondary" onclick="reprintLabel('${escapeJSStr(repairId)}')">
+                            <i class="fas fa-tag"></i> Print label
+                        </button>
+                        <button class="btn btn-secondary" onclick="generateInvoice('${escapeJSStr(repairId)}')">
+                            <i class="fas fa-file-invoice"></i> Invoice
+                        </button>
+                        <span class="job-actions__spacer"></span>
                         <button class="btn btn-secondary" onclick="this.closest('.modal').remove()">Close</button>
                     </div>
                 </div>
@@ -4170,7 +4259,7 @@
         }
 
         // === KANBAN BOARD ===
-        function renderKanban(containerId = 'kanban-container') {
+        function renderKanban(containerId = 'overview-kanban-container') {
             const container = document.getElementById(containerId);
             if (!container) return;
             const columns = ['received', 'diagnosing', 'waiting-parts', 'in-repair', 'testing', 'ready'];
@@ -4209,18 +4298,37 @@
             const priorityHTML = priority === 'urgent' ? '<span class="priority-badge priority-urgent"><i class="fas fa-bolt"></i></span>' :
                                  priority === 'low' ? '<span class="priority-badge priority-low"><i class="fas fa-arrow-down"></i></span>' : '';
 
+            // Days sitting in this column. A week in Diagnosing means nobody
+            // has touched it, which total age alone will not tell you.
+            const stuck = daysInStatus(repair);
+            let flagHTML = '';
+            let flagClass = '';
+            if (stuck !== null && stuck >= 3) {
+                flagClass = stuck >= 7 ? 'is-stale' : 'is-warn';
+                flagHTML = `<div class="kanban-card-stuck">
+                        <i class="fas fa-triangle-exclamation"></i>
+                        ${stuck} day${stuck === 1 ? '' : 's'} in this status
+                    </div>`;
+            }
+
+            // Opens the job sheet, not the status box. Reading a customer's
+            // number off the board used to mean leaving it for All Repairs.
             return `
-                <div class="kanban-card" draggable="true" data-id="${escapeHTML(repair.id)}"
+                <div class="kanban-card ${flagClass}" draggable="true" data-id="${escapeHTML(repair.id)}"
+                     role="button" tabindex="0"
                      ondragstart="event.dataTransfer.setData('text/plain', '${escapeJSStr(repair.id)}'); this.classList.add('dragging')"
                      ondragend="this.classList.remove('dragging')"
-                     onclick="editRepair('${escapeJSStr(repair.id)}')">
+                     onclick="viewRepair('${escapeJSStr(repair.id)}')"
+                     onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();viewRepair('${escapeJSStr(repair.id)}');}">
                     <div class="kanban-card-id">${escapeHTML(repair.repairId)} ${priorityHTML}</div>
                     <div class="kanban-card-customer">${escapeHTML(repair.customerName)}</div>
                     <div class="kanban-card-device">${escapeHTML(repair.brand)} ${escapeHTML(repair.model)}</div>
+                    ${flagHTML}
+                    <!-- Age since booked in. The running stopwatch that sat
+                         beside it measured the same thing to the hour, so a
+                         flagged card carried three readings of time. -->
                     <div class="kanban-card-footer">
                         <span class="kanban-card-age">${age}</span>
-                        ${!['completed', 'ready'].includes(repair.currentStatus) && repair.dateReceived ?
-                            `<span class="repair-timer"><i class="fas fa-stopwatch"></i> ${getElapsedTime(repair.dateReceived.seconds)}</span>` : ''}
                     </div>
                 </div>
             `;
@@ -4556,7 +4664,7 @@
                 case 'b':
                 case 'B':
                     e.preventDefault();
-                    showSection('kanban');
+                    showSection('overview');
                     break;
                 case 'Escape':
                     const modals = document.querySelectorAll('.modal.show');
