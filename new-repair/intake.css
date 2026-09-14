@@ -188,7 +188,7 @@ body {
        row for the customer checklist, and that row rewraps as items are ticked
        off and on rotation. Padding to a constant left ~100px of dead page
        between the last card and the bar at the bottom of the scroll. */
-    padding: calc(var(--topbar-h) + 1.75rem) 1.5rem calc(var(--actionbar-real-h, var(--actionbar-h)) + 1.75rem);
+    padding: calc(var(--topbar-h) + 1.75rem) 1.5rem calc(var(--actionbar-real-h, var(--actionbar-h)) + var(--actionbar-lift, 0px) + 1.75rem);
 }
 
 .step { display: none; animation: rise 0.28s ease both; }
