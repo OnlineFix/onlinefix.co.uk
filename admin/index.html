@@ -4334,18 +4334,105 @@
             `;
         }
 
-        async function handleKanbanDrop(event, newStatus) {
+        // A drop no longer writes anything on its own. Dragging a card was
+        // stamping "Moved to X via Kanban board" onto the customer's tracking
+        // timeline, which read as shop-floor chatter to the person waiting on
+        // their device. The drop now opens this box instead: pick the wording
+        // the customer gets, send the move with no message at all, or cancel.
+        // Nothing reaches Firestore until the button in here is pressed.
+        function handleKanbanDrop(event, newStatus) {
             event.preventDefault();
             event.currentTarget.classList.remove('drag-over');
             const repairId = event.dataTransfer.getData('text/plain');
             const repair = allRepairs.find(r => r.id === repairId);
             if (!repair || repair.currentStatus === newStatus) return;
+            showKanbanMoveModal(repair, newStatus);
+        }
+
+        function showKanbanMoveModal(repair, newStatus) {
+            const fromLabel = statusConfig[repair.currentStatus]?.label || repair.currentStatus;
+            const toLabel = statusConfig[newStatus]?.label || newStatus;
+            const templates = statusTemplates[newStatus] || [];
+
+            const modal = document.createElement('div');
+            modal.className = 'modal show';
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width: 560px;">
+                    <div class="modal-header">
+                        <h2 class="modal-title">Move to ${escapeHTML(toLabel)}?</h2>
+                        <button class="close-btn" onclick="this.closest('.modal').remove()">&times;</button>
+                    </div>
+                    <div class="form-group" style="background: var(--bg-surface); border: 1px solid var(--border-color); padding: 1rem; border-radius: var(--radius-md); margin-bottom: 1.25rem;">
+                        <label class="form-label">${escapeHTML(repair.repairId)} &mdash; <span style="color: var(--text-main); font-weight: 400;">${escapeHTML(repair.customerName)}</span></label>
+                        <label class="form-label" style="margin-bottom: 0.5rem;">Device: <span style="color: var(--text-main); font-weight: 400;">${escapeHTML(repair.brand)} ${escapeHTML(repair.model)}</span></label>
+                        <span style="color: var(--text-dark); font-size: 0.85rem;">
+                            ${escapeHTML(fromLabel)} <i class="fas fa-arrow-right" style="margin: 0 0.35rem;"></i> <span style="color: ${getStatusColor(newStatus)};">${escapeHTML(toLabel)}</span>
+                        </span>
+                    </div>
+                    ${templates.length > 0 ? `
+                        <div class="template-selector">
+                            <label class="form-label">Quick Templates:</label>
+                            <div id="kanban-move-templates"></div>
+                        </div>
+                    ` : ''}
+                    <div class="form-group">
+                        <label class="form-label" for="kanban-move-notes">Message on the customer's tracking page</label>
+                        <textarea class="form-input form-textarea" id="kanban-move-notes"
+                            placeholder="Leave blank to move the job without writing anything to the customer."></textarea>
+                        <span style="color: var(--text-dark); font-size: 0.8rem;">
+                            Blank is fine. The tracking page still shows the new stage and the time, just with no message under it.
+                        </span>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: flex-end; margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid var(--border-color);">
+                        <button type="button" class="btn btn-secondary" onclick="this.closest('.modal').remove()">Cancel</button>
+                        <button type="button" class="btn btn-primary" id="kanban-move-confirm">
+                            <i class="fas fa-arrow-right"></i>
+                            Move job
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            const notes = modal.querySelector('#kanban-move-notes');
+            const templateBox = modal.querySelector('#kanban-move-templates');
+            if (templateBox) {
+                templates.forEach((template) => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'template-btn-improved';
+                    btn.textContent = template.length > 60 ? template.substring(0, 60) + '...' : template;
+                    btn.title = template;
+                    // Tapping the same template again clears it, so a tap made
+                    // by mistake on the shop iPad does not need the keyboard.
+                    btn.onclick = () => {
+                        notes.value = notes.value === template ? '' : template;
+                    };
+                    templateBox.appendChild(btn);
+                });
+            }
+
+            modal.querySelector('#kanban-move-confirm').onclick = (e) =>
+                confirmKanbanMove(repair.id, newStatus, notes.value.trim(), e.currentTarget);
+
+            notes.focus();
+        }
+
+        async function confirmKanbanMove(repairId, newStatus, noteText, btn) {
+            const repair = allRepairs.find(r => r.id === repairId);
+            if (!repair) return;
+
+            const original = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Moving...';
 
             try {
                 const progressEntry = {
                     status: newStatus,
                     timestamp: firebase.firestore.Timestamp.now(),
-                    notes: `Moved to ${statusConfig[newStatus]?.label || newStatus} via Kanban board`,
+                    // Whatever was typed, and nothing if nothing was. The
+                    // tracking page hides the note line when this is empty.
+                    notes: noteText,
                     technician: currentUser.email,
                     photos: []
                 };
@@ -4353,9 +4440,16 @@
                     currentStatus: newStatus,
                     progress: firebase.firestore.FieldValue.arrayUnion(progressEntry)
                 });
+                btn.closest('.modal')?.remove();
                 showAlert(`Moved to ${statusConfig[newStatus]?.label}`, 'success');
-                trackEvent('kanban_status_change', { repair_id: repair.repairId, new_status: newStatus });
+                trackEvent('kanban_status_change', {
+                    repair_id: repair.repairId,
+                    new_status: newStatus,
+                    has_note: noteText.length > 0
+                });
             } catch (error) {
+                btn.disabled = false;
+                btn.innerHTML = original;
                 showAlert('Error moving repair: ' + error.message, 'error');
             }
         }
