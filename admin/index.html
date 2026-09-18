@@ -860,7 +860,7 @@
            padding. Nine columns of 1rem side padding left the fault
            description about 100px wide, so 50 characters wrapped onto six
            lines and every row stood 250px tall. */
-        @media (min-width: 1181px) {
+        @media (min-width: 1560px) {
             #all-repairs-table th,
             #all-repairs-table td {
                 padding: 1rem 0.6rem;
@@ -928,15 +928,29 @@
            .table-container — which put the status, both dates and every
            action button off the right-hand edge, reachable only by
            discovering a horizontal scroll inside a vertically scrolling
-           page. Below 1180px each row becomes a self-contained card instead —
-           the ceiling is an iPad in landscape: 1180px wide, and with the
-           280px sidebar alongside it still lost the last two columns.
+           page. Each row becomes a self-contained card instead.
+
+           The ceiling is worked out rather than picked. Measured against real
+           shop data the table cannot be squeezed below about 1100px: the
+           Actions column is seven 44px buttons, .cell-issue holds a 190px
+           floor, and nine columns of padding sit between them. It needs
+           1100px of room INSIDE .section-content, and what stands between
+           that and the viewport is the 280px sidebar plus 128px of page and
+           section padding. So the table only fits from 1560px up, with a
+           little slack for a long customer name.
+
+           The old ceiling was 1180px, which counted the viewport and forgot
+           the sidebar. An iPad in landscape is 1194px or 1366px: above the
+           ceiling, so the table came back, into 784px and 956px of actual
+           room. The whole Actions column sat off the right-hand edge behind
+           a sideways scroll — the exact fault card mode exists to prevent.
+           A narrow desktop window is the same sum and now gets cards too.
 
            Layout is by grid-template-areas rather than source order, so a
            card reads ID / status / customer / device / fault / dates /
            actions however the columns are ordered for the desktop table.
            ================================================================== */
-        @media (max-width: 1180px) {
+        @media (max-width: 1559px) {
 
             .table-container {
                 /* Rows are no longer wider than the screen, so a horizontal
@@ -1755,6 +1769,7 @@
         /* Bulk Actions */
         .bulk-actions-bar {
             display: flex;
+            flex-wrap: wrap;
             align-items: center;
             gap: 1rem;
             padding: 0.75rem 1.25rem;
@@ -1775,6 +1790,50 @@
             color: var(--accent-cyan);
             font-size: 0.95rem;
             white-space: nowrap;
+        }
+
+        /* Sizing that used to be inline on each control. Moved here so the
+           phone rules below can override it without !important. */
+        .bulk-actions-bar .form-input {
+            width: auto;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.85rem;
+            /* The select was a 35px target on a touch screen. */
+            min-height: 44px;
+        }
+
+        .bulk-actions-bar .btn {
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+        }
+
+        /* One row per control on a phone. As a nowrap flex row the two
+           buttons ran past the right-hand edge — Apply ended 8px over on a
+           390px screen and Cancel was off it entirely — and .content-section
+           is overflow:hidden, so there was no sideways scroll to reach them
+           with. You could select repairs and then not apply the change. */
+        @media (max-width: 640px) {
+            .bulk-actions-bar {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 0.6rem;
+            }
+
+            .bulk-actions-bar .bulk-count,
+            .bulk-actions-bar .form-input {
+                grid-column: 1 / -1;
+            }
+
+            .bulk-actions-bar .form-input {
+                width: 100%;
+                min-height: 48px;
+            }
+
+            .bulk-actions-bar .btn {
+                width: 100%;
+                justify-content: center;
+                min-height: 48px;
+            }
         }
 
         .bulk-checkbox {
@@ -2782,7 +2841,7 @@
                     <!-- Bulk Actions Bar (hidden by default) -->
                     <div class="bulk-actions-bar hidden" id="bulk-actions-bar">
                         <span class="bulk-count"><span id="bulk-selected-count">0</span> selected</span>
-                        <select class="form-input" id="bulk-status-select" style="width: auto; padding: 0.5rem 0.75rem; font-size: 0.85rem;">
+                        <select class="form-input" id="bulk-status-select">
                             <option value="">Change status to...</option>
                             <option value="received">Received</option>
                             <option value="diagnosing">Diagnosing</option>
@@ -2792,10 +2851,10 @@
                             <option value="ready">Ready for Collection</option>
                             <option value="completed">Completed</option>
                         </select>
-                        <button class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.85rem;" onclick="applyBulkStatusUpdate()">
+                        <button class="btn btn-primary" onclick="applyBulkStatusUpdate()">
                             <i class="fas fa-check"></i> Apply
                         </button>
-                        <button class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.85rem;" onclick="clearBulkSelection()">
+                        <button class="btn btn-secondary" onclick="clearBulkSelection()">
                             Cancel
                         </button>
                     </div>
@@ -4447,6 +4506,11 @@
                 <html>
                 <head>
                     <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline';">
+                    <!-- Without this a phone or tablet lays the page out at about
+                         980px and scales it down to fit, which arrived at roughly
+                         40% size. Every other page on the site sets it; this one
+                         is built in a string and was missed. -->
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
                     <title>Invoice - ${escapeHTML(repair.repairId)}</title>
                     <style>
                         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -4466,7 +4530,28 @@
                         .footer { text-align: center; margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid #e9ecef; color: #999; font-size: 0.85rem; }
                         .status-tag { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600; background: #e8f5e9; color: #2e7d32; }
                         .print-btn { position: fixed; top: 1rem; right: 1rem; padding: 0.5rem 1.5rem; background: #0033FF; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.9rem; }
+                        .meta-group--right { text-align: right; }
                         @media print { .print-btn { display: none; } }
+
+                        /* The sheet is 800px wide and centred, so a Print
+                           button pinned to the top right corner only clears it
+                           on a wide screen. Below that it came down on the shop
+                           address — on an iPad in portrait it covered it. Sits
+                           in the flow instead, at a size worth tapping. */
+                        @media (max-width: 1100px) {
+                            .print-btn { position: static; display: block; width: 100%; min-height: 44px; margin-bottom: 1.25rem; font-size: 1rem; }
+                        }
+
+                        /* Phone. The header and the two meta groups are
+                           side-by-side blocks with no room to be side by side. */
+                        @media (max-width: 700px) {
+                            body { padding: 1rem; }
+                            .invoice-header { flex-direction: column; gap: 1rem; }
+                            .company-details { text-align: left; }
+                            .invoice-meta { grid-template-columns: 1fr; gap: 1.25rem; }
+                            .meta-group--right { text-align: left; }
+                            th, td { padding: 0.6rem 0.5rem; font-size: 0.9rem; }
+                        }
                     </style>
                 </head>
                 <body>
@@ -4493,7 +4578,7 @@
                             ${escapeHTML(repair.customerEmail || '')}<br>
                             ${escapeHTML(repair.customerAddress || '')}</p>
                         </div>
-                        <div class="meta-group" style="text-align: right;">
+                        <div class="meta-group meta-group--right">
                             <h3>Invoice Details</h3>
                             <p>Date: ${date}<br>
                             Invoice #: INV-${escapeHTML(repair.repairId.replace('REPAIR_', ''))}</p>
