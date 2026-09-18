@@ -3610,19 +3610,55 @@
         // Remove a single entry from a repair's progress history.
         // Index-based so the snapshotted Timestamp doesn't have to round-trip
         // through arrayRemove, which compares by deep-equality.
+        //
+        // Removing the entry is only half of it. The customer's tracking page
+        // headlines currentStatus and uses the history only for the detail
+        // underneath (track/index.html, buildTimeline), so deleting the entry
+        // that put the repair in its current stage used to leave that stage on
+        // their page with "In Progress" where the note had been - the stage
+        // stayed, only the wording changed. So the repair moves back with it,
+        // to whatever the newest remaining entry says, or to received once the
+        // history is empty.
         async function removeProgressEntry(repairId, index) {
             const repair = allRepairs.find(r => r.id === repairId);
             if (!repair || !Array.isArray(repair.progress) || !repair.progress[index]) return;
 
             const entry = repair.progress[index];
             const label = statusConfig[entry.status]?.label || entry.status;
-            if (!confirm(`Remove the "${label}" entry from this repair's history?`)) return;
+
+            const newProgress = repair.progress.slice();
+            newProgress.splice(index, 1);
+
+            const update = { progress: newProgress };
+            let movedBackLabel = '';
+            // Only when this entry is the one holding the repair's current
+            // stage: removing an older entry corrects the history and should
+            // leave the repair where it is.
+            if (entry.status === repair.currentStatus) {
+                // Newest by timestamp rather than last in the array - entries
+                // arrive through arrayUnion and are not guaranteed to be in
+                // order. >= keeps the later of two entries sharing a second.
+                const newest = newProgress.reduce((latest, p) => (
+                    !latest || (p.timestamp?.seconds || 0) >= (latest.timestamp?.seconds || 0) ? p : latest
+                ), null);
+                update.currentStatus = newest ? newest.status : 'received';
+                // A repair can hold the same status twice, so removing one of
+                // them leaves it where it was. Only say it moved when it did.
+                if (update.currentStatus !== repair.currentStatus) {
+                    movedBackLabel = statusConfig[update.currentStatus]?.label || update.currentStatus;
+                }
+            }
+
+            const question = movedBackLabel
+                ? `Remove the "${label}" entry?\n\nThe customer stops seeing it on their tracking page, and this repair moves back to "${movedBackLabel}".`
+                : `Remove the "${label}" entry from this repair's history? The customer stops seeing it on their tracking page.`;
+            if (!confirm(question)) return;
 
             try {
-                const newProgress = repair.progress.slice();
-                newProgress.splice(index, 1);
-                await db.collection('repairs').doc(repairId).update({ progress: newProgress });
-                showAlert('Status entry removed', 'success');
+                await db.collection('repairs').doc(repairId).update(update);
+                showAlert(movedBackLabel
+                    ? `Entry removed, repair moved back to "${movedBackLabel}"`
+                    : 'Status entry removed', 'success');
 
                 // Re-open the view modal so it shows the updated history.
                 const modal = document.querySelector('.modal.show');
