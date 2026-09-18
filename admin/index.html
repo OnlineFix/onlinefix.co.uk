@@ -970,7 +970,12 @@
             /* Two cards abreast on an iPad, one on a phone. */
             .table-container table tbody {
                 display: grid;
-                grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+                /* min() so the track can fall below 320px rather than
+                   forcing one. On a 320px screen the column here is 280px
+                   wide, so a flat 320px floor overflowed it and
+                   .content-section clipped the right-hand edge off every
+                   card — taking part of the last action button with it. */
+                grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
                 gap: 0.75rem;
                 width: 100%;
             }
@@ -1060,9 +1065,27 @@
                 margin-bottom: 0.2rem;
             }
 
+            /* A tap here advances the job to the next status. At the badge's
+               own 32px it was a small target for something that changes a
+               real repair, and it sits where a thumb reaching for the card
+               lands. Same pill, sized to be aimed at. */
+            .cell-status .status-badge.clickable-status {
+                min-height: 44px;
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+
             .cell-customer {
                 grid-area: cust;
                 font-size: 1rem;
+            }
+
+            /* Two links stacked 3px apart, one of which rings the customer:
+               the name was 18px tall and the number 15px. */
+            .cell-customer a {
+                display: inline-flex;
+                align-items: center;
+                min-height: 44px;
             }
 
             .cell-device {
@@ -1394,6 +1417,17 @@
             text-align: left;
         }
 
+        /* Removes a status entry from the job's history. It was an
+           icon-only button squeezed to 18px wide by inline padding, next to
+           a timestamp, and it deletes. */
+        .progress-remove {
+            min-width: 44px;
+            min-height: 44px;
+            justify-content: center;
+            padding: 0.5rem;
+            font-size: 0.85rem;
+        }
+
         /* How long the job has been in its current status, beside the badge. */
         .status-dwell {
             display: inline-block;
@@ -1425,6 +1459,29 @@
 
         .modal-content--job .job-actions {
             flex: none;
+        }
+
+        /* A phone on its side. At 844x390 the 90vh cap is 351px, and once
+           the header and a two-row action bar had taken their share the
+           scrolling body was 45px — customer, device, fault and history all
+           read through a slot. Give the sheet the whole screen and put the
+           actions on a diet, and the body gets about 200px instead. */
+        @media (max-height: 560px) {
+            .modal-content--job {
+                max-height: 100vh;
+                border-radius: 0;
+            }
+
+            .modal-content--job .job-actions {
+                margin-top: 1rem;
+                padding-top: 0.75rem;
+            }
+
+            .modal-content--job .job-actions .btn {
+                min-height: 44px;
+                padding: 0.5rem 0.9rem;
+                font-size: 0.85rem;
+            }
         }
 
         .job-actions {
@@ -2592,10 +2649,12 @@
             color: var(--text-main);
             border-radius: 6px;
             font-size: 0.85rem;
+            /* Was 33px. Six controls in a row, none of them thumb-sized. */
+            min-height: 44px;
         }
 
         .date-range-btn {
-            padding: 0.35rem 0.7rem;
+            padding: 0.35rem 0.9rem;
             background: var(--bg-base);
             border: 1px solid var(--border-color);
             color: var(--text-muted);
@@ -2603,12 +2662,36 @@
             cursor: pointer;
             font-size: 0.8rem;
             transition: all 0.2s;
+            /* Was 28px tall. */
+            min-height: 44px;
         }
 
         .date-range-btn:hover, .date-range-btn.active {
             background: var(--primary-blue);
             color: white;
             border-color: var(--primary-blue);
+        }
+
+        /* Four ranges and two date boxes do not make one row on a phone.
+           The wrapping flex row is left as it is — .section-header's own
+           stacking rule outranks anything set here anyway — and only the two
+           date boxes are changed: full width, on their own lines, which is
+           the only way a date picker is usable at this size. */
+        @media (max-width: 640px) {
+            .date-range-filter {
+                width: 100%;
+            }
+
+            .date-range-filter input[type="date"] {
+                flex: 1 0 100%;
+                width: 100%;
+            }
+
+            /* The dash between the two boxes reads as a range on one line and
+               as a stray character once they stack. */
+            .date-range-filter > span {
+                display: none;
+            }
         }
 
         @media (max-width: 768px) {
@@ -3477,7 +3560,7 @@
                                             <strong style="color: var(--text-main);">${escapeHTML(statusConfig[p.status]?.label || p.status)}</strong>
                                             <div style="display: flex; align-items: center; gap: 0.75rem;">
                                                 <small style="color: var(--text-muted);">${p.timestamp ? new Date(p.timestamp.seconds * 1000).toLocaleString('en-GB') : 'N/A'}</small>
-                                                <button class="btn btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;" onclick="removeProgressEntry('${escapeJSStr(repairId)}', ${i})" title="Remove this status entry">
+                                                <button class="btn btn-secondary progress-remove" onclick="removeProgressEntry('${escapeJSStr(repairId)}', ${i})" title="Remove this status entry">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
                                             </div>
@@ -4161,7 +4244,7 @@
             row.innerHTML = `
                 <td class="cell-select"><input type="checkbox" class="bulk-checkbox row-checkbox" data-repair-id="${escapeHTML(repair.id)}" onchange="updateBulkSelection()"></td>
                 <td class="cell-id" data-label="Repair ID"><strong>${escapeHTML(repair.repairId)}</strong>${priorityBadge}</td>
-                <td class="cell-customer" data-label="Customer"><a href="#" onclick="showCustomerHistory('${safeCustomerKey}', event)" style="color: var(--text-main); text-decoration: none; border-bottom: 1px dashed var(--text-dark);">${escapeHTML(repair.customerName)}</a><br><a class="cell-customer__phone" href="tel:${escapeHTML((repair.customerPhone || '').replace(/[^+\d]/g, ''))}">${escapeHTML(repair.customerPhone)}</a></td>
+                <td class="cell-customer" data-label="Customer"><a href="#" onclick="showCustomerHistory('${safeCustomerKey}', event)" style="color: var(--text-main); text-decoration: underline dashed var(--text-dark); text-underline-offset: 4px;">${escapeHTML(repair.customerName)}</a><br><a class="cell-customer__phone" href="tel:${escapeHTML((repair.customerPhone || '').replace(/[^+\d]/g, ''))}">${escapeHTML(repair.customerPhone)}</a></td>
                 <td class="cell-device" data-label="Device">${escapeHTML(repair.deviceType)}<br><small style="color: var(--text-muted);">${escapeHTML(repair.brand)} ${escapeHTML(repair.model)}</small></td>
                 <td class="cell-issue" data-label="Issue" title="${escapeHTML(repair.issueDescription)}">${escapeHTML(repair.issueDescription).substring(0, 50)}${(repair.issueDescription || '').length > 50 ? '...' : ''}</td>
                 <td class="cell-status" data-label="Status"><span class="status-badge ${status.class} ${statusClickable}" ${statusOnclick} ${statusTitle}>${status.label}</span>${overdueTag}${warrantyTag}</td>
