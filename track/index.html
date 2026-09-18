@@ -846,28 +846,29 @@
     <div class="container fade-in" style="position: relative; z-index: 1;">
         <div class="header">
             <div class="logo">OnlineFix</div>
-            <div class="subtitle"><i class="fas fa-microchip" style="margin-right: 0.5rem;"></i> Secure Device Tracking
+            <div class="subtitle"><i class="fas fa-microchip" style="margin-right: 0.5rem;"></i> Track Your Repair
             </div>
         </div>
 
         <!-- Loading State -->
         <div id="loading" class="loading">
             <div class="spinner"></div>
-            <p style="color: var(--text-muted); font-size: 0.95rem;">Retrieving secure repair logs...</p>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">Finding your repair...</p>
         </div>
 
         <!-- Error State -->
         <div id="error" class="error" style="display: none;">
             <div class="error-icon">
-                <i class="fas fa-shield-alt" style="color: var(--danger);"></i>
+                <i class="fas fa-exclamation-circle" style="color: var(--danger);"></i>
             </div>
-            <h2 style="color: var(--text-main); margin-bottom: 0.5rem;">Repair Record Not Found</h2>
-            <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.5;">We couldn't verify a repair with
-                this secure ID. Please check your NFC tag or contact our support team.</p>
+            <h2 style="color: var(--text-main); margin-bottom: 0.5rem;">We couldn't find that repair</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.5;">We couldn't find a repair with that
+                ID. Please check the link, or tap the tag on your device again. If it still doesn't work, give us a
+                call and we'll look it up for you.</p>
             <div style="margin-top: 2rem;">
                 <a href="tel:+447940730537" class="contact-btn primary" style="width: 100%; justify-content: center;">
                     <i class="fas fa-phone-alt"></i>
-                    Call Support
+                    Call Us
                 </a>
             </div>
         </div>
@@ -889,7 +890,7 @@
                     <div class="current-status">
                         <div
                             style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 0.75rem;">
-                            Authentication Status</div>
+                            Repair Status</div>
                         <div class="status-badge" id="statusBadge">
                             <i class="fas fa-clock"></i>
                             Loading...
@@ -909,8 +910,8 @@
                 <div class="device-details">
                     <h3
                         style="margin-bottom: 1.5rem; color: var(--text-main); font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem;">
-                        <i class="fas fa-fingerprint" style="color: var(--primary-cyan);"></i>
-                        Device Fingerprint
+                        <i class="fas fa-mobile-alt" style="color: var(--primary-cyan);"></i>
+                        Your Device
                     </h3>
                     <div class="detail-grid" id="deviceDetails">
                         <!-- Details will be populated by JavaScript -->
@@ -921,7 +922,7 @@
             <!-- Contact Section -->
             <div class="contact-section">
                 <div class="contact-title"><i class="fas fa-headset"
-                        style="margin-right: 0.5rem; color: var(--text-muted);"></i> Support Center</div>
+                        style="margin-right: 0.5rem; color: var(--text-muted);"></i> Need Help?</div>
                 <div class="contact-buttons">
                     <a href="tel:+447940730537" class="contact-btn primary">
                         <i class="fas fa-phone-alt"></i>
@@ -1298,7 +1299,7 @@
                     timeText = dateReceived
                         ? new Date(dateReceived.seconds * 1000).toLocaleString('en-GB')
                         : 'Device received';
-                    notes = 'Device received and logged into system';
+                    notes = 'We\'ve received your device.';
                     if (initialPhotos && initialPhotos.length > 0) photos.push(...initialPhotos);
                 } else if (isCurrent) {
                     timeText = 'In Progress';
