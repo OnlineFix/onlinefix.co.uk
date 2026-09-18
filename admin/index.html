@@ -3330,7 +3330,11 @@
                 const progressEntry = {
                     status: nextStatus,
                     timestamp: firebase.firestore.Timestamp.now(),
-                    notes: `Status advanced to ${nextLabel}`,
+                    // Left empty on purpose: the customer's tracking page
+                    // shows the new stage and the time, and adding "Status
+                    // advanced to Testing" only spoke to them in shop words.
+                    // Use Update Repair when there is something to tell them.
+                    notes: '',
                     technician: currentUser.email,
                     photos: []
                 };
@@ -3870,7 +3874,9 @@
                 const progressEntry = {
                     status: data.newStatus,
                     timestamp: firebase.firestore.Timestamp.now(),
-                    notes: data.progressNotes || `Status updated to ${statusConfig[data.newStatus]?.label || data.newStatus}`,
+                    // Empty means no message, not a generated one. See the
+                    // note in quickAdvanceStatus.
+                    notes: data.progressNotes || '',
                     technician: currentUser.email,
                     photos: photoUrls
                 };
@@ -5086,7 +5092,10 @@
                     const progressEntry = {
                         status: newStatus,
                         timestamp: firebase.firestore.Timestamp.now(),
-                        notes: `Bulk status update to ${statusLabel}`,
+                        // Same reasoning as quickAdvanceStatus: "Bulk status
+                        // update to Ready for Collection" was being printed on
+                        // every one of these customers' tracking pages.
+                        notes: '',
                         technician: currentUser.email,
                         photos: []
                     };
