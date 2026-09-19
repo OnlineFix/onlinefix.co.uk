@@ -964,8 +964,10 @@ body[data-step="done"] .steprail { display: none; }
     left: 50%;
     /* The same measurement .shell's bottom padding uses, not the static
        height: the bar grows a row on the customer step — 111px against the
-       96px assumed — so a toast placed off the constant landed under it. */
-    bottom: calc(var(--actionbar-real-h, var(--actionbar-h)) + var(--actionbar-lift, 0px) + 1.5rem);
+       96px assumed — so a toast placed off the constant landed under it.
+       (--actionbar-lift was dropped here with the viewport lift it belonged
+       to; nothing sets it any more, so the reference only read as live.) */
+    bottom: calc(var(--actionbar-real-h, var(--actionbar-h)) + 1.5rem);
     transform: translateX(-50%);
     min-width: 280px;
     max-width: 90vw;
