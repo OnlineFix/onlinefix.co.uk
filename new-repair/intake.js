@@ -372,56 +372,13 @@
         window.addEventListener('orientationchange', syncActionbarHeight);
     }
 
-    // ------------------------------------------------------------------
-    // Keeping the bar on the bottom edge (iOS/iPadOS Safari)
-    //
-    // position:fixed is laid out against the LAYOUT viewport. Safari's own
-    // toolbar collapses and expands as you scroll, which changes the VISUAL
-    // viewport and leaves the layout one alone — so the bar ends up parked an
-    // inch or so above the real bottom edge, with page content showing under
-    // it and the bar covering whatever it now overlaps.
-    //
-    // visualViewport reports exactly that difference, so translate the bar by
-    // it. Every other browser reports zero here and nothing moves.
-    //
-    // The on-screen keyboard shrinks the visual viewport too, by far more.
-    // Riding above the keyboard would eat a third of what is left to type
-    // into, so past a threshold the bar stays put — behind the keyboard, out
-    // of the way, which is what it did before any of this.
-    // ------------------------------------------------------------------
-    var vv = window.visualViewport;
-    var lastPin = null;
-
-    function pinActionbar() {
-        var bar = $('#actionbar');
-        if (!bar || !vv) return;
-        var keyboardLikely = (window.innerHeight - vv.height) > window.innerHeight * 0.25;
-        var delta = (vv.offsetTop + vv.height) - window.innerHeight;
-        // Only ever lift the bar. If the visual viewport reports taller than
-        // the layout one, pushing the bar down by the difference would send it
-        // off the bottom of the screen, and that is not the fault being fixed.
-        var pin = (delta < 0 && !keyboardLikely) ? 'translateY(' + Math.round(delta) + 'px)' : '';
-        // The scroll handler fires continuously while the toolbar animates;
-        // writing only on a change keeps that off the style recalc path.
-        if (pin === lastPin) return;
-        lastPin = pin;
-        bar.style.transform = pin;
-        // A lifted bar covers content the page padding did not reserve, so the
-        // reserve grows by however far it was lifted. Without this the last
-        // card is clipped by the difference at the very bottom of the scroll.
-        document.documentElement.style.setProperty('--actionbar-lift',
-            (pin ? Math.abs(Math.round(delta)) : 0) + 'px');
-    }
-
-    if (vv) {
-        vv.addEventListener('resize', pinActionbar);
-        vv.addEventListener('scroll', pinActionbar);
-        // Rotation settles a beat after the event fires.
-        window.addEventListener('orientationchange', function () {
-            setTimeout(pinActionbar, 250);
-        });
-        pinActionbar();
-    }
+    // A visualViewport-driven lift used to live here, translating the bar up by
+    // (innerHeight - visualViewport.height) to chase Safari's collapsing
+    // toolbar. On the shop iPad that difference is a permanent ~9% with no
+    // keyboard and no scrolling, so the bar was lifted clear of the bottom edge
+    // on load and sat over the page with content showing beneath it. That
+    // reading is not trustworthy on the device this page is built for, so
+    // nothing moves the bar: it is plain position:fixed / bottom:0 again.
 
     function refreshChecklist() {
         var bar = $('#checklist');
