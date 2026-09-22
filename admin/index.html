@@ -23,6 +23,7 @@
     <!-- One label design, shared with /new-repair/label.html -->
     <link rel="stylesheet" href="/new-repair/label.css?v=20260910b">
     <script src="/new-repair/label-render.js?v=20260910b"></script>
+    <script src="/new-repair/tracking-copy.js?v=20260922"></script>
     <style>
         * {
             margin: 0;
@@ -3418,6 +3419,7 @@
 
         // Logout
         function logout() {
+            stopTrackingSync();
             auth.signOut();
         }
 
@@ -3463,6 +3465,7 @@
 
         // Real-time dashboard data with Firestore onSnapshot
         let unsubscribeRepairs = null;
+        let repairsLoaded = false;
 
         function loadDashboardData() {
             document.getElementById('loading').style.display = 'block';
@@ -3476,6 +3479,7 @@
                     id: doc.id,
                     ...doc.data()
                 }));
+                repairsLoaded = true;
 
                 // Update everything
                 updateStats();
@@ -3488,11 +3492,143 @@
                 }
 
                 document.getElementById('loading').style.display = 'none';
+
+                syncTrackingCopies();
             }, (error) => {
                 console.error('Error listening to repairs:', error);
                 document.getElementById('loading').style.display = 'none';
                 showAlert('Error loading data: ' + error.message, 'error');
             });
+
+            if (!window.OnlineFixTracking) {
+                showAlert('Tracking page script did not load — reload the page', 'error');
+            } else if (!unsubscribeTracking) {
+                startTrackingSync();
+            }
+        }
+
+        // === CUSTOMER TRACKING PAGES ===
+        // The customer's tracking page never reads a ticket. It reads the
+        // job's copy at tracking/{code}, which holds only what that page
+        // shows (new-repair/tracking-copy.js has the list and the reasons).
+        // This keeps every copy in step with its ticket: whenever a ticket or
+        // a copy changes, any copy that no longer matches its ticket is written
+        // again. So every route that changes a ticket - Update Repair, the
+        // board, bulk changes, deleting a status entry, an edit made in the
+        // Firebase console - reaches the customer without each one having to
+        // remember to publish, and a job booked in while no dashboard was open
+        // gets its copy as soon as one is.
+        //
+        // It never deletes a copy. A copy with no ticket to match is left
+        // alone, because a dashboard that had loaded only some tickets would
+        // otherwise take down live tracking links. deleteRepair removes the
+        // copy of the job it deletes.
+        let unsubscribeTracking = null;
+        let trackingCopies = null;     // code -> copy, as last read
+        let trackingRetryTimer = null;
+        let trackingSyncBusy = false;
+        let trackingSyncAgain = false;
+        let trackingSyncRuns = 0;
+        let trackingRulesNoticeShown = false;
+        let trackingWriteNoticeShown = false;
+        // code -> fingerprint of the copy this page last sent. A write the
+        // server refuses is rolled back locally, which fires the listener
+        // again; without this the same refused write would go straight back out.
+        const trackingSent = new Map();
+
+        function startTrackingSync() {
+            clearTimeout(trackingRetryTimer);
+            if (unsubscribeTracking) unsubscribeTracking();
+            trackingCopies = null;
+            unsubscribeTracking = db.collection(OnlineFixTracking.COLLECTION).onSnapshot((snapshot) => {
+                trackingCopies = new Map(snapshot.docs.map(doc => [doc.id, doc.data()]));
+                syncTrackingCopies();
+            }, (error) => {
+                unsubscribeTracking = null;
+                trackingCopies = null;
+                if (!auth.currentUser) return;   // signed out, nothing to report
+                console.warn('Tracking copies unavailable:', error);
+                if (!trackingRulesNoticeShown) {
+                    trackingRulesNoticeShown = true;
+                    showAlert(error.code === 'permission-denied'
+                        ? 'Customer tracking pages are waiting for the new database rules to be published.'
+                        : 'Could not load customer tracking pages: ' + error.message, 'info');
+                }
+                // The rules could be published at any moment, so look again.
+                trackingRetryTimer = setTimeout(startTrackingSync, 60000);
+            });
+        }
+
+        function stopTrackingSync() {
+            clearTimeout(trackingRetryTimer);
+            if (unsubscribeTracking) unsubscribeTracking();
+            unsubscribeTracking = null;
+            trackingCopies = null;
+        }
+
+        // One copy per code, wherever the copy on file differs from what the
+        // ticket says now.
+        function trackingWritesNeeded() {
+            // Should two tickets ever share a code, publish the one the old
+            // lookup showed: the lowest document id.
+            const byCode = new Map();
+            allRepairs.forEach(repair => {
+                if (!OnlineFixTracking.isCode(repair.repairId)) return;
+                const seen = byCode.get(repair.repairId);
+                if (!seen || repair.id < seen.id) byCode.set(repair.repairId, repair);
+            });
+
+            const writes = [];
+            byCode.forEach((repair, code) => {
+                const view = OnlineFixTracking.publicView(repair);
+                const print = OnlineFixTracking.fingerprint(view);
+                const onFile = trackingCopies.get(code);
+                if (onFile && OnlineFixTracking.fingerprint(onFile) === print) return;
+                if (trackingSent.get(code) === print) return;
+                writes.push({ code, view, print });
+            });
+            return writes;
+        }
+
+        async function syncTrackingCopies() {
+            if (!repairsLoaded || !trackingCopies) return;
+            if (trackingSyncBusy) { trackingSyncAgain = true; return; }
+            trackingSyncBusy = true;
+            const firstRun = trackingSyncRuns++ === 0;
+            try {
+                const writes = trackingWritesNeeded();
+                if (writes.length === 0) return;
+
+                writes.forEach(w => trackingSent.set(w.code, w.print));
+                const results = await Promise.allSettled(writes.map(w =>
+                    db.collection(OnlineFixTracking.COLLECTION).doc(w.code).set(w.view)));
+
+                const failed = writes.filter((w, i) => results[i].status === 'rejected');
+                const written = writes.length - failed.length;
+                if (firstRun && written > 0) {
+                    showAlert(`Tracking pages updated for ${written} job${written === 1 ? '' : 's'}`, 'success');
+                }
+                if (failed.length > 0) {
+                    console.error('Tracking copies not written:', failed.map(w => w.code),
+                        results.find(r => r.status === 'rejected').reason);
+                    if (!trackingWriteNoticeShown) {
+                        trackingWriteNoticeShown = true;
+                        showAlert(`Could not update ${failed.length} customer tracking page${failed.length === 1 ? '' : 's'}. Trying again in a minute.`, 'error');
+                    }
+                    setTimeout(() => {
+                        failed.forEach(w => {
+                            if (trackingSent.get(w.code) === w.print) trackingSent.delete(w.code);
+                        });
+                        syncTrackingCopies();
+                    }, 60000);
+                }
+            } finally {
+                trackingSyncBusy = false;
+                if (trackingSyncAgain) {
+                    trackingSyncAgain = false;
+                    syncTrackingCopies();
+                }
+            }
         }
 
         // Utility: calculate time ago
@@ -5707,6 +5843,17 @@
                 try {
                     // Delete from Firestore
                     await db.collection('repairs').doc(repairId).delete();
+
+                    // And the customer's tracking page for it. After the
+                    // ticket, so the dashboard's sync has nothing left to
+                    // publish it again from.
+                    if (window.OnlineFixTracking && OnlineFixTracking.isCode(repairIdNumber)) {
+                        try {
+                            await db.collection(OnlineFixTracking.COLLECTION).doc(repairIdNumber).delete();
+                        } catch (error) {
+                            console.warn('Tracking copy not deleted:', error);
+                        }
+                    }
 
                     // Delete photos from Storage if any
                     const repair = allRepairs.find(r => r.id === repairId);

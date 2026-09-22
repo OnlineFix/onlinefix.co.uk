@@ -20,8 +20,12 @@ service firebase.storage {
                    && request.resource.size < 10 * 1024 * 1024  // 10MB max
                    && request.resource.contentType.matches('image/.*');
 
-      // Anyone can read photos (for tracking page)
-      allow read: if true;
+      // Anyone can open a photo from its link, which the tracking page
+      // needs. Listing is staff only: "read" covers listing too, and a public
+      // list of repairs/ handed out every job's code as a folder name, which
+      // is all it takes to open that job's tracking copy.
+      allow get: if true;
+      allow list: if isAdmin();
     }
 
     // Public booking photos. The /book/ page is open to anonymous visitors,

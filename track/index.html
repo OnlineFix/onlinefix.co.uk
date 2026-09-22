@@ -1060,25 +1060,47 @@
             return null;
         }
 
-        // Load repair data
-        async function loadRepairData(repairId) {
+        // The ticket itself is staff only. This page reads the repair's
+        // tracking copy, which holds only what is shown here, by its code:
+        // firestore.rules lets anyone open one copy by code but not list
+        // them. See new-repair/tracking-copy.js.
+        async function fetchTrackingCopy(repairId) {
             try {
-                // Query by repairId field instead of document ID.
-                // .limit(1) is required: firestore.rules allows public list
-                // queries only when request.query.limit <= 1.
+                const doc = await db.collection('tracking').doc(repairId).get();
+                return doc.exists ? doc.data() : null;
+            } catch (error) {
+                // Refused until the new database rules are published.
+                return null;
+            }
+        }
+
+        // The old lookup, for the switchover only: between this page going
+        // live and the dashboard publishing a copy of every existing job, a
+        // job can still be missing its copy. Once the new rules are
+        // published this query is refused, so it finds nothing and the page
+        // relies on the copy alone.
+        async function fetchFromTicket(repairId) {
+            try {
                 const querySnapshot = await db.collection('repairs')
                     .where('repairId', '==', repairId)
                     .limit(1)
                     .get();
+                return querySnapshot.empty ? null : querySnapshot.docs[0].data();
+            } catch (error) {
+                return null;
+            }
+        }
 
-                if (querySnapshot.empty) {
+        // Load repair data
+        async function loadRepairData(repairId) {
+            try {
+                const data = (await fetchTrackingCopy(repairId)) || (await fetchFromTicket(repairId));
+
+                if (!data) {
                     showError();
                     return;
                 }
 
-                // Get the first matching document
-                const doc = querySnapshot.docs[0];
-                const data = doc.data();
                 displayRepairData(data);
 
                 // GA4: Track customer viewing their repair

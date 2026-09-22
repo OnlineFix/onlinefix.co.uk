@@ -1175,12 +1175,15 @@
             var d = collectDevice();
 
             // 1) Signature into an admin-only Storage path (never public-read).
-            var signature = { url: '', path: '' };
+            //    Only the path is kept. A download URL carries its own access
+            //    token and opens the file for whoever holds it, whatever the
+            //    rules on consents/ say, so storing one on the ticket undid the
+            //    lock. Staff find the file by this path in the Firebase console.
+            var signature = { path: '' };
             try {
                 var blob = await signatureBlob();
                 var sigPath = 'consents/' + state.repairId + '/signature.png';
-                var sigSnap = await storage.ref().child(sigPath).put(blob, { contentType: 'image/png' });
-                signature.url = await sigSnap.ref.getDownloadURL();
+                await storage.ref().child(sigPath).put(blob, { contentType: 'image/png' });
                 signature.path = sigPath;
             } catch (err) {
                 console.error('Signature upload failed', err);
@@ -1249,7 +1252,6 @@
                     termsEffective: TERMS_EFFECTIVE,
                     signedName: customerName,
                     signedAt: now,
-                    signatureUrl: signature.url,
                     signaturePath: signature.path,
                     acknowledgedOwnership: true,
                     acknowledgedBackup: true,
@@ -1259,6 +1261,18 @@
             };
 
             await db.collection('repairs').add(repairData);
+
+            // 2b) The public copy the customer's tracking link opens (see
+            //     tracking-copy.js). Non-fatal: the repair is already safe,
+            //     and the dashboard publishes any missing copy as soon as it
+            //     is open.
+            try {
+                await db.collection(OnlineFixTracking.COLLECTION).doc(state.repairId)
+                    .set(OnlineFixTracking.publicView(repairData));
+            } catch (err) {
+                console.error('Tracking copy not published', err);
+                delivery.push(['warn', 'Tracking page not live yet — it will be once the dashboard is open.']);
+            }
 
             // 3) Customer record. Non-fatal: the repair is already safe.
             showOverlay('Updating the customer record…');

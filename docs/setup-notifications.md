@@ -331,16 +331,32 @@ Worth knowing given the ICO registration.
 
 | Data | Where | Who can read it |
 |---|---|---|
-| Repair details, customer name, contact, address | Firestore `repairs` | Admins; the customer sees their own via the tracking link |
+| Repair details, customer name, contact, address, unlock code | Firestore `repairs` | Admins only |
+| What the tracking page shows: name, device, fault, stage, dates, price, progress notes, photo links | Firestore `tracking/{code}` | Anyone with that job's tracking link. Only admins can list them |
 | Customer directory + repair history | Firestore `customers` | Admins only |
-| Device photos | Storage `repairs/{id}/` | Anyone with the link — the tracking page needs this |
+| Device photos | Storage `repairs/{id}/` | Anyone with a photo's link — the tracking page needs this. Only admins can list the folders |
 | **Signature images** | Storage `consents/{id}/` | **Admins only** |
 | Queued emails | Firestore `mail` | Admins only |
+
+The tracking page never reads the ticket in `repairs`. It reads a copy in
+`tracking/{code}` that holds only the fields above: the intake page writes it
+when a job is booked in, and the dashboard keeps every copy up to date while
+it is open. Copies can be opened one at a time by code but never listed, so
+knowing one job's link tells you nothing about any other job.
+
+The list of fields in that copy lives in two places that must match:
+`new-repair/tracking-copy.js` and the `tracking` rule in `firestore.rules`. To
+show something new on the tracking page, add it to both. **Never add the phone
+number, email, address or unlock code** — anyone with the link can read the
+copy.
 
 The signature is deliberately kept out of the photos folder. Photos have to be
 publicly readable so the tracking page can show them; a signature must never
 be, so it lives on a separate path that the security rules lock to signed-in
-staff.
+staff. The intake page also no longer saves a download link for it: a Storage
+download link opens the file for anyone who has it, whatever the rules say.
+Tickets booked in before that change still hold one (`consent.signatureUrl`),
+readable by admins only now that tickets are.
 
 Each signed agreement records which version of the terms was agreed
 (`dropoff-1.0`), so "which terms did they actually sign?" stays answerable
