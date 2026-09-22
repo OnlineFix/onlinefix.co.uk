@@ -337,6 +337,21 @@ Worth knowing given the ICO registration.
 | Device photos | Storage `repairs/{id}/` | Anyone with a photo's link — the tracking page needs this. Only admins can list the folders |
 | **Signature images** | Storage `consents/{id}/` | **Admins only** |
 | Queued emails | Firestore `mail` | Admins only |
+| Online booking requests | Firestore `bookings` | Admins only — anyone can submit one, nobody but an admin can read one back |
+| Online booking photos | Storage `bookings/{id}/` | **Admins only**, including the person who uploaded them |
+
+The `/book/` form is the only place on the site that writes anything without
+signing in first, so it is worth knowing exactly what it can and cannot do. It
+may create a booking whose fields match the shape in `firestore.rules` and
+nothing else — an extra field of any kind is refused — and it may upload up to
+three JPEGs named `photo-1.jpg` to `photo-3.jpg` into a folder named after that
+booking's random id. It cannot read anything, including its own upload, and it
+cannot change or delete anything.
+
+Booking photos are stored as paths, not as download links. A Storage download
+link carries its own access token and opens the file for anyone holding it,
+whatever the rules say — the same trap the signature had. Staff resolve those
+paths from the Firebase console or the admin SDK, neither of which needs one.
 
 The tracking page never reads the ticket in `repairs`. It reads a copy in
 `tracking/{code}` that holds only the fields above: the intake page writes it
