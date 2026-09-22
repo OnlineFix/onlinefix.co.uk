@@ -331,7 +331,7 @@ Worth knowing given the ICO registration.
 
 | Data | Where | Who can read it |
 |---|---|---|
-| Repair details, customer name, contact, address, unlock code | Firestore `repairs` | Admins only |
+| Repair details, customer name, contact, address, unlock code (until the job is completed) | Firestore `repairs` | Admins only |
 | What the tracking page shows: name, device, fault, stage, dates, price, progress notes, photo links | Firestore `tracking/{code}` | Anyone with that job's tracking link. Only admins can list them |
 | Customer directory + repair history | Firestore `customers` | Admins only |
 | Device photos | Storage `repairs/{id}/` | Anyone with a photo's link — the tracking page needs this. Only admins can list the folders |
@@ -364,6 +364,9 @@ later. **If you change the terms wording in `new-repair/intake.js`, bump
 `TERMS_VERSION` in the same file** — otherwise old and new agreements become
 indistinguishable.
 
-Unlock codes are stored on the ticket so the repair can be tested. Clear them
-from the ticket once the device goes back; there is no reason to keep a
-customer's PIN after the job is done.
+Unlock codes are stored on the ticket so the repair can be tested, and only
+until then: the dashboard removes the code from the ticket as soon as the job
+is marked Completed, however it got there, including jobs completed before
+this was added (it clears those the first time the dashboard opens). A
+removed code cannot be brought back, so if a device returns, ask the customer
+for it again.
