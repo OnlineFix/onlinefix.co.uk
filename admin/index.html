@@ -502,6 +502,9 @@
         }
 
         .photo-item-small img {
+            /* Block, or the image sits on a text baseline and leaves a 10px
+               strip under it - which is where the upload bar would land. */
+            display: block;
             width: 100%;
             height: 80px;
             object-fit: cover;
@@ -520,6 +523,126 @@
             cursor: pointer;
             font-size: 0.7rem;
             backdrop-filter: blur(4px);
+        }
+
+        /* Upload state on each Update Repair thumbnail. Photos only go up
+           when the form is saved, so until then a tile has no state; after
+           that it dims while it waits or uploads, fills a bar along its
+           bottom edge, and ends with a tick or a red "Failed". */
+        .photo-item-small[data-state="queued"] img,
+        .photo-item-small[data-state="uploading"] img {
+            opacity: 0.5;
+        }
+
+        .photo-item-small[data-state="failed"] {
+            border-color: var(--danger);
+        }
+
+        .photo-progress-small {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 4px;
+            background: rgba(0, 0, 0, 0.45);
+            display: none;
+        }
+
+        .photo-item-small[data-state="uploading"] .photo-progress-small {
+            display: block;
+        }
+
+        .photo-progress-small > span {
+            display: block;
+            height: 100%;
+            width: calc(var(--upload-progress, 0) * 100%);
+            background: var(--accent-cyan);
+            transition: width 0.2s linear;
+        }
+
+        .photo-state-small {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            padding: 0.15rem 0.5rem;
+            border-radius: 999px;
+            background: rgba(0, 0, 0, 0.65);
+            color: var(--white);
+            font-size: 0.75rem;
+            font-weight: 600;
+            white-space: nowrap;
+            pointer-events: none;
+        }
+
+        .photo-state-small:empty {
+            display: none;
+        }
+
+        .photo-item-small[data-state="done"] .photo-state-small {
+            background: var(--success);
+        }
+
+        .photo-item-small[data-state="failed"] .photo-state-small {
+            background: var(--danger);
+        }
+
+        /* While the form saves, nothing in it can be changed. */
+        .modal[data-busy] .photo-remove-small {
+            display: none;
+        }
+
+        /* The other buttons are disabled then too, and should look it, or a
+           tap on Cancel appears to do nothing. Update Repair itself is left
+           bright: it is the one saying "Saving…". */
+        .modal[data-busy] .btn:disabled:not([type="submit"]) {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .modal[data-busy] .photo-upload-small {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        /* The bar beside Update Repair. It sits by the buttons because that
+           is where the eye is after tapping one - on a phone the thumbnails
+           are well out of view above it. */
+        .upload-progress {
+            margin-top: 1.5rem;
+        }
+
+        .upload-progress[hidden] {
+            display: none;
+        }
+
+        .upload-progress__label {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 0.4rem;
+        }
+
+        .upload-progress__pct {
+            color: var(--text-main);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .upload-progress__track {
+            height: 8px;
+            border-radius: 999px;
+            background: var(--bg-base);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .upload-progress__fill {
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, var(--primary-blue), var(--accent-cyan));
+            transition: width 0.2s linear;
         }
 
         /* Template selector */
@@ -3965,6 +4088,15 @@
                                     value="${repair.warrantyDays || 30}" placeholder="30">
                             </div>
                         </div>
+                        <div class="upload-progress" hidden>
+                            <div class="upload-progress__label">
+                                <span class="upload-progress__text" aria-live="polite"></span>
+                                <span class="upload-progress__pct"></span>
+                            </div>
+                            <div class="upload-progress__track" role="progressbar" aria-label="Upload progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                                <div class="upload-progress__fill"></div>
+                            </div>
+                        </div>
                         <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; justify-content: space-between; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
                             <div style="display: flex; gap: 0.5rem;">
                                 <button type="button" class="btn btn-whatsapp" onclick="sendWhatsApp('${escapeJSStr(repair.id)}')" title="Send WhatsApp update to customer">
@@ -3995,15 +4127,129 @@
             document.getElementById('update-repair-form').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const repairId = e.target.dataset.repairId;
-                await updateRepairStatus(repairId, e.target);
-                modal.remove();
+                // Closes only once saved. On a failure the form stays up with
+                // the notes and photos still in it, ready to try again.
+                if (await updateRepairStatus(repairId, e.target)) modal.remove();
             });
         }
 
-        // Update repair status
+        // ------------------------------------------------------------------
+        // Photo upload progress in Update Repair.
+        //
+        // Photos go up when the form is saved, and a photo off an iPad is
+        // several megabytes, so a save with a few of them could sit for a
+        // long time with nothing on screen to say it was working - and
+        // nothing to stop a second tap saving it twice. A photo that failed
+        // was skipped without a word and the save still reported success.
+        // Now the form locks while it works, each thumbnail fills as it
+        // uploads, a bar by the buttons shows the whole job, and a failure
+        // stops the save with the form left as it was.
+        // ------------------------------------------------------------------
+
+        // Locks the form while it saves, so a second tap cannot send it
+        // twice and the modal cannot be closed out from under the upload.
+        function setUpdateBusy(modal, busy) {
+            if (!modal) return;
+            if (busy) modal.dataset.busy = 'true';
+            else delete modal.dataset.busy;
+            modal.querySelectorAll('button, input, select, textarea').forEach(el => { el.disabled = busy; });
+
+            const submit = modal.querySelector('button[type="submit"]');
+            if (submit) {
+                if (!submit.dataset.label) submit.dataset.label = submit.innerHTML;
+                submit.innerHTML = busy
+                    ? '<i class="fas fa-spinner fa-spin"></i> Saving…'
+                    : submit.dataset.label;
+            }
+            if (!busy) {
+                const box = modal.querySelector('.upload-progress');
+                if (box) box.hidden = true;
+            }
+        }
+
+        // fraction is 0-1, or null for work with no measurable amount (the
+        // save itself), which fills the bar and drops the percentage.
+        function showUpdateProgress(modal, label, fraction) {
+            const box = modal && modal.querySelector('.upload-progress');
+            if (!box) return;
+            const pct = fraction === null ? 100 : Math.max(0, Math.min(100, Math.round(fraction * 100)));
+            box.hidden = false;
+            box.querySelector('.upload-progress__text').textContent = label;
+            box.querySelector('.upload-progress__pct').textContent = fraction === null ? '' : pct + '%';
+            box.querySelector('.upload-progress__fill').style.width = pct + '%';
+            box.querySelector('.upload-progress__track').setAttribute('aria-valuenow', String(pct));
+        }
+
+        function setPhotoTileState(photo, state, fraction) {
+            const tile = document.querySelector(`#update-photo-preview [data-photo-id="${photo.id}"]`);
+            if (!tile) return;
+            tile.dataset.state = state;
+            tile.style.setProperty('--upload-progress', String(fraction || 0));
+            const label = tile.querySelector('.photo-state-small');
+            if (label) {
+                label.textContent = state === 'queued' ? 'Waiting'
+                    : state === 'uploading' ? Math.round((fraction || 0) * 100) + '%'
+                        : state === 'done' ? '✓'
+                            : state === 'failed' ? 'Failed' : '';
+            }
+        }
+
+        // Sends whatever in updatePhotos has not gone up yet, one at a time.
+        // A photo that made it keeps its URL, so trying again after a
+        // failure only sends the ones that failed. False if any failed.
+        async function uploadUpdatePhotos(repair, modal) {
+            const pending = updatePhotos.filter(p => !p.url);
+            if (pending.length === 0) return true;
+
+            const totalBytes = pending.reduce((sum, p) => sum + (p.file.size || 0), 0) || 1;
+            let doneBytes = 0;
+            let failed = 0;
+
+            pending.forEach(p => setPhotoTileState(p, 'queued', 0));
+
+            for (let i = 0; i < pending.length; i++) {
+                const photo = pending[i];
+                const label = pending.length === 1
+                    ? 'Uploading photo'
+                    : `Uploading photo ${i + 1} of ${pending.length}`;
+                setPhotoTileState(photo, 'uploading', 0);
+                showUpdateProgress(modal, label, doneBytes / totalBytes);
+                try {
+                    const photoRef = storage.ref().child(`repairs/${repair.repairId}/updates/${Date.now()}_${photo.id}`);
+                    const task = photoRef.put(photo.file);
+                    task.on('state_changed', (snap) => {
+                        const own = snap.totalBytes ? snap.bytesTransferred / snap.totalBytes : 0;
+                        setPhotoTileState(photo, 'uploading', own);
+                        showUpdateProgress(modal, label, (doneBytes + snap.bytesTransferred) / totalBytes);
+                    }, () => { /* reported by the await below */ });
+                    const snapshot = await task;
+                    photo.url = await snapshot.ref.getDownloadURL();
+                    setPhotoTileState(photo, 'done', 1);
+                } catch (error) {
+                    console.error('Error uploading photo:', error);
+                    failed++;
+                    setPhotoTileState(photo, 'failed', 0);
+                }
+                doneBytes += photo.file.size || 0;
+            }
+
+            if (failed) {
+                showAlert(failed === 1
+                    ? "A photo didn't upload, so nothing has been saved yet. Tap Update Repair to try it again, or remove it to save without it."
+                    : `${failed} photos didn't upload, so nothing has been saved yet. Tap Update Repair to try them again, or remove them to save without them.`,
+                    'error');
+                return false;
+            }
+            return true;
+        }
+
+        // Update repair status. True once saved; false leaves the form open
+        // with everything still in it, so a failed photo or a rejected cost
+        // does not throw away the notes that were typed.
         async function updateRepairStatus(repairId, form) {
             const formData = new FormData(form);
             const data = Object.fromEntries(formData);
+            const modal = form.closest('.modal');
 
             try {
                 const updateData = {
@@ -4018,7 +4264,7 @@
                     const cost = parseFloat(data.estimatedCost);
                     if (isNaN(cost) || cost < 0 || cost > 50000) {
                         showAlert('Invalid cost: must be between £0 and £50,000', 'error');
-                        return;
+                        return false;
                     }
                     updateData.estimatedCost = cost;
                 }
@@ -4029,24 +4275,23 @@
                     updateData.warrantyDays = parseInt(data.warrantyDays) || 30;
                 }
 
+                setUpdateBusy(modal, true);
+
                 // Upload photos if any
                 const photoUrls = [];
                 if (updatePhotos.length > 0) {
                     const repair = allRepairs.find(r => r.id === repairId);
-                    for (const photo of updatePhotos) {
-                        try {
-                            const photoRef = storage.ref().child(`repairs/${repair.repairId}/updates/${Date.now()}_${photo.id}`);
-                            const snapshot = await photoRef.put(photo.file);
-                            const downloadURL = await snapshot.ref.getDownloadURL();
-                            photoUrls.push(downloadURL);
-                        } catch (error) {
-                            console.error('Error uploading photo:', error);
-                        }
+                    if (!(await uploadUpdatePhotos(repair, modal))) {
+                        setUpdateBusy(modal, false);
+                        return false;
                     }
+                    photoUrls.push(...updatePhotos.map(p => p.url));
 
                     // Add new photos to existing photos array
                     updateData.photos = firebase.firestore.FieldValue.arrayUnion(...photoUrls);
                 }
+
+                showUpdateProgress(modal, 'Saving the update', null);
 
                 // Add progress entry
                 const progressEntry = {
@@ -4073,10 +4318,13 @@
 
                 // Reset update photos
                 updatePhotos = [];
+                return true;
 
             } catch (error) {
                 console.error('Error updating repair:', error);
                 showAlert('Error updating repair: ' + error.message, 'error');
+                setUpdateBusy(modal, false);
+                return false;
             }
         }
 
@@ -4345,6 +4593,8 @@
         // Close modals when clicking outside or pressing Escape
         document.addEventListener('click', (e) => {
             if (e.target.classList.contains('modal')) {
+                // Not while it is saving: the upload would carry on unseen.
+                if (e.target.dataset.busy) return;
                 if (e.target.id) {
                     e.target.classList.remove('show');
                 } else {
@@ -4414,6 +4664,8 @@
             const photoId = 'photo_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
             photoItem.innerHTML = `
                 <img src="${escapeHTML(src)}" alt="Update photo">
+                <span class="photo-progress-small" aria-hidden="true"><span></span></span>
+                <span class="photo-state-small"></span>
                 <button type="button" class="photo-remove-small" onclick="removeUpdatePhoto('${escapeJSStr(photoId)}')">×</button>
             `;
 
@@ -4972,7 +5224,7 @@
                     break;
                 case 'Escape':
                     const modals = document.querySelectorAll('.modal.show');
-                    modals.forEach(modal => modal.remove());
+                    modals.forEach(modal => { if (!modal.dataset.busy) modal.remove(); });
                     break;
             }
         });
