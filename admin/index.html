@@ -3353,6 +3353,7 @@
                 showDashboard();
                 loadDashboardData();
             } else {
+                stopListening();
                 showLogin();
             }
         });
@@ -3419,8 +3420,21 @@
 
         // Logout
         function logout() {
-            stopTrackingSync();
+            stopListening();
             auth.signOut();
+        }
+
+        // The live listeners are refused the moment the account signs out,
+        // which showed "Error loading data" on every sign-out, so they stop
+        // first. The job list they filled is now out of date, and the
+        // tracking sync must not publish from it after the next sign-in:
+        // a job deleted on another device meanwhile would get its tracking
+        // page back.
+        function stopListening() {
+            stopTrackingSync();
+            if (unsubscribeRepairs) unsubscribeRepairs();
+            unsubscribeRepairs = null;
+            repairsLoaded = false;
         }
 
         // Navigation
@@ -3495,8 +3509,11 @@
 
                 syncTrackingCopies();
             }, (error) => {
-                console.error('Error listening to repairs:', error);
+                unsubscribeRepairs = null;
+                repairsLoaded = false;
                 document.getElementById('loading').style.display = 'none';
+                if (!auth.currentUser) return;   // signed out, nothing to report
+                console.error('Error listening to repairs:', error);
                 showAlert('Error loading data: ' + error.message, 'error');
             });
 
