@@ -33,6 +33,9 @@
 
     var MAX_PHOTO_BYTES = 10 * 1024 * 1024;
     var MAX_PHOTOS = 12;
+    // Photos are shrunk to this before they upload; see shrinkPhoto.
+    var PHOTO_MAX_EDGE = 2000;
+    var PHOTO_JPEG_QUALITY = 0.85;
     var ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif'];
 
     var firebaseConfig = {
@@ -702,12 +705,9 @@
     }
 
     function addPhoto(file) {
-        var ext = (file.name && file.name.indexOf('.') !== -1)
-            ? file.name.slice(file.name.lastIndexOf('.')).toLowerCase().slice(0, 6)
-            : '.jpg';
         var photo = {
             id: 'p' + randomHex(6),
-            path: 'repairs/' + state.repairId + '/' + randomHex(8) + ext,
+            path: '',
             previewUrl: URL.createObjectURL(file),
             status: 'uploading',
             url: '',
@@ -715,7 +715,86 @@
         };
         state.photos.push(photo);
         renderPhotos();
-        uploadPhoto(photo);
+
+        // Shrunk first, then sent. The tile reads "Uploading…" through both,
+        // and the step cannot move on until it settles, as before.
+        shrinkPhoto(file).then(function (small) {
+            // Removed while it was being shrunk: there is nothing to send.
+            if (state.photos.indexOf(photo) === -1) return;
+            var ext = (small.name && small.name.indexOf('.') !== -1)
+                ? small.name.slice(small.name.lastIndexOf('.')).toLowerCase().slice(0, 6)
+                : '.jpg';
+            photo.file = small;
+            photo.path = 'repairs/' + state.repairId + '/' + randomHex(8) + ext;
+            uploadPhoto(photo);
+        });
+    }
+
+    // ------------------------------------------------------------------
+    // Photos are shrunk in the browser before they upload.
+    //
+    // A photo off the iPad camera is 12 megapixels and several megabytes,
+    // and it was stored like that: slow to send from the counter, and slow
+    // for the customer, whose tracking page downloads every original just to
+    // show a thumbnail. 2000px on the long side still shows a scratch, at a
+    // few hundred KB. The dashboard has its own copy of this, with the same
+    // numbers, in admin/index.html.
+    //
+    // Best effort. If the browser cannot decode the file or the result is no
+    // smaller, the original goes up exactly as it did before.
+    // ------------------------------------------------------------------
+
+    // One at a time: a dozen 12-megapixel photos decoded at once is more
+    // memory than an iPad tab will give a page. Always resolves, to the
+    // smaller file or the original.
+    var shrinkQueue = Promise.resolve();
+
+    function shrinkPhoto(file) {
+        var run = shrinkQueue
+            .then(function () { return shrinkPhotoNow(file); })
+            .catch(function () { return file; });
+        shrinkQueue = run;
+        return run;
+    }
+
+    async function shrinkPhotoNow(file) {
+        var url = URL.createObjectURL(file);
+        var canvas = document.createElement('canvas');
+        try {
+            var img = new Image();
+            img.src = url;
+            await img.decode();
+            // naturalWidth/Height are after the photo's EXIF rotation, and
+            // drawImage draws it rotated, so a portrait shot stays upright.
+            var scale = Math.min(1, PHOTO_MAX_EDGE / Math.max(img.naturalWidth, img.naturalHeight));
+            // Already small and already a JPEG: a second compression would
+            // only cost quality.
+            if (scale === 1 && file.type === 'image/jpeg' && file.size <= 1024 * 1024) return file;
+
+            canvas.width = Math.round(img.naturalWidth * scale);
+            canvas.height = Math.round(img.naturalHeight * scale);
+            var ctx = canvas.getContext('2d');
+            // JPEG has no transparency, so a clear PNG would turn black.
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            var blob = await new Promise(function (resolve) {
+                canvas.toBlob(resolve, 'image/jpeg', PHOTO_JPEG_QUALITY);
+            });
+            if (!blob || blob.size >= file.size) return file;
+
+            var name = (file.name || 'photo').replace(/\.[^.]*$/, '') + '.jpg';
+            return new File([blob], name, { type: 'image/jpeg', lastModified: file.lastModified });
+        } catch (err) {
+            console.warn('Could not shrink photo; uploading the original', err);
+            return file;
+        } finally {
+            URL.revokeObjectURL(url);
+            // iPad browsers hold a canvas's memory until it is sized to
+            // nothing, whatever the garbage collector thinks.
+            canvas.width = 0;
+            canvas.height = 0;
+        }
     }
 
     function uploadPhoto(photo) {
