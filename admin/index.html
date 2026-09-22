@@ -3508,6 +3508,7 @@
                 document.getElementById('loading').style.display = 'none';
 
                 syncTrackingCopies();
+                clearFinishedUnlockCodes();
             }, (error) => {
                 unsubscribeRepairs = null;
                 repairsLoaded = false;
@@ -3645,6 +3646,53 @@
                     trackingSyncAgain = false;
                     syncTrackingCopies();
                 }
+            }
+        }
+
+        // === UNLOCK CODES ===
+        // A device's unlock code is only needed while the repair is being
+        // tested, so it comes off the ticket once the job is Completed,
+        // whichever way it got there: Update Repair, the board, a bulk
+        // change, the Firebase console, or a job completed before this
+        // existed. Watching the job list covers every route at once, the
+        // same way the tracking pages are kept in step. It cannot be undone;
+        // if a device comes back, ask the customer for the code again.
+        const unlockClearAsked = new Set();   // ticket ids this page has cleared
+        let unlockClearNoticeShown = false;
+
+        function hasUnlockCode(repair) {
+            return repair.unlockCode !== undefined && repair.unlockCode !== null
+                && String(repair.unlockCode).trim() !== '';
+        }
+
+        async function clearFinishedUnlockCodes() {
+            if (!repairsLoaded) return;
+            const due = allRepairs.filter(r =>
+                r.currentStatus === 'completed' && hasUnlockCode(r) && !unlockClearAsked.has(r.id));
+            if (due.length === 0) return;
+
+            due.forEach(r => unlockClearAsked.add(r.id));
+            const results = await Promise.allSettled(due.map(r =>
+                db.collection('repairs').doc(r.id).update({
+                    unlockCode: firebase.firestore.FieldValue.delete()
+                })));
+
+            const failed = due.filter((r, i) => results[i].status === 'rejected');
+            const cleared = due.length - failed.length;
+            if (cleared > 0) {
+                showAlert(`Passcode cleared from ${cleared} completed job${cleared === 1 ? '' : 's'}`, 'success');
+            }
+            if (failed.length > 0) {
+                console.error('Passcodes not cleared:', failed.map(r => r.repairId),
+                    results.find(r => r.status === 'rejected').reason);
+                if (!unlockClearNoticeShown) {
+                    unlockClearNoticeShown = true;
+                    showAlert(`Could not clear the passcode from ${failed.length} completed job${failed.length === 1 ? '' : 's'}. Trying again in a minute.`, 'error');
+                }
+                setTimeout(() => {
+                    failed.forEach(r => unlockClearAsked.delete(r.id));
+                    clearFinishedUnlockCodes();
+                }, 60000);
             }
         }
 
