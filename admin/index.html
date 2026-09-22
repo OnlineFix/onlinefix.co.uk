@@ -4134,6 +4134,83 @@
         }
 
         // ------------------------------------------------------------------
+        // Photos are shrunk in the browser before they upload.
+        //
+        // A photo off an iPad is 12 megapixels and several megabytes, and it
+        // was stored like that: slow to send from the shop, and slow for the
+        // customer, whose tracking page downloads every original just to
+        // show a thumbnail. 2000px on the long side is still sharp enough to
+        // show a scratch, at a few hundred KB.
+        //
+        // Best effort. If the browser cannot decode the file (HEIC on a
+        // desktop browser, say) or the result is no smaller, the original
+        // goes up exactly as it did before. The intake page carries its own
+        // copy of this in new-repair/intake.js.
+        // ------------------------------------------------------------------
+        const PHOTO_MAX_EDGE = 2000;
+        const PHOTO_JPEG_QUALITY = 0.85;
+
+        // One at a time: a dozen 12-megapixel photos decoded at once is
+        // more memory than an iPad tab will give a page.
+        let photoShrinkQueue = Promise.resolve();
+
+        // Always resolves, to the smaller file or the original.
+        function shrinkPhoto(file) {
+            const run = photoShrinkQueue.then(() => shrinkPhotoNow(file)).catch(() => file);
+            photoShrinkQueue = run;
+            return run;
+        }
+
+        async function shrinkPhotoNow(file) {
+            const url = URL.createObjectURL(file);
+            const canvas = document.createElement('canvas');
+            try {
+                const img = new Image();
+                img.src = url;
+                await img.decode();
+                // naturalWidth/Height are after the photo's EXIF rotation, and
+                // drawImage draws it rotated, so a portrait shot stays upright.
+                const scale = Math.min(1, PHOTO_MAX_EDGE / Math.max(img.naturalWidth, img.naturalHeight));
+                // Already small and already a JPEG: a second compression
+                // would only cost quality.
+                if (scale === 1 && file.type === 'image/jpeg' && file.size <= 1024 * 1024) return file;
+
+                canvas.width = Math.round(img.naturalWidth * scale);
+                canvas.height = Math.round(img.naturalHeight * scale);
+                const ctx = canvas.getContext('2d');
+                // JPEG has no transparency, so a clear PNG would turn black.
+                ctx.fillStyle = '#fff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', PHOTO_JPEG_QUALITY));
+                if (!blob || blob.size >= file.size) return file;
+
+                const name = (file.name || 'photo').replace(/\.[^.]*$/, '') + '.jpg';
+                return new File([blob], name, { type: 'image/jpeg', lastModified: file.lastModified });
+            } catch (error) {
+                console.warn('Could not shrink photo; uploading the original', error);
+                return file;
+            } finally {
+                URL.revokeObjectURL(url);
+                // iPad browsers hold a canvas's memory until it is sized to
+                // nothing, whatever the garbage collector thinks.
+                canvas.width = 0;
+                canvas.height = 0;
+            }
+        }
+
+        // Storage only accepts image/* (storage.rules), and a photo with no
+        // type would otherwise go up as a generic file and be refused.
+        function photoContentType(file) {
+            if (file.type) return file.type;
+            const ext = ((file.name || '').match(/\.([^.]+)$/) || [])[1] || '';
+            return {
+                heic: 'image/heic', heif: 'image/heif', png: 'image/png',
+                webp: 'image/webp', gif: 'image/gif'
+            }[ext.toLowerCase()] || 'image/jpeg';
+        }
+
+        // ------------------------------------------------------------------
         // Photo upload progress in Update Repair.
         //
         // Photos go up when the form is saved, and a photo off an iPad is
@@ -4201,6 +4278,10 @@
             const pending = updatePhotos.filter(p => !p.url);
             if (pending.length === 0) return true;
 
+            // Normally long finished by the time Update Repair is tapped.
+            showUpdateProgress(modal, 'Preparing photos', 0);
+            await Promise.all(pending.map(p => p.ready));
+
             const totalBytes = pending.reduce((sum, p) => sum + (p.file.size || 0), 0) || 1;
             let doneBytes = 0;
             let failed = 0;
@@ -4216,7 +4297,7 @@
                 showUpdateProgress(modal, label, doneBytes / totalBytes);
                 try {
                     const photoRef = storage.ref().child(`repairs/${repair.repairId}/updates/${Date.now()}_${photo.id}`);
-                    const task = photoRef.put(photo.file);
+                    const task = photoRef.put(photo.file, { contentType: photoContentType(photo.file) });
                     task.on('state_changed', (snap) => {
                         const own = snap.totalBytes ? snap.bytesTransferred / snap.totalBytes : 0;
                         setPhotoTileState(photo, 'uploading', own);
@@ -4637,10 +4718,16 @@
         function handleUpdatePhotos(event) {
             const files = Array.from(event.target.files);
             const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-            const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/heic'];
+            const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/heic', 'image/heif'];
 
             files.forEach(file => {
-                if (!file.type.startsWith('image/') || !ALLOWED_TYPES.some(t => file.type === t)) {
+                // A photo from an iPad sometimes arrives with no type at all,
+                // so an untyped file is judged by its name - the way the
+                // intake page already does. It used to be refused here.
+                const typeOk = file.type
+                    ? ALLOWED_TYPES.includes(file.type)
+                    : /\.(jpe?g|png|gif|webp|heic|heif)$/i.test(file.name || '');
+                if (!typeOk) {
                     showAlert(`Skipped "${file.name}": not a valid image type`, 'error');
                     return;
                 }
@@ -4672,7 +4759,11 @@
             photoItem.dataset.photoId = photoId;
             preview.appendChild(photoItem);
 
-            updatePhotos.push({ id: photoId, file, src });
+            const photo = { id: photoId, file, src };
+            // Starts now, while the rest of the form is filled in, so it is
+            // usually done before Update Repair is tapped.
+            photo.ready = shrinkPhoto(file).then(small => { photo.file = small; });
+            updatePhotos.push(photo);
         }
 
         function removeUpdatePhoto(photoId) {
