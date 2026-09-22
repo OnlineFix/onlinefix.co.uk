@@ -750,16 +750,28 @@
         try {
             // 1) Upload photos to Storage. Done sequentially so a partial
             //    upload set is easy to clean up on the admin side later.
-            const photoUrls = [];
+            //
+            //    Only the storage paths are kept. This used to call
+            //    getDownloadURL() on each upload, which cannot work from here
+            //    and was failing every booking that had a photo attached:
+            //    reading a booking photo is admin-only in storage.rules, and
+            //    getDownloadURL is a read. The visitor uploaded fine, the
+            //    read after it was refused, and the whole submit landed in
+            //    the catch below as "Photo upload failed" without a booking
+            //    ever being created.
+            //
+            //    Keeping paths rather than links is also the safer shape: a
+            //    download link carries its own access token and opens the
+            //    file for anyone holding it, whatever the rules say, so it
+            //    would have handed out a permanent public link to a
+            //    customer's photo. Staff read these through the admin SDK,
+            //    which resolves a path without one.
             const photoPaths = [];
             for (let i = 0; i < state.photos.length; i++) {
                 const p = state.photos[i];
                 const filename = `photo-${i + 1}.jpg`;
                 const path = `bookings/${state.tempId}/${filename}`;
-                const ref = storage.ref().child(path);
-                const snapshot = await ref.put(p.file, { contentType: 'image/jpeg' });
-                const url = await snapshot.ref.getDownloadURL();
-                photoUrls.push(url);
+                await storage.ref().child(path).put(p.file, { contentType: 'image/jpeg' });
                 photoPaths.push(path);
             }
 
@@ -794,7 +806,10 @@
                 },
                 issue: issueText.trim().slice(0, 1000),
                 preferredAt: firebase.firestore.Timestamp.fromDate(preferredAt),
-                photos: photoUrls,
+                // Always empty, and required to be by the rule: see the
+                // upload loop above. Kept as a field so a booking's shape
+                // does not change for whatever reads these later.
+                photos: [],
                 photoPaths: photoPaths
             };
 

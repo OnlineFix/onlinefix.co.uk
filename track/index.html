@@ -985,14 +985,22 @@
             appId: "1:382934797751:web:5ac8a9c87d68a17b4cec32"
         };
 
-        // Initialize Firebase. App Check intentionally not used here:
-        // the tracking page is a single-doc lookup by an unguessable
-        // random repair ID, and firestore.rules already restricts public
-        // list queries to limit <= 1. App Check kept tripping the
-        // production CSP (no www.google.com/recaptcha.net in connect-src
-        // from the Cloudflare Transform Rule), then getting throttled
-        // for 24h, which broke every customer tracking link. See
-        // commit 9aa300b for the same fix on admin/index.html.
+        // Initialize Firebase. App Check intentionally not used here: the
+        // tracking page is a single-doc lookup by an unguessable random
+        // repair ID, and the tracking copy holds nothing private.
+        //
+        // This comment used to cite "firestore.rules restricts public list
+        // queries to limit <= 1" as the safeguard. That rule was the leak,
+        // not a protection: rules cannot see a query's filter values, so
+        // limit(1) with startAfter() walked the whole repairs collection one
+        // document per request. It is gone, and this page no longer reads
+        // repairs at all.
+        //
+        // App Check kept tripping the production CSP (no
+        // www.google.com/recaptcha.net in connect-src from the Cloudflare
+        // Transform Rule), then getting throttled for 24h, which broke every
+        // customer tracking link. See commit 9aa300b for the same fix on
+        // admin/index.html.
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 

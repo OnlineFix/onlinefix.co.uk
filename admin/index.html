@@ -2911,6 +2911,10 @@
             <div class="sidebar-header">
                 <div class="logo">OnlineFix</div>
                 <div class="user-info" id="user-email">Admin Dashboard</div>
+                <!-- Says how this account is being recognised as staff, so
+                     the email fallback in the rules can be retired knowingly
+                     rather than by guessing. See checkAdminAccess(). -->
+                <div class="user-info" id="admin-access-note" style="font-size: 0.7rem; opacity: 0.75; margin-top: 0.25rem;"></div>
             </div>
             <nav class="sidebar-nav">
                 <div class="nav-item">
@@ -3342,20 +3346,91 @@
         };
 
         // Authentication state observer
-        auth.onAuthStateChanged((user) => {
+        // The addresses the rules treat as staff. Keep in step with isAdmin()
+        // in firestore.rules and storage.rules.
+        const ADMIN_EMAILS = ['onlinerepairbooking@gmail.com'];
+
+        /* Is this account staff?
+
+           Signing in is not the same as being staff: anyone with an account on
+           the Firebase project could sign in, and the dashboard used to open
+           for them. The rules refused every read, so the screen came up empty
+           rather than leaking anything, but an empty dashboard is not an
+           answer to "should you be here".
+
+           Deliberately one notch looser than the rules: it admits the
+           allow-listed address whether or not it has been verified, where the
+           tightened rules require verification. Matching the rules exactly
+           would lock the shop out of its own dashboard the moment this ships,
+           before anyone had a chance to check which way the account is
+           recognised. So the page still opens for an unverified address, and
+           says plainly that it would not survive the tightened rules. */
+        function describeAdminAccess(token) {
+            if (token.claims.admin === true) return { allowed: true, state: 'claim' };
+            if (ADMIN_EMAILS.indexOf(token.claims.email) !== -1) {
+                return {
+                    allowed: true,
+                    state: token.claims.email_verified === true ? 'email-verified' : 'email-unverified'
+                };
+            }
+            return { allowed: false, state: 'none' };
+        }
+
+        async function checkAdminAccess(user) {
+            // Force a refresh so a claim granted since the last sign-in counts.
+            const token = await user.getIdTokenResult(true);
+            return describeAdminAccess(token);
+        }
+
+        auth.onAuthStateChanged(async (user) => {
             // Hide loading splash once Firebase has resolved persisted session.
             const splash = document.getElementById('auth-loading');
             if (splash) splash.style.display = 'none';
 
-            if (user) {
-                currentUser = user;
-                document.getElementById('user-email').textContent = user.email;
-                showDashboard();
-                loadDashboardData();
-            } else {
+            if (!user) {
                 stopListening();
                 showLogin();
+                return;
             }
+
+            let access;
+            try {
+                access = await checkAdminAccess(user);
+            } catch (error) {
+                // Never lock the dashboard out on a network hiccup: the rules
+                // are the real boundary and they are still enforcing.
+                console.warn('Could not read admin claims:', error);
+                access = { allowed: true, state: 'unknown' };
+            }
+
+            if (!access.allowed) {
+                stopListening();
+                showLogin();
+                showLoginError('This account does not have access to the dashboard.');
+                auth.signOut();
+                return;
+            }
+
+            currentUser = user;
+            document.getElementById('user-email').textContent = user.email;
+
+            /* Which of the two tests is carrying this account. Read this
+               before publishing tightened rules: "email, not confirmed" is
+               the one that would lose access. */
+            const NOTES = {
+                'claim': 'Admin access: security claim. Safe to remove the email fallback.',
+                'email-verified': 'Admin access: confirmed email. Works, but a security claim is better.',
+                'email-unverified': 'Admin access: email, NOT confirmed. Fix this before tightening the rules.',
+                'unknown': 'Admin access: could not be checked just now.'
+            };
+            const note = document.getElementById('admin-access-note');
+            if (note) {
+                note.textContent = NOTES[access.state] || NOTES.unknown;
+                note.style.color = access.state === 'email-unverified' ? '#F87171' : '';
+            }
+
+            showDashboard();
+            loadDashboardData();
         });
 
         // Login form submission
@@ -5237,7 +5312,7 @@
                                             <div style="font-size: 0.75rem; color: var(--text-dark);">${date}</div>
                                         </div>
                                         <span class="status-badge ${status.class}" style="font-size: 0.7rem; padding: 0.2rem 0.6rem;">${status.label}</span>
-                                        ${r.estimatedCost ? `<span style="color: var(--text-muted); font-size: 0.85rem;">£${r.estimatedCost}</span>` : ''}
+                                        ${r.estimatedCost ? `<span style="color: var(--text-muted); font-size: 0.85rem;">£${escapeHTML(r.estimatedCost)}</span>` : ''}
                                     </div>
                                 `;
                             }).join('')}
@@ -5880,16 +5955,36 @@
                 r.deviceType || '',
                 r.brand || '',
                 r.model || '',
-                (r.issueDescription || '').replace(/"/g, '""'),
+                r.issueDescription || '',
                 statusConfig[r.currentStatus]?.label || r.currentStatus || '',
                 r.dateReceived ? new Date(r.dateReceived.seconds * 1000).toLocaleDateString('en-GB') : '',
                 r.estimatedCompletion ? new Date(r.estimatedCompletion.seconds * 1000).toLocaleDateString('en-GB') : '',
                 r.estimatedCost ? `£${r.estimatedCost}` : ''
             ]);
 
+            /* Two separate problems with writing a cell as "…".
+
+               Quoting: only the fault description used to have its quotes
+               doubled, so a customer name or model containing a double quote
+               ended the cell early and shifted the rest of the row into the
+               wrong columns.
+
+               Formulas: a spreadsheet reads a cell opening with = + - or @
+               as a formula, quotes or not. A fault description typed as
+               =HYPERLINK(...) becomes a live formula in Excel the moment the
+               export is opened, which is how an ordinary-looking export
+               turns into something that acts on its own. Prefixing a single
+               quote makes the spreadsheet treat it as text; the leading
+               quote is not shown in the cell. */
+            const csvCell = (value) => {
+                const text = String(value === null || value === undefined ? '' : value);
+                const safe = /^[=+\-@\t\r]/.test(text) ? `'${text}` : text;
+                return `"${safe.replace(/"/g, '""')}"`;
+            };
+
             const csvContent = [csvHeader, ...csvRows]
-                .map(row => row.map(cell => `"${cell}"`).join(','))
-                .join('\n');
+                .map(row => row.map(csvCell).join(','))
+                .join('\r\n');
 
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
