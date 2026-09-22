@@ -2913,7 +2913,7 @@
                 <div class="user-info" id="user-email">Admin Dashboard</div>
                 <!-- Says how this account is being recognised as staff, so
                      the email fallback in the rules can be retired knowingly
-                     rather than by guessing. See checkAdminAccess(). -->
+                     rather than by guessing. See describeAdminAccess(). -->
                 <div class="user-info" id="admin-access-note" style="font-size: 0.7rem; opacity: 0.75; margin-top: 0.25rem;"></div>
             </div>
             <nav class="sidebar-nav">
@@ -3350,6 +3350,10 @@
         // in firestore.rules and storage.rules.
         const ADMIN_EMAILS = ['onlinerepairbooking@gmail.com'];
 
+        function isAllowListed(email) {
+            return ADMIN_EMAILS.indexOf(email) !== -1;
+        }
+
         /* Is this account staff?
 
            Signing in is not the same as being staff: anyone with an account on
@@ -3358,104 +3362,158 @@
            rather than leaking anything, but an empty dashboard is not an
            answer to "should you be here".
 
-           Deliberately one notch looser than the rules: it admits the
-           allow-listed address whether or not it has been verified, where the
-           tightened rules require verification. Matching the rules exactly
-           would lock the shop out of its own dashboard the moment this ships,
-           before anyone had a chance to check which way the account is
-           recognised. So the page still opens for an unverified address, and
-           says plainly that it would not survive the tightened rules. */
-        function describeAdminAccess(user, claims) {
+           Deliberately one notch looser than the rules, so that this can never
+           lock the shop out of its own dashboard: the allow-listed address is
+           admitted whether or not it is confirmed, and an account is only
+           turned away when its claims were actually read and say no.
+
+           The label is worked out from the token's claims when there are any,
+           because the token is what the rules check. The account's own copy of
+           the address (user.email, user.emailVerified) is used only when no
+           token could be read at all. */
+        function describeAdminAccess(user, read) {
+            const claims = read.claims;
             if (claims && claims.admin === true) return { allowed: true, state: 'claim' };
-            if (ADMIN_EMAILS.indexOf(user.email) !== -1) {
-                return {
-                    allowed: true,
-                    state: user.emailVerified === true ? 'email-verified' : 'email-unverified'
-                };
+
+            const verified = claims ? claims.email_verified === true : user.emailVerified === true;
+            if (isAllowListed(user.email) || (claims && isAllowListed(claims.email))) {
+                return { allowed: true, state: verified ? 'email-verified' : 'email-unverified' };
             }
-            /* Not an allow-listed address, and the claim could not be read.
-               A claim-only admin would be turned away by a failed network
-               call, so the page opens and the rules decide, exactly as they
-               did before this check existed. */
+
+            // Not the shop's address, and no claims to go on. Opening leaves it
+            // to the rules, as before this check existed, rather than turning
+            // away a claim-only admin because a network call failed.
             if (!claims) return { allowed: true, state: 'unknown' };
             return { allowed: false, state: 'none' };
         }
 
         /* The custom claim is the only part of this that needs the ID token,
-           and the token is the only part that can fail. A forced refresh is a
-           network call, and when it failed the whole check gave up, which is
-           why this line read "could not be checked" rather than an answer.
+           and the token is the only part that can fail.
 
-           So the claim is best-effort, and the address is read from the
-           signed-in account rather than from the token: user.email and
-           user.emailVerified are held locally on the account Firebase has
-           already resolved, so they need no network and cannot throw. */
+           A forced refresh goes to Google's Token Service. When that is
+           refused the whole check used to give up, which is why this line read
+           "could not be checked". It is refused on the live site as of
+           2026-09-22: the browser API key's list of allowed Google APIs leaves
+           the Token Service out, so sign-ins cannot be renewed at all. That is
+           a Google Cloud setting, not something code here can fix, so the
+           failure is reported on screen (see renewalNote) rather than
+           swallowed. */
         async function readAdminClaims(user) {
             // Fresh first, so a claim granted since sign-in counts today
             // rather than after the next sign-out.
             try {
-                return (await user.getIdTokenResult(true)).claims || null;
+                const token = await user.getIdTokenResult(true);
+                return { claims: token.claims || null, refreshError: null };
             } catch (refreshError) {
                 console.warn('Could not refresh the ID token:', refreshError);
-            }
-            // Then the token already in hand, which normally needs no network.
-            try {
-                return (await user.getIdTokenResult()).claims || null;
-            } catch (cachedError) {
-                console.warn('Could not read the cached ID token:', cachedError);
-                return null;
+                // Then the token already in hand, which needs no network while
+                // it is still in date.
+                try {
+                    const token = await user.getIdTokenResult();
+                    return { claims: token.claims || null, refreshError };
+                } catch (cachedError) {
+                    console.warn('Could not read the cached ID token:', cachedError);
+                    return { claims: null, refreshError };
+                }
             }
         }
 
-        auth.onAuthStateChanged(async (user) => {
-            // Hide loading splash once Firebase has resolved persisted session.
+        /* A request that hangs, rather than failing, holds the SDK for 30
+           seconds, and falling back to the cached token can start a second
+           one. Nobody should stare at a blank page for that. */
+        function withTimeout(promise, ms) {
+            return Promise.race([promise, new Promise(resolve => setTimeout(
+                () => resolve({ claims: null, refreshError: { code: 'timeout' } }), ms))]);
+        }
+
+        const ACCESS_NOTES = {
+            'claim': 'Admin access: security claim. Safe to remove the email fallback.',
+            'email-verified': 'Admin access: confirmed email. A security claim would be better.',
+            'email-unverified': 'Admin access: email, not confirmed. The new rules refuse this account.',
+            'unknown': 'Admin access: could not be checked just now.',
+            'pending': 'Admin access: checking…'
+        };
+
+        /* Google names the refused API in the error code when the key itself
+           blocks it, e.g. auth/requests-to-this-api-securetoken...-are-blocked. */
+        function renewalNote(refreshError) {
+            if (!refreshError) return { text: '', alarm: false };
+            if (/are[-\s]blocked|api[-_\s]key|service[-_\s]blocked/i.test(String(refreshError.code || refreshError.message || ''))) {
+                return {
+                    text: 'Sign-in renewal is blocked by a Google setting, so the dashboard stops working about an hour after signing in.',
+                    alarm: true
+                };
+            }
+            return { text: 'Sign-in could not be renewed just now.', alarm: false };
+        }
+
+        function showAccessNote(state, refreshError) {
+            const note = document.getElementById('admin-access-note');
+            if (!note) return;
+            const renewal = renewalNote(refreshError);
+            note.textContent = (ACCESS_NOTES[state] || ACCESS_NOTES.unknown) + (renewal.text ? ' ' + renewal.text : '');
+            note.style.color = (state === 'email-unverified' || renewal.alarm) ? '#F87171' : '';
+        }
+
+        function openDashboard(user) {
+            currentUser = user;
+            document.getElementById('user-email').textContent = user.email;
+            const loginError = document.getElementById('login-error');
+            if (loginError) loginError.classList.add('hidden');
+            showDashboard();
+            loadDashboardData();
+        }
+
+        function hideSplash() {
             const splash = document.getElementById('auth-loading');
             if (splash) splash.style.display = 'none';
+        }
 
+        auth.onAuthStateChanged(async (user) => {
             if (!user) {
+                hideSplash();
                 stopListening();
                 showLogin();
                 return;
             }
 
-            let access;
-            try {
-                access = describeAdminAccess(user, await readAdminClaims(user));
-            } catch (error) {
-                // Never lock the dashboard out on a hiccup: the rules are the
-                // real boundary and they are still enforcing. readAdminClaims
-                // already swallows its own failures, so this is a backstop.
-                console.warn('Could not work out admin access:', error);
-                access = { allowed: true, state: 'unknown' };
+            /* The shop's own address needs no network to recognise, so its
+               dashboard opens straight away and the note fills in after.
+               Anyone else waits behind the splash until the claims are read. */
+            const shopAddress = isAllowListed(user.email);
+            if (shopAddress) {
+                hideSplash();
+                openDashboard(user);
+                showAccessNote('pending', null);
             }
+
+            let read;
+            try {
+                read = await withTimeout(readAdminClaims(user), 8000);
+            } catch (error) {
+                // readAdminClaims swallows its own failures; this is a backstop.
+                console.warn('Could not work out admin access:', error);
+                read = { claims: null, refreshError: error };
+            }
+
+            // Someone signed out, or in as someone else, while this was
+            // waiting. Acting on it now would open the dashboard for a
+            // signed-out page, or sign out the account that replaced this one.
+            if (!auth.currentUser || auth.currentUser.uid !== user.uid) return;
+
+            const access = describeAdminAccess(user, read);
+            hideSplash();
 
             if (!access.allowed) {
                 stopListening();
                 showLogin();
-                showLoginError('This account does not have access to the dashboard.');
+                showLoginError('This account does not have access to the dashboard. If access was granted recently, sign in again.');
                 auth.signOut();
                 return;
             }
 
-            currentUser = user;
-            document.getElementById('user-email').textContent = user.email;
-
-            /* Which of the two tests is carrying this account. "Email, not
-               confirmed" is the one the tightened rules turn away. */
-            const NOTES = {
-                'claim': 'Admin access: security claim. Safe to remove the email fallback.',
-                'email-verified': 'Admin access: confirmed email. Works, but a security claim is better.',
-                'email-unverified': 'Admin access: email, not confirmed. The new rules refuse this account.',
-                'unknown': 'Admin access: could not be checked just now.'
-            };
-            const note = document.getElementById('admin-access-note');
-            if (note) {
-                note.textContent = NOTES[access.state] || NOTES.unknown;
-                note.style.color = access.state === 'email-unverified' ? '#F87171' : '';
-            }
-
-            showDashboard();
-            loadDashboardData();
+            if (!shopAddress) openDashboard(user);
+            showAccessNote(access.state, read.refreshError);
         });
 
         // Login form submission
@@ -3521,7 +3579,12 @@
         // Logout
         function logout() {
             stopListening();
-            auth.signOut();
+            /* Reload once signed out. Sign-out only hides the dashboard: the
+               job list, customer details and rendered tables all stay in the
+               page's memory, readable from the browser's developer tools by
+               the next person at the shop computer. A reload is the one clear
+               that cannot miss anything. */
+            auth.signOut().finally(() => window.location.reload());
         }
 
         // The live listeners are refused the moment the account signs out,
