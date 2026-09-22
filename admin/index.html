@@ -3365,21 +3365,46 @@
            before anyone had a chance to check which way the account is
            recognised. So the page still opens for an unverified address, and
            says plainly that it would not survive the tightened rules. */
-        function describeAdminAccess(token) {
-            if (token.claims.admin === true) return { allowed: true, state: 'claim' };
-            if (ADMIN_EMAILS.indexOf(token.claims.email) !== -1) {
+        function describeAdminAccess(user, claims) {
+            if (claims && claims.admin === true) return { allowed: true, state: 'claim' };
+            if (ADMIN_EMAILS.indexOf(user.email) !== -1) {
                 return {
                     allowed: true,
-                    state: token.claims.email_verified === true ? 'email-verified' : 'email-unverified'
+                    state: user.emailVerified === true ? 'email-verified' : 'email-unverified'
                 };
             }
+            /* Not an allow-listed address, and the claim could not be read.
+               A claim-only admin would be turned away by a failed network
+               call, so the page opens and the rules decide, exactly as they
+               did before this check existed. */
+            if (!claims) return { allowed: true, state: 'unknown' };
             return { allowed: false, state: 'none' };
         }
 
-        async function checkAdminAccess(user) {
-            // Force a refresh so a claim granted since the last sign-in counts.
-            const token = await user.getIdTokenResult(true);
-            return describeAdminAccess(token);
+        /* The custom claim is the only part of this that needs the ID token,
+           and the token is the only part that can fail. A forced refresh is a
+           network call, and when it failed the whole check gave up, which is
+           why this line read "could not be checked" rather than an answer.
+
+           So the claim is best-effort, and the address is read from the
+           signed-in account rather than from the token: user.email and
+           user.emailVerified are held locally on the account Firebase has
+           already resolved, so they need no network and cannot throw. */
+        async function readAdminClaims(user) {
+            // Fresh first, so a claim granted since sign-in counts today
+            // rather than after the next sign-out.
+            try {
+                return (await user.getIdTokenResult(true)).claims || null;
+            } catch (refreshError) {
+                console.warn('Could not refresh the ID token:', refreshError);
+            }
+            // Then the token already in hand, which normally needs no network.
+            try {
+                return (await user.getIdTokenResult()).claims || null;
+            } catch (cachedError) {
+                console.warn('Could not read the cached ID token:', cachedError);
+                return null;
+            }
         }
 
         auth.onAuthStateChanged(async (user) => {
@@ -3395,11 +3420,12 @@
 
             let access;
             try {
-                access = await checkAdminAccess(user);
+                access = describeAdminAccess(user, await readAdminClaims(user));
             } catch (error) {
-                // Never lock the dashboard out on a network hiccup: the rules
-                // are the real boundary and they are still enforcing.
-                console.warn('Could not read admin claims:', error);
+                // Never lock the dashboard out on a hiccup: the rules are the
+                // real boundary and they are still enforcing. readAdminClaims
+                // already swallows its own failures, so this is a backstop.
+                console.warn('Could not work out admin access:', error);
                 access = { allowed: true, state: 'unknown' };
             }
 
@@ -3414,13 +3440,12 @@
             currentUser = user;
             document.getElementById('user-email').textContent = user.email;
 
-            /* Which of the two tests is carrying this account. Read this
-               before publishing tightened rules: "email, not confirmed" is
-               the one that would lose access. */
+            /* Which of the two tests is carrying this account. "Email, not
+               confirmed" is the one the tightened rules turn away. */
             const NOTES = {
                 'claim': 'Admin access: security claim. Safe to remove the email fallback.',
                 'email-verified': 'Admin access: confirmed email. Works, but a security claim is better.',
-                'email-unverified': 'Admin access: email, NOT confirmed. Fix this before tightening the rules.',
+                'email-unverified': 'Admin access: email, not confirmed. The new rules refuse this account.',
                 'unknown': 'Admin access: could not be checked just now.'
             };
             const note = document.getElementById('admin-access-note');
