@@ -2846,6 +2846,97 @@
                 display: none;
             }
         }
+
+        /* Online bookings */
+        .bookings-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--text-dark);
+            cursor: pointer;
+        }
+
+        .bookings-list {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .booking-card {
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.25rem;
+            background: var(--bg-surface);
+        }
+
+        .booking-card.is-replied {
+            opacity: 0.7;
+        }
+
+        .booking-card__top {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .booking-card__name {
+            font-weight: 600;
+            font-size: 1.05rem;
+        }
+
+        .booking-card__status {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.2rem 0.6rem;
+            border-radius: 999px;
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+            white-space: nowrap;
+        }
+
+        .booking-card.is-replied .booking-card__status {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .booking-card__facts {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.5rem 1.5rem;
+            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .booking-card__facts span {
+            display: block;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--text-dark);
+        }
+
+        .booking-card__facts a {
+            color: inherit;
+            word-break: break-all;
+        }
+
+        .booking-card__issue {
+            white-space: pre-wrap;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .booking-card__actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .booking-card__actions .btn {
+            min-height: 44px;
+        }
     </style>
 </head>
 
@@ -2928,6 +3019,13 @@
                         <i class="fas fa-tools"></i>
                         All Repairs
                         <span class="overdue-nav-badge hidden" id="nav-overdue-badge">0</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link" data-section="bookings">
+                        <i class="fas fa-calendar-check"></i>
+                        Online Bookings
+                        <span class="overdue-nav-badge hidden" id="nav-bookings-badge" title="New bookings not yet replied to">0</span>
                     </a>
                 </div>
                 <div class="nav-item">
@@ -3099,6 +3197,21 @@
             </div>
 
             <!-- Analytics Section -->
+            <!-- Requests from the public /book/ page. Nothing emails you when
+                 one arrives, so this list is the only place they show up. -->
+            <div id="bookings-section" class="content-section hidden">
+                <div class="section-header" style="flex-wrap: wrap; gap: 0.75rem;">
+                    <h2 class="section-title">Online Bookings <span class="results-count" id="bookings-count"></span></h2>
+                    <label class="bookings-toggle">
+                        <input type="checkbox" id="bookings-show-replied" onchange="renderBookings()">
+                        Show ones already replied to
+                    </label>
+                </div>
+                <div class="section-content">
+                    <div id="bookings-list" class="bookings-list"></div>
+                </div>
+            </div>
+
             <div id="analytics-section" class="content-section hidden">
                 <div class="section-header" style="flex-wrap: wrap; gap: 0.75rem;">
                     <h2 class="section-title">Business Analytics</h2>
@@ -3598,6 +3711,7 @@
             if (unsubscribeRepairs) unsubscribeRepairs();
             unsubscribeRepairs = null;
             repairsLoaded = false;
+            stopBookings();
         }
 
         // Navigation
@@ -3625,6 +3739,7 @@
             const titles = {
                 'overview': 'Dashboard Overview',
                 'repairs': 'All Repairs',
+                'bookings': 'Online Bookings',
                 'analytics': 'Business Analytics'
             };
             document.getElementById('page-title').textContent = titles[sectionName] || 'Dashboard';
@@ -3637,6 +3752,8 @@
                 renderKanban('overview-kanban-container');
             } else if (sectionName === 'analytics') {
                 renderAnalytics();
+            } else if (sectionName === 'bookings') {
+                renderBookings();
             }
         }
 
@@ -3681,12 +3798,165 @@
                 showAlert('Error loading data: ' + error.message, 'error');
             });
 
+            startBookings();
+
             if (!window.OnlineFixTracking) {
                 showAlert('Tracking page script did not load — reload the page', 'error');
             } else if (!unsubscribeTracking) {
                 startTrackingSync();
             }
         }
+
+        // === ONLINE BOOKINGS ===
+        // Requests sent from the public /book/ page land in `bookings`. No
+        // email goes out when one arrives (a public page must never be able
+        // to send mail), so this section and its sidebar count are how the
+        // shop finds out. Handled ones are marked replied, and removing one
+        // only hides it: `deleted` is the booking's own flag for that.
+        let unsubscribeBookings = null;
+        let allBookings = [];
+        let bookingsLoaded = false;
+
+        function startBookings() {
+            if (unsubscribeBookings) unsubscribeBookings();
+            unsubscribeBookings = db.collection('bookings')
+                .orderBy('createdAt', 'desc').limit(300)
+                .onSnapshot((snapshot) => {
+                    allBookings = snapshot.docs
+                        .map(doc => ({ id: doc.id, ...doc.data() }))
+                        .filter(b => b.deleted !== true);
+                    bookingsLoaded = true;
+                    updateBookingsBadge();
+                    if (document.getElementById('bookings-list')?.offsetParent) renderBookings();
+                }, (error) => {
+                    unsubscribeBookings = null;
+                    bookingsLoaded = false;
+                    if (!auth.currentUser) return;   // signed out, nothing to report
+                    console.warn('Online bookings unavailable:', error);
+                    const list = document.getElementById('bookings-list');
+                    if (list) list.innerHTML = '<p class="empty-state">Online bookings could not be loaded: ' + escapeHTML(error.message) + '</p>';
+                });
+        }
+
+        function stopBookings() {
+            if (unsubscribeBookings) unsubscribeBookings();
+            unsubscribeBookings = null;
+            bookingsLoaded = false;
+            allBookings = [];
+        }
+
+        function isNewBooking(b) {
+            return b.status !== 'responded';
+        }
+
+        function updateBookingsBadge() {
+            const badge = document.getElementById('nav-bookings-badge');
+            if (!badge) return;
+            const count = allBookings.filter(isNewBooking).length;
+            badge.textContent = count;
+            badge.classList.toggle('hidden', count === 0);
+        }
+
+        function formatBookingTime(ts) {
+            const d = ts && typeof ts.toDate === 'function' ? ts.toDate() : null;
+            if (!d) return 'Not given';
+            return d.toLocaleString('en-GB', {
+                weekday: 'short', day: 'numeric', month: 'short', year: 'numeric',
+                hour: '2-digit', minute: '2-digit'
+            });
+        }
+
+        function renderBookings() {
+            const list = document.getElementById('bookings-list');
+            if (!list) return;
+            if (!bookingsLoaded) {
+                if (!list.innerHTML) list.innerHTML = '<p class="empty-state">Loading online bookings…</p>';
+                return;
+            }
+            const showReplied = document.getElementById('bookings-show-replied')?.checked;
+            const shown = allBookings.filter(b => showReplied || isNewBooking(b));
+            const newCount = allBookings.filter(isNewBooking).length;
+            document.getElementById('bookings-count').textContent = `(${newCount} new)`;
+
+            if (!shown.length) {
+                list.innerHTML = '<p class="empty-state">' + (allBookings.length
+                    ? 'No new bookings. Tick the box above to see the ones already replied to.'
+                    : 'No online bookings yet.') + '</p>';
+                return;
+            }
+
+            list.innerHTML = shown.map(b => {
+                const customer = b.customer || {};
+                const device = b.device || {};
+                const replied = !isNewBooking(b);
+                const deviceText = [device.brand, device.model].filter(Boolean).join(' ')
+                    + (device.category ? ` (${device.category})` : '');
+                const email = String(customer.email || '');
+                const phone = String(customer.phone || '');
+                const photos = Array.isArray(b.photoPaths) ? b.photoPaths : [];
+                return `
+                    <div class="booking-card${replied ? ' is-replied' : ''}">
+                        <div class="booking-card__top">
+                            <div class="booking-card__name">${escapeHTML(customer.name || 'No name')}</div>
+                            <div class="booking-card__status">${replied ? 'Replied' : 'New'}</div>
+                        </div>
+                        <div class="booking-card__facts">
+                            <div><span>Wants to drop off</span>${escapeHTML(formatBookingTime(b.preferredAt))}</div>
+                            <div><span>Device</span>${escapeHTML(deviceText || 'Not given')}</div>
+                            <div><span>Email</span><a href="mailto:${escapeHTML(encodeURIComponent(email))}">${escapeHTML(email)}</a></div>
+                            <div><span>Phone</span><a href="tel:${escapeHTML(phone.replace(/[^0-9+]/g, ''))}">${escapeHTML(phone)}</a></div>
+                            <div><span>Sent</span>${escapeHTML(formatBookingTime(b.createdAt))}</div>
+                        </div>
+                        <div class="booking-card__issue">${escapeHTML(b.issue || '')}</div>
+                        <div class="booking-card__actions">
+                            ${photos.map((path, i) => `<button type="button" class="btn btn-secondary" data-booking-photo="${escapeHTML(path)}"><i class="fas fa-image"></i> Photo ${i + 1}</button>`).join('')}
+                            <button type="button" class="btn ${replied ? 'btn-secondary' : 'btn-primary'}" data-booking-replied="${escapeHTML(b.id)}" data-replied="${replied ? '1' : ''}">
+                                <i class="fas ${replied ? 'fa-rotate-left' : 'fa-check'}"></i> ${replied ? 'Mark as new' : 'Mark replied'}
+                            </button>
+                            <button type="button" class="btn btn-danger" data-booking-remove="${escapeHTML(b.id)}"><i class="fas fa-trash"></i> Remove</button>
+                        </div>
+                    </div>`;
+            }).join('');
+        }
+
+        document.addEventListener('click', async (e) => {
+            const photoBtn = e.target.closest('[data-booking-photo]');
+            const repliedBtn = e.target.closest('[data-booking-replied]');
+            const removeBtn = e.target.closest('[data-booking-remove]');
+            if (!photoBtn && !repliedBtn && !removeBtn) return;
+
+            if (photoBtn) {
+                // Opened in a new tab first, so an iPad does not treat the
+                // later navigation as an unrequested popup.
+                const win = window.open('', '_blank');
+                try {
+                    const url = await storage.ref(photoBtn.dataset.bookingPhoto).getDownloadURL();
+                    if (win) { win.opener = null; win.location.href = url; } else safeOpen(url);
+                } catch (error) {
+                    if (win) win.close();
+                    showAlert('Could not open that photo: ' + error.message, 'error');
+                }
+                return;
+            }
+
+            const id = (repliedBtn || removeBtn).dataset.bookingReplied || (removeBtn && removeBtn.dataset.bookingRemove);
+            const booking = allBookings.find(b => b.id === id);
+            if (!booking) return;
+            const name = (booking.customer && booking.customer.name) || 'this customer';
+            try {
+                if (repliedBtn) {
+                    const wasReplied = !!repliedBtn.dataset.replied;
+                    await db.collection('bookings').doc(id).update(wasReplied
+                        ? { status: 'pending', respondedAt: null }
+                        : { status: 'responded', respondedAt: firebase.firestore.FieldValue.serverTimestamp() });
+                } else {
+                    if (!confirm(`Remove the booking from ${name}? It will no longer show here.`)) return;
+                    await db.collection('bookings').doc(id).update({ deleted: true });
+                }
+            } catch (error) {
+                showAlert('Could not update that booking: ' + error.message, 'error');
+            }
+        });
 
         // === CUSTOMER TRACKING PAGES ===
         // The customer's tracking page never reads a ticket. It reads the
