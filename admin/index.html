@@ -2941,8 +2941,12 @@
             min-height: 0;
         }
 
-        #booking-modal .booking-actions {
+        #booking-modal .booking-actions,
+        #booking-modal #bk-error {
             flex: none;
+        }
+
+        #booking-modal .booking-actions {
             margin-top: 1rem;
         }
 
@@ -4019,7 +4023,7 @@
 
         function bookingDeviceText(b) {
             const device = b.device || {};
-            return [device.brand, device.model].filter(Boolean).join(' ')
+            return [bookingBrandForJob(device.brand), device.model].filter(Boolean).join(' ')
                 || BOOKING_CATEGORIES[device.category] || 'Device not given';
         }
 
@@ -4042,6 +4046,12 @@
         document.addEventListener('click', (e) => {
             const card = e.target.closest('[data-booking-open]');
             if (card) openBooking(card.dataset.bookingOpen);
+            // Booking photo buttons, in the booking box and on a booked-in
+            // job. The path is carried in a data attribute, never written
+            // into an onclick: it came from the booking form, and older
+            // bookings were not held to a fixed shape.
+            const photo = e.target.closest('[data-booking-photo]');
+            if (photo) openBookingPhoto(photo.dataset.bookingPhoto);
         });
         document.addEventListener('keydown', (e) => {
             if (e.key !== 'Enter' && e.key !== ' ') return;
@@ -4062,9 +4072,9 @@
         }
 
         /* The booking form's brand list mixes in product lines ("Apple
-           iPad"), which would make the job read "Apple iPad iPad Air". The
-           box starts with the plain maker instead; the booking itself keeps
-           what the customer picked. */
+           iPad"), which would make the job read "Apple iPad iPad Air". Cards
+           and the box show the plain maker instead, and the booking keeps
+           what the customer picked until the box is saved. */
         const BOOKING_BRAND_MAKERS = {
             'Apple iPad': 'Apple', 'Apple iMac/Mac': 'Apple',
             'Microsoft Xbox': 'Microsoft', 'Microsoft Surface': 'Microsoft',
@@ -4165,8 +4175,10 @@
                                 <input type="checkbox" id="bk-send-email"${isValidEmail(email) ? ' checked' : ''}>
                                 <span>When booking in, email the customer their tracking link (the same email as the Send tracking email button).</span>
                             </label>
-                            <div class="alert alert-error hidden" id="bk-error" style="margin-bottom: 1rem;"></div>
                         </div>
+                        <!-- Outside the scrolling part, so a message shows
+                             beside the buttons however far down the form is. -->
+                        <div class="alert alert-error hidden" id="bk-error" style="margin: 1rem 0 0;"></div>
                         <div class="modal-actions booking-actions">
                             <button type="button" class="btn btn-danger" data-booking-action="remove"><i class="fas fa-trash"></i> Remove</button>
                             <span class="modal-actions__spacer"></span>
@@ -4186,8 +4198,6 @@
             modal.addEventListener('click', async (e) => {
                 if (modal.dataset.busy) return;
                 if (e.target === modal || e.target.closest('[data-booking-close]')) { modal.remove(); return; }
-                const photoBtn = e.target.closest('[data-booking-photo]');
-                if (photoBtn) { openBookingPhoto(photoBtn.dataset.bookingPhoto); return; }
                 const actionBtn = e.target.closest('[data-booking-action]');
                 if (!actionBtn || actionBtn.disabled) return;
                 const action = actionBtn.dataset.bookingAction;
@@ -4199,7 +4209,7 @@
                     actionBtn.innerHTML = busy ? `<i class="fas fa-spinner fa-spin"></i> ${BUSY_LABELS[action] || 'Saving…'}` : label;
                 };
                 try {
-                    await runBookingAction(booking.id, action, modal, setBusy);
+                    await runBookingAction(booking, action, modal, setBusy);
                 } finally {
                     if (modal.isConnected) setBusy(false);
                 }
@@ -4291,9 +4301,13 @@
             return String((error && error.message) || error || 'unknown error').replace(/\.\s*$/, '');
         }
 
-        async function runBookingAction(bookingId, action, modal, setBusy) {
-            const booking = allBookings.find(b => b.id === bookingId);
-            if (!booking) { modal.remove(); return; }
+        async function runBookingAction(opened, action, modal, setBusy) {
+            // The board only holds bookings still waiting, so one booked in or
+            // removed elsewhere drops out of it while its box is open here.
+            // Carry on with the copy the box was opened from: every write
+            // below re-reads the booking and says what happened to it.
+            const booking = allBookings.find(b => b.id === opened.id) || opened;
+            const bookingId = booking.id;
             const name = (booking.customer && booking.customer.name) || 'this customer';
 
             try {
@@ -4447,6 +4461,7 @@
                 const data = fresh.exists ? fresh.data() : null;
                 if (!data || data.deleted === true || data.status === 'removed') throw new Error('this booking has been removed.');
                 if (data.status === 'booked' || data.linkedRepairId) throw new Error('this booking is already booked in.');
+                repair.bookingPhotoPaths = Array.isArray(data.photoPaths) ? data.photoPaths : [];
                 tx.set(repairRef, repair);
                 tx.update(bookingRef, {
                     ...bookingEdits(form),
@@ -4877,7 +4892,7 @@
                                 <p><strong>Booking photos:</strong> <span style="color: var(--text-muted);">sent by the customer, staff only</span></p>
                                 <div class="booking-photos">
                                     ${repair.bookingPhotoPaths.map((path, i) => `
-                                        <button type="button" class="btn btn-secondary" onclick="openBookingPhoto('${escapeJSStr(path)}')">
+                                        <button type="button" class="btn btn-secondary" data-booking-photo="${escapeHTML(path)}">
                                             <i class="fas fa-image"></i> Photo ${i + 1}
                                         </button>`).join('')}
                                 </div>` : ''}

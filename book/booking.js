@@ -118,6 +118,14 @@
     // ---- Init ------------------------------------------------------------
     document.addEventListener('DOMContentLoaded', init);
 
+    // A CSPRNG booking id, used as the Storage folder for the photos, the
+    // booking's document id and its notice's id.
+    function newTempId() {
+        const idBytes = new Uint8Array(16);
+        crypto.getRandomValues(idBytes);
+        return 'BK_' + Array.from(idBytes, b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
+    }
+
     function init() {
         const form = $('#booking-form');
         const fallback = $('#booking-fallback');
@@ -125,9 +133,7 @@
 
         // Generate a CSPRNG temp id used as both the Storage path and a marker
         // on the Firestore doc (so admins can match doc <-> photos later).
-        const idBytes = new Uint8Array(16);
-        crypto.getRandomValues(idBytes);
-        state.tempId = 'BK_' + Array.from(idBytes, b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
+        state.tempId = newTempId();
 
         // Reveal the form (and hide the fallback paragraph since the form is here)
         form.hidden = false;
@@ -454,8 +460,8 @@
         const a = state.availability;
         const dateInput = $('#preferred-date');
         if (dateInput) {
-            const min = isoDate(addDays(new Date(), 0));
-            const max = isoDate(addDays(new Date(), a.maxFutureDays || 60));
+            const min = ukIsoDate(0);
+            const max = ukIsoDate(a.maxFutureDays || 60);
             dateInput.min = min;
             dateInput.max = max;
         }
@@ -514,7 +520,10 @@
         const earliest = new Date(Date.now() + minNoticeMs);
 
         slots.forEach((slot) => {
-            const slotDate = new Date(y, m - 1, d, slot.h, slot.min, 0, 0);
+            // Slots are the shop's hours, so compare them as UK times (the
+            // same way submitBooking stores the one picked), not as times on
+            // the visitor's own clock.
+            const slotDate = ukTime(y, m, d, slot.h, slot.min);
             const disabled = slotDate < earliest;
             const isSelected = state.preferredTime === slot.label;
 
@@ -603,6 +612,13 @@
         if (step === 3) {
             if (!state.preferredDate) fail('preferred-date', 'Pick a date.');
             if (!state.preferredTime) fail('preferred-time', 'Pick a time slot.');
+            // The description and these notes are saved as one text, which
+            // the rule holds to 999 characters: say so rather than cut it.
+            const over = issueWithNotes().length - 999;
+            if (state.extraNotes && over > 0) {
+                fail('extra-notes', 'Together with your description this is ' + over
+                    + ' characters too long. Please shorten one of them.');
+            }
         }
         if (step === 4) {
             if (!state.customerName || !state.customerName.trim()) fail('customer-name', 'Your name please.');
@@ -617,6 +633,14 @@
             if (!state.consent) fail('consent', 'Please tick the box to continue.');
         }
         return ok;
+    }
+
+    // The description as saved: the issue, then any extra notes under a
+    // heading. The rule allows fewer than 1000 characters in all.
+    function issueWithNotes() {
+        return (state.extraNotes
+            ? `${state.issue}\n\n--- Additional notes ---\n${state.extraNotes}`
+            : state.issue).trim();
     }
 
     function isUkPhone(s) {
@@ -790,9 +814,7 @@
             // whatever the visitor's device is set to.
             const preferredAt = ukTime(y, m, d, hh, mm);
 
-            const issueText = state.extraNotes
-                ? `${state.issue}\n\n--- Additional notes ---\n${state.extraNotes}`
-                : state.issue;
+            const issueText = issueWithNotes();
 
             const docData = {
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),
@@ -813,7 +835,7 @@
                     model: state.model.trim()
                 },
                 // The rule wants fewer than 1000 characters.
-                issue: issueText.trim().slice(0, 999),
+                issue: issueText.slice(0, 999),
                 preferredAt: firebase.firestore.Timestamp.fromDate(preferredAt),
                 // Always empty, and required to be by the rule: see the
                 // upload loop above. Kept as a field so a booking's shape
@@ -869,6 +891,11 @@
             showStep(6);
         } catch (err) {
             console.error('Booking submit failed:', err);
+            // An upload that reached the server but whose reply was lost looks
+            // like a failure here, and sending that photo again would replace
+            // a file, which storage.rules refuses. So after a refused upload
+            // the next try starts in a new folder, and uploads every photo.
+            if (err && err.code === 'storage/unauthorized') state.tempId = newTempId();
             if (errEl) {
                 errEl.hidden = false;
                 errEl.textContent = friendlyError(err) + ' Your details are still here — try again, or call 07940 730537.';
@@ -972,9 +999,7 @@
             submitting: false
         });
         // New tempId for the next booking
-        const idBytes = new Uint8Array(16);
-        crypto.getRandomValues(idBytes);
-        state.tempId = 'BK_' + Array.from(idBytes, b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
+        state.tempId = newTempId();
 
         const form = $('#booking-form');
         if (form) form.reset();
@@ -995,13 +1020,9 @@
     }
 
     // ---- Date helpers ----------------------------------------------------
-    function addDays(d, n) {
-        const out = new Date(d);
-        out.setDate(out.getDate() + n);
-        return out;
-    }
-
-    function isoDate(d) {
-        return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+    // Today's date in the UK, plus n days, as YYYY-MM-DD.
+    function ukIsoDate(n) {
+        const p = ukParts(new Date(), { year: 'numeric', month: '2-digit', day: '2-digit' });
+        return new Date(Date.UTC(+p.year, +p.month - 1, +p.day + n)).toISOString().slice(0, 10);
     }
 })();

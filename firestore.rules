@@ -208,6 +208,11 @@ service cloud.firestore {
           && b.tempId == mailId
           && throttle.mailId == mailId
           && b.customer.name.matches('[^\\r\\n]+')
+          // Every other field printed on a labelled line must stay on it.
+          && b.customer.email.matches('[^\\r\\n]+')
+          && b.customer.phone.matches('[^\\r\\n]+')
+          && b.device.brand.matches('[^\\r\\n]*')
+          && b.device.model.matches('[^\\r\\n]*')
           && m.keys().hasOnly(['to', 'replyTo', 'message', 'meta'])
           && m.to == ['hello@onlinefix.uk']
           && m.replyTo == b.customer.email
