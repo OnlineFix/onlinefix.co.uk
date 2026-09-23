@@ -766,12 +766,20 @@
             //    would have handed out a permanent public link to a
             //    customer's photo. Staff read these through the admin SDK,
             //    which resolves a path without one.
+            //
+            //    A photo that already went up on an earlier attempt is not
+            //    sent again: the Storage rule only allows creating a file,
+            //    so re-sending it after a failed submit would be refused and
+            //    the retry could never succeed.
             const photoPaths = [];
             for (let i = 0; i < state.photos.length; i++) {
                 const p = state.photos[i];
                 const filename = `photo-${i + 1}.jpg`;
                 const path = `bookings/${state.tempId}/${filename}`;
-                await storage.ref().child(path).put(p.file, { contentType: 'image/jpeg' });
+                if (p.uploadedPath !== path) {
+                    await storage.ref().child(path).put(p.file, { contentType: 'image/jpeg' });
+                    p.uploadedPath = path;
+                }
                 photoPaths.push(path);
             }
 
@@ -813,7 +821,24 @@
                 photoPaths: photoPaths
             };
 
-            const ref = await db.collection('bookings').add(docData);
+            // The booking takes its tempId as its document id, and the notice
+            // to the shop takes the same id, so the rules can tie exactly one
+            // notice to each new booking (see /mail in firestore.rules).
+            // Written together: either both land or neither does.
+            const ref = db.collection('bookings').doc(state.tempId);
+            const batch = db.batch();
+            batch.set(ref, docData);
+            batch.set(db.collection('mail').doc(state.tempId), shopNotice(docData, preferredAt));
+            try {
+                await batch.commit();
+            } catch (err) {
+                // Until the rules that allow the notice are published, the
+                // whole batch is refused. The booking on its own is still
+                // allowed, and saving it matters more than the email about it.
+                if (!err || err.code !== 'permission-denied') throw err;
+                console.warn('Booking notice refused, saving the booking alone:', err);
+                await ref.set(docData);
+            }
 
             // 3) Show confirmation
             const refId = ref.id.slice(-6).toUpperCase();
@@ -833,6 +858,45 @@
             state.submitting = false;
             if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Request Booking'; }
         }
+    }
+
+    // The email the shop gets for each booking. Plain text only: the rule on
+    // /mail refuses anything else from this page. Reply-To is the customer,
+    // so replying in the inbox answers them.
+    const SHOP_INBOX = 'hello@onlinefix.uk';
+
+    function shopNotice(doc, preferredAt) {
+        const when = preferredAt.toLocaleString('en-GB', {
+            weekday: 'long', day: 'numeric', month: 'long',
+            hour: '2-digit', minute: '2-digit'
+        });
+        const device = [doc.device.brand, doc.device.model].filter(Boolean).join(' ')
+            + ' (' + doc.device.category + ')';
+        const lines = [
+            'New online booking request.',
+            '',
+            'Customer: ' + doc.customer.name,
+            'Email: ' + doc.customer.email,
+            'Phone: ' + doc.customer.phone,
+            'Wants to drop off: ' + when,
+            'Device: ' + device,
+            'Photos: ' + (doc.photoPaths.length ? doc.photoPaths.length + ' (open the booking on the dashboard to see them)' : 'none'),
+            '',
+            'Issue:',
+            doc.issue,
+            '',
+            'Reply to this email to answer the customer.',
+            'It is on the dashboard under Online Bookings: https://onlinefix.co.uk/admin/'
+        ];
+        return {
+            to: [SHOP_INBOX],
+            replyTo: doc.customer.email,
+            message: {
+                subject: ('Booking request: ' + doc.customer.name + ', ' + when).slice(0, 190),
+                text: lines.join('\n').slice(0, 3900)
+            },
+            meta: { kind: 'booking-request', bookingId: state.tempId }
+        };
     }
 
     function friendlyError(err) {

@@ -2847,69 +2847,43 @@
             }
         }
 
-        /* Online bookings */
-        .bookings-toggle {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.85rem;
-            color: var(--text-dark);
-            cursor: pointer;
+        /* Online bookings board. Columns and cards borrow the jobs board's
+           kanban classes; these add what a booking card shows. */
+        .kanban-card.booking-card--new {
+            border-left: 3px solid var(--warning);
         }
 
-        .bookings-list {
-            display: grid;
-            gap: 1rem;
+        .booking-card-time {
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin-bottom: 0.25rem;
         }
 
-        .booking-card {
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 1.25rem;
-            background: var(--bg-surface);
-        }
-
-        .booking-card.is-replied {
-            opacity: 0.7;
-        }
-
-        .booking-card__top {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            gap: 0.5rem;
-            margin-bottom: 0.75rem;
-        }
-
-        .booking-card__name {
+        .booking-chip {
+            display: inline-block;
+            font-size: 0.7rem;
             font-weight: 600;
-            font-size: 1.05rem;
-        }
-
-        .booking-card__status {
-            font-size: 0.75rem;
-            font-weight: 600;
-            padding: 0.2rem 0.6rem;
+            padding: 0.15rem 0.5rem;
             border-radius: 999px;
-            background: rgba(245, 158, 11, 0.2);
-            color: var(--warning);
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
             white-space: nowrap;
         }
 
-        .booking-card.is-replied .booking-card__status {
-            background: rgba(16, 185, 129, 0.2);
-            color: var(--success);
+        .booking-chip--new {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
         }
 
-        .booking-card__facts {
+        .booking-facts {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 0.5rem 1.5rem;
             font-size: 0.9rem;
-            margin-bottom: 0.75rem;
+            margin-bottom: 1rem;
         }
 
-        .booking-card__facts span {
+        .booking-facts span {
             display: block;
             font-size: 0.7rem;
             text-transform: uppercase;
@@ -2917,24 +2891,32 @@
             color: var(--text-dark);
         }
 
-        .booking-card__facts a {
+        .booking-facts a {
             color: inherit;
             word-break: break-all;
         }
 
-        .booking-card__issue {
-            white-space: pre-wrap;
-            font-size: 0.9rem;
-            margin-bottom: 1rem;
-        }
-
-        .booking-card__actions {
+        .booking-photos {
             display: flex;
             flex-wrap: wrap;
             gap: 0.5rem;
+            margin-bottom: 1rem;
         }
 
-        .booking-card__actions .btn {
+        .booking-check {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+        }
+
+        .booking-check input {
+            margin-top: 0.2rem;
+        }
+
+        #booking-modal .modal-actions .btn {
             min-height: 44px;
         }
     </style>
@@ -3197,18 +3179,17 @@
             </div>
 
             <!-- Analytics Section -->
-            <!-- Requests from the public /book/ page. Nothing emails you when
-                 one arrives, so this list is the only place they show up. -->
-            <div id="bookings-section" class="content-section hidden">
-                <div class="section-header" style="flex-wrap: wrap; gap: 0.75rem;">
+            <!-- Requests from the public /book/ page, by the day and time the
+                 customer asked to drop off. See ONLINE BOOKINGS in the script. -->
+            <div id="bookings-section" class="content-section is-board hidden">
+                <div class="section-header">
                     <h2 class="section-title">Online Bookings <span class="results-count" id="bookings-count"></span></h2>
-                    <label class="bookings-toggle">
-                        <input type="checkbox" id="bookings-show-replied" onchange="renderBookings()">
-                        Show ones already replied to
-                    </label>
+                    <div class="board-legend">
+                        <span class="board-legend__item"><span class="board-flag board-flag--warn"></span>New, not yet confirmed</span>
+                    </div>
                 </div>
-                <div class="section-content">
-                    <div id="bookings-list" class="bookings-list"></div>
+                <div class="section-content board-content">
+                    <div class="kanban-container" id="bookings-board"></div>
                 </div>
             </div>
 
@@ -3808,33 +3789,42 @@
         }
 
         // === ONLINE BOOKINGS ===
-        // Requests sent from the public /book/ page land in `bookings`. No
-        // email goes out when one arrives (a public page must never be able
-        // to send mail), so this section and its sidebar count are how the
-        // shop finds out. Handled ones are marked replied, and removing one
-        // only hides it: `deleted` is the booking's own flag for that.
+        // Requests from the public /book/ page land in `bookings`, and the
+        // booking page emails the shop about each one (see /mail in
+        // firestore.rules). This board lays them out by the day and time the
+        // customer asked to drop off. Opening one lets staff correct the
+        // details, confirm it, and book it in, which turns it into a job on
+        // the jobs board.
+        //
+        // A booking moves pending (New) -> confirmed -> booked. Older ones
+        // may say 'responded', from before this board, and count as
+        // confirmed. Booked-in and removed bookings leave the board; removing
+        // only sets the booking's own `deleted` flag.
         let unsubscribeBookings = null;
         let allBookings = [];
         let bookingsLoaded = false;
+
+        const BOOKING_CATEGORIES = {
+            phone: 'Phone', laptop: 'Laptop', tablet: 'Tablet',
+            console: 'Games console', desktop: 'Desktop', other: 'Other'
+        };
 
         function startBookings() {
             if (unsubscribeBookings) unsubscribeBookings();
             unsubscribeBookings = db.collection('bookings')
                 .orderBy('createdAt', 'desc').limit(300)
                 .onSnapshot((snapshot) => {
-                    allBookings = snapshot.docs
-                        .map(doc => ({ id: doc.id, ...doc.data() }))
-                        .filter(b => b.deleted !== true);
+                    allBookings = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                     bookingsLoaded = true;
                     updateBookingsBadge();
-                    if (document.getElementById('bookings-list')?.offsetParent) renderBookings();
+                    if (document.getElementById('bookings-board')?.offsetParent) renderBookings();
                 }, (error) => {
                     unsubscribeBookings = null;
                     bookingsLoaded = false;
                     if (!auth.currentUser) return;   // signed out, nothing to report
                     console.warn('Online bookings unavailable:', error);
-                    const list = document.getElementById('bookings-list');
-                    if (list) list.innerHTML = '<p class="empty-state">Online bookings could not be loaded: ' + escapeHTML(error.message) + '</p>';
+                    const board = document.getElementById('bookings-board');
+                    if (board) board.innerHTML = '<p class="empty-state">Online bookings could not be loaded: ' + escapeHTML(error.message) + '</p>';
                 });
         }
 
@@ -3845,8 +3835,13 @@
             allBookings = [];
         }
 
+        // Still waiting on the shop: not removed and not yet a job.
+        function isOpenBooking(b) {
+            return b.deleted !== true && b.status !== 'booked' && !b.linkedRepairId;
+        }
+
         function isNewBooking(b) {
-            return b.status !== 'responded';
+            return isOpenBooking(b) && (!b.status || b.status === 'pending');
         }
 
         function updateBookingsBadge() {
@@ -3857,106 +3852,512 @@
             badge.classList.toggle('hidden', count === 0);
         }
 
-        function formatBookingTime(ts) {
-            const d = ts && typeof ts.toDate === 'function' ? ts.toDate() : null;
+        function bookingDate(ts) {
+            return ts && typeof ts.toDate === 'function' ? ts.toDate() : null;
+        }
+
+        function formatBookingTime(ts, withDate = true) {
+            const d = bookingDate(ts);
             if (!d) return 'Not given';
-            return d.toLocaleString('en-GB', {
-                weekday: 'short', day: 'numeric', month: 'short', year: 'numeric',
-                hour: '2-digit', minute: '2-digit'
+            return d.toLocaleString('en-GB', withDate
+                ? { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }
+                : { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function startOfDay(d) {
+            return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+        }
+
+        /* One column per day the customers asked for, starting today.
+           Today and Tomorrow always show, so the board keeps its shape when
+           they are empty; any other day shows only when something is booked
+           on it. Earlier holds bookings whose day has passed without being
+           booked in, which usually means a no-show or a job someone forgot
+           to book in. */
+        function bookingColumns(bookings) {
+            const today = startOfDay(new Date());
+            const dayMs = 24 * 60 * 60 * 1000;
+            const weekEnd = new Date(today.getTime() + 7 * dayMs);
+            const columns = new Map();
+            const add = (key, label, order, booking, withDate) => {
+                if (!columns.has(key)) columns.set(key, { label, order, withDate, bookings: [] });
+                if (booking) columns.get(key).bookings.push(booking);
+            };
+            add('today', 'Today', 1, null, false);
+            add('tomorrow', 'Tomorrow', 2, null, false);
+
+            bookings.forEach(b => {
+                const d = bookingDate(b.preferredAt);
+                if (!d) return add('undated', 'No time given', 99, b, true);
+                const day = startOfDay(d);
+                const offset = Math.round((day - today) / dayMs);
+                if (day < today) return add('earlier', 'Earlier, not booked in', 0, b, true);
+                if (offset === 0) return add('today', 'Today', 1, b, false);
+                if (offset === 1) return add('tomorrow', 'Tomorrow', 2, b, false);
+                if (day < weekEnd) {
+                    return add('d' + offset, d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' }), 1 + offset, b, false);
+                }
+                return add('later', 'Later', 50, b, true);
             });
+
+            return [...columns.values()]
+                .sort((a, b) => a.order - b.order)
+                .map(col => ({
+                    ...col,
+                    bookings: col.bookings.sort((x, y) =>
+                        (bookingDate(x.preferredAt) || 0) - (bookingDate(y.preferredAt) || 0))
+                }));
         }
 
         function renderBookings() {
-            const list = document.getElementById('bookings-list');
-            if (!list) return;
+            const board = document.getElementById('bookings-board');
+            if (!board) return;
             if (!bookingsLoaded) {
-                if (!list.innerHTML) list.innerHTML = '<p class="empty-state">Loading online bookings…</p>';
+                if (!board.innerHTML.trim()) board.innerHTML = '<p class="empty-state">Loading online bookings…</p>';
                 return;
             }
-            const showReplied = document.getElementById('bookings-show-replied')?.checked;
-            const shown = allBookings.filter(b => showReplied || isNewBooking(b));
-            const newCount = allBookings.filter(isNewBooking).length;
-            document.getElementById('bookings-count').textContent = `(${newCount} new)`;
+            const open = allBookings.filter(isOpenBooking);
+            const newCount = open.filter(isNewBooking).length;
+            document.getElementById('bookings-count').textContent =
+                open.length ? `(${open.length} waiting, ${newCount} new)` : '';
 
-            if (!shown.length) {
-                list.innerHTML = '<p class="empty-state">' + (allBookings.length
-                    ? 'No new bookings. Tick the box above to see the ones already replied to.'
-                    : 'No online bookings yet.') + '</p>';
-                return;
-            }
-
-            list.innerHTML = shown.map(b => {
-                const customer = b.customer || {};
-                const device = b.device || {};
-                const replied = !isNewBooking(b);
-                const deviceText = [device.brand, device.model].filter(Boolean).join(' ')
-                    + (device.category ? ` (${device.category})` : '');
-                const email = String(customer.email || '');
-                const phone = String(customer.phone || '');
-                const photos = Array.isArray(b.photoPaths) ? b.photoPaths : [];
-                return `
-                    <div class="booking-card${replied ? ' is-replied' : ''}">
-                        <div class="booking-card__top">
-                            <div class="booking-card__name">${escapeHTML(customer.name || 'No name')}</div>
-                            <div class="booking-card__status">${replied ? 'Replied' : 'New'}</div>
-                        </div>
-                        <div class="booking-card__facts">
-                            <div><span>Wants to drop off</span>${escapeHTML(formatBookingTime(b.preferredAt))}</div>
-                            <div><span>Device</span>${escapeHTML(deviceText || 'Not given')}</div>
-                            <div><span>Email</span><a href="mailto:${escapeHTML(encodeURIComponent(email))}">${escapeHTML(email)}</a></div>
-                            <div><span>Phone</span><a href="tel:${escapeHTML(phone.replace(/[^0-9+]/g, ''))}">${escapeHTML(phone)}</a></div>
-                            <div><span>Sent</span>${escapeHTML(formatBookingTime(b.createdAt))}</div>
-                        </div>
-                        <div class="booking-card__issue">${escapeHTML(b.issue || '')}</div>
-                        <div class="booking-card__actions">
-                            ${photos.map((path, i) => `<button type="button" class="btn btn-secondary" data-booking-photo="${escapeHTML(path)}"><i class="fas fa-image"></i> Photo ${i + 1}</button>`).join('')}
-                            <button type="button" class="btn ${replied ? 'btn-secondary' : 'btn-primary'}" data-booking-replied="${escapeHTML(b.id)}" data-replied="${replied ? '1' : ''}">
-                                <i class="fas ${replied ? 'fa-rotate-left' : 'fa-check'}"></i> ${replied ? 'Mark as new' : 'Mark replied'}
-                            </button>
-                            <button type="button" class="btn btn-danger" data-booking-remove="${escapeHTML(b.id)}"><i class="fas fa-trash"></i> Remove</button>
-                        </div>
-                    </div>`;
-            }).join('');
+            board.innerHTML = bookingColumns(open).map(col => `
+                <div class="kanban-column">
+                    <div class="kanban-column-header">
+                        <span>${escapeHTML(col.label)}</span>
+                        <span class="kanban-column-count">${col.bookings.length}</span>
+                    </div>
+                    <div class="kanban-cards">
+                        ${col.bookings.map(b => renderBookingCard(b, col.withDate)).join('')}
+                    </div>
+                </div>
+            `).join('');
         }
 
-        document.addEventListener('click', async (e) => {
-            const photoBtn = e.target.closest('[data-booking-photo]');
-            const repliedBtn = e.target.closest('[data-booking-replied]');
-            const removeBtn = e.target.closest('[data-booking-remove]');
-            if (!photoBtn && !repliedBtn && !removeBtn) return;
+        function bookingDeviceText(b) {
+            const device = b.device || {};
+            return [device.brand, device.model].filter(Boolean).join(' ')
+                || BOOKING_CATEGORIES[device.category] || 'Device not given';
+        }
 
-            if (photoBtn) {
-                // Opened in a new tab first, so an iPad does not treat the
-                // later navigation as an unrequested popup.
-                const win = window.open('', '_blank');
-                try {
-                    const url = await storage.ref(photoBtn.dataset.bookingPhoto).getDownloadURL();
-                    if (win) { win.opener = null; win.location.href = url; } else safeOpen(url);
-                } catch (error) {
-                    if (win) win.close();
-                    showAlert('Could not open that photo: ' + error.message, 'error');
-                }
-                return;
-            }
+        function renderBookingCard(b, withDate) {
+            const isNew = isNewBooking(b);
+            const photos = Array.isArray(b.photoPaths) ? b.photoPaths.length : 0;
+            return `
+                <div class="kanban-card${isNew ? ' booking-card--new' : ''}" role="button" tabindex="0"
+                     data-booking-open="${escapeHTML(b.id)}">
+                    <div class="booking-card-time">${escapeHTML(formatBookingTime(b.preferredAt, withDate))}</div>
+                    <div class="kanban-card-customer">${escapeHTML((b.customer && b.customer.name) || 'No name')}</div>
+                    <div class="kanban-card-device">${escapeHTML(bookingDeviceText(b))}</div>
+                    <div class="kanban-card-footer">
+                        <span class="booking-chip${isNew ? ' booking-chip--new' : ''}">${isNew ? 'New' : 'Confirmed'}</span>
+                        ${photos ? `<span class="kanban-card-age"><i class="fas fa-image"></i> ${photos}</span>` : ''}
+                    </div>
+                </div>`;
+        }
 
-            const id = (repliedBtn || removeBtn).dataset.bookingReplied || (removeBtn && removeBtn.dataset.bookingRemove);
-            const booking = allBookings.find(b => b.id === id);
+        document.addEventListener('click', (e) => {
+            const card = e.target.closest('[data-booking-open]');
+            if (card) openBooking(card.dataset.bookingOpen);
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key !== 'Enter' && e.key !== ' ') return;
+            const card = e.target.closest && e.target.closest('[data-booking-open]');
+            if (!card) return;
+            e.preventDefault();
+            openBooking(card.dataset.bookingOpen);
+        });
+
+        // <input type="datetime-local"> wants local time with no zone.
+        function toLocalInputValue(d) {
+            if (!d) return '';
+            const pad = n => String(n).padStart(2, '0');
+            return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+        }
+
+        function openBooking(bookingId) {
+            const booking = allBookings.find(b => b.id === bookingId);
             if (!booking) return;
-            const name = (booking.customer && booking.customer.name) || 'this customer';
+            document.getElementById('booking-modal')?.remove();
+
+            const customer = booking.customer || {};
+            const device = booking.device || {};
+            const parts = String(customer.name || '').trim().split(/\s+/);
+            const first = parts[0] || '';
+            const last = parts.slice(1).join(' ');
+            const isNew = isNewBooking(booking);
+            const email = String(customer.email || '');
+            const phone = String(customer.phone || '');
+            const photos = Array.isArray(booking.photoPaths) ? booking.photoPaths : [];
+            const cost = typeof booking.estimatedCost === 'number' ? booking.estimatedCost : '';
+
+            const modal = document.createElement('div');
+            modal.className = 'modal show';
+            modal.id = 'booking-modal';
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width: 680px;">
+                    <div class="modal-header">
+                        <h2 class="modal-title">Booking: ${escapeHTML(customer.name || 'No name')}</h2>
+                        <button type="button" class="close-btn" data-booking-close>&times;</button>
+                    </div>
+                    <div class="booking-facts">
+                        <div><span>Status</span><span class="booking-chip${isNew ? ' booking-chip--new' : ''}" style="display: inline-block; font-size: 0.75rem; text-transform: none; letter-spacing: 0;">${isNew ? 'New' : 'Confirmed'}</span></div>
+                        <div><span>Sent</span>${escapeHTML(formatBookingTime(booking.createdAt))}</div>
+                        <div><span>Email</span><a href="mailto:${escapeHTML(encodeURIComponent(email))}">${escapeHTML(email || 'None')}</a></div>
+                        <div><span>Phone</span><a href="tel:${escapeHTML(phone.replace(/[^0-9+]/g, ''))}">${escapeHTML(phone || 'None')}</a></div>
+                    </div>
+                    ${photos.length ? `<div class="booking-photos">${photos.map((path, i) =>
+                        `<button type="button" class="btn btn-secondary" data-booking-photo="${escapeHTML(path)}"><i class="fas fa-image"></i> Photo ${i + 1}</button>`).join('')}</div>` : ''}
+                    <form id="booking-edit-form" novalidate>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label" for="bk-first">First name</label>
+                                <input type="text" class="form-input" id="bk-first" maxlength="60" autocomplete="off" autocapitalize="words" value="${escapeHTML(first)}">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="bk-last">Last name</label>
+                                <input type="text" class="form-input" id="bk-last" maxlength="60" autocomplete="off" autocapitalize="words" value="${escapeHTML(last)}">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="bk-email">Email</label>
+                                <input type="email" class="form-input" id="bk-email" maxlength="200" inputmode="email" autocapitalize="off" spellcheck="false" value="${escapeHTML(email)}">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="bk-phone">Mobile number</label>
+                                <input type="tel" class="form-input" id="bk-phone" maxlength="24" inputmode="tel" value="${escapeHTML(phone)}">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="bk-when">Drop-off</label>
+                                <input type="datetime-local" class="form-input" id="bk-when" value="${escapeHTML(toLocalInputValue(bookingDate(booking.preferredAt)))}">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="bk-category">Device type</label>
+                                <select class="form-input" id="bk-category">
+                                    ${Object.entries(BOOKING_CATEGORIES).map(([value, label]) =>
+                                        `<option value="${value}"${device.category === value ? ' selected' : ''}>${label}</option>`).join('')}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="bk-brand">Brand</label>
+                                <input type="text" class="form-input" id="bk-brand" maxlength="50" autocomplete="off" value="${escapeHTML(device.brand || '')}">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="bk-model">Model</label>
+                                <input type="text" class="form-input" id="bk-model" maxlength="100" autocomplete="off" value="${escapeHTML(device.model || '')}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="bk-issue">Fault</label>
+                            <textarea class="form-input form-textarea" id="bk-issue" maxlength="1000">${escapeHTML(booking.issue || '')}</textarea>
+                            <small style="color: var(--text-muted);">Shown to the customer on their tracking page once booked in.</small>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="bk-cost">Estimated price (£, optional)</label>
+                            <input type="number" class="form-input" id="bk-cost" min="0" step="0.01" inputmode="decimal" value="${escapeHTML(cost)}">
+                        </div>
+                        <label class="booking-check">
+                            <input type="checkbox" id="bk-send-email"${isValidEmail(email) ? ' checked' : ''}>
+                            <span>When booking in, email the customer their tracking link (the same email as the Send tracking email button).</span>
+                        </label>
+                        <div class="alert alert-error hidden" id="bk-error" style="margin-bottom: 1rem;"></div>
+                        <div class="modal-actions">
+                            <button type="button" class="btn btn-danger" data-booking-action="remove"><i class="fas fa-trash"></i> Remove</button>
+                            <span class="modal-actions__spacer"></span>
+                            <button type="button" class="btn btn-secondary" data-booking-action="save"><i class="fas fa-save"></i> Save</button>
+                            <button type="button" class="btn btn-secondary" data-booking-action="${isNew ? 'confirm' : 'unconfirm'}">
+                                <i class="fas ${isNew ? 'fa-check' : 'fa-rotate-left'}"></i> ${isNew ? 'Confirm booking' : 'Mark as new'}
+                            </button>
+                            <button type="button" class="btn btn-primary" data-booking-action="book-in"><i class="fas fa-tools"></i> Book in as job</button>
+                        </div>
+                    </form>
+                </div>`;
+            modal.dataset.bookingId = booking.id;
+            document.body.appendChild(modal);
+
+            modal.addEventListener('click', async (e) => {
+                if (e.target === modal || e.target.closest('[data-booking-close]')) { modal.remove(); return; }
+                const photoBtn = e.target.closest('[data-booking-photo]');
+                if (photoBtn) { openBookingPhoto(photoBtn.dataset.bookingPhoto); return; }
+                const actionBtn = e.target.closest('[data-booking-action]');
+                if (!actionBtn || actionBtn.disabled) return;
+                const buttons = modal.querySelectorAll('[data-booking-action]');
+                buttons.forEach(b => { b.disabled = true; });
+                try {
+                    await runBookingAction(booking.id, actionBtn.dataset.bookingAction, modal);
+                } finally {
+                    buttons.forEach(b => { b.disabled = false; });
+                }
+            });
+        }
+
+        async function openBookingPhoto(path) {
+            // Opened first, so an iPad does not treat the later navigation as
+            // an unrequested popup.
+            const win = window.open('', '_blank');
             try {
-                if (repliedBtn) {
-                    const wasReplied = !!repliedBtn.dataset.replied;
-                    await db.collection('bookings').doc(id).update(wasReplied
-                        ? { status: 'pending', respondedAt: null }
-                        : { status: 'responded', respondedAt: firebase.firestore.FieldValue.serverTimestamp() });
-                } else {
-                    if (!confirm(`Remove the booking from ${name}? It will no longer show here.`)) return;
-                    await db.collection('bookings').doc(id).update({ deleted: true });
+                const url = await storage.ref(path).getDownloadURL();
+                if (win) { win.opener = null; win.location.href = url; } else safeOpen(url);
+            } catch (error) {
+                if (win) win.close();
+                showAlert('Could not open that photo: ' + error.message, 'error');
+            }
+        }
+
+        // What the form says now, checked. Returns null (and shows why) when
+        // it is not good enough to save.
+        function readBookingForm(modal, forBookIn) {
+            const val = id => modal.querySelector('#' + id).value.trim();
+            const err = modal.querySelector('#bk-error');
+            const fail = (msg) => { err.textContent = msg; err.classList.remove('hidden'); return null; };
+
+            const firstName = val('bk-first');
+            const lastName = val('bk-last');
+            const email = val('bk-email');
+            const phone = val('bk-phone');
+            const when = val('bk-when');
+            const category = val('bk-category');
+            const brand = val('bk-brand');
+            const model = val('bk-model');
+            const issue = val('bk-issue');
+            const costRaw = val('bk-cost');
+
+            if (!firstName) return fail('A first name is needed.');
+            if (email && !isValidEmail(email)) return fail('That email address does not look right.');
+            if (!email && !phone) return fail('Give at least an email address or a mobile number.');
+            const preferredAt = when ? new Date(when) : null;
+            if (when && isNaN(preferredAt)) return fail('That drop-off time does not look right.');
+            if (!BOOKING_CATEGORIES[category]) return fail('Pick a device type.');
+            if (forBookIn && !issue) return fail('Describe the fault before booking in. The customer sees it on their tracking page.');
+            let estimatedCost = null;
+            if (costRaw) {
+                estimatedCost = Math.round(parseFloat(costRaw) * 100) / 100;
+                if (!isFinite(estimatedCost) || estimatedCost < 0) return fail('The estimated price should be a number, like 49.99.');
+            }
+            err.classList.add('hidden');
+
+            return {
+                firstName, lastName, email, phone, category, brand, model, issue, estimatedCost, preferredAt,
+                customerName: (firstName + ' ' + lastName).trim()
+            };
+        }
+
+        // The form's edits, in the booking's own shape.
+        function bookingEdits(form) {
+            const edits = {
+                customer: { name: form.customerName, email: form.email, phone: form.phone },
+                device: { category: form.category, brand: form.brand, model: form.model },
+                issue: form.issue,
+                estimatedCost: form.estimatedCost,
+                updatedAt: firebase.firestore.Timestamp.now(),
+                updatedBy: currentUser ? currentUser.email : 'unknown'
+            };
+            if (form.preferredAt) edits.preferredAt = firebase.firestore.Timestamp.fromDate(form.preferredAt);
+            return edits;
+        }
+
+        async function runBookingAction(bookingId, action, modal) {
+            const booking = allBookings.find(b => b.id === bookingId);
+            if (!booking) { modal.remove(); return; }
+            const ref = db.collection('bookings').doc(bookingId);
+            const name = (booking.customer && booking.customer.name) || 'this customer';
+
+            try {
+                if (action === 'remove') {
+                    if (!confirm(`Remove the booking from ${name}? It leaves the board and cannot be booked in afterwards.`)) return;
+                    await ref.update({ deleted: true, deletedAt: firebase.firestore.Timestamp.now() });
+                    modal.remove();
+                    showAlert('Booking removed.', 'success');
+                    return;
+                }
+
+                const form = readBookingForm(modal, action === 'book-in');
+                if (!form) return;
+
+                if (action === 'save') {
+                    await ref.update(bookingEdits(form));
+                    modal.remove();
+                    showAlert('Booking saved.', 'success');
+                } else if (action === 'confirm') {
+                    await ref.update({ ...bookingEdits(form), status: 'confirmed', confirmedAt: firebase.firestore.Timestamp.now() });
+                    modal.remove();
+                    showAlert('Booking confirmed. Nothing is sent to the customer; reply to their email or call them.', 'success');
+                } else if (action === 'unconfirm') {
+                    await ref.update({ ...bookingEdits(form), status: 'pending', confirmedAt: null });
+                    modal.remove();
+                } else if (action === 'book-in') {
+                    const sendEmail = modal.querySelector('#bk-send-email').checked;
+                    const device = [form.brand, form.model].filter(Boolean).join(' ') || BOOKING_CATEGORIES[form.category];
+                    if (!confirm(`Book in ${form.customerName}'s ${device} as a job? It goes on the jobs board as Received.`)) return;
+                    const repair = await bookInBooking(booking, form);
+                    modal.remove();
+                    if (!sendEmail) {
+                        showAlert(`Booked in as ${repair.repairId}. It is on the jobs board.`, 'success');
+                    } else {
+                        if (!isValidEmail(form.email)) {
+                            showAlert(`Booked in as ${repair.repairId}. No valid email address, so no tracking email was sent.`, 'info');
+                        } else {
+                            try {
+                                await queueTrackingEmail(repair, form.email);
+                                showAlert(`Booked in as ${repair.repairId}, and the tracking email is queued to ${form.email}.`, 'success');
+                            } catch (error) {
+                                showAlert(`Booked in as ${repair.repairId}, but the tracking email could not be queued: ${error.message}. Use Send tracking email on the job.`, 'error');
+                            }
+                        }
+                    }
                 }
             } catch (error) {
-                showAlert('Could not update that booking: ' + error.message, 'error');
+                const err = modal.isConnected && modal.querySelector('#bk-error');
+                if (err) {
+                    err.textContent = 'Could not save: ' + error.message;
+                    err.classList.remove('hidden');
+                } else {
+                    showAlert('Could not update that booking: ' + error.message, 'error');
+                }
             }
-        });
+        }
+
+        function randomHex(bytes) {
+            const buf = new Uint8Array(bytes);
+            crypto.getRandomValues(buf);
+            return Array.from(buf, b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        // Same shape and strength as the intake page's codes (see
+        // newRepairId in new-repair/intake.js): the code is all that guards
+        // the customer's tracking page.
+        function newRepairCode() {
+            return 'REP_' + randomHex(8).toUpperCase();
+        }
+
+        // Mirrors deviceTypeFor in new-repair/intake.js.
+        function deviceTypeFor(category, brand) {
+            const b = String(brand || '').toLowerCase();
+            const isApple = b.indexOf('apple') !== -1;
+            switch (category) {
+                case 'phone': return isApple ? 'iPhone' : (b.indexOf('samsung') !== -1 ? 'Samsung' : 'Android');
+                case 'tablet': return isApple ? 'iPad' : 'Tablet';
+                case 'laptop': return isApple ? 'MacBook' : 'Laptop';
+                case 'desktop': return 'Desktop';
+                case 'console': return 'Gaming Console';
+                default: return 'Device';
+            }
+        }
+
+        // Mirrors normalisePhone in new-repair/intake.js, so a customer booked
+        // in here is recognised when they next come through the iPad.
+        function normalisePhone(raw) {
+            let digits = String(raw || '').replace(/[^\d+]/g, '');
+            if (!digits) return '';
+            if (digits.indexOf('+') === 0) return '+' + digits.slice(1).replace(/\D/g, '');
+            digits = digits.replace(/\D/g, '');
+            if (digits.indexOf('44') === 0 && digits.length >= 11) return '+' + digits;
+            if (digits.indexOf('0') === 0) return '+44' + digits.slice(1);
+            return '+' + digits;
+        }
+
+        /* Turns a booking into a job, shaped like one from the iPad intake
+           (new-repair/intake.js) so every screen that reads jobs treats it
+           the same. What differs: no signed drop-off agreement and no unlock
+           code or condition notes, because none were taken; intakeChannel
+           says where it came from; and the booking's photos stay where they
+           are, private, rather than joining the job's photos, which the
+           tracking page shows.
+
+           The progress entry has no note on purpose: notes appear word for
+           word on the customer's tracking page.
+
+           The job and the booking's "booked" mark are written together, so
+           a booking can never become two jobs. The tracking page copy is
+           published by the dashboard's own sync as soon as the job appears. */
+        async function bookInBooking(booking, form) {
+            const now = firebase.firestore.Timestamp.now();
+            const by = currentUser ? currentUser.email : 'unknown';
+            const repairRef = db.collection('repairs').doc();
+            const bookingRef = db.collection('bookings').doc(booking.id);
+            const repair = {
+                repairId: newRepairCode(),
+                customerName: form.customerName,
+                firstName: form.firstName,
+                lastName: form.lastName,
+                customerEmail: form.email,
+                customerPhone: form.phone,
+                device: [form.brand, form.model].filter(Boolean).join(' ') || BOOKING_CATEGORIES[form.category],
+                brand: form.brand,
+                model: form.model,
+                deviceType: deviceTypeFor(form.category, form.brand),
+                issueDescription: form.issue,
+                estimatedCost: form.estimatedCost,
+                currentStatus: 'received',
+                dateReceived: now,
+                photos: [],
+                createdBy: by,
+                createdAt: now,
+                progress: [{ status: 'received', timestamp: now, notes: '', technician: by }],
+                intakeChannel: 'online-booking',
+                deviceCategory: form.category,
+                bookingId: booking.id,
+                bookingPhotoPaths: Array.isArray(booking.photoPaths) ? booking.photoPaths : [],
+                customerId: ''
+            };
+
+            await db.runTransaction(async (tx) => {
+                const fresh = await tx.get(bookingRef);
+                const data = fresh.exists ? fresh.data() : null;
+                if (!data || data.deleted === true) throw new Error('this booking has been removed.');
+                if (data.status === 'booked' || data.linkedRepairId) throw new Error('this booking is already booked in.');
+                tx.set(repairRef, repair);
+                tx.update(bookingRef, {
+                    ...bookingEdits(form),
+                    status: 'booked',
+                    linkedRepairId: repairRef.id,
+                    repairCode: repair.repairId,
+                    bookedInAt: now,
+                    bookedInBy: by
+                });
+            });
+
+            // Customer directory, as the intake page keeps it. Non-fatal: the
+            // job is already safe.
+            try {
+                const customerId = await upsertBookedCustomer(form, repair.repairId);
+                if (customerId) await repairRef.update({ customerId });
+            } catch (error) {
+                console.warn('Customer record not updated:', error);
+            }
+
+            return { id: repairRef.id, ...repair };
+        }
+
+        async function upsertBookedCustomer(form, repairCode) {
+            const payload = {
+                firstName: form.firstName,
+                lastName: form.lastName,
+                fullName: form.customerName,
+                email: form.email,
+                emailLower: form.email.toLowerCase(),
+                phone: form.phone,
+                phoneE164: normalisePhone(form.phone),
+                updatedAt: firebase.firestore.Timestamp.now(),
+                lastRepairId: repairCode,
+                repairIds: firebase.firestore.FieldValue.arrayUnion(repairCode),
+                repairCount: firebase.firestore.FieldValue.increment(1)
+            };
+            let match = null;
+            if (payload.emailLower) {
+                match = await db.collection('customers').where('emailLower', '==', payload.emailLower).limit(1).get();
+            }
+            if ((!match || match.empty) && payload.phoneE164) {
+                match = await db.collection('customers').where('phoneE164', '==', payload.phoneE164).limit(1).get();
+            }
+            if (match && !match.empty) {
+                const id = match.docs[0].id;
+                await db.collection('customers').doc(id).set(payload, { merge: true });
+                return id;
+            }
+            const id = 'CUS_' + randomHex(12).toUpperCase();
+            await db.collection('customers').doc(id).set({ ...payload, marketingOptIn: false, createdAt: firebase.firestore.Timestamp.now() });
+            return id;
+        }
 
         // === CUSTOMER TRACKING PAGES ===
         // The customer's tracking page never reads a ticket. It reads the
@@ -4590,6 +4991,23 @@
                 btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Sending…</span>';
             }
 
+            try {
+                await queueTrackingEmail(repair, email);
+                showAlert('Tracking email queued to ' + email, 'success');
+            } catch (error) {
+                showAlert('Could not queue the email: ' + error.message, 'error');
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = original;
+                }
+            }
+        }
+
+        // The tracking-link email itself. Shared by the Send tracking email
+        // button and by booking in an online booking, so both send the same
+        // wording.
+        function queueTrackingEmail(repair, email) {
             const trackUrl = `${window.location.origin}/track/?id=${encodeURIComponent(repair.repairId)}`;
             const device = [repair.brand, repair.model].filter(Boolean).join(' ') || repair.deviceType || 'your device';
             const greeting = repair.firstName || repair.customerName || 'there';
@@ -4618,31 +5036,21 @@
                 'Track your repair: ' + trackUrl + '\n\n' +
                 'OnlineFix · ' + SHOP_ADDRESS + '\n' + SHOP_PHONE + ' · ' + SHOP_EMAIL + '\n';
 
-            try {
-                await db.collection('mail').add({
-                    to: [email],
-                    replyTo: SHOP_EMAIL,
-                    message: {
-                        subject: 'Your repair tracking link — ' + repair.repairId,
-                        text: text,
-                        html: html
-                    },
-                    meta: {
-                        kind: 'tracking-link-resend',
-                        repairId: repair.repairId,
-                        sentBy: currentUser ? currentUser.email : 'unknown',
-                        createdAt: firebase.firestore.Timestamp.now()
-                    }
-                });
-                showAlert('Tracking email queued to ' + email, 'success');
-            } catch (error) {
-                showAlert('Could not queue the email: ' + error.message, 'error');
-            } finally {
-                if (btn) {
-                    btn.disabled = false;
-                    btn.innerHTML = original;
+            return db.collection('mail').add({
+                to: [email],
+                replyTo: SHOP_EMAIL,
+                message: {
+                    subject: 'Your repair tracking link — ' + repair.repairId,
+                    text: text,
+                    html: html
+                },
+                meta: {
+                    kind: 'tracking-link-resend',
+                    repairId: repair.repairId,
+                    sentBy: currentUser ? currentUser.email : 'unknown',
+                    createdAt: firebase.firestore.Timestamp.now()
                 }
-            }
+            });
         }
 
         // Edit repair - show status update modal

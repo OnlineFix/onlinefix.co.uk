@@ -139,12 +139,46 @@ service cloud.firestore {
     }
 
     // Mail collection consumed by the "Trigger Email from Firestore"
-    // extension. The extension uses the Admin SDK and bypasses rules
-    // entirely; these rules just keep direct client access locked down.
-    // The Cloud Function that fires on bookings/{id} create also writes
-    // here via Admin SDK so it is unaffected by these rules.
+    // extension, which sends every document that lands here. The extension
+    // uses the Admin SDK and bypasses rules entirely; these rules decide who
+    // may queue a message.
+    //
+    // (This comment used to mention a Cloud Function that emails the shop
+    // when a booking arrives. There is none, which is why online bookings
+    // went unseen until the booking page queued its own notice, below.)
     match /mail/{mailId} {
       allow read, write: if isAdmin();
+
+      // The booking page's notice to the shop. Anyone can send a booking, so
+      // this is the one place a visitor can queue mail, and it is held to:
+      //   - the shop's own inbox only, so the site can never be used to
+      //     send mail to anyone else;
+      //   - exactly one notice per booking, written in the same batch as
+      //     that booking: the notice takes the booking's id, which must be
+      //     new before the batch and hold a booking with that tempId after
+      //     it;
+      //   - plain text only, with no html, attachments or extra headers
+      //     (the extension would fetch an attachment's URL itself);
+      //   - Reply-To set to the address on that booking, so replying in the
+      //     inbox answers the customer.
+      function isBookingNotice() {
+        let m = request.resource.data;
+        let booking = getAfter(/databases/$(database)/documents/bookings/$(mailId)).data;
+        return mailId.matches('BK_[0-9A-F]{32}')
+          && !exists(/databases/$(database)/documents/bookings/$(mailId))
+          && booking.tempId == mailId
+          && m.keys().hasOnly(['to', 'replyTo', 'message', 'meta'])
+          && m.to == ['hello@onlinefix.uk']
+          && m.replyTo == booking.customer.email
+          && m.message.keys().hasOnly(['subject', 'text'])
+          && m.message.subject is string && m.message.subject.size() < 200
+          && m.message.text is string && m.message.text.size() < 4000
+          && m.meta.keys().hasOnly(['kind', 'bookingId'])
+          && m.meta.kind == 'booking-request'
+          && m.meta.bookingId == mailId;
+      }
+
+      allow create: if isBookingNotice();
     }
 
     // Block everything else
