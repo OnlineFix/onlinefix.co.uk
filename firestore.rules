@@ -5,12 +5,21 @@ service cloud.firestore {
     // Admin access is granted via a custom claim (admin == true) set with the
     // Firebase Admin SDK, with the email allow-list kept as a transitional
     // fallback. Once the custom claim is provisioned on the admin account,
-    // remove the email branch so admin status no longer depends on a
-    // user-controllable token field.
+    // delete the email branch entirely — the dashboard's "admin access" line
+    // says when that is safe to do.
+    //
+    // The fallback now also requires a verified address. Firebase can be
+    // configured to allow several accounts on one email address, and a token's
+    // `email` is whatever the account was registered with, verified or not. On
+    // its own the address was therefore enough to become an admin: sign up
+    // with it, never confirm it, and the branch below matched. Requiring
+    // email_verified closes that, because the real mailbox is needed to
+    // confirm the address.
     function isAdmin() {
       return request.auth != null
         && (request.auth.token.admin == true
-            || request.auth.token.email in ['onlinerepairbooking@gmail.com']);
+            || (request.auth.token.email in ['onlinerepairbooking@gmail.com']
+                && request.auth.token.email_verified == true));
     }
 
     match /repairs/{repairDoc} {
@@ -20,37 +29,76 @@ service cloud.firestore {
                     && request.resource.data.keys().hasAll(['repairId', 'customerName', 'device', 'issueDescription', 'currentStatus'])
                     && request.resource.data.currentStatus == 'received';
 
-      // READ: Admins can read everything
+      // READ: staff only, and nothing else reads tickets.
+      //
+      // The tracking page used to query this collection directly, under
+      // "allow list: if request.query.limit <= 1". Rules cannot see a
+      // query's filter values, so that rule also passed a query with no
+      // filter at all: limit(1) plus startAfter() walked every ticket, one
+      // per request, with no code needed, and handed over phone numbers,
+      // emails, addresses, unlock codes and signature links. The tracking
+      // page now reads its own copy at /tracking/{code}, below.
       allow read: if isAdmin();
-
-      // Public tracking page: anonymous lookup by repairId. Firestore
-      // security rules cannot inspect query filter values (request.query
-      // only exposes limit, offset, orderBy), so we cannot require the
-      // filter be on the repairId field. Rate-limiting is enforced via
-      // request.query.limit <= 1 — an attacker has to make one query per
-      // doc to enumerate, and the security boundary is the unguessable
-      // 128-bit repairId generated in new-repair/index.html.
-      allow list: if request.query.limit <= 1;
 
       // UPDATE/DELETE: Only admins
       allow update, delete: if isAdmin();
     }
 
+    // Public tracking copies: one per repair, stored under the repair's own
+    // code (REP_...) and holding only what the customer's tracking page
+    // shows. Published by the intake page and kept in step by the
+    // dashboard, both through new-repair/tracking-copy.js.
+    //
+    // get, never list: a visitor can open the copy for a code they already
+    // hold, but cannot ask which codes exist. The key list mirrors FIELDS in
+    // tracking-copy.js, and any other key is refused, so contact details or
+    // an unlock code cannot be published here by mistake.
+    match /tracking/{code} {
+      allow get: if true;
+      allow list: if isAdmin();
+      allow create, update: if isAdmin()
+                            && request.resource.data.repairId == code
+                            && request.resource.data.keys().hasOnly([
+                                 'repairId', 'device', 'deviceType', 'brand', 'model',
+                                 'issueDescription', 'customerName', 'currentStatus',
+                                 'dateReceived', 'estimatedCompletion', 'estimatedCost',
+                                 'price', 'photos', 'progress'
+                               ]);
+      allow delete: if isAdmin();
+    }
+
     // Public booking requests. Anyone can submit one (the page is the
     // public-facing /book/ form), but reads and mutations are admin-only.
-    // App Check + the validation below are the only things between the
-    // open create endpoint and the database.
+    //
+    // This is the site's only endpoint that writes without signing in, so the
+    // validation below is the whole boundary. App Check is NOT active on
+    // /book/ — the page deliberately does not load it (see the comment in
+    // book/index.html), so a rule written as though App Check were enforcing
+    // anything would be describing a control that is not there.
+    //
+    // hasOnly is the important line. Listing the fields a booking may carry
+    // is not the same as listing the fields it must have: without hasOnly the
+    // shape checks all passed while arbitrary extra keys rode along beside
+    // them, so a booking could be padded out to Firestore's 1 MB document
+    // limit with anything at all.
     match /bookings/{bookingId} {
 
       function isValidBookingCreate() {
         let d = request.resource.data;
-        return d.status == 'pending'
+        return d.keys().hasOnly([
+               'createdAt', 'status', 'respondedAt', 'linkedRepairId',
+               'adminNotes', 'deleted', 'tempId', 'customer', 'device',
+               'issue', 'preferredAt', 'photos', 'photoPaths'
+             ])
+          && d.customer.keys().hasOnly(['name', 'email', 'phone'])
+          && d.device.keys().hasOnly(['category', 'brand', 'model'])
+          && d.status == 'pending'
           && d.createdAt == request.time
           && d.respondedAt == null
           && d.linkedRepairId == null
           && d.adminNotes == ''
           && d.deleted == false
-          && d.tempId is string && d.tempId.size() > 0 && d.tempId.size() < 100
+          && d.tempId is string && d.tempId.matches('BK_[0-9A-F]{32}')
           && d.customer.name is string && d.customer.name.size() > 0 && d.customer.name.size() < 100
           && d.customer.email is string && d.customer.email.matches('.*@.*\\..*') && d.customer.email.size() < 200
           && d.customer.phone is string && d.customer.phone.size() > 5 && d.customer.phone.size() < 30
@@ -59,7 +107,14 @@ service cloud.firestore {
           && d.device.model is string && d.device.model.size() < 100
           && d.issue is string && d.issue.size() > 0 && d.issue.size() < 1000
           && d.preferredAt is timestamp
-          && d.photos is list && d.photos.size() <= 3
+          // Rules cannot look inside a list, so neither of these can be
+          // checked element by element. photos is therefore required to be
+          // empty: the booking page no longer puts download links in it (it
+          // could not read them back anyway — booking photos are admin-read
+          // only, by design), and only the paths are kept. photoPaths stays
+          // bounded, and the Storage rule constrains what may exist at those
+          // paths.
+          && d.photos is list && d.photos.size() == 0
           && d.photoPaths is list && d.photoPaths.size() <= 3;
       }
 

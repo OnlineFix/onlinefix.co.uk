@@ -23,6 +23,7 @@
     <!-- One label design, shared with /new-repair/label.html -->
     <link rel="stylesheet" href="/new-repair/label.css?v=20260910b">
     <script src="/new-repair/label-render.js?v=20260910b"></script>
+    <script src="/new-repair/tracking-copy.js?v=20260922"></script>
     <style>
         * {
             margin: 0;
@@ -502,6 +503,9 @@
         }
 
         .photo-item-small img {
+            /* Block, or the image sits on a text baseline and leaves a 10px
+               strip under it - which is where the upload bar would land. */
+            display: block;
             width: 100%;
             height: 80px;
             object-fit: cover;
@@ -520,6 +524,126 @@
             cursor: pointer;
             font-size: 0.7rem;
             backdrop-filter: blur(4px);
+        }
+
+        /* Upload state on each Update Repair thumbnail. Photos only go up
+           when the form is saved, so until then a tile has no state; after
+           that it dims while it waits or uploads, fills a bar along its
+           bottom edge, and ends with a tick or a red "Failed". */
+        .photo-item-small[data-state="queued"] img,
+        .photo-item-small[data-state="uploading"] img {
+            opacity: 0.5;
+        }
+
+        .photo-item-small[data-state="failed"] {
+            border-color: var(--danger);
+        }
+
+        .photo-progress-small {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 4px;
+            background: rgba(0, 0, 0, 0.45);
+            display: none;
+        }
+
+        .photo-item-small[data-state="uploading"] .photo-progress-small {
+            display: block;
+        }
+
+        .photo-progress-small > span {
+            display: block;
+            height: 100%;
+            width: calc(var(--upload-progress, 0) * 100%);
+            background: var(--accent-cyan);
+            transition: width 0.2s linear;
+        }
+
+        .photo-state-small {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            padding: 0.15rem 0.5rem;
+            border-radius: 999px;
+            background: rgba(0, 0, 0, 0.65);
+            color: var(--white);
+            font-size: 0.75rem;
+            font-weight: 600;
+            white-space: nowrap;
+            pointer-events: none;
+        }
+
+        .photo-state-small:empty {
+            display: none;
+        }
+
+        .photo-item-small[data-state="done"] .photo-state-small {
+            background: var(--success);
+        }
+
+        .photo-item-small[data-state="failed"] .photo-state-small {
+            background: var(--danger);
+        }
+
+        /* While the form saves, nothing in it can be changed. */
+        .modal[data-busy] .photo-remove-small {
+            display: none;
+        }
+
+        /* The other buttons are disabled then too, and should look it, or a
+           tap on Cancel appears to do nothing. Update Repair itself is left
+           bright: it is the one saying "Saving…". */
+        .modal[data-busy] .btn:disabled:not([type="submit"]) {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .modal[data-busy] .photo-upload-small {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        /* The bar beside Update Repair. It sits by the buttons because that
+           is where the eye is after tapping one - on a phone the thumbnails
+           are well out of view above it. */
+        .upload-progress {
+            margin-top: 1.5rem;
+        }
+
+        .upload-progress[hidden] {
+            display: none;
+        }
+
+        .upload-progress__label {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 0.4rem;
+        }
+
+        .upload-progress__pct {
+            color: var(--text-main);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .upload-progress__track {
+            height: 8px;
+            border-radius: 999px;
+            background: var(--bg-base);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .upload-progress__fill {
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, var(--primary-blue), var(--accent-cyan));
+            transition: width 0.2s linear;
         }
 
         /* Template selector */
@@ -2787,6 +2911,10 @@
             <div class="sidebar-header">
                 <div class="logo">OnlineFix</div>
                 <div class="user-info" id="user-email">Admin Dashboard</div>
+                <!-- Says how this account is being recognised as staff, so
+                     the email fallback in the rules can be retired knowingly
+                     rather than by guessing. See checkAdminAccess(). -->
+                <div class="user-info" id="admin-access-note" style="font-size: 0.7rem; opacity: 0.75; margin-top: 0.25rem;"></div>
             </div>
             <nav class="sidebar-nav">
                 <div class="nav-item">
@@ -3218,19 +3346,91 @@
         };
 
         // Authentication state observer
-        auth.onAuthStateChanged((user) => {
+        // The addresses the rules treat as staff. Keep in step with isAdmin()
+        // in firestore.rules and storage.rules.
+        const ADMIN_EMAILS = ['onlinerepairbooking@gmail.com'];
+
+        /* Is this account staff?
+
+           Signing in is not the same as being staff: anyone with an account on
+           the Firebase project could sign in, and the dashboard used to open
+           for them. The rules refused every read, so the screen came up empty
+           rather than leaking anything, but an empty dashboard is not an
+           answer to "should you be here".
+
+           Deliberately one notch looser than the rules: it admits the
+           allow-listed address whether or not it has been verified, where the
+           tightened rules require verification. Matching the rules exactly
+           would lock the shop out of its own dashboard the moment this ships,
+           before anyone had a chance to check which way the account is
+           recognised. So the page still opens for an unverified address, and
+           says plainly that it would not survive the tightened rules. */
+        function describeAdminAccess(token) {
+            if (token.claims.admin === true) return { allowed: true, state: 'claim' };
+            if (ADMIN_EMAILS.indexOf(token.claims.email) !== -1) {
+                return {
+                    allowed: true,
+                    state: token.claims.email_verified === true ? 'email-verified' : 'email-unverified'
+                };
+            }
+            return { allowed: false, state: 'none' };
+        }
+
+        async function checkAdminAccess(user) {
+            // Force a refresh so a claim granted since the last sign-in counts.
+            const token = await user.getIdTokenResult(true);
+            return describeAdminAccess(token);
+        }
+
+        auth.onAuthStateChanged(async (user) => {
             // Hide loading splash once Firebase has resolved persisted session.
             const splash = document.getElementById('auth-loading');
             if (splash) splash.style.display = 'none';
 
-            if (user) {
-                currentUser = user;
-                document.getElementById('user-email').textContent = user.email;
-                showDashboard();
-                loadDashboardData();
-            } else {
+            if (!user) {
+                stopListening();
                 showLogin();
+                return;
             }
+
+            let access;
+            try {
+                access = await checkAdminAccess(user);
+            } catch (error) {
+                // Never lock the dashboard out on a network hiccup: the rules
+                // are the real boundary and they are still enforcing.
+                console.warn('Could not read admin claims:', error);
+                access = { allowed: true, state: 'unknown' };
+            }
+
+            if (!access.allowed) {
+                stopListening();
+                showLogin();
+                showLoginError('This account does not have access to the dashboard.');
+                auth.signOut();
+                return;
+            }
+
+            currentUser = user;
+            document.getElementById('user-email').textContent = user.email;
+
+            /* Which of the two tests is carrying this account. Read this
+               before publishing tightened rules: "email, not confirmed" is
+               the one that would lose access. */
+            const NOTES = {
+                'claim': 'Admin access: security claim. Safe to remove the email fallback.',
+                'email-verified': 'Admin access: confirmed email. Works, but a security claim is better.',
+                'email-unverified': 'Admin access: email, NOT confirmed. Fix this before tightening the rules.',
+                'unknown': 'Admin access: could not be checked just now.'
+            };
+            const note = document.getElementById('admin-access-note');
+            if (note) {
+                note.textContent = NOTES[access.state] || NOTES.unknown;
+                note.style.color = access.state === 'email-unverified' ? '#F87171' : '';
+            }
+
+            showDashboard();
+            loadDashboardData();
         });
 
         // Login form submission
@@ -3295,7 +3495,21 @@
 
         // Logout
         function logout() {
+            stopListening();
             auth.signOut();
+        }
+
+        // The live listeners are refused the moment the account signs out,
+        // which showed "Error loading data" on every sign-out, so they stop
+        // first. The job list they filled is now out of date, and the
+        // tracking sync must not publish from it after the next sign-in:
+        // a job deleted on another device meanwhile would get its tracking
+        // page back.
+        function stopListening() {
+            stopTrackingSync();
+            if (unsubscribeRepairs) unsubscribeRepairs();
+            unsubscribeRepairs = null;
+            repairsLoaded = false;
         }
 
         // Navigation
@@ -3340,6 +3554,7 @@
 
         // Real-time dashboard data with Firestore onSnapshot
         let unsubscribeRepairs = null;
+        let repairsLoaded = false;
 
         function loadDashboardData() {
             document.getElementById('loading').style.display = 'block';
@@ -3353,6 +3568,7 @@
                     id: doc.id,
                     ...doc.data()
                 }));
+                repairsLoaded = true;
 
                 // Update everything
                 updateStats();
@@ -3365,11 +3581,194 @@
                 }
 
                 document.getElementById('loading').style.display = 'none';
+
+                syncTrackingCopies();
+                clearFinishedUnlockCodes();
             }, (error) => {
-                console.error('Error listening to repairs:', error);
+                unsubscribeRepairs = null;
+                repairsLoaded = false;
                 document.getElementById('loading').style.display = 'none';
+                if (!auth.currentUser) return;   // signed out, nothing to report
+                console.error('Error listening to repairs:', error);
                 showAlert('Error loading data: ' + error.message, 'error');
             });
+
+            if (!window.OnlineFixTracking) {
+                showAlert('Tracking page script did not load — reload the page', 'error');
+            } else if (!unsubscribeTracking) {
+                startTrackingSync();
+            }
+        }
+
+        // === CUSTOMER TRACKING PAGES ===
+        // The customer's tracking page never reads a ticket. It reads the
+        // job's copy at tracking/{code}, which holds only what that page
+        // shows (new-repair/tracking-copy.js has the list and the reasons).
+        // This keeps every copy in step with its ticket: whenever a ticket or
+        // a copy changes, any copy that no longer matches its ticket is written
+        // again. So every route that changes a ticket - Update Repair, the
+        // board, bulk changes, deleting a status entry, an edit made in the
+        // Firebase console - reaches the customer without each one having to
+        // remember to publish, and a job booked in while no dashboard was open
+        // gets its copy as soon as one is.
+        //
+        // It never deletes a copy. A copy with no ticket to match is left
+        // alone, because a dashboard that had loaded only some tickets would
+        // otherwise take down live tracking links. deleteRepair removes the
+        // copy of the job it deletes.
+        let unsubscribeTracking = null;
+        let trackingCopies = null;     // code -> copy, as last read
+        let trackingRetryTimer = null;
+        let trackingSyncBusy = false;
+        let trackingSyncAgain = false;
+        let trackingSyncRuns = 0;
+        let trackingRulesNoticeShown = false;
+        let trackingWriteNoticeShown = false;
+        // code -> fingerprint of the copy this page last sent. A write the
+        // server refuses is rolled back locally, which fires the listener
+        // again; without this the same refused write would go straight back out.
+        const trackingSent = new Map();
+
+        function startTrackingSync() {
+            clearTimeout(trackingRetryTimer);
+            if (unsubscribeTracking) unsubscribeTracking();
+            trackingCopies = null;
+            unsubscribeTracking = db.collection(OnlineFixTracking.COLLECTION).onSnapshot((snapshot) => {
+                trackingCopies = new Map(snapshot.docs.map(doc => [doc.id, doc.data()]));
+                syncTrackingCopies();
+            }, (error) => {
+                unsubscribeTracking = null;
+                trackingCopies = null;
+                if (!auth.currentUser) return;   // signed out, nothing to report
+                console.warn('Tracking copies unavailable:', error);
+                if (!trackingRulesNoticeShown) {
+                    trackingRulesNoticeShown = true;
+                    showAlert(error.code === 'permission-denied'
+                        ? 'Customer tracking pages are waiting for the new database rules to be published.'
+                        : 'Could not load customer tracking pages: ' + error.message, 'info');
+                }
+                // The rules could be published at any moment, so look again.
+                trackingRetryTimer = setTimeout(startTrackingSync, 60000);
+            });
+        }
+
+        function stopTrackingSync() {
+            clearTimeout(trackingRetryTimer);
+            if (unsubscribeTracking) unsubscribeTracking();
+            unsubscribeTracking = null;
+            trackingCopies = null;
+        }
+
+        // One copy per code, wherever the copy on file differs from what the
+        // ticket says now.
+        function trackingWritesNeeded() {
+            // Should two tickets ever share a code, publish the one the old
+            // lookup showed: the lowest document id.
+            const byCode = new Map();
+            allRepairs.forEach(repair => {
+                if (!OnlineFixTracking.isCode(repair.repairId)) return;
+                const seen = byCode.get(repair.repairId);
+                if (!seen || repair.id < seen.id) byCode.set(repair.repairId, repair);
+            });
+
+            const writes = [];
+            byCode.forEach((repair, code) => {
+                const view = OnlineFixTracking.publicView(repair);
+                const print = OnlineFixTracking.fingerprint(view);
+                const onFile = trackingCopies.get(code);
+                if (onFile && OnlineFixTracking.fingerprint(onFile) === print) return;
+                if (trackingSent.get(code) === print) return;
+                writes.push({ code, view, print });
+            });
+            return writes;
+        }
+
+        async function syncTrackingCopies() {
+            if (!repairsLoaded || !trackingCopies) return;
+            if (trackingSyncBusy) { trackingSyncAgain = true; return; }
+            trackingSyncBusy = true;
+            const firstRun = trackingSyncRuns++ === 0;
+            try {
+                const writes = trackingWritesNeeded();
+                if (writes.length === 0) return;
+
+                writes.forEach(w => trackingSent.set(w.code, w.print));
+                const results = await Promise.allSettled(writes.map(w =>
+                    db.collection(OnlineFixTracking.COLLECTION).doc(w.code).set(w.view)));
+
+                const failed = writes.filter((w, i) => results[i].status === 'rejected');
+                const written = writes.length - failed.length;
+                if (firstRun && written > 0) {
+                    showAlert(`Tracking pages updated for ${written} job${written === 1 ? '' : 's'}`, 'success');
+                }
+                if (failed.length > 0) {
+                    console.error('Tracking copies not written:', failed.map(w => w.code),
+                        results.find(r => r.status === 'rejected').reason);
+                    if (!trackingWriteNoticeShown) {
+                        trackingWriteNoticeShown = true;
+                        showAlert(`Could not update ${failed.length} customer tracking page${failed.length === 1 ? '' : 's'}. Trying again in a minute.`, 'error');
+                    }
+                    setTimeout(() => {
+                        failed.forEach(w => {
+                            if (trackingSent.get(w.code) === w.print) trackingSent.delete(w.code);
+                        });
+                        syncTrackingCopies();
+                    }, 60000);
+                }
+            } finally {
+                trackingSyncBusy = false;
+                if (trackingSyncAgain) {
+                    trackingSyncAgain = false;
+                    syncTrackingCopies();
+                }
+            }
+        }
+
+        // === UNLOCK CODES ===
+        // A device's unlock code is only needed while the repair is being
+        // tested, so it comes off the ticket once the job is Completed,
+        // whichever way it got there: Update Repair, the board, a bulk
+        // change, the Firebase console, or a job completed before this
+        // existed. Watching the job list covers every route at once, the
+        // same way the tracking pages are kept in step. It cannot be undone;
+        // if a device comes back, ask the customer for the code again.
+        const unlockClearAsked = new Set();   // ticket ids this page has cleared
+        let unlockClearNoticeShown = false;
+
+        function hasUnlockCode(repair) {
+            return repair.unlockCode !== undefined && repair.unlockCode !== null
+                && String(repair.unlockCode).trim() !== '';
+        }
+
+        async function clearFinishedUnlockCodes() {
+            if (!repairsLoaded) return;
+            const due = allRepairs.filter(r =>
+                r.currentStatus === 'completed' && hasUnlockCode(r) && !unlockClearAsked.has(r.id));
+            if (due.length === 0) return;
+
+            due.forEach(r => unlockClearAsked.add(r.id));
+            const results = await Promise.allSettled(due.map(r =>
+                db.collection('repairs').doc(r.id).update({
+                    unlockCode: firebase.firestore.FieldValue.delete()
+                })));
+
+            const failed = due.filter((r, i) => results[i].status === 'rejected');
+            const cleared = due.length - failed.length;
+            if (cleared > 0) {
+                showAlert(`Passcode cleared from ${cleared} completed job${cleared === 1 ? '' : 's'}`, 'success');
+            }
+            if (failed.length > 0) {
+                console.error('Passcodes not cleared:', failed.map(r => r.repairId),
+                    results.find(r => r.status === 'rejected').reason);
+                if (!unlockClearNoticeShown) {
+                    unlockClearNoticeShown = true;
+                    showAlert(`Could not clear the passcode from ${failed.length} completed job${failed.length === 1 ? '' : 's'}. Trying again in a minute.`, 'error');
+                }
+                setTimeout(() => {
+                    failed.forEach(r => unlockClearAsked.delete(r.id));
+                    clearFinishedUnlockCodes();
+                }, 60000);
+            }
         }
 
         // Utility: calculate time ago
@@ -3965,6 +4364,15 @@
                                     value="${repair.warrantyDays || 30}" placeholder="30">
                             </div>
                         </div>
+                        <div class="upload-progress" hidden>
+                            <div class="upload-progress__label">
+                                <span class="upload-progress__text" aria-live="polite"></span>
+                                <span class="upload-progress__pct"></span>
+                            </div>
+                            <div class="upload-progress__track" role="progressbar" aria-label="Upload progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                                <div class="upload-progress__fill"></div>
+                            </div>
+                        </div>
                         <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; justify-content: space-between; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
                             <div style="display: flex; gap: 0.5rem;">
                                 <button type="button" class="btn btn-whatsapp" onclick="sendWhatsApp('${escapeJSStr(repair.id)}')" title="Send WhatsApp update to customer">
@@ -3995,15 +4403,210 @@
             document.getElementById('update-repair-form').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const repairId = e.target.dataset.repairId;
-                await updateRepairStatus(repairId, e.target);
-                modal.remove();
+                // Closes only once saved. On a failure the form stays up with
+                // the notes and photos still in it, ready to try again.
+                if (await updateRepairStatus(repairId, e.target)) modal.remove();
             });
         }
 
-        // Update repair status
+        // ------------------------------------------------------------------
+        // Photos are shrunk in the browser before they upload.
+        //
+        // A photo off an iPad is 12 megapixels and several megabytes, and it
+        // was stored like that: slow to send from the shop, and slow for the
+        // customer, whose tracking page downloads every original just to
+        // show a thumbnail. 2000px on the long side is still sharp enough to
+        // show a scratch, at a few hundred KB.
+        //
+        // Best effort. If the browser cannot decode the file (HEIC on a
+        // desktop browser, say) or the result is no smaller, the original
+        // goes up exactly as it did before. The intake page carries its own
+        // copy of this in new-repair/intake.js.
+        // ------------------------------------------------------------------
+        const PHOTO_MAX_EDGE = 2000;
+        const PHOTO_JPEG_QUALITY = 0.85;
+
+        // One at a time: a dozen 12-megapixel photos decoded at once is
+        // more memory than an iPad tab will give a page.
+        let photoShrinkQueue = Promise.resolve();
+
+        // Always resolves, to the smaller file or the original.
+        function shrinkPhoto(file) {
+            const run = photoShrinkQueue.then(() => shrinkPhotoNow(file)).catch(() => file);
+            photoShrinkQueue = run;
+            return run;
+        }
+
+        async function shrinkPhotoNow(file) {
+            const url = URL.createObjectURL(file);
+            const canvas = document.createElement('canvas');
+            try {
+                const img = new Image();
+                img.src = url;
+                await img.decode();
+                // naturalWidth/Height are after the photo's EXIF rotation, and
+                // drawImage draws it rotated, so a portrait shot stays upright.
+                const scale = Math.min(1, PHOTO_MAX_EDGE / Math.max(img.naturalWidth, img.naturalHeight));
+                // Already small and already a JPEG: a second compression
+                // would only cost quality.
+                if (scale === 1 && file.type === 'image/jpeg' && file.size <= 1024 * 1024) return file;
+
+                canvas.width = Math.round(img.naturalWidth * scale);
+                canvas.height = Math.round(img.naturalHeight * scale);
+                const ctx = canvas.getContext('2d');
+                // JPEG has no transparency, so a clear PNG would turn black.
+                ctx.fillStyle = '#fff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', PHOTO_JPEG_QUALITY));
+                if (!blob || blob.size >= file.size) return file;
+
+                const name = (file.name || 'photo').replace(/\.[^.]*$/, '') + '.jpg';
+                return new File([blob], name, { type: 'image/jpeg', lastModified: file.lastModified });
+            } catch (error) {
+                console.warn('Could not shrink photo; uploading the original', error);
+                return file;
+            } finally {
+                URL.revokeObjectURL(url);
+                // iPad browsers hold a canvas's memory until it is sized to
+                // nothing, whatever the garbage collector thinks.
+                canvas.width = 0;
+                canvas.height = 0;
+            }
+        }
+
+        // Storage only accepts image/* (storage.rules), and a photo with no
+        // type would otherwise go up as a generic file and be refused.
+        function photoContentType(file) {
+            if (file.type) return file.type;
+            const ext = ((file.name || '').match(/\.([^.]+)$/) || [])[1] || '';
+            return {
+                heic: 'image/heic', heif: 'image/heif', png: 'image/png',
+                webp: 'image/webp', gif: 'image/gif'
+            }[ext.toLowerCase()] || 'image/jpeg';
+        }
+
+        // ------------------------------------------------------------------
+        // Photo upload progress in Update Repair.
+        //
+        // Photos go up when the form is saved, and a photo off an iPad is
+        // several megabytes, so a save with a few of them could sit for a
+        // long time with nothing on screen to say it was working - and
+        // nothing to stop a second tap saving it twice. A photo that failed
+        // was skipped without a word and the save still reported success.
+        // Now the form locks while it works, each thumbnail fills as it
+        // uploads, a bar by the buttons shows the whole job, and a failure
+        // stops the save with the form left as it was.
+        // ------------------------------------------------------------------
+
+        // Locks the form while it saves, so a second tap cannot send it
+        // twice and the modal cannot be closed out from under the upload.
+        function setUpdateBusy(modal, busy) {
+            if (!modal) return;
+            if (busy) modal.dataset.busy = 'true';
+            else delete modal.dataset.busy;
+            modal.querySelectorAll('button, input, select, textarea').forEach(el => { el.disabled = busy; });
+
+            const submit = modal.querySelector('button[type="submit"]');
+            if (submit) {
+                if (!submit.dataset.label) submit.dataset.label = submit.innerHTML;
+                submit.innerHTML = busy
+                    ? '<i class="fas fa-spinner fa-spin"></i> Saving…'
+                    : submit.dataset.label;
+            }
+            if (!busy) {
+                const box = modal.querySelector('.upload-progress');
+                if (box) box.hidden = true;
+            }
+        }
+
+        // fraction is 0-1, or null for work with no measurable amount (the
+        // save itself), which fills the bar and drops the percentage.
+        function showUpdateProgress(modal, label, fraction) {
+            const box = modal && modal.querySelector('.upload-progress');
+            if (!box) return;
+            const pct = fraction === null ? 100 : Math.max(0, Math.min(100, Math.round(fraction * 100)));
+            box.hidden = false;
+            box.querySelector('.upload-progress__text').textContent = label;
+            box.querySelector('.upload-progress__pct').textContent = fraction === null ? '' : pct + '%';
+            box.querySelector('.upload-progress__fill').style.width = pct + '%';
+            box.querySelector('.upload-progress__track').setAttribute('aria-valuenow', String(pct));
+        }
+
+        function setPhotoTileState(photo, state, fraction) {
+            const tile = document.querySelector(`#update-photo-preview [data-photo-id="${photo.id}"]`);
+            if (!tile) return;
+            tile.dataset.state = state;
+            tile.style.setProperty('--upload-progress', String(fraction || 0));
+            const label = tile.querySelector('.photo-state-small');
+            if (label) {
+                label.textContent = state === 'queued' ? 'Waiting'
+                    : state === 'uploading' ? Math.round((fraction || 0) * 100) + '%'
+                        : state === 'done' ? '✓'
+                            : state === 'failed' ? 'Failed' : '';
+            }
+        }
+
+        // Sends whatever in updatePhotos has not gone up yet, one at a time.
+        // A photo that made it keeps its URL, so trying again after a
+        // failure only sends the ones that failed. False if any failed.
+        async function uploadUpdatePhotos(repair, modal) {
+            const pending = updatePhotos.filter(p => !p.url);
+            if (pending.length === 0) return true;
+
+            // Normally long finished by the time Update Repair is tapped.
+            showUpdateProgress(modal, 'Preparing photos', 0);
+            await Promise.all(pending.map(p => p.ready));
+
+            const totalBytes = pending.reduce((sum, p) => sum + (p.file.size || 0), 0) || 1;
+            let doneBytes = 0;
+            let failed = 0;
+
+            pending.forEach(p => setPhotoTileState(p, 'queued', 0));
+
+            for (let i = 0; i < pending.length; i++) {
+                const photo = pending[i];
+                const label = pending.length === 1
+                    ? 'Uploading photo'
+                    : `Uploading photo ${i + 1} of ${pending.length}`;
+                setPhotoTileState(photo, 'uploading', 0);
+                showUpdateProgress(modal, label, doneBytes / totalBytes);
+                try {
+                    const photoRef = storage.ref().child(`repairs/${repair.repairId}/updates/${Date.now()}_${photo.id}`);
+                    const task = photoRef.put(photo.file, { contentType: photoContentType(photo.file) });
+                    task.on('state_changed', (snap) => {
+                        const own = snap.totalBytes ? snap.bytesTransferred / snap.totalBytes : 0;
+                        setPhotoTileState(photo, 'uploading', own);
+                        showUpdateProgress(modal, label, (doneBytes + snap.bytesTransferred) / totalBytes);
+                    }, () => { /* reported by the await below */ });
+                    const snapshot = await task;
+                    photo.url = await snapshot.ref.getDownloadURL();
+                    setPhotoTileState(photo, 'done', 1);
+                } catch (error) {
+                    console.error('Error uploading photo:', error);
+                    failed++;
+                    setPhotoTileState(photo, 'failed', 0);
+                }
+                doneBytes += photo.file.size || 0;
+            }
+
+            if (failed) {
+                showAlert(failed === 1
+                    ? "A photo didn't upload, so nothing has been saved yet. Tap Update Repair to try it again, or remove it to save without it."
+                    : `${failed} photos didn't upload, so nothing has been saved yet. Tap Update Repair to try them again, or remove them to save without them.`,
+                    'error');
+                return false;
+            }
+            return true;
+        }
+
+        // Update repair status. True once saved; false leaves the form open
+        // with everything still in it, so a failed photo or a rejected cost
+        // does not throw away the notes that were typed.
         async function updateRepairStatus(repairId, form) {
             const formData = new FormData(form);
             const data = Object.fromEntries(formData);
+            const modal = form.closest('.modal');
 
             try {
                 const updateData = {
@@ -4018,7 +4621,7 @@
                     const cost = parseFloat(data.estimatedCost);
                     if (isNaN(cost) || cost < 0 || cost > 50000) {
                         showAlert('Invalid cost: must be between £0 and £50,000', 'error');
-                        return;
+                        return false;
                     }
                     updateData.estimatedCost = cost;
                 }
@@ -4029,24 +4632,23 @@
                     updateData.warrantyDays = parseInt(data.warrantyDays) || 30;
                 }
 
+                setUpdateBusy(modal, true);
+
                 // Upload photos if any
                 const photoUrls = [];
                 if (updatePhotos.length > 0) {
                     const repair = allRepairs.find(r => r.id === repairId);
-                    for (const photo of updatePhotos) {
-                        try {
-                            const photoRef = storage.ref().child(`repairs/${repair.repairId}/updates/${Date.now()}_${photo.id}`);
-                            const snapshot = await photoRef.put(photo.file);
-                            const downloadURL = await snapshot.ref.getDownloadURL();
-                            photoUrls.push(downloadURL);
-                        } catch (error) {
-                            console.error('Error uploading photo:', error);
-                        }
+                    if (!(await uploadUpdatePhotos(repair, modal))) {
+                        setUpdateBusy(modal, false);
+                        return false;
                     }
+                    photoUrls.push(...updatePhotos.map(p => p.url));
 
                     // Add new photos to existing photos array
                     updateData.photos = firebase.firestore.FieldValue.arrayUnion(...photoUrls);
                 }
+
+                showUpdateProgress(modal, 'Saving the update', null);
 
                 // Add progress entry
                 const progressEntry = {
@@ -4073,10 +4675,13 @@
 
                 // Reset update photos
                 updatePhotos = [];
+                return true;
 
             } catch (error) {
                 console.error('Error updating repair:', error);
                 showAlert('Error updating repair: ' + error.message, 'error');
+                setUpdateBusy(modal, false);
+                return false;
             }
         }
 
@@ -4345,6 +4950,8 @@
         // Close modals when clicking outside or pressing Escape
         document.addEventListener('click', (e) => {
             if (e.target.classList.contains('modal')) {
+                // Not while it is saving: the upload would carry on unseen.
+                if (e.target.dataset.busy) return;
                 if (e.target.id) {
                     e.target.classList.remove('show');
                 } else {
@@ -4387,10 +4994,16 @@
         function handleUpdatePhotos(event) {
             const files = Array.from(event.target.files);
             const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-            const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/heic'];
+            const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/heic', 'image/heif'];
 
             files.forEach(file => {
-                if (!file.type.startsWith('image/') || !ALLOWED_TYPES.some(t => file.type === t)) {
+                // A photo from an iPad sometimes arrives with no type at all,
+                // so an untyped file is judged by its name - the way the
+                // intake page already does. It used to be refused here.
+                const typeOk = file.type
+                    ? ALLOWED_TYPES.includes(file.type)
+                    : /\.(jpe?g|png|gif|webp|heic|heif)$/i.test(file.name || '');
+                if (!typeOk) {
                     showAlert(`Skipped "${file.name}": not a valid image type`, 'error');
                     return;
                 }
@@ -4414,13 +5027,19 @@
             const photoId = 'photo_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
             photoItem.innerHTML = `
                 <img src="${escapeHTML(src)}" alt="Update photo">
+                <span class="photo-progress-small" aria-hidden="true"><span></span></span>
+                <span class="photo-state-small"></span>
                 <button type="button" class="photo-remove-small" onclick="removeUpdatePhoto('${escapeJSStr(photoId)}')">×</button>
             `;
 
             photoItem.dataset.photoId = photoId;
             preview.appendChild(photoItem);
 
-            updatePhotos.push({ id: photoId, file, src });
+            const photo = { id: photoId, file, src };
+            // Starts now, while the rest of the form is filled in, so it is
+            // usually done before Update Repair is tapped.
+            photo.ready = shrinkPhoto(file).then(small => { photo.file = small; });
+            updatePhotos.push(photo);
         }
 
         function removeUpdatePhoto(photoId) {
@@ -4693,7 +5312,7 @@
                                             <div style="font-size: 0.75rem; color: var(--text-dark);">${date}</div>
                                         </div>
                                         <span class="status-badge ${status.class}" style="font-size: 0.7rem; padding: 0.2rem 0.6rem;">${status.label}</span>
-                                        ${r.estimatedCost ? `<span style="color: var(--text-muted); font-size: 0.85rem;">£${r.estimatedCost}</span>` : ''}
+                                        ${r.estimatedCost ? `<span style="color: var(--text-muted); font-size: 0.85rem;">£${escapeHTML(r.estimatedCost)}</span>` : ''}
                                     </div>
                                 `;
                             }).join('')}
@@ -4972,7 +5591,7 @@
                     break;
                 case 'Escape':
                     const modals = document.querySelectorAll('.modal.show');
-                    modals.forEach(modal => modal.remove());
+                    modals.forEach(modal => { if (!modal.dataset.busy) modal.remove(); });
                     break;
             }
         });
@@ -5336,16 +5955,36 @@
                 r.deviceType || '',
                 r.brand || '',
                 r.model || '',
-                (r.issueDescription || '').replace(/"/g, '""'),
+                r.issueDescription || '',
                 statusConfig[r.currentStatus]?.label || r.currentStatus || '',
                 r.dateReceived ? new Date(r.dateReceived.seconds * 1000).toLocaleDateString('en-GB') : '',
                 r.estimatedCompletion ? new Date(r.estimatedCompletion.seconds * 1000).toLocaleDateString('en-GB') : '',
                 r.estimatedCost ? `£${r.estimatedCost}` : ''
             ]);
 
+            /* Two separate problems with writing a cell as "…".
+
+               Quoting: only the fault description used to have its quotes
+               doubled, so a customer name or model containing a double quote
+               ended the cell early and shifted the rest of the row into the
+               wrong columns.
+
+               Formulas: a spreadsheet reads a cell opening with = + - or @
+               as a formula, quotes or not. A fault description typed as
+               =HYPERLINK(...) becomes a live formula in Excel the moment the
+               export is opened, which is how an ordinary-looking export
+               turns into something that acts on its own. Prefixing a single
+               quote makes the spreadsheet treat it as text; the leading
+               quote is not shown in the cell. */
+            const csvCell = (value) => {
+                const text = String(value === null || value === undefined ? '' : value);
+                const safe = /^[=+\-@\t\r]/.test(text) ? `'${text}` : text;
+                return `"${safe.replace(/"/g, '""')}"`;
+            };
+
             const csvContent = [csvHeader, ...csvRows]
-                .map(row => row.map(cell => `"${cell}"`).join(','))
-                .join('\n');
+                .map(row => row.map(csvCell).join(','))
+                .join('\r\n');
 
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
@@ -5364,6 +6003,17 @@
                 try {
                     // Delete from Firestore
                     await db.collection('repairs').doc(repairId).delete();
+
+                    // And the customer's tracking page for it. After the
+                    // ticket, so the dashboard's sync has nothing left to
+                    // publish it again from.
+                    if (window.OnlineFixTracking && OnlineFixTracking.isCode(repairIdNumber)) {
+                        try {
+                            await db.collection(OnlineFixTracking.COLLECTION).doc(repairIdNumber).delete();
+                        } catch (error) {
+                            console.warn('Tracking copy not deleted:', error);
+                        }
+                    }
 
                     // Delete photos from Storage if any
                     const repair = allRepairs.find(r => r.id === repairId);

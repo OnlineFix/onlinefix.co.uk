@@ -5,11 +5,18 @@ service firebase.storage {
     // Admin access is granted via a custom claim (admin == true) set with the
     // Firebase Admin SDK, with the email allow-list kept as a transitional
     // fallback until set-admin-claim.mjs has been run for every admin
-    // account. Remove the email branch once verified.
+    // account. Delete the email branch once that is done.
+    //
+    // The fallback also requires a verified address, for the reason spelled
+    // out on the matching function in firestore.rules: an address alone was
+    // enough to become an admin, because a token carries whatever address the
+    // account was registered with whether or not anyone confirmed it. Keep
+    // the two functions identical.
     function isAdmin() {
       return request.auth != null
         && (request.auth.token.admin == true
-            || request.auth.token.email in ['onlinerepairbooking@gmail.com']);
+            || (request.auth.token.email in ['onlinerepairbooking@gmail.com']
+                && request.auth.token.email_verified == true));
     }
 
     // Repair photos
@@ -20,18 +27,33 @@ service firebase.storage {
                    && request.resource.size < 10 * 1024 * 1024  // 10MB max
                    && request.resource.contentType.matches('image/.*');
 
-      // Anyone can read photos (for tracking page)
-      allow read: if true;
+      // Anyone can open a photo from its link, which the tracking page
+      // needs. Listing is staff only: "read" covers listing too, and a public
+      // list of repairs/ handed out every job's code as a folder name, which
+      // is all it takes to open that job's tracking copy.
+      allow get: if true;
+      allow list: if isAdmin();
     }
 
     // Public booking photos. The /book/ page is open to anonymous visitors,
     // so create must work without auth, but reads and deletes are gated to
-    // the admin account so customers can't enumerate other bookings'
-    // photos. App Check + the size/content-type checks are the only abuse
-    // controls on the create path.
+    // the admin account so customers can't enumerate other bookings' photos.
+    //
+    // This is the only path on the bucket that anyone can write to without
+    // signing in, and App Check is not active on /book/, so the path shape is
+    // doing the work. Both wildcards used to accept anything, which made the
+    // bucket a general-purpose drop for any 5 MB image under any name. The
+    // booking form writes exactly photo-1.jpg to photo-3.jpg inside a folder
+    // named after its CSPRNG booking id, so that is all this accepts now:
+    // three files per folder, and a folder name nobody can collide with.
+    //
+    // Note that create is the only write verb here: an existing file cannot
+    // be replaced or removed except by an admin.
     match /bookings/{tempId}/{filename} {
-      allow create: if request.resource.size < 5 * 1024 * 1024
-                    && request.resource.contentType.matches('image/.*');
+      allow create: if tempId.matches('BK_[0-9A-F]{32}')
+                    && filename.matches('photo-[1-3]\\.jpg')
+                    && request.resource.size < 5 * 1024 * 1024
+                    && request.resource.contentType == 'image/jpeg';
 
       allow read, delete: if isAdmin();
     }
