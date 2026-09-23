@@ -118,6 +118,14 @@
     // ---- Init ------------------------------------------------------------
     document.addEventListener('DOMContentLoaded', init);
 
+    // A CSPRNG booking id, used as the Storage folder for the photos, the
+    // booking's document id and its notice's id.
+    function newTempId() {
+        const idBytes = new Uint8Array(16);
+        crypto.getRandomValues(idBytes);
+        return 'BK_' + Array.from(idBytes, b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
+    }
+
     function init() {
         const form = $('#booking-form');
         const fallback = $('#booking-fallback');
@@ -125,9 +133,7 @@
 
         // Generate a CSPRNG temp id used as both the Storage path and a marker
         // on the Firestore doc (so admins can match doc <-> photos later).
-        const idBytes = new Uint8Array(16);
-        crypto.getRandomValues(idBytes);
-        state.tempId = 'BK_' + Array.from(idBytes, b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
+        state.tempId = newTempId();
 
         // Reveal the form (and hide the fallback paragraph since the form is here)
         form.hidden = false;
@@ -454,8 +460,8 @@
         const a = state.availability;
         const dateInput = $('#preferred-date');
         if (dateInput) {
-            const min = isoDate(addDays(new Date(), 0));
-            const max = isoDate(addDays(new Date(), a.maxFutureDays || 60));
+            const min = ukIsoDate(0);
+            const max = ukIsoDate(a.maxFutureDays || 60);
             dateInput.min = min;
             dateInput.max = max;
         }
@@ -514,7 +520,10 @@
         const earliest = new Date(Date.now() + minNoticeMs);
 
         slots.forEach((slot) => {
-            const slotDate = new Date(y, m - 1, d, slot.h, slot.min, 0, 0);
+            // Slots are the shop's hours, so compare them as UK times (the
+            // same way submitBooking stores the one picked), not as times on
+            // the visitor's own clock.
+            const slotDate = ukTime(y, m, d, slot.h, slot.min);
             const disabled = slotDate < earliest;
             const isSelected = state.preferredTime === slot.label;
 
@@ -594,19 +603,26 @@
             if (!state.category) fail('category', 'Pick the kind of device.');
             if (!state.brand) fail('brand', 'Choose a brand.');
             if (!state.model || !state.model.trim()) fail('model', 'Tell us the model.');
-            else if (state.model.length > 100) fail('model', 'Model name is too long (max 100).');
+            else if (state.model.length > 99) fail('model', 'Model name is too long (max 99 characters).');
         }
         if (step === 2) {
             if (!state.issue || !state.issue.trim()) fail('issue', 'Tell us briefly what\'s wrong.');
-            else if (state.issue.length > 1000) fail('issue', 'Description is too long (max 1000).');
+            else if (state.issue.length > 999) fail('issue', 'Description is too long (max 999 characters).');
         }
         if (step === 3) {
             if (!state.preferredDate) fail('preferred-date', 'Pick a date.');
             if (!state.preferredTime) fail('preferred-time', 'Pick a time slot.');
+            // The description and these notes are saved as one text, which
+            // the rule holds to 999 characters: say so rather than cut it.
+            const over = issueWithNotes().length - 999;
+            if (state.extraNotes && over > 0) {
+                fail('extra-notes', 'Together with your description this is ' + over
+                    + ' characters too long. Please shorten one of them.');
+            }
         }
         if (step === 4) {
             if (!state.customerName || !state.customerName.trim()) fail('customer-name', 'Your name please.');
-            else if (state.customerName.length > 100) fail('customer-name', 'Name is too long.');
+            else if (state.customerName.length > 99) fail('customer-name', 'Name is too long.');
 
             if (!state.customerEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(state.customerEmail)) {
                 fail('customer-email', 'A valid email so we can reach you.');
@@ -617,6 +633,14 @@
             if (!state.consent) fail('consent', 'Please tick the box to continue.');
         }
         return ok;
+    }
+
+    // The description as saved: the issue, then any extra notes under a
+    // heading. The rule allows fewer than 1000 characters in all.
+    function issueWithNotes() {
+        return (state.extraNotes
+            ? `${state.issue}\n\n--- Additional notes ---\n${state.extraNotes}`
+            : state.issue).trim();
     }
 
     function isUkPhone(s) {
@@ -744,7 +768,7 @@
         state.submitting = true;
         const submitBtn = $('#submit-btn');
         const errEl = $('#submit-error');
-        if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Submitting&hellip;'; }
+        if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Submitting…'; }
         if (errEl) errEl.hidden = true;
 
         try {
@@ -766,12 +790,18 @@
             //    would have handed out a permanent public link to a
             //    customer's photo. Staff read these through the admin SDK,
             //    which resolves a path without one.
+            //
+            //    A photo that already went up on an earlier attempt is not
+            //    sent again when the visitor retries after a failure.
             const photoPaths = [];
             for (let i = 0; i < state.photos.length; i++) {
                 const p = state.photos[i];
                 const filename = `photo-${i + 1}.jpg`;
                 const path = `bookings/${state.tempId}/${filename}`;
-                await storage.ref().child(path).put(p.file, { contentType: 'image/jpeg' });
+                if (p.uploadedPath !== path) {
+                    await storage.ref().child(path).put(p.file, { contentType: 'image/jpeg' });
+                    p.uploadedPath = path;
+                }
                 photoPaths.push(path);
             }
 
@@ -780,11 +810,11 @@
             //    be rejected server-side.
             const [y, m, d] = state.preferredDate.split('-').map(Number);
             const [hh, mm] = state.preferredTime.split(':').map(Number);
-            const preferredAt = new Date(y, m - 1, d, hh, mm, 0, 0);
+            // The slots are the shop's hours, so the time picked is UK time
+            // whatever the visitor's device is set to.
+            const preferredAt = ukTime(y, m, d, hh, mm);
 
-            const issueText = state.extraNotes
-                ? `${state.issue}\n\n--- Additional notes ---\n${state.extraNotes}`
-                : state.issue;
+            const issueText = issueWithNotes();
 
             const docData = {
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),
@@ -804,7 +834,8 @@
                     brand: state.brand,
                     model: state.model.trim()
                 },
-                issue: issueText.trim().slice(0, 1000),
+                // The rule wants fewer than 1000 characters.
+                issue: issueText.slice(0, 999),
                 preferredAt: firebase.firestore.Timestamp.fromDate(preferredAt),
                 // Always empty, and required to be by the rule: see the
                 // upload loop above. Kept as a field so a booking's shape
@@ -813,7 +844,42 @@
                 photoPaths: photoPaths
             };
 
-            const ref = await db.collection('bookings').add(docData);
+            // The booking takes its tempId as its document id, and the notice
+            // to the shop takes the same id, so the rules can tie exactly one
+            // notice to each new booking (see /mail in firestore.rules).
+            // Written together: either both land or neither does.
+            //
+            // The five-minute throttle (see /throttle in firestore.rules) is
+            // written in the same batch. When the notice is refused (another
+            // booking went out in the last five minutes, or the rules that
+            // allow it are not published yet) the booking is saved on its own:
+            // saving it matters more than the email about it, and it still
+            // shows on the dashboard.
+            const ref = db.collection('bookings').doc(state.tempId);
+            let notice = null;
+            try {
+                notice = shopNotice(docData, preferredAt);
+            } catch (err) {
+                console.warn('Could not build the booking notice:', err);
+            }
+            let saved = false;
+            if (notice) {
+                const batch = db.batch();
+                batch.set(ref, docData);
+                batch.set(db.collection('mail').doc(state.tempId), notice);
+                batch.set(db.collection('throttle').doc('bookingNotice'), {
+                    at: firebase.firestore.FieldValue.serverTimestamp(),
+                    mailId: state.tempId
+                });
+                try {
+                    await batch.commit();
+                    saved = true;
+                } catch (err) {
+                    if (!err || err.code !== 'permission-denied') throw err;
+                    console.warn('Booking notice refused, saving the booking alone:', err);
+                }
+            }
+            if (!saved) await ref.set(docData);
 
             // 3) Show confirmation
             const refId = ref.id.slice(-6).toUpperCase();
@@ -825,6 +891,11 @@
             showStep(6);
         } catch (err) {
             console.error('Booking submit failed:', err);
+            // An upload that reached the server but whose reply was lost looks
+            // like a failure here, and sending that photo again would replace
+            // a file, which storage.rules refuses. So after a refused upload
+            // the next try starts in a new folder, and uploads every photo.
+            if (err && err.code === 'storage/unauthorized') state.tempId = newTempId();
             if (errEl) {
                 errEl.hidden = false;
                 errEl.textContent = friendlyError(err) + ' Your details are still here — try again, or call 07940 730537.';
@@ -833,6 +904,72 @@
             state.submitting = false;
             if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Request Booking'; }
         }
+    }
+
+    // The email the shop gets for each booking. The rule on /mail accepts
+    // exactly this wording and nothing else (see bookingNoticeText in
+    // firestore.rules), so any change here has to be made there too, and a
+    // mismatch just means the booking is saved without its email.
+    const SHOP_INBOX = 'hello@onlinefix.uk';
+
+    // Parts of a moment as a UK clock shows them.
+    function ukParts(date, options) {
+        const parts = {};
+        new Intl.DateTimeFormat('en-GB', Object.assign({ timeZone: 'Europe/London' }, options))
+            .formatToParts(date)
+            .forEach(p => { parts[p.type] = p.value; });
+        return parts;
+    }
+
+    // The moment a UK clock reads y-m-d hh:mm. Starts from that reading as
+    // if it were UTC, then takes off however far the UK is ahead of UTC then
+    // (nothing in winter, an hour in summer).
+    function ukTime(y, m, d, hh, mm) {
+        const asUtc = Date.UTC(y, m - 1, d, hh, mm);
+        const p = ukParts(new Date(asUtc), {
+            year: 'numeric', month: 'numeric', day: 'numeric',
+            hour: 'numeric', minute: 'numeric', hourCycle: 'h23'
+        });
+        const ukAsUtc = Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute);
+        return new Date(asUtc - (ukAsUtc - asUtc));
+    }
+
+    // "Friday 25 September at 11:00", in UK time. Built from parts rather
+    // than toLocaleString, whose punctuation differs between browsers; the
+    // rule holds it to exactly this shape.
+    function ukWhen(date) {
+        const p = ukParts(date, {
+            weekday: 'long', day: 'numeric', month: 'long',
+            hour: '2-digit', minute: '2-digit', hourCycle: 'h23'
+        });
+        return `${p.weekday} ${p.day} ${p.month} at ${p.hour}:${p.minute}`;
+    }
+
+    function shopNotice(doc, preferredAt) {
+        const reference = state.tempId.slice(-6);
+        const when = ukWhen(preferredAt);
+        const text = 'New booking request from the website booking form.\n\n'
+            + 'Reference: ' + reference + '\n'
+            + 'Customer: ' + doc.customer.name + '\n'
+            + 'Email: ' + doc.customer.email + '\n'
+            + 'Phone: ' + doc.customer.phone + '\n'
+            + 'Wants to drop off: ' + when + '\n'
+            + 'Device type: ' + doc.device.category + '\n'
+            + 'Brand: ' + doc.device.brand + '\n'
+            + 'Model: ' + doc.device.model + '\n'
+            + 'Photos: ' + doc.photoPaths.length + '\n\n'
+            + 'What the customer wrote:\n' + doc.issue + '\n\n'
+            + 'Reply to this email to answer the customer. The booking is on the '
+            + 'dashboard under Online Bookings: https://onlinefix.co.uk/admin/';
+        return {
+            to: [SHOP_INBOX],
+            replyTo: doc.customer.email,
+            message: {
+                subject: 'Booking request ' + reference + ': ' + doc.customer.name + ', ' + when,
+                text: text
+            },
+            meta: { kind: 'booking-request', bookingId: state.tempId, reference: reference, when: when }
+        };
     }
 
     function friendlyError(err) {
@@ -862,9 +999,7 @@
             submitting: false
         });
         // New tempId for the next booking
-        const idBytes = new Uint8Array(16);
-        crypto.getRandomValues(idBytes);
-        state.tempId = 'BK_' + Array.from(idBytes, b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
+        state.tempId = newTempId();
 
         const form = $('#booking-form');
         if (form) form.reset();
@@ -885,13 +1020,9 @@
     }
 
     // ---- Date helpers ----------------------------------------------------
-    function addDays(d, n) {
-        const out = new Date(d);
-        out.setDate(out.getDate() + n);
-        return out;
-    }
-
-    function isoDate(d) {
-        return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+    // Today's date in the UK, plus n days, as YYYY-MM-DD.
+    function ukIsoDate(n) {
+        const p = ukParts(new Date(), { year: 'numeric', month: '2-digit', day: '2-digit' });
+        return new Date(Date.UTC(+p.year, +p.month - 1, +p.day + n)).toISOString().slice(0, 10);
     }
 })();

@@ -2846,6 +2846,123 @@
                 display: none;
             }
         }
+
+        /* Online bookings board. Columns and cards borrow the jobs board's
+           kanban classes; these add what a booking card shows. */
+        .kanban-card.booking-card--new {
+            border-left: 3px solid var(--warning);
+        }
+
+        .booking-card-time {
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .booking-chip {
+            display: inline-block;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.15rem 0.5rem;
+            border-radius: 999px;
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+            white-space: nowrap;
+        }
+
+        .booking-chip--new {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+
+        .booking-facts {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 0.5rem 1.5rem;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .booking-facts span {
+            display: block;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--text-dark);
+        }
+
+        .booking-facts a {
+            color: inherit;
+            word-break: break-all;
+        }
+
+        .booking-photos {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .booking-check {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+        }
+
+        .booking-check input {
+            margin-top: 0.2rem;
+        }
+
+        .kanban-card[data-booking-open] {
+            cursor: pointer;
+        }
+
+        .booking-facts .booking-chip {
+            display: inline-block;
+            font-size: 0.75rem;
+            text-transform: none;
+            letter-spacing: normal;
+        }
+
+        /* The booking box: wider than the other forms so its fields sit two
+           or three to a row on an iPad, with the header and buttons pinned
+           and the form scrolling between them, as the job box does. */
+        .booking-modal-content {
+            max-width: 760px;
+        }
+
+        #booking-modal form {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-height: 0;
+        }
+
+        #booking-modal .booking-actions,
+        #booking-modal #bk-error {
+            flex: none;
+        }
+
+        #booking-modal .booking-actions {
+            margin-top: 1rem;
+        }
+
+        .booking-form-grid {
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        }
+
+        /* A long name must not push the close button off the edge. */
+        #booking-modal .modal-title {
+            overflow-wrap: anywhere;
+            min-width: 0;
+        }
+
+        #booking-modal .close-btn {
+            flex-shrink: 0;
+        }
     </style>
 </head>
 
@@ -2913,7 +3030,7 @@
                 <div class="user-info" id="user-email">Admin Dashboard</div>
                 <!-- Says how this account is being recognised as staff, so
                      the email fallback in the rules can be retired knowingly
-                     rather than by guessing. See checkAdminAccess(). -->
+                     rather than by guessing. See describeAdminAccess(). -->
                 <div class="user-info" id="admin-access-note" style="font-size: 0.7rem; opacity: 0.75; margin-top: 0.25rem;"></div>
             </div>
             <nav class="sidebar-nav">
@@ -2928,6 +3045,13 @@
                         <i class="fas fa-tools"></i>
                         All Repairs
                         <span class="overdue-nav-badge hidden" id="nav-overdue-badge">0</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link" data-section="bookings">
+                        <i class="fas fa-calendar-check"></i>
+                        Online Bookings
+                        <span class="overdue-nav-badge hidden" id="nav-bookings-badge" title="New bookings not yet confirmed">0</span>
                     </a>
                 </div>
                 <div class="nav-item">
@@ -3095,6 +3219,23 @@
                         <small>Try adjusting your search or filters</small>
                     </div>
                     <div class="pagination" id="pagination"></div>
+                </div>
+            </div>
+
+            <!-- Requests from the public /book/ page, by the day and time the
+                 customer asked to drop off. See ONLINE BOOKINGS in the script. -->
+            <div id="bookings-section" class="content-section is-board hidden">
+                <div class="section-header">
+                    <h2 class="section-title">Online Bookings <span class="results-count" id="bookings-count"></span></h2>
+                    <div class="board-legend">
+                        <span class="board-legend__item"><span class="board-flag board-flag--warn"></span>New, not yet confirmed</span>
+                    </div>
+                </div>
+                <p id="bookings-truncated" class="hidden" style="color: var(--warning); margin: 0 0 0.75rem;">
+                    More bookings are waiting than this board shows. Book in or remove some and the rest will appear.
+                </p>
+                <div class="section-content board-content">
+                    <div class="kanban-container" id="bookings-board"></div>
                 </div>
             </div>
 
@@ -3350,6 +3491,10 @@
         // in firestore.rules and storage.rules.
         const ADMIN_EMAILS = ['onlinerepairbooking@gmail.com'];
 
+        function isAllowListed(email) {
+            return ADMIN_EMAILS.indexOf(email) !== -1;
+        }
+
         /* Is this account staff?
 
            Signing in is not the same as being staff: anyone with an account on
@@ -3358,79 +3503,158 @@
            rather than leaking anything, but an empty dashboard is not an
            answer to "should you be here".
 
-           Deliberately one notch looser than the rules: it admits the
-           allow-listed address whether or not it has been verified, where the
-           tightened rules require verification. Matching the rules exactly
-           would lock the shop out of its own dashboard the moment this ships,
-           before anyone had a chance to check which way the account is
-           recognised. So the page still opens for an unverified address, and
-           says plainly that it would not survive the tightened rules. */
-        function describeAdminAccess(token) {
-            if (token.claims.admin === true) return { allowed: true, state: 'claim' };
-            if (ADMIN_EMAILS.indexOf(token.claims.email) !== -1) {
-                return {
-                    allowed: true,
-                    state: token.claims.email_verified === true ? 'email-verified' : 'email-unverified'
-                };
+           Deliberately one notch looser than the rules, so that this can never
+           lock the shop out of its own dashboard: the allow-listed address is
+           admitted whether or not it is confirmed, and an account is only
+           turned away when its claims were actually read and say no.
+
+           The label is worked out from the token's claims when there are any,
+           because the token is what the rules check. The account's own copy of
+           the address (user.email, user.emailVerified) is used only when no
+           token could be read at all. */
+        function describeAdminAccess(user, read) {
+            const claims = read.claims;
+            if (claims && claims.admin === true) return { allowed: true, state: 'claim' };
+
+            const verified = claims ? claims.email_verified === true : user.emailVerified === true;
+            if (isAllowListed(user.email) || (claims && isAllowListed(claims.email))) {
+                return { allowed: true, state: verified ? 'email-verified' : 'email-unverified' };
             }
+
+            // Not the shop's address, and no claims to go on. Opening leaves it
+            // to the rules, as before this check existed, rather than turning
+            // away a claim-only admin because a network call failed.
+            if (!claims) return { allowed: true, state: 'unknown' };
             return { allowed: false, state: 'none' };
         }
 
-        async function checkAdminAccess(user) {
-            // Force a refresh so a claim granted since the last sign-in counts.
-            const token = await user.getIdTokenResult(true);
-            return describeAdminAccess(token);
+        /* The custom claim is the only part of this that needs the ID token,
+           and the token is the only part that can fail.
+
+           A forced refresh goes to Google's Token Service. When that is
+           refused the whole check used to give up, which is why this line read
+           "could not be checked". It is refused on the live site as of
+           2026-09-22: the browser API key's list of allowed Google APIs leaves
+           the Token Service out, so sign-ins cannot be renewed at all. That is
+           a Google Cloud setting, not something code here can fix, so the
+           failure is reported on screen (see renewalNote) rather than
+           swallowed. */
+        async function readAdminClaims(user) {
+            // Fresh first, so a claim granted since sign-in counts today
+            // rather than after the next sign-out.
+            try {
+                const token = await user.getIdTokenResult(true);
+                return { claims: token.claims || null, refreshError: null };
+            } catch (refreshError) {
+                console.warn('Could not refresh the ID token:', refreshError);
+                // Then the token already in hand, which needs no network while
+                // it is still in date.
+                try {
+                    const token = await user.getIdTokenResult();
+                    return { claims: token.claims || null, refreshError };
+                } catch (cachedError) {
+                    console.warn('Could not read the cached ID token:', cachedError);
+                    return { claims: null, refreshError };
+                }
+            }
+        }
+
+        /* A request that hangs, rather than failing, holds the SDK for 30
+           seconds, and falling back to the cached token can start a second
+           one. Nobody should stare at a blank page for that. */
+        function withTimeout(promise, ms) {
+            return Promise.race([promise, new Promise(resolve => setTimeout(
+                () => resolve({ claims: null, refreshError: { code: 'timeout' } }), ms))]);
+        }
+
+        const ACCESS_NOTES = {
+            'claim': 'Admin access: security claim. Safe to remove the email fallback.',
+            'email-verified': 'Admin access: confirmed email. A security claim would be better.',
+            'email-unverified': 'Admin access: email, not confirmed. The new rules refuse this account.',
+            'unknown': 'Admin access: could not be checked just now.',
+            'pending': 'Admin access: checking…'
+        };
+
+        /* Google names the refused API in the error code when the key itself
+           blocks it, e.g. auth/requests-to-this-api-securetoken...-are-blocked. */
+        function renewalNote(refreshError) {
+            if (!refreshError) return { text: '', alarm: false };
+            if (/are[-\s]blocked|api[-_\s]key|service[-_\s]blocked/i.test(String(refreshError.code || refreshError.message || ''))) {
+                return {
+                    text: 'Sign-in renewal is blocked by a Google setting, so the dashboard stops working about an hour after signing in.',
+                    alarm: true
+                };
+            }
+            return { text: 'Sign-in could not be renewed just now.', alarm: false };
+        }
+
+        function showAccessNote(state, refreshError) {
+            const note = document.getElementById('admin-access-note');
+            if (!note) return;
+            const renewal = renewalNote(refreshError);
+            note.textContent = (ACCESS_NOTES[state] || ACCESS_NOTES.unknown) + (renewal.text ? ' ' + renewal.text : '');
+            note.style.color = (state === 'email-unverified' || renewal.alarm) ? '#F87171' : '';
+        }
+
+        function openDashboard(user) {
+            currentUser = user;
+            document.getElementById('user-email').textContent = user.email;
+            const loginError = document.getElementById('login-error');
+            if (loginError) loginError.classList.add('hidden');
+            showDashboard();
+            loadDashboardData();
+        }
+
+        function hideSplash() {
+            const splash = document.getElementById('auth-loading');
+            if (splash) splash.style.display = 'none';
         }
 
         auth.onAuthStateChanged(async (user) => {
-            // Hide loading splash once Firebase has resolved persisted session.
-            const splash = document.getElementById('auth-loading');
-            if (splash) splash.style.display = 'none';
-
             if (!user) {
+                hideSplash();
                 stopListening();
                 showLogin();
                 return;
             }
 
-            let access;
-            try {
-                access = await checkAdminAccess(user);
-            } catch (error) {
-                // Never lock the dashboard out on a network hiccup: the rules
-                // are the real boundary and they are still enforcing.
-                console.warn('Could not read admin claims:', error);
-                access = { allowed: true, state: 'unknown' };
+            /* The shop's own address needs no network to recognise, so its
+               dashboard opens straight away and the note fills in after.
+               Anyone else waits behind the splash until the claims are read. */
+            const shopAddress = isAllowListed(user.email);
+            if (shopAddress) {
+                hideSplash();
+                openDashboard(user);
+                showAccessNote('pending', null);
             }
+
+            let read;
+            try {
+                read = await withTimeout(readAdminClaims(user), 8000);
+            } catch (error) {
+                // readAdminClaims swallows its own failures; this is a backstop.
+                console.warn('Could not work out admin access:', error);
+                read = { claims: null, refreshError: error };
+            }
+
+            // Someone signed out, or in as someone else, while this was
+            // waiting. Acting on it now would open the dashboard for a
+            // signed-out page, or sign out the account that replaced this one.
+            if (!auth.currentUser || auth.currentUser.uid !== user.uid) return;
+
+            const access = describeAdminAccess(user, read);
+            hideSplash();
 
             if (!access.allowed) {
                 stopListening();
                 showLogin();
-                showLoginError('This account does not have access to the dashboard.');
+                showLoginError('This account does not have access to the dashboard. If access was granted recently, sign in again.');
                 auth.signOut();
                 return;
             }
 
-            currentUser = user;
-            document.getElementById('user-email').textContent = user.email;
-
-            /* Which of the two tests is carrying this account. Read this
-               before publishing tightened rules: "email, not confirmed" is
-               the one that would lose access. */
-            const NOTES = {
-                'claim': 'Admin access: security claim. Safe to remove the email fallback.',
-                'email-verified': 'Admin access: confirmed email. Works, but a security claim is better.',
-                'email-unverified': 'Admin access: email, NOT confirmed. Fix this before tightening the rules.',
-                'unknown': 'Admin access: could not be checked just now.'
-            };
-            const note = document.getElementById('admin-access-note');
-            if (note) {
-                note.textContent = NOTES[access.state] || NOTES.unknown;
-                note.style.color = access.state === 'email-unverified' ? '#F87171' : '';
-            }
-
-            showDashboard();
-            loadDashboardData();
+            if (!shopAddress) openDashboard(user);
+            showAccessNote(access.state, read.refreshError);
         });
 
         // Login form submission
@@ -3496,7 +3720,12 @@
         // Logout
         function logout() {
             stopListening();
-            auth.signOut();
+            /* Reload once signed out. Sign-out only hides the dashboard: the
+               job list, customer details and rendered tables all stay in the
+               page's memory, readable from the browser's developer tools by
+               the next person at the shop computer. A reload is the one clear
+               that cannot miss anything. */
+            auth.signOut().finally(() => window.location.reload());
         }
 
         // The live listeners are refused the moment the account signs out,
@@ -3510,6 +3739,7 @@
             if (unsubscribeRepairs) unsubscribeRepairs();
             unsubscribeRepairs = null;
             repairsLoaded = false;
+            stopBookings();
         }
 
         // Navigation
@@ -3537,6 +3767,7 @@
             const titles = {
                 'overview': 'Dashboard Overview',
                 'repairs': 'All Repairs',
+                'bookings': 'Online Bookings',
                 'analytics': 'Business Analytics'
             };
             document.getElementById('page-title').textContent = titles[sectionName] || 'Dashboard';
@@ -3549,6 +3780,8 @@
                 renderKanban('overview-kanban-container');
             } else if (sectionName === 'analytics') {
                 renderAnalytics();
+            } else if (sectionName === 'bookings') {
+                renderBookings();
             }
         }
 
@@ -3593,11 +3826,713 @@
                 showAlert('Error loading data: ' + error.message, 'error');
             });
 
+            startBookings();
+
             if (!window.OnlineFixTracking) {
                 showAlert('Tracking page script did not load — reload the page', 'error');
             } else if (!unsubscribeTracking) {
                 startTrackingSync();
             }
+        }
+
+        // === ONLINE BOOKINGS ===
+        // Requests from the public /book/ page land in `bookings`, and the
+        // booking page emails the shop about each one (see /mail in
+        // firestore.rules). This board lays them out by the day and time the
+        // customer asked to drop off. Opening one lets staff correct the
+        // details, confirm it, and book it in, which turns it into a job on
+        // the jobs board.
+        //
+        // A booking moves pending (New) -> confirmed -> booked, or to
+        // removed. Older ones may say 'responded', from before this board,
+        // and count as confirmed. Removing one also sets its `deleted` flag.
+        let unsubscribeBookings = null;
+        let allBookings = [];
+        let bookingsLoaded = false;
+        let bookingsTruncated = false;
+
+        const BOOKING_CATEGORIES = {
+            phone: 'Phone', laptop: 'Laptop', tablet: 'Tablet',
+            console: 'Games console', desktop: 'Desktop', other: 'Other'
+        };
+        const OPEN_BOOKING_STATUSES = ['pending', 'confirmed', 'responded'];
+        const BOOKINGS_LIMIT = 300;
+
+        /* Only the bookings still waiting on the shop are fetched. Fetching
+           the newest few hundred of every kind and filtering here let removed
+           and booked-in ones take up the window: a burst of junk bookings
+           would push every real one out of it, and removing the junk would
+           not bring them back. */
+        function startBookings() {
+            if (unsubscribeBookings) unsubscribeBookings();
+            unsubscribeBookings = db.collection('bookings')
+                .where('status', 'in', OPEN_BOOKING_STATUSES)
+                .limit(BOOKINGS_LIMIT)
+                .onSnapshot((snapshot) => {
+                    allBookings = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    bookingsTruncated = snapshot.size >= BOOKINGS_LIMIT;
+                    bookingsLoaded = true;
+                    updateBookingsBadge();
+                    if (isBookingsBoardShown()) renderBookings();
+                }, (error) => {
+                    unsubscribeBookings = null;
+                    bookingsLoaded = false;
+                    if (!auth.currentUser) return;   // signed out, nothing to report
+                    console.warn('Online bookings unavailable:', error);
+                    const board = document.getElementById('bookings-board');
+                    if (board) board.innerHTML = '<p class="empty-state">Online bookings could not be loaded: ' + escapeHTML(error.message) + '</p>';
+                });
+        }
+
+        function stopBookings() {
+            if (unsubscribeBookings) unsubscribeBookings();
+            unsubscribeBookings = null;
+            bookingsLoaded = false;
+            allBookings = [];
+        }
+
+        function isBookingsBoardShown() {
+            return !!document.getElementById('bookings-board')?.offsetParent;
+        }
+
+        // Still waiting on the shop: not removed and not yet a job.
+        function isOpenBooking(b) {
+            return b.deleted !== true && OPEN_BOOKING_STATUSES.includes(b.status || 'pending') && !b.linkedRepairId;
+        }
+
+        function isNewBooking(b) {
+            return isOpenBooking(b) && (!b.status || b.status === 'pending');
+        }
+
+        // What the customer was shown as their reference on the booking page.
+        function bookingReference(b) {
+            return String(b.id || '').slice(-6).toUpperCase();
+        }
+
+        function updateBookingsBadge() {
+            const badge = document.getElementById('nav-bookings-badge');
+            if (!badge) return;
+            const count = allBookings.filter(isNewBooking).length;
+            badge.textContent = count;
+            badge.classList.toggle('hidden', count === 0);
+        }
+
+        function bookingDate(ts) {
+            return ts && typeof ts.toDate === 'function' ? ts.toDate() : null;
+        }
+
+        function formatBookingTime(ts, withDate = true) {
+            const d = bookingDate(ts);
+            if (!d) return 'Not given';
+            return d.toLocaleString('en-GB', withDate
+                ? { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }
+                : { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function startOfDay(d) {
+            return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+        }
+
+        // Whole calendar days from a to b, counted on the calendar so a clock
+        // change in between does not shift a booking into the wrong column.
+        function daysBetween(a, b) {
+            return Math.round((Date.UTC(b.getFullYear(), b.getMonth(), b.getDate())
+                - Date.UTC(a.getFullYear(), a.getMonth(), a.getDate())) / 86400000);
+        }
+
+        /* One column per day the customers asked for, starting today.
+           Today and Tomorrow always show, so the board keeps its shape when
+           they are empty; any other day shows only when something is booked
+           on it. Earlier holds bookings whose day has passed without being
+           booked in, which usually means a no-show or a job someone forgot
+           to book in. */
+        function bookingColumns(bookings) {
+            const today = startOfDay(new Date());
+            const columns = new Map();
+            const add = (key, label, order, booking, withDate) => {
+                if (!columns.has(key)) columns.set(key, { label, order, withDate, bookings: [] });
+                if (booking) columns.get(key).bookings.push(booking);
+            };
+            add('today', 'Today', 1, null, false);
+            add('tomorrow', 'Tomorrow', 2, null, false);
+
+            bookings.forEach(b => {
+                const d = bookingDate(b.preferredAt);
+                if (!d) return add('undated', 'No time given', 99, b, true);
+                const offset = daysBetween(today, d);
+                if (offset < 0) return add('earlier', 'Earlier, not booked in', 0, b, true);
+                if (offset === 0) return add('today', 'Today', 1, b, false);
+                if (offset === 1) return add('tomorrow', 'Tomorrow', 2, b, false);
+                if (offset < 7) {
+                    return add('d' + offset, d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' }), 1 + offset, b, false);
+                }
+                return add('later', 'Later', 50, b, true);
+            });
+
+            return [...columns.values()]
+                .sort((a, b) => a.order - b.order)
+                .map(col => ({
+                    ...col,
+                    bookings: col.bookings.sort((x, y) =>
+                        (bookingDate(x.preferredAt) || 0) - (bookingDate(y.preferredAt) || 0))
+                }));
+        }
+
+        function renderBookings() {
+            const board = document.getElementById('bookings-board');
+            if (!board) return;
+            if (!bookingsLoaded) {
+                if (!board.innerHTML.trim()) board.innerHTML = '<p class="empty-state">Loading online bookings…</p>';
+                return;
+            }
+            const open = allBookings.filter(isOpenBooking);
+            const newCount = open.filter(isNewBooking).length;
+            document.getElementById('bookings-count').textContent =
+                open.length ? `(${open.length} waiting, ${newCount} new)` : '';
+            const note = document.getElementById('bookings-truncated');
+            if (note) note.classList.toggle('hidden', !bookingsTruncated);
+
+            board.innerHTML = bookingColumns(open).map(col => `
+                <div class="kanban-column">
+                    <div class="kanban-column-header">
+                        <span>${escapeHTML(col.label)}</span>
+                        <span class="kanban-column-count">${col.bookings.length}</span>
+                    </div>
+                    <div class="kanban-cards">
+                        ${col.bookings.map(b => renderBookingCard(b, col.withDate)).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Today and Tomorrow are worked out when the board is drawn, so a
+        // dashboard left open overnight would otherwise keep yesterday's
+        // columns until a booking changed.
+        function scheduleBookingsMidnightRedraw() {
+            const now = new Date();
+            const next = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 5);
+            setTimeout(() => {
+                if (isBookingsBoardShown()) renderBookings();
+                scheduleBookingsMidnightRedraw();
+            }, next - now);
+        }
+        scheduleBookingsMidnightRedraw();
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden && isBookingsBoardShown()) renderBookings();
+        });
+
+        function bookingDeviceText(b) {
+            const device = b.device || {};
+            return [bookingBrandForJob(device.brand), device.model].filter(Boolean).join(' ')
+                || BOOKING_CATEGORIES[device.category] || 'Device not given';
+        }
+
+        function renderBookingCard(b, withDate) {
+            const isNew = isNewBooking(b);
+            const photos = Array.isArray(b.photoPaths) ? b.photoPaths.length : 0;
+            return `
+                <div class="kanban-card booking-card${isNew ? ' booking-card--new' : ''}" role="button" tabindex="0"
+                     data-booking-open="${escapeHTML(b.id)}">
+                    <div class="booking-card-time">${escapeHTML(formatBookingTime(b.preferredAt, withDate))}</div>
+                    <div class="kanban-card-customer">${escapeHTML((b.customer && b.customer.name) || 'No name')}</div>
+                    <div class="kanban-card-device">${escapeHTML(bookingDeviceText(b))}</div>
+                    <div class="kanban-card-footer">
+                        <span class="booking-chip${isNew ? ' booking-chip--new' : ''}">${isNew ? 'New' : 'Confirmed'}</span>
+                        ${photos ? `<span class="kanban-card-age"><i class="fas fa-image"></i> ${photos}</span>` : ''}
+                    </div>
+                </div>`;
+        }
+
+        document.addEventListener('click', (e) => {
+            const card = e.target.closest('[data-booking-open]');
+            if (card) openBooking(card.dataset.bookingOpen);
+            // Booking photo buttons, in the booking box and on a booked-in
+            // job. The path is carried in a data attribute, never written
+            // into an onclick: it came from the booking form, and older
+            // bookings were not held to a fixed shape.
+            const photo = e.target.closest('[data-booking-photo]');
+            if (photo) openBookingPhoto(photo.dataset.bookingPhoto);
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key !== 'Enter' && e.key !== ' ') return;
+            // Not while a booking is open: the card underneath still has
+            // focus, and reopening it would throw away what was typed.
+            if (document.getElementById('booking-modal')) return;
+            const card = e.target.closest && e.target.closest('[data-booking-open]');
+            if (!card) return;
+            e.preventDefault();
+            openBooking(card.dataset.bookingOpen);
+        });
+
+        // <input type="datetime-local"> wants local time with no zone.
+        function toLocalInputValue(d) {
+            if (!d) return '';
+            const pad = n => String(n).padStart(2, '0');
+            return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+        }
+
+        /* The booking form's brand list mixes in product lines ("Apple
+           iPad"), which would make the job read "Apple iPad iPad Air". Cards
+           and the box show the plain maker instead, and the booking keeps
+           what the customer picked until the box is saved. */
+        const BOOKING_BRAND_MAKERS = {
+            'Apple iPad': 'Apple', 'Apple iMac/Mac': 'Apple',
+            'Microsoft Xbox': 'Microsoft', 'Microsoft Surface': 'Microsoft',
+            'Sony PlayStation': 'Sony', 'Amazon': 'Amazon', 'Custom Build': '', 'Other': ''
+        };
+
+        function bookingBrandForJob(brand) {
+            const b = String(brand || '');
+            return Object.prototype.hasOwnProperty.call(BOOKING_BRAND_MAKERS, b) ? BOOKING_BRAND_MAKERS[b] : b;
+        }
+
+        function openBooking(bookingId) {
+            const booking = allBookings.find(b => b.id === bookingId);
+            if (!booking) return;
+            document.getElementById('booking-modal')?.remove();
+
+            const customer = booking.customer || {};
+            const device = booking.device || {};
+            const parts = String(customer.name || '').trim().split(/\s+/);
+            const first = parts[0] || '';
+            const last = parts.slice(1).join(' ');
+            const isNew = isNewBooking(booking);
+            const email = String(customer.email || '');
+            const phone = String(customer.phone || '');
+            const photos = Array.isArray(booking.photoPaths) ? booking.photoPaths : [];
+            const cost = typeof booking.estimatedCost === 'number' ? booking.estimatedCost : '';
+
+            const modal = document.createElement('div');
+            modal.className = 'modal show';
+            modal.id = 'booking-modal';
+            modal.setAttribute('role', 'dialog');
+            modal.setAttribute('aria-modal', 'true');
+            modal.setAttribute('aria-labelledby', 'booking-modal-title');
+            modal.innerHTML = `
+                <div class="modal-content modal-content--job booking-modal-content">
+                    <div class="modal-header">
+                        <h2 class="modal-title" id="booking-modal-title">Booking: ${escapeHTML(customer.name || 'No name')}</h2>
+                        <button type="button" class="close-btn" data-booking-close aria-label="Close">&times;</button>
+                    </div>
+                    <form id="booking-edit-form" novalidate>
+                        <div class="job-body">
+                            <div class="booking-facts">
+                                <div><span>Status</span><span class="booking-chip${isNew ? ' booking-chip--new' : ''}">${isNew ? 'New, not yet confirmed' : 'Confirmed'}</span></div>
+                                <div><span>Reference</span>${escapeHTML(bookingReference(booking))}</div>
+                                <div><span>Requested</span>${escapeHTML(formatBookingTime(booking.createdAt))}</div>
+                                <div><span>Email</span><a href="mailto:${escapeHTML(encodeURIComponent(email))}">${escapeHTML(email || 'None')}</a></div>
+                                <div><span>Phone</span><a href="tel:${escapeHTML(phone.replace(/[^0-9+]/g, ''))}">${escapeHTML(phone || 'None')}</a></div>
+                            </div>
+                            ${photos.length ? `<div class="booking-photos">${photos.map((path, i) =>
+                                `<button type="button" class="btn btn-secondary" data-booking-photo="${escapeHTML(path)}"><i class="fas fa-image"></i> Photo ${i + 1}</button>`).join('')}</div>` : ''}
+                            <div class="form-grid booking-form-grid">
+                                <div class="form-group">
+                                    <label class="form-label" for="bk-first">First name</label>
+                                    <input type="text" class="form-input" id="bk-first" maxlength="60" autocomplete="off" autocapitalize="words" value="${escapeHTML(first)}">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="bk-last">Last name</label>
+                                    <input type="text" class="form-input" id="bk-last" maxlength="60" autocomplete="off" autocapitalize="words" value="${escapeHTML(last)}">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="bk-email">Email</label>
+                                    <input type="email" class="form-input" id="bk-email" maxlength="200" inputmode="email" autocapitalize="off" spellcheck="false" value="${escapeHTML(email)}">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="bk-phone">Mobile number</label>
+                                    <input type="tel" class="form-input" id="bk-phone" maxlength="24" inputmode="tel" value="${escapeHTML(phone)}">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="bk-when">Drop-off</label>
+                                    <input type="datetime-local" class="form-input" id="bk-when" value="${escapeHTML(toLocalInputValue(bookingDate(booking.preferredAt)))}">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="bk-category">Device type</label>
+                                    <select class="form-input" id="bk-category">
+                                        ${Object.entries(BOOKING_CATEGORIES).map(([value, label]) =>
+                                            `<option value="${value}"${device.category === value ? ' selected' : ''}>${label}</option>`).join('')}
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="bk-brand">Brand</label>
+                                    <input type="text" class="form-input" id="bk-brand" maxlength="50" autocomplete="off" value="${escapeHTML(bookingBrandForJob(device.brand))}">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="bk-model">Model</label>
+                                    <input type="text" class="form-input" id="bk-model" maxlength="100" autocomplete="off" value="${escapeHTML(device.model || '')}">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="bk-issue">Fault</label>
+                                <textarea class="form-input form-textarea" id="bk-issue" maxlength="1000">${escapeHTML(booking.issue || '')}</textarea>
+                                <small style="color: var(--text-muted);">Shown to the customer on their tracking page once booked in.</small>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="bk-cost">Estimated price (£, optional)</label>
+                                <input type="number" class="form-input" id="bk-cost" min="0" step="0.01" inputmode="decimal" value="${escapeHTML(cost)}">
+                            </div>
+                            <label class="booking-check">
+                                <input type="checkbox" id="bk-send-email"${isValidEmail(email) ? ' checked' : ''}>
+                                <span>When booking in, email the customer their tracking link (the same email as the Send tracking email button).</span>
+                            </label>
+                        </div>
+                        <!-- Outside the scrolling part, so a message shows
+                             beside the buttons however far down the form is. -->
+                        <div class="alert alert-error hidden" id="bk-error" style="margin: 1rem 0 0;"></div>
+                        <div class="modal-actions booking-actions">
+                            <button type="button" class="btn btn-danger" data-booking-action="remove"><i class="fas fa-trash"></i> Remove</button>
+                            <span class="modal-actions__spacer"></span>
+                            <button type="button" class="btn btn-secondary" data-booking-action="save"><i class="fas fa-save"></i> Save</button>
+                            <button type="button" class="btn btn-secondary" data-booking-action="${isNew ? 'confirm' : 'unconfirm'}">
+                                <i class="fas ${isNew ? 'fa-check' : 'fa-rotate-left'}"></i> ${isNew ? 'Confirm booking' : 'Mark as new'}
+                            </button>
+                            <button type="button" class="btn btn-primary" data-booking-action="book-in"><i class="fas fa-tools"></i> Book in as job</button>
+                        </div>
+                    </form>
+                </div>`;
+            modal.dataset.bookingId = booking.id;
+            document.body.appendChild(modal);
+            modal.querySelector('#bk-first').focus({ preventScroll: true });
+
+            const BUSY_LABELS = { save: 'Saving…', confirm: 'Saving…', unconfirm: 'Saving…', remove: 'Removing…', 'book-in': 'Booking in…' };
+            modal.addEventListener('click', async (e) => {
+                if (modal.dataset.busy) return;
+                if (e.target === modal || e.target.closest('[data-booking-close]')) { modal.remove(); return; }
+                const actionBtn = e.target.closest('[data-booking-action]');
+                if (!actionBtn || actionBtn.disabled) return;
+                const action = actionBtn.dataset.bookingAction;
+                const buttons = modal.querySelectorAll('[data-booking-action]');
+                const label = actionBtn.innerHTML;
+                const setBusy = (busy) => {
+                    if (busy) modal.dataset.busy = '1'; else delete modal.dataset.busy;
+                    buttons.forEach(b => { b.disabled = busy; });
+                    actionBtn.innerHTML = busy ? `<i class="fas fa-spinner fa-spin"></i> ${BUSY_LABELS[action] || 'Saving…'}` : label;
+                };
+                try {
+                    await runBookingAction(booking, action, modal, setBusy);
+                } finally {
+                    if (modal.isConnected) setBusy(false);
+                }
+            });
+        }
+
+        async function openBookingPhoto(path) {
+            // Opened first, so an iPad does not treat the later navigation as
+            // an unrequested popup.
+            const win = window.open('', '_blank');
+            try {
+                const url = await storage.ref(path).getDownloadURL();
+                if (win) { win.opener = null; win.location.href = url; } else safeOpen(url);
+            } catch (error) {
+                if (win) win.close();
+                showAlert('Could not open that photo: ' + error.message, 'error');
+            }
+        }
+
+        // What the form says now, checked. Returns null (and shows why) when
+        // it is not good enough to save.
+        function readBookingForm(modal, forBookIn) {
+            const val = id => modal.querySelector('#' + id).value.trim();
+            const err = modal.querySelector('#bk-error');
+            const fail = (msg) => { err.textContent = msg; err.classList.remove('hidden'); return null; };
+
+            const firstName = val('bk-first');
+            const lastName = val('bk-last');
+            const email = val('bk-email');
+            const phone = val('bk-phone');
+            const when = val('bk-when');
+            const category = val('bk-category');
+            const brand = val('bk-brand');
+            const model = val('bk-model');
+            const issue = val('bk-issue');
+            const costRaw = val('bk-cost');
+
+            if (!firstName) return fail('A first name is needed.');
+            if (email && !isValidEmail(email)) return fail('That email address does not look right.');
+            if (!email && !phone) return fail('Give at least an email address or a mobile number.');
+            const preferredAt = when ? new Date(when) : null;
+            if (when && isNaN(preferredAt)) return fail('That drop-off time does not look right.');
+            if (!BOOKING_CATEGORIES[category]) return fail('Pick a device type.');
+            if (forBookIn && !issue) return fail('Describe the fault before booking in. The customer sees it on their tracking page.');
+            let estimatedCost = null;
+            if (costRaw) {
+                estimatedCost = Math.round(parseFloat(costRaw) * 100) / 100;
+                if (!isFinite(estimatedCost) || estimatedCost < 0) return fail('The estimated price should be a number, like 49.99.');
+            }
+            err.classList.add('hidden');
+
+            return {
+                firstName, lastName, email, phone, category, brand, model, issue, estimatedCost, preferredAt,
+                customerName: (firstName + ' ' + lastName).trim()
+            };
+        }
+
+        // The form's edits, in the booking's own shape. An emptied drop-off
+        // box clears the time, which puts the booking under No time given.
+        function bookingEdits(form) {
+            return {
+                customer: { name: form.customerName, email: form.email, phone: form.phone },
+                device: { category: form.category, brand: form.brand, model: form.model },
+                issue: form.issue,
+                estimatedCost: form.estimatedCost,
+                preferredAt: form.preferredAt ? firebase.firestore.Timestamp.fromDate(form.preferredAt) : null,
+                updatedAt: firebase.firestore.Timestamp.now(),
+                updatedBy: currentUser ? currentUser.email : 'unknown'
+            };
+        }
+
+        /* Every change to a booking checks, in the same transaction, that it
+           is still waiting. A box left open in another tab could otherwise
+           set a booked-in booking back to confirmed, or write over its
+           details after the job was made. */
+        async function updateOpenBooking(bookingId, changes) {
+            const ref = db.collection('bookings').doc(bookingId);
+            await db.runTransaction(async (tx) => {
+                const fresh = await tx.get(ref);
+                const data = fresh.exists ? { id: fresh.id, ...fresh.data() } : null;
+                if (!data || data.deleted === true || data.status === 'removed') throw new Error('this booking has been removed.');
+                if (data.status === 'booked' || data.linkedRepairId) throw new Error('this booking is already booked in.');
+                tx.update(ref, changes);
+            });
+        }
+
+        // Firebase messages already end in a full stop.
+        function errorText(error) {
+            return String((error && error.message) || error || 'unknown error').replace(/\.\s*$/, '');
+        }
+
+        async function runBookingAction(opened, action, modal, setBusy) {
+            // The board only holds bookings still waiting, so one booked in or
+            // removed elsewhere drops out of it while its box is open here.
+            // Carry on with the copy the box was opened from: every write
+            // below re-reads the booking and says what happened to it.
+            const booking = allBookings.find(b => b.id === opened.id) || opened;
+            const bookingId = booking.id;
+            const name = (booking.customer && booking.customer.name) || 'this customer';
+
+            try {
+                if (action === 'remove') {
+                    if (!confirm(`Remove the booking from ${name}? It leaves the board and cannot be booked in afterwards. The customer is not told.`)) return;
+                    setBusy(true);
+                    await updateOpenBooking(bookingId, { status: 'removed', deleted: true, deletedAt: firebase.firestore.Timestamp.now() });
+                    modal.remove();
+                    showAlert('Booking removed.', 'success');
+                    return;
+                }
+
+                const form = readBookingForm(modal, action === 'book-in');
+                if (!form) return;
+
+                if (action === 'save') {
+                    setBusy(true);
+                    await updateOpenBooking(bookingId, bookingEdits(form));
+                    modal.remove();
+                    showAlert('Booking saved.', 'success');
+                } else if (action === 'confirm') {
+                    setBusy(true);
+                    await updateOpenBooking(bookingId, { ...bookingEdits(form), status: 'confirmed', confirmedAt: firebase.firestore.Timestamp.now() });
+                    modal.remove();
+                    showAlert('Booking confirmed. Nothing is sent to the customer; reply to their email or call them.', 'success');
+                } else if (action === 'unconfirm') {
+                    setBusy(true);
+                    await updateOpenBooking(bookingId, { ...bookingEdits(form), status: 'pending', confirmedAt: null });
+                    modal.remove();
+                    showAlert('Booking marked as new.', 'success');
+                } else if (action === 'book-in') {
+                    const sendEmail = modal.querySelector('#bk-send-email').checked && isValidEmail(form.email);
+                    const device = [form.brand, form.model].filter(Boolean).join(' ') || BOOKING_CATEGORIES[form.category];
+                    const mailNote = sendEmail ? `\n\nTheir tracking link will be emailed to ${form.email}.` : '';
+                    if (!confirm(`Book in ${form.customerName}'s ${device} as a job?\n\nDo this when the device is handed in: it goes on the jobs board, and on the customer's tracking page, as Received.${mailNote}`)) return;
+                    setBusy(true);
+                    const repair = await bookInBooking(booking, form);
+                    modal.remove();
+                    const notes = [];
+                    if (!repair.customerSaved) notes.push('The customer record was not updated.');
+                    let failed = false;
+                    if (sendEmail) {
+                        try {
+                            await queueTrackingEmail(repair, form.email);
+                            notes.push(`The tracking email is queued to ${form.email}.`);
+                        } catch (error) {
+                            failed = true;
+                            notes.push(`The tracking email could not be queued (${errorText(error)}). Open the job and use Send tracking email.`);
+                        }
+                    }
+                    showAlert(`Booked in as ${repair.repairId}. It is on the jobs board. ${notes.join(' ')}`.trim(),
+                        failed ? 'error' : 'success', { sticky: failed || !repair.customerSaved });
+                }
+            } catch (error) {
+                const err = modal.isConnected && modal.querySelector('#bk-error');
+                if (err) {
+                    err.textContent = 'Could not save: ' + errorText(error) + '.';
+                    err.classList.remove('hidden');
+                } else {
+                    showAlert('Could not update that booking: ' + errorText(error) + '.', 'error', { sticky: true });
+                }
+            }
+        }
+
+        function randomHex(bytes) {
+            const buf = new Uint8Array(bytes);
+            crypto.getRandomValues(buf);
+            return Array.from(buf, b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        // Same shape and strength as the intake page's codes (see
+        // newRepairId in new-repair/intake.js): the code is all that guards
+        // the customer's tracking page.
+        function newRepairCode() {
+            return 'REP_' + randomHex(8).toUpperCase();
+        }
+
+        // Mirrors deviceTypeFor in new-repair/intake.js.
+        function deviceTypeFor(category, brand) {
+            const b = String(brand || '').toLowerCase();
+            const isApple = b.indexOf('apple') !== -1;
+            switch (category) {
+                case 'phone': return isApple ? 'iPhone' : (b.indexOf('samsung') !== -1 ? 'Samsung' : 'Android');
+                case 'tablet': return isApple ? 'iPad' : 'Tablet';
+                case 'laptop': return isApple ? 'MacBook' : 'Laptop';
+                case 'desktop': return 'Desktop';
+                case 'console': return 'Gaming Console';
+                default: return 'Device';
+            }
+        }
+
+        // Mirrors normalisePhone in new-repair/intake.js, so a customer booked
+        // in here is recognised when they next come through the iPad.
+        function normalisePhone(raw) {
+            let digits = String(raw || '').replace(/[^\d+]/g, '');
+            if (!digits) return '';
+            if (digits.indexOf('+') === 0) return '+' + digits.slice(1).replace(/\D/g, '');
+            digits = digits.replace(/\D/g, '');
+            if (digits.indexOf('44') === 0 && digits.length >= 11) return '+' + digits;
+            if (digits.indexOf('0') === 0) return '+44' + digits.slice(1);
+            return '+' + digits;
+        }
+
+        /* Turns a booking into a job, shaped like one from the iPad intake
+           (new-repair/intake.js) so every screen that reads jobs treats it
+           the same. What differs: no signed drop-off agreement and no unlock
+           code or condition notes, because none were taken; intakeChannel
+           says where it came from; and the booking's photos stay where they
+           are, private, rather than joining the job's photos, which the
+           tracking page shows.
+
+           The progress entry has no note on purpose: notes appear word for
+           word on the customer's tracking page.
+
+           The job and the booking's "booked" mark are written together, so
+           a booking can never become two jobs. The tracking page copy is
+           published by the dashboard's own sync as soon as the job appears. */
+        async function bookInBooking(booking, form) {
+            const now = firebase.firestore.Timestamp.now();
+            const by = currentUser ? currentUser.email : 'unknown';
+            const repairRef = db.collection('repairs').doc();
+            const bookingRef = db.collection('bookings').doc(booking.id);
+            const repair = {
+                repairId: newRepairCode(),
+                customerName: form.customerName,
+                firstName: form.firstName,
+                lastName: form.lastName,
+                customerEmail: form.email,
+                customerPhone: form.phone,
+                device: [form.brand, form.model].filter(Boolean).join(' ') || BOOKING_CATEGORIES[form.category],
+                brand: form.brand,
+                model: form.model,
+                deviceType: deviceTypeFor(form.category, form.brand),
+                issueDescription: form.issue,
+                estimatedCost: form.estimatedCost,
+                currentStatus: 'received',
+                dateReceived: now,
+                photos: [],
+                createdBy: by,
+                createdAt: now,
+                progress: [{ status: 'received', timestamp: now, notes: '', technician: by }],
+                intakeChannel: 'online-booking',
+                deviceCategory: form.category,
+                bookingId: booking.id,
+                bookingPhotoPaths: Array.isArray(booking.photoPaths) ? booking.photoPaths : [],
+                customerId: ''
+            };
+
+            await db.runTransaction(async (tx) => {
+                const fresh = await tx.get(bookingRef);
+                const data = fresh.exists ? fresh.data() : null;
+                if (!data || data.deleted === true || data.status === 'removed') throw new Error('this booking has been removed.');
+                if (data.status === 'booked' || data.linkedRepairId) throw new Error('this booking is already booked in.');
+                repair.bookingPhotoPaths = Array.isArray(data.photoPaths) ? data.photoPaths : [];
+                tx.set(repairRef, repair);
+                tx.update(bookingRef, {
+                    ...bookingEdits(form),
+                    status: 'booked',
+                    linkedRepairId: repairRef.id,
+                    repairCode: repair.repairId,
+                    bookedInAt: now,
+                    bookedInBy: by
+                });
+            });
+
+            // Customer directory, as the intake page keeps it. Non-fatal: the
+            // job is already safe.
+            let customerSaved = false;
+            try {
+                const customerId = await upsertBookedCustomer(form, repair.repairId);
+                if (customerId) await repairRef.update({ customerId });
+                customerSaved = true;
+            } catch (error) {
+                console.warn('Customer record not updated:', error);
+            }
+
+            return { id: repairRef.id, ...repair, customerSaved };
+        }
+
+        /* Links the job to the customer's record, or starts one. A booking's
+           details were typed by whoever filled in the form, not checked
+           face to face as the iPad intake's are, so an existing record is
+           never overwritten from them: the new job is added to it, and only
+           boxes the record has empty are filled in. Otherwise anyone who
+           knew a customer's email address could change that customer's
+           name and number by booking with it.
+
+           Matched by email when there is one, else by mobile number. */
+        async function upsertBookedCustomer(form, repairCode) {
+            const now = firebase.firestore.Timestamp.now();
+            const details = {
+                firstName: form.firstName,
+                lastName: form.lastName,
+                fullName: form.customerName,
+                email: form.email,
+                emailLower: form.email.toLowerCase(),
+                phone: form.phone,
+                phoneE164: normalisePhone(form.phone)
+            };
+            const link = {
+                updatedAt: now,
+                lastRepairId: repairCode,
+                repairIds: firebase.firestore.FieldValue.arrayUnion(repairCode),
+                repairCount: firebase.firestore.FieldValue.increment(1)
+            };
+
+            const customers = db.collection('customers');
+            const match = details.emailLower
+                ? await customers.where('emailLower', '==', details.emailLower).limit(1).get()
+                : details.phoneE164
+                    ? await customers.where('phoneE164', '==', details.phoneE164).limit(1).get()
+                    : null;
+
+            if (match && !match.empty) {
+                const existing = match.docs[0].data();
+                const fill = {};
+                Object.keys(details).forEach(key => {
+                    if (details[key] && !existing[key]) fill[key] = details[key];
+                });
+                await customers.doc(match.docs[0].id).update({ ...fill, ...link });
+                return match.docs[0].id;
+            }
+            const id = 'CUS_' + randomHex(12).toUpperCase();
+            await customers.doc(id).set({ ...details, ...link, marketingOptIn: false, createdAt: now });
+            return id;
         }
 
         // === CUSTOMER TRACKING PAGES ===
@@ -3949,6 +4884,18 @@
                             ${repair.estimatedCompletion ? `<p><strong>Est. Completion:</strong> <span style="color: var(--text-muted);">${new Date(repair.estimatedCompletion.seconds * 1000).toLocaleDateString('en-GB')}</span></p>` : ''}
                             ${repair.estimatedCost ? `<p><strong>Est. Cost:</strong> <span style="color: var(--text-muted);">£${escapeHTML(repair.estimatedCost)}</span></p>` : ''}
                             ${repair.additionalNotes ? `<p><strong>Notes:</strong> <span style="color: var(--text-muted);">${escapeHTML(repair.additionalNotes)}</span></p>` : ''}
+                            ${Array.isArray(repair.bookingPhotoPaths) && repair.bookingPhotoPaths.length ? `
+                                <!-- Photos the customer sent with an online
+                                     booking. They stay private: the job's own
+                                     photos are shown on the tracking page, so
+                                     these are opened from here instead. -->
+                                <p><strong>Booking photos:</strong> <span style="color: var(--text-muted);">sent by the customer, staff only</span></p>
+                                <div class="booking-photos">
+                                    ${repair.bookingPhotoPaths.map((path, i) => `
+                                        <button type="button" class="btn btn-secondary" data-booking-photo="${escapeHTML(path)}">
+                                            <i class="fas fa-image"></i> Photo ${i + 1}
+                                        </button>`).join('')}
+                                </div>` : ''}
                         </div>
                         ${repair.progress && repair.progress.length > 0 ? `
                             <div style="background: var(--bg-surface); border: 1px solid var(--border-color); padding: 1.5rem; border-radius: var(--radius-lg); margin-bottom: 2rem;">
@@ -4232,6 +5179,23 @@
                 btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Sending…</span>';
             }
 
+            try {
+                await queueTrackingEmail(repair, email);
+                showAlert('Tracking email queued to ' + email, 'success');
+            } catch (error) {
+                showAlert('Could not queue the email: ' + error.message, 'error');
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = original;
+                }
+            }
+        }
+
+        // The tracking-link email itself. Shared by the Send tracking email
+        // button and by booking in an online booking, so both send the same
+        // wording.
+        function queueTrackingEmail(repair, email) {
             const trackUrl = `${window.location.origin}/track/?id=${encodeURIComponent(repair.repairId)}`;
             const device = [repair.brand, repair.model].filter(Boolean).join(' ') || repair.deviceType || 'your device';
             const greeting = repair.firstName || repair.customerName || 'there';
@@ -4260,31 +5224,21 @@
                 'Track your repair: ' + trackUrl + '\n\n' +
                 'OnlineFix · ' + SHOP_ADDRESS + '\n' + SHOP_PHONE + ' · ' + SHOP_EMAIL + '\n';
 
-            try {
-                await db.collection('mail').add({
-                    to: [email],
-                    replyTo: SHOP_EMAIL,
-                    message: {
-                        subject: 'Your repair tracking link — ' + repair.repairId,
-                        text: text,
-                        html: html
-                    },
-                    meta: {
-                        kind: 'tracking-link-resend',
-                        repairId: repair.repairId,
-                        sentBy: currentUser ? currentUser.email : 'unknown',
-                        createdAt: firebase.firestore.Timestamp.now()
-                    }
-                });
-                showAlert('Tracking email queued to ' + email, 'success');
-            } catch (error) {
-                showAlert('Could not queue the email: ' + error.message, 'error');
-            } finally {
-                if (btn) {
-                    btn.disabled = false;
-                    btn.innerHTML = original;
+            return db.collection('mail').add({
+                to: [email],
+                replyTo: SHOP_EMAIL,
+                message: {
+                    subject: 'Your repair tracking link — ' + repair.repairId,
+                    text: text,
+                    html: html
+                },
+                meta: {
+                    kind: 'tracking-link-resend',
+                    repairId: repair.repairId,
+                    sentBy: currentUser ? currentUser.email : 'unknown',
+                    createdAt: firebase.firestore.Timestamp.now()
                 }
-            }
+            });
         }
 
         // Edit repair - show status update modal
@@ -4927,7 +5881,9 @@
         }
 
         // Toast notification system
-        function showAlert(message, type) {
+        // opts.sticky keeps the message up until it is closed, for a problem
+        // that needs doing something about rather than a passing note.
+        function showAlert(message, type, opts = {}) {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
             const iconMap = { success: 'fa-check-circle', error: 'fa-exclamation-circle', info: 'fa-info-circle' };
@@ -4938,7 +5894,7 @@
                 <button class="toast-close" onclick="dismissToast(this.parentElement)">&times;</button>
             `;
             container.appendChild(toast);
-            setTimeout(() => dismissToast(toast), 5000);
+            if (!opts.sticky) setTimeout(() => dismissToast(toast), 5000);
         }
 
         function dismissToast(toast) {
@@ -5999,10 +6955,37 @@
 
         // Delete repair
         async function deleteRepair(repairId, repairIdNumber) {
-            if (confirm(`Are you sure you want to delete repair ${repairIdNumber}? This action cannot be undone.`)) {
+            const booked = allRepairs.find(r => r.id === repairId);
+            const bookingId = booked && booked.bookingId;
+            const bookingNote = bookingId ? ' It came from an online booking, which goes back on the Online Bookings board.' : '';
+            if (confirm(`Are you sure you want to delete repair ${repairIdNumber}? This action cannot be undone.${bookingNote}`)) {
                 try {
                     // Delete from Firestore
                     await db.collection('repairs').doc(repairId).delete();
+
+                    // A job booked in from an online booking hands the booking
+                    // back, so it is not left marked as booked in to a job that
+                    // no longer exists. Only if it still points at this job.
+                    if (bookingId) {
+                        try {
+                            const bookingRef = db.collection('bookings').doc(bookingId);
+                            await db.runTransaction(async (tx) => {
+                                const fresh = await tx.get(bookingRef);
+                                if (!fresh.exists || fresh.data().linkedRepairId !== repairId) return;
+                                tx.update(bookingRef, {
+                                    status: 'confirmed',
+                                    linkedRepairId: null,
+                                    repairCode: firebase.firestore.FieldValue.delete(),
+                                    bookedInAt: firebase.firestore.FieldValue.delete(),
+                                    bookedInBy: firebase.firestore.FieldValue.delete(),
+                                    updatedAt: firebase.firestore.Timestamp.now(),
+                                    updatedBy: currentUser ? currentUser.email : 'unknown'
+                                });
+                            });
+                        } catch (error) {
+                            console.warn('Booking not handed back:', error);
+                        }
+                    }
 
                     // And the customer's tracking page for it. After the
                     // ticket, so the dashboard's sync has nothing left to
