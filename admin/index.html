@@ -2916,8 +2916,48 @@
             margin-top: 0.2rem;
         }
 
-        #booking-modal .modal-actions .btn {
-            min-height: 44px;
+        .kanban-card[data-booking-open] {
+            cursor: pointer;
+        }
+
+        .booking-facts .booking-chip {
+            display: inline-block;
+            font-size: 0.75rem;
+            text-transform: none;
+            letter-spacing: normal;
+        }
+
+        /* The booking box: wider than the other forms so its fields sit two
+           or three to a row on an iPad, with the header and buttons pinned
+           and the form scrolling between them, as the job box does. */
+        .booking-modal-content {
+            max-width: 760px;
+        }
+
+        #booking-modal form {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-height: 0;
+        }
+
+        #booking-modal .booking-actions {
+            flex: none;
+            margin-top: 1rem;
+        }
+
+        .booking-form-grid {
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        }
+
+        /* A long name must not push the close button off the edge. */
+        #booking-modal .modal-title {
+            overflow-wrap: anywhere;
+            min-width: 0;
+        }
+
+        #booking-modal .close-btn {
+            flex-shrink: 0;
         }
     </style>
 </head>
@@ -3007,7 +3047,7 @@
                     <a href="#" class="nav-link" data-section="bookings">
                         <i class="fas fa-calendar-check"></i>
                         Online Bookings
-                        <span class="overdue-nav-badge hidden" id="nav-bookings-badge" title="New bookings not yet replied to">0</span>
+                        <span class="overdue-nav-badge hidden" id="nav-bookings-badge" title="New bookings not yet confirmed">0</span>
                     </a>
                 </div>
                 <div class="nav-item">
@@ -3178,7 +3218,6 @@
                 </div>
             </div>
 
-            <!-- Analytics Section -->
             <!-- Requests from the public /book/ page, by the day and time the
                  customer asked to drop off. See ONLINE BOOKINGS in the script. -->
             <div id="bookings-section" class="content-section is-board hidden">
@@ -3188,11 +3227,15 @@
                         <span class="board-legend__item"><span class="board-flag board-flag--warn"></span>New, not yet confirmed</span>
                     </div>
                 </div>
+                <p id="bookings-truncated" class="hidden" style="color: var(--warning); margin: 0 0 0.75rem;">
+                    More bookings are waiting than this board shows. Book in or remove some and the rest will appear.
+                </p>
                 <div class="section-content board-content">
                     <div class="kanban-container" id="bookings-board"></div>
                 </div>
             </div>
 
+            <!-- Analytics Section -->
             <div id="analytics-section" class="content-section hidden">
                 <div class="section-header" style="flex-wrap: wrap; gap: 0.75rem;">
                     <h2 class="section-title">Business Analytics</h2>
@@ -3796,28 +3839,37 @@
         // details, confirm it, and book it in, which turns it into a job on
         // the jobs board.
         //
-        // A booking moves pending (New) -> confirmed -> booked. Older ones
-        // may say 'responded', from before this board, and count as
-        // confirmed. Booked-in and removed bookings leave the board; removing
-        // only sets the booking's own `deleted` flag.
+        // A booking moves pending (New) -> confirmed -> booked, or to
+        // removed. Older ones may say 'responded', from before this board,
+        // and count as confirmed. Removing one also sets its `deleted` flag.
         let unsubscribeBookings = null;
         let allBookings = [];
         let bookingsLoaded = false;
+        let bookingsTruncated = false;
 
         const BOOKING_CATEGORIES = {
             phone: 'Phone', laptop: 'Laptop', tablet: 'Tablet',
             console: 'Games console', desktop: 'Desktop', other: 'Other'
         };
+        const OPEN_BOOKING_STATUSES = ['pending', 'confirmed', 'responded'];
+        const BOOKINGS_LIMIT = 300;
 
+        /* Only the bookings still waiting on the shop are fetched. Fetching
+           the newest few hundred of every kind and filtering here let removed
+           and booked-in ones take up the window: a burst of junk bookings
+           would push every real one out of it, and removing the junk would
+           not bring them back. */
         function startBookings() {
             if (unsubscribeBookings) unsubscribeBookings();
             unsubscribeBookings = db.collection('bookings')
-                .orderBy('createdAt', 'desc').limit(300)
+                .where('status', 'in', OPEN_BOOKING_STATUSES)
+                .limit(BOOKINGS_LIMIT)
                 .onSnapshot((snapshot) => {
                     allBookings = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    bookingsTruncated = snapshot.size >= BOOKINGS_LIMIT;
                     bookingsLoaded = true;
                     updateBookingsBadge();
-                    if (document.getElementById('bookings-board')?.offsetParent) renderBookings();
+                    if (isBookingsBoardShown()) renderBookings();
                 }, (error) => {
                     unsubscribeBookings = null;
                     bookingsLoaded = false;
@@ -3835,13 +3887,22 @@
             allBookings = [];
         }
 
+        function isBookingsBoardShown() {
+            return !!document.getElementById('bookings-board')?.offsetParent;
+        }
+
         // Still waiting on the shop: not removed and not yet a job.
         function isOpenBooking(b) {
-            return b.deleted !== true && b.status !== 'booked' && !b.linkedRepairId;
+            return b.deleted !== true && OPEN_BOOKING_STATUSES.includes(b.status || 'pending') && !b.linkedRepairId;
         }
 
         function isNewBooking(b) {
             return isOpenBooking(b) && (!b.status || b.status === 'pending');
+        }
+
+        // What the customer was shown as their reference on the booking page.
+        function bookingReference(b) {
+            return String(b.id || '').slice(-6).toUpperCase();
         }
 
         function updateBookingsBadge() {
@@ -3868,6 +3929,13 @@
             return new Date(d.getFullYear(), d.getMonth(), d.getDate());
         }
 
+        // Whole calendar days from a to b, counted on the calendar so a clock
+        // change in between does not shift a booking into the wrong column.
+        function daysBetween(a, b) {
+            return Math.round((Date.UTC(b.getFullYear(), b.getMonth(), b.getDate())
+                - Date.UTC(a.getFullYear(), a.getMonth(), a.getDate())) / 86400000);
+        }
+
         /* One column per day the customers asked for, starting today.
            Today and Tomorrow always show, so the board keeps its shape when
            they are empty; any other day shows only when something is booked
@@ -3876,8 +3944,6 @@
            to book in. */
         function bookingColumns(bookings) {
             const today = startOfDay(new Date());
-            const dayMs = 24 * 60 * 60 * 1000;
-            const weekEnd = new Date(today.getTime() + 7 * dayMs);
             const columns = new Map();
             const add = (key, label, order, booking, withDate) => {
                 if (!columns.has(key)) columns.set(key, { label, order, withDate, bookings: [] });
@@ -3889,12 +3955,11 @@
             bookings.forEach(b => {
                 const d = bookingDate(b.preferredAt);
                 if (!d) return add('undated', 'No time given', 99, b, true);
-                const day = startOfDay(d);
-                const offset = Math.round((day - today) / dayMs);
-                if (day < today) return add('earlier', 'Earlier, not booked in', 0, b, true);
+                const offset = daysBetween(today, d);
+                if (offset < 0) return add('earlier', 'Earlier, not booked in', 0, b, true);
                 if (offset === 0) return add('today', 'Today', 1, b, false);
                 if (offset === 1) return add('tomorrow', 'Tomorrow', 2, b, false);
-                if (day < weekEnd) {
+                if (offset < 7) {
                     return add('d' + offset, d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' }), 1 + offset, b, false);
                 }
                 return add('later', 'Later', 50, b, true);
@@ -3920,6 +3985,8 @@
             const newCount = open.filter(isNewBooking).length;
             document.getElementById('bookings-count').textContent =
                 open.length ? `(${open.length} waiting, ${newCount} new)` : '';
+            const note = document.getElementById('bookings-truncated');
+            if (note) note.classList.toggle('hidden', !bookingsTruncated);
 
             board.innerHTML = bookingColumns(open).map(col => `
                 <div class="kanban-column">
@@ -3934,6 +4001,22 @@
             `).join('');
         }
 
+        // Today and Tomorrow are worked out when the board is drawn, so a
+        // dashboard left open overnight would otherwise keep yesterday's
+        // columns until a booking changed.
+        function scheduleBookingsMidnightRedraw() {
+            const now = new Date();
+            const next = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 5);
+            setTimeout(() => {
+                if (isBookingsBoardShown()) renderBookings();
+                scheduleBookingsMidnightRedraw();
+            }, next - now);
+        }
+        scheduleBookingsMidnightRedraw();
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden && isBookingsBoardShown()) renderBookings();
+        });
+
         function bookingDeviceText(b) {
             const device = b.device || {};
             return [device.brand, device.model].filter(Boolean).join(' ')
@@ -3944,7 +4027,7 @@
             const isNew = isNewBooking(b);
             const photos = Array.isArray(b.photoPaths) ? b.photoPaths.length : 0;
             return `
-                <div class="kanban-card${isNew ? ' booking-card--new' : ''}" role="button" tabindex="0"
+                <div class="kanban-card booking-card${isNew ? ' booking-card--new' : ''}" role="button" tabindex="0"
                      data-booking-open="${escapeHTML(b.id)}">
                     <div class="booking-card-time">${escapeHTML(formatBookingTime(b.preferredAt, withDate))}</div>
                     <div class="kanban-card-customer">${escapeHTML((b.customer && b.customer.name) || 'No name')}</div>
@@ -3962,6 +4045,9 @@
         });
         document.addEventListener('keydown', (e) => {
             if (e.key !== 'Enter' && e.key !== ' ') return;
+            // Not while a booking is open: the card underneath still has
+            // focus, and reopening it would throw away what was typed.
+            if (document.getElementById('booking-modal')) return;
             const card = e.target.closest && e.target.closest('[data-booking-open]');
             if (!card) return;
             e.preventDefault();
@@ -3973,6 +4059,21 @@
             if (!d) return '';
             const pad = n => String(n).padStart(2, '0');
             return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+        }
+
+        /* The booking form's brand list mixes in product lines ("Apple
+           iPad"), which would make the job read "Apple iPad iPad Air". The
+           box starts with the plain maker instead; the booking itself keeps
+           what the customer picked. */
+        const BOOKING_BRAND_MAKERS = {
+            'Apple iPad': 'Apple', 'Apple iMac/Mac': 'Apple',
+            'Microsoft Xbox': 'Microsoft', 'Microsoft Surface': 'Microsoft',
+            'Sony PlayStation': 'Sony', 'Amazon': 'Amazon', 'Custom Build': '', 'Other': ''
+        };
+
+        function bookingBrandForJob(brand) {
+            const b = String(brand || '');
+            return Object.prototype.hasOwnProperty.call(BOOKING_BRAND_MAKERS, b) ? BOOKING_BRAND_MAKERS[b] : b;
         }
 
         function openBooking(bookingId) {
@@ -3994,73 +4095,79 @@
             const modal = document.createElement('div');
             modal.className = 'modal show';
             modal.id = 'booking-modal';
+            modal.setAttribute('role', 'dialog');
+            modal.setAttribute('aria-modal', 'true');
+            modal.setAttribute('aria-labelledby', 'booking-modal-title');
             modal.innerHTML = `
-                <div class="modal-content" style="max-width: 680px;">
+                <div class="modal-content modal-content--job booking-modal-content">
                     <div class="modal-header">
-                        <h2 class="modal-title">Booking: ${escapeHTML(customer.name || 'No name')}</h2>
-                        <button type="button" class="close-btn" data-booking-close>&times;</button>
+                        <h2 class="modal-title" id="booking-modal-title">Booking: ${escapeHTML(customer.name || 'No name')}</h2>
+                        <button type="button" class="close-btn" data-booking-close aria-label="Close">&times;</button>
                     </div>
-                    <div class="booking-facts">
-                        <div><span>Status</span><span class="booking-chip${isNew ? ' booking-chip--new' : ''}" style="display: inline-block; font-size: 0.75rem; text-transform: none; letter-spacing: 0;">${isNew ? 'New' : 'Confirmed'}</span></div>
-                        <div><span>Sent</span>${escapeHTML(formatBookingTime(booking.createdAt))}</div>
-                        <div><span>Email</span><a href="mailto:${escapeHTML(encodeURIComponent(email))}">${escapeHTML(email || 'None')}</a></div>
-                        <div><span>Phone</span><a href="tel:${escapeHTML(phone.replace(/[^0-9+]/g, ''))}">${escapeHTML(phone || 'None')}</a></div>
-                    </div>
-                    ${photos.length ? `<div class="booking-photos">${photos.map((path, i) =>
-                        `<button type="button" class="btn btn-secondary" data-booking-photo="${escapeHTML(path)}"><i class="fas fa-image"></i> Photo ${i + 1}</button>`).join('')}</div>` : ''}
                     <form id="booking-edit-form" novalidate>
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label class="form-label" for="bk-first">First name</label>
-                                <input type="text" class="form-input" id="bk-first" maxlength="60" autocomplete="off" autocapitalize="words" value="${escapeHTML(first)}">
+                        <div class="job-body">
+                            <div class="booking-facts">
+                                <div><span>Status</span><span class="booking-chip${isNew ? ' booking-chip--new' : ''}">${isNew ? 'New, not yet confirmed' : 'Confirmed'}</span></div>
+                                <div><span>Reference</span>${escapeHTML(bookingReference(booking))}</div>
+                                <div><span>Requested</span>${escapeHTML(formatBookingTime(booking.createdAt))}</div>
+                                <div><span>Email</span><a href="mailto:${escapeHTML(encodeURIComponent(email))}">${escapeHTML(email || 'None')}</a></div>
+                                <div><span>Phone</span><a href="tel:${escapeHTML(phone.replace(/[^0-9+]/g, ''))}">${escapeHTML(phone || 'None')}</a></div>
+                            </div>
+                            ${photos.length ? `<div class="booking-photos">${photos.map((path, i) =>
+                                `<button type="button" class="btn btn-secondary" data-booking-photo="${escapeHTML(path)}"><i class="fas fa-image"></i> Photo ${i + 1}</button>`).join('')}</div>` : ''}
+                            <div class="form-grid booking-form-grid">
+                                <div class="form-group">
+                                    <label class="form-label" for="bk-first">First name</label>
+                                    <input type="text" class="form-input" id="bk-first" maxlength="60" autocomplete="off" autocapitalize="words" value="${escapeHTML(first)}">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="bk-last">Last name</label>
+                                    <input type="text" class="form-input" id="bk-last" maxlength="60" autocomplete="off" autocapitalize="words" value="${escapeHTML(last)}">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="bk-email">Email</label>
+                                    <input type="email" class="form-input" id="bk-email" maxlength="200" inputmode="email" autocapitalize="off" spellcheck="false" value="${escapeHTML(email)}">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="bk-phone">Mobile number</label>
+                                    <input type="tel" class="form-input" id="bk-phone" maxlength="24" inputmode="tel" value="${escapeHTML(phone)}">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="bk-when">Drop-off</label>
+                                    <input type="datetime-local" class="form-input" id="bk-when" value="${escapeHTML(toLocalInputValue(bookingDate(booking.preferredAt)))}">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="bk-category">Device type</label>
+                                    <select class="form-input" id="bk-category">
+                                        ${Object.entries(BOOKING_CATEGORIES).map(([value, label]) =>
+                                            `<option value="${value}"${device.category === value ? ' selected' : ''}>${label}</option>`).join('')}
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="bk-brand">Brand</label>
+                                    <input type="text" class="form-input" id="bk-brand" maxlength="50" autocomplete="off" value="${escapeHTML(bookingBrandForJob(device.brand))}">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="bk-model">Model</label>
+                                    <input type="text" class="form-input" id="bk-model" maxlength="100" autocomplete="off" value="${escapeHTML(device.model || '')}">
+                                </div>
                             </div>
                             <div class="form-group">
-                                <label class="form-label" for="bk-last">Last name</label>
-                                <input type="text" class="form-input" id="bk-last" maxlength="60" autocomplete="off" autocapitalize="words" value="${escapeHTML(last)}">
+                                <label class="form-label" for="bk-issue">Fault</label>
+                                <textarea class="form-input form-textarea" id="bk-issue" maxlength="1000">${escapeHTML(booking.issue || '')}</textarea>
+                                <small style="color: var(--text-muted);">Shown to the customer on their tracking page once booked in.</small>
                             </div>
                             <div class="form-group">
-                                <label class="form-label" for="bk-email">Email</label>
-                                <input type="email" class="form-input" id="bk-email" maxlength="200" inputmode="email" autocapitalize="off" spellcheck="false" value="${escapeHTML(email)}">
+                                <label class="form-label" for="bk-cost">Estimated price (£, optional)</label>
+                                <input type="number" class="form-input" id="bk-cost" min="0" step="0.01" inputmode="decimal" value="${escapeHTML(cost)}">
                             </div>
-                            <div class="form-group">
-                                <label class="form-label" for="bk-phone">Mobile number</label>
-                                <input type="tel" class="form-input" id="bk-phone" maxlength="24" inputmode="tel" value="${escapeHTML(phone)}">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label" for="bk-when">Drop-off</label>
-                                <input type="datetime-local" class="form-input" id="bk-when" value="${escapeHTML(toLocalInputValue(bookingDate(booking.preferredAt)))}">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label" for="bk-category">Device type</label>
-                                <select class="form-input" id="bk-category">
-                                    ${Object.entries(BOOKING_CATEGORIES).map(([value, label]) =>
-                                        `<option value="${value}"${device.category === value ? ' selected' : ''}>${label}</option>`).join('')}
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label" for="bk-brand">Brand</label>
-                                <input type="text" class="form-input" id="bk-brand" maxlength="50" autocomplete="off" value="${escapeHTML(device.brand || '')}">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label" for="bk-model">Model</label>
-                                <input type="text" class="form-input" id="bk-model" maxlength="100" autocomplete="off" value="${escapeHTML(device.model || '')}">
-                            </div>
+                            <label class="booking-check">
+                                <input type="checkbox" id="bk-send-email"${isValidEmail(email) ? ' checked' : ''}>
+                                <span>When booking in, email the customer their tracking link (the same email as the Send tracking email button).</span>
+                            </label>
+                            <div class="alert alert-error hidden" id="bk-error" style="margin-bottom: 1rem;"></div>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label" for="bk-issue">Fault</label>
-                            <textarea class="form-input form-textarea" id="bk-issue" maxlength="1000">${escapeHTML(booking.issue || '')}</textarea>
-                            <small style="color: var(--text-muted);">Shown to the customer on their tracking page once booked in.</small>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label" for="bk-cost">Estimated price (£, optional)</label>
-                            <input type="number" class="form-input" id="bk-cost" min="0" step="0.01" inputmode="decimal" value="${escapeHTML(cost)}">
-                        </div>
-                        <label class="booking-check">
-                            <input type="checkbox" id="bk-send-email"${isValidEmail(email) ? ' checked' : ''}>
-                            <span>When booking in, email the customer their tracking link (the same email as the Send tracking email button).</span>
-                        </label>
-                        <div class="alert alert-error hidden" id="bk-error" style="margin-bottom: 1rem;"></div>
-                        <div class="modal-actions">
+                        <div class="modal-actions booking-actions">
                             <button type="button" class="btn btn-danger" data-booking-action="remove"><i class="fas fa-trash"></i> Remove</button>
                             <span class="modal-actions__spacer"></span>
                             <button type="button" class="btn btn-secondary" data-booking-action="save"><i class="fas fa-save"></i> Save</button>
@@ -4073,19 +4180,28 @@
                 </div>`;
             modal.dataset.bookingId = booking.id;
             document.body.appendChild(modal);
+            modal.querySelector('#bk-first').focus({ preventScroll: true });
 
+            const BUSY_LABELS = { save: 'Saving…', confirm: 'Saving…', unconfirm: 'Saving…', remove: 'Removing…', 'book-in': 'Booking in…' };
             modal.addEventListener('click', async (e) => {
+                if (modal.dataset.busy) return;
                 if (e.target === modal || e.target.closest('[data-booking-close]')) { modal.remove(); return; }
                 const photoBtn = e.target.closest('[data-booking-photo]');
                 if (photoBtn) { openBookingPhoto(photoBtn.dataset.bookingPhoto); return; }
                 const actionBtn = e.target.closest('[data-booking-action]');
                 if (!actionBtn || actionBtn.disabled) return;
+                const action = actionBtn.dataset.bookingAction;
                 const buttons = modal.querySelectorAll('[data-booking-action]');
-                buttons.forEach(b => { b.disabled = true; });
+                const label = actionBtn.innerHTML;
+                const setBusy = (busy) => {
+                    if (busy) modal.dataset.busy = '1'; else delete modal.dataset.busy;
+                    buttons.forEach(b => { b.disabled = busy; });
+                    actionBtn.innerHTML = busy ? `<i class="fas fa-spinner fa-spin"></i> ${BUSY_LABELS[action] || 'Saving…'}` : label;
+                };
                 try {
-                    await runBookingAction(booking.id, actionBtn.dataset.bookingAction, modal);
+                    await runBookingAction(booking.id, action, modal, setBusy);
                 } finally {
-                    buttons.forEach(b => { b.disabled = false; });
+                    if (modal.isConnected) setBusy(false);
                 }
             });
         }
@@ -4141,30 +4257,50 @@
             };
         }
 
-        // The form's edits, in the booking's own shape.
+        // The form's edits, in the booking's own shape. An emptied drop-off
+        // box clears the time, which puts the booking under No time given.
         function bookingEdits(form) {
-            const edits = {
+            return {
                 customer: { name: form.customerName, email: form.email, phone: form.phone },
                 device: { category: form.category, brand: form.brand, model: form.model },
                 issue: form.issue,
                 estimatedCost: form.estimatedCost,
+                preferredAt: form.preferredAt ? firebase.firestore.Timestamp.fromDate(form.preferredAt) : null,
                 updatedAt: firebase.firestore.Timestamp.now(),
                 updatedBy: currentUser ? currentUser.email : 'unknown'
             };
-            if (form.preferredAt) edits.preferredAt = firebase.firestore.Timestamp.fromDate(form.preferredAt);
-            return edits;
         }
 
-        async function runBookingAction(bookingId, action, modal) {
+        /* Every change to a booking checks, in the same transaction, that it
+           is still waiting. A box left open in another tab could otherwise
+           set a booked-in booking back to confirmed, or write over its
+           details after the job was made. */
+        async function updateOpenBooking(bookingId, changes) {
+            const ref = db.collection('bookings').doc(bookingId);
+            await db.runTransaction(async (tx) => {
+                const fresh = await tx.get(ref);
+                const data = fresh.exists ? { id: fresh.id, ...fresh.data() } : null;
+                if (!data || data.deleted === true || data.status === 'removed') throw new Error('this booking has been removed.');
+                if (data.status === 'booked' || data.linkedRepairId) throw new Error('this booking is already booked in.');
+                tx.update(ref, changes);
+            });
+        }
+
+        // Firebase messages already end in a full stop.
+        function errorText(error) {
+            return String((error && error.message) || error || 'unknown error').replace(/\.\s*$/, '');
+        }
+
+        async function runBookingAction(bookingId, action, modal, setBusy) {
             const booking = allBookings.find(b => b.id === bookingId);
             if (!booking) { modal.remove(); return; }
-            const ref = db.collection('bookings').doc(bookingId);
             const name = (booking.customer && booking.customer.name) || 'this customer';
 
             try {
                 if (action === 'remove') {
-                    if (!confirm(`Remove the booking from ${name}? It leaves the board and cannot be booked in afterwards.`)) return;
-                    await ref.update({ deleted: true, deletedAt: firebase.firestore.Timestamp.now() });
+                    if (!confirm(`Remove the booking from ${name}? It leaves the board and cannot be booked in afterwards. The customer is not told.`)) return;
+                    setBusy(true);
+                    await updateOpenBooking(bookingId, { status: 'removed', deleted: true, deletedAt: firebase.firestore.Timestamp.now() });
                     modal.remove();
                     showAlert('Booking removed.', 'success');
                     return;
@@ -4174,44 +4310,50 @@
                 if (!form) return;
 
                 if (action === 'save') {
-                    await ref.update(bookingEdits(form));
+                    setBusy(true);
+                    await updateOpenBooking(bookingId, bookingEdits(form));
                     modal.remove();
                     showAlert('Booking saved.', 'success');
                 } else if (action === 'confirm') {
-                    await ref.update({ ...bookingEdits(form), status: 'confirmed', confirmedAt: firebase.firestore.Timestamp.now() });
+                    setBusy(true);
+                    await updateOpenBooking(bookingId, { ...bookingEdits(form), status: 'confirmed', confirmedAt: firebase.firestore.Timestamp.now() });
                     modal.remove();
                     showAlert('Booking confirmed. Nothing is sent to the customer; reply to their email or call them.', 'success');
                 } else if (action === 'unconfirm') {
-                    await ref.update({ ...bookingEdits(form), status: 'pending', confirmedAt: null });
+                    setBusy(true);
+                    await updateOpenBooking(bookingId, { ...bookingEdits(form), status: 'pending', confirmedAt: null });
                     modal.remove();
+                    showAlert('Booking marked as new.', 'success');
                 } else if (action === 'book-in') {
-                    const sendEmail = modal.querySelector('#bk-send-email').checked;
+                    const sendEmail = modal.querySelector('#bk-send-email').checked && isValidEmail(form.email);
                     const device = [form.brand, form.model].filter(Boolean).join(' ') || BOOKING_CATEGORIES[form.category];
-                    if (!confirm(`Book in ${form.customerName}'s ${device} as a job? It goes on the jobs board as Received.`)) return;
+                    const mailNote = sendEmail ? `\n\nTheir tracking link will be emailed to ${form.email}.` : '';
+                    if (!confirm(`Book in ${form.customerName}'s ${device} as a job?\n\nDo this when the device is handed in: it goes on the jobs board, and on the customer's tracking page, as Received.${mailNote}`)) return;
+                    setBusy(true);
                     const repair = await bookInBooking(booking, form);
                     modal.remove();
-                    if (!sendEmail) {
-                        showAlert(`Booked in as ${repair.repairId}. It is on the jobs board.`, 'success');
-                    } else {
-                        if (!isValidEmail(form.email)) {
-                            showAlert(`Booked in as ${repair.repairId}. No valid email address, so no tracking email was sent.`, 'info');
-                        } else {
-                            try {
-                                await queueTrackingEmail(repair, form.email);
-                                showAlert(`Booked in as ${repair.repairId}, and the tracking email is queued to ${form.email}.`, 'success');
-                            } catch (error) {
-                                showAlert(`Booked in as ${repair.repairId}, but the tracking email could not be queued: ${error.message}. Use Send tracking email on the job.`, 'error');
-                            }
+                    const notes = [];
+                    if (!repair.customerSaved) notes.push('The customer record was not updated.');
+                    let failed = false;
+                    if (sendEmail) {
+                        try {
+                            await queueTrackingEmail(repair, form.email);
+                            notes.push(`The tracking email is queued to ${form.email}.`);
+                        } catch (error) {
+                            failed = true;
+                            notes.push(`The tracking email could not be queued (${errorText(error)}). Open the job and use Send tracking email.`);
                         }
                     }
+                    showAlert(`Booked in as ${repair.repairId}. It is on the jobs board. ${notes.join(' ')}`.trim(),
+                        failed ? 'error' : 'success', { sticky: failed || !repair.customerSaved });
                 }
             } catch (error) {
                 const err = modal.isConnected && modal.querySelector('#bk-error');
                 if (err) {
-                    err.textContent = 'Could not save: ' + error.message;
+                    err.textContent = 'Could not save: ' + errorText(error) + '.';
                     err.classList.remove('hidden');
                 } else {
-                    showAlert('Could not update that booking: ' + error.message, 'error');
+                    showAlert('Could not update that booking: ' + errorText(error) + '.', 'error', { sticky: true });
                 }
             }
         }
@@ -4303,7 +4445,7 @@
             await db.runTransaction(async (tx) => {
                 const fresh = await tx.get(bookingRef);
                 const data = fresh.exists ? fresh.data() : null;
-                if (!data || data.deleted === true) throw new Error('this booking has been removed.');
+                if (!data || data.deleted === true || data.status === 'removed') throw new Error('this booking has been removed.');
                 if (data.status === 'booked' || data.linkedRepairId) throw new Error('this booking is already booked in.');
                 tx.set(repairRef, repair);
                 tx.update(bookingRef, {
@@ -4318,44 +4460,63 @@
 
             // Customer directory, as the intake page keeps it. Non-fatal: the
             // job is already safe.
+            let customerSaved = false;
             try {
                 const customerId = await upsertBookedCustomer(form, repair.repairId);
                 if (customerId) await repairRef.update({ customerId });
+                customerSaved = true;
             } catch (error) {
                 console.warn('Customer record not updated:', error);
             }
 
-            return { id: repairRef.id, ...repair };
+            return { id: repairRef.id, ...repair, customerSaved };
         }
 
+        /* Links the job to the customer's record, or starts one. A booking's
+           details were typed by whoever filled in the form, not checked
+           face to face as the iPad intake's are, so an existing record is
+           never overwritten from them: the new job is added to it, and only
+           boxes the record has empty are filled in. Otherwise anyone who
+           knew a customer's email address could change that customer's
+           name and number by booking with it.
+
+           Matched by email when there is one, else by mobile number. */
         async function upsertBookedCustomer(form, repairCode) {
-            const payload = {
+            const now = firebase.firestore.Timestamp.now();
+            const details = {
                 firstName: form.firstName,
                 lastName: form.lastName,
                 fullName: form.customerName,
                 email: form.email,
                 emailLower: form.email.toLowerCase(),
                 phone: form.phone,
-                phoneE164: normalisePhone(form.phone),
-                updatedAt: firebase.firestore.Timestamp.now(),
+                phoneE164: normalisePhone(form.phone)
+            };
+            const link = {
+                updatedAt: now,
                 lastRepairId: repairCode,
                 repairIds: firebase.firestore.FieldValue.arrayUnion(repairCode),
                 repairCount: firebase.firestore.FieldValue.increment(1)
             };
-            let match = null;
-            if (payload.emailLower) {
-                match = await db.collection('customers').where('emailLower', '==', payload.emailLower).limit(1).get();
-            }
-            if ((!match || match.empty) && payload.phoneE164) {
-                match = await db.collection('customers').where('phoneE164', '==', payload.phoneE164).limit(1).get();
-            }
+
+            const customers = db.collection('customers');
+            const match = details.emailLower
+                ? await customers.where('emailLower', '==', details.emailLower).limit(1).get()
+                : details.phoneE164
+                    ? await customers.where('phoneE164', '==', details.phoneE164).limit(1).get()
+                    : null;
+
             if (match && !match.empty) {
-                const id = match.docs[0].id;
-                await db.collection('customers').doc(id).set(payload, { merge: true });
-                return id;
+                const existing = match.docs[0].data();
+                const fill = {};
+                Object.keys(details).forEach(key => {
+                    if (details[key] && !existing[key]) fill[key] = details[key];
+                });
+                await customers.doc(match.docs[0].id).update({ ...fill, ...link });
+                return match.docs[0].id;
             }
             const id = 'CUS_' + randomHex(12).toUpperCase();
-            await db.collection('customers').doc(id).set({ ...payload, marketingOptIn: false, createdAt: firebase.firestore.Timestamp.now() });
+            await customers.doc(id).set({ ...details, ...link, marketingOptIn: false, createdAt: now });
             return id;
         }
 
@@ -4708,6 +4869,18 @@
                             ${repair.estimatedCompletion ? `<p><strong>Est. Completion:</strong> <span style="color: var(--text-muted);">${new Date(repair.estimatedCompletion.seconds * 1000).toLocaleDateString('en-GB')}</span></p>` : ''}
                             ${repair.estimatedCost ? `<p><strong>Est. Cost:</strong> <span style="color: var(--text-muted);">£${escapeHTML(repair.estimatedCost)}</span></p>` : ''}
                             ${repair.additionalNotes ? `<p><strong>Notes:</strong> <span style="color: var(--text-muted);">${escapeHTML(repair.additionalNotes)}</span></p>` : ''}
+                            ${Array.isArray(repair.bookingPhotoPaths) && repair.bookingPhotoPaths.length ? `
+                                <!-- Photos the customer sent with an online
+                                     booking. They stay private: the job's own
+                                     photos are shown on the tracking page, so
+                                     these are opened from here instead. -->
+                                <p><strong>Booking photos:</strong> <span style="color: var(--text-muted);">sent by the customer, staff only</span></p>
+                                <div class="booking-photos">
+                                    ${repair.bookingPhotoPaths.map((path, i) => `
+                                        <button type="button" class="btn btn-secondary" onclick="openBookingPhoto('${escapeJSStr(path)}')">
+                                            <i class="fas fa-image"></i> Photo ${i + 1}
+                                        </button>`).join('')}
+                                </div>` : ''}
                         </div>
                         ${repair.progress && repair.progress.length > 0 ? `
                             <div style="background: var(--bg-surface); border: 1px solid var(--border-color); padding: 1.5rem; border-radius: var(--radius-lg); margin-bottom: 2rem;">
@@ -5693,7 +5866,9 @@
         }
 
         // Toast notification system
-        function showAlert(message, type) {
+        // opts.sticky keeps the message up until it is closed, for a problem
+        // that needs doing something about rather than a passing note.
+        function showAlert(message, type, opts = {}) {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
             const iconMap = { success: 'fa-check-circle', error: 'fa-exclamation-circle', info: 'fa-info-circle' };
@@ -5704,7 +5879,7 @@
                 <button class="toast-close" onclick="dismissToast(this.parentElement)">&times;</button>
             `;
             container.appendChild(toast);
-            setTimeout(() => dismissToast(toast), 5000);
+            if (!opts.sticky) setTimeout(() => dismissToast(toast), 5000);
         }
 
         function dismissToast(toast) {
@@ -6765,10 +6940,37 @@
 
         // Delete repair
         async function deleteRepair(repairId, repairIdNumber) {
-            if (confirm(`Are you sure you want to delete repair ${repairIdNumber}? This action cannot be undone.`)) {
+            const booked = allRepairs.find(r => r.id === repairId);
+            const bookingId = booked && booked.bookingId;
+            const bookingNote = bookingId ? ' It came from an online booking, which goes back on the Online Bookings board.' : '';
+            if (confirm(`Are you sure you want to delete repair ${repairIdNumber}? This action cannot be undone.${bookingNote}`)) {
                 try {
                     // Delete from Firestore
                     await db.collection('repairs').doc(repairId).delete();
+
+                    // A job booked in from an online booking hands the booking
+                    // back, so it is not left marked as booked in to a job that
+                    // no longer exists. Only if it still points at this job.
+                    if (bookingId) {
+                        try {
+                            const bookingRef = db.collection('bookings').doc(bookingId);
+                            await db.runTransaction(async (tx) => {
+                                const fresh = await tx.get(bookingRef);
+                                if (!fresh.exists || fresh.data().linkedRepairId !== repairId) return;
+                                tx.update(bookingRef, {
+                                    status: 'confirmed',
+                                    linkedRepairId: null,
+                                    repairCode: firebase.firestore.FieldValue.delete(),
+                                    bookedInAt: firebase.firestore.FieldValue.delete(),
+                                    bookedInBy: firebase.firestore.FieldValue.delete(),
+                                    updatedAt: firebase.firestore.Timestamp.now(),
+                                    updatedBy: currentUser ? currentUser.email : 'unknown'
+                                });
+                            });
+                        } catch (error) {
+                            console.warn('Booking not handed back:', error);
+                        }
+                    }
 
                     // And the customer's tracking page for it. After the
                     // ticket, so the dashboard's sync has nothing left to
