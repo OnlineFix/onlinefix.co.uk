@@ -910,7 +910,13 @@
     // exactly this wording and nothing else (see bookingNoticeText in
     // firestore.rules), so any change here has to be made there too, and a
     // mismatch just means the booking is saved without its email.
-    const SHOP_INBOX = 'hello@onlinefix.uk';
+    //
+    // It goes straight to the shop's Gmail rather than hello@onlinefix.uk.
+    // The mail is sent through that same Gmail account, and hello@ forwards
+    // to it, so a copy sent to hello@ came back to the mailbox that sent it
+    // and Gmail kept it under Sent only: it never reached the inbox. Mail an
+    // account sends to itself directly does land in the inbox.
+    const SHOP_INBOX = 'onlinerepairbooking@gmail.com';
 
     // Parts of a moment as a UK clock shows them.
     function ukParts(date, options) {
