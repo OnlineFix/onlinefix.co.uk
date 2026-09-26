@@ -21,6 +21,12 @@
 
     var SITE_URL = 'https://onlinefix.co.uk';
     var SHOP_EMAIL = 'hello@onlinefix.uk';
+    // Where the staff copy of each intake goes. Not SHOP_EMAIL: mail is sent
+    // through this same Gmail account, and hello@ forwards to it, so a copy
+    // sent to hello@ came back to the mailbox that sent it and Gmail kept it
+    // under Sent only, out of the inbox. Mail an account sends to itself
+    // directly does land in the inbox.
+    var STAFF_INBOX = 'onlinerepairbooking@gmail.com';
     var SHOP_PHONE = '07940 730537';
     var SHOP_ADDRESS = '13 Quarry Street, Guildford, Surrey, GU1 3UY';
 
@@ -1300,7 +1306,7 @@
 
             try {
                 await queueStaffEmail(repairData, trackUrl);
-                delivery.push(['ok', 'Text-the-customer link sent to ' + SHOP_EMAIL]);
+                delivery.push(['ok', 'Text-the-customer link sent to ' + STAFF_INBOX]);
             } catch (err) {
                 console.error('Staff email failed', err);
                 delivery.push(['warn', 'Staff copy could not be sent — use the button below instead.']);
@@ -1438,7 +1444,7 @@
         );
 
         return db.collection('mail').add({
-            to: [SHOP_EMAIL],
+            to: [STAFF_INBOX],
             message: {
                 subject: 'New intake ' + repair.repairId + ' — ' + repair.customerName + ' — ' + repair.device,
                 text: 'New intake ' + repair.repairId + '\n' +
