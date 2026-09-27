@@ -2,7 +2,7 @@
    OnlineFix — text-the-customer handoff
    ---------------------------------------------------------------------
    The shop iPad has no SIM, so it can never send the customer's text.
-   Instead the intake emails hello@onlinefix.uk a link to this page; the
+   Instead the intake emails the shop (see STAFF_INBOX in intake.js) a link to this page; the
    owner opens it on their phone and taps once.
 
    An sms: href placed directly in an email body gets stripped by most

@@ -160,7 +160,11 @@ service cloud.firestore {
       // The booking page's notice to the shop. Anyone can send a booking, so
       // this is the one place a visitor can queue mail, and it is held to:
       //   - the shop's own inbox only, so the site can never be used to
-      //     send mail to anyone else;
+      //     send mail to anyone else. That is the shop's Gmail: mail is sent
+      //     through that account, and a copy sent to hello@onlinefix.uk
+      //     came back to it through hello@'s forwarding and Gmail kept it
+      //     under Sent, out of the inbox. hello@ is still accepted so that
+      //     booking pages loaded before the change keep working;
       //   - exactly one notice per booking, written in the same batch as
       //     that booking: the notice takes the booking's id, which must be
       //     new before the batch and hold a booking with that tempId after
@@ -214,7 +218,7 @@ service cloud.firestore {
           && b.device.brand.matches('[^\\r\\n]*')
           && b.device.model.matches('[^\\r\\n]*')
           && m.keys().hasOnly(['to', 'replyTo', 'message', 'meta'])
-          && m.to == ['hello@onlinefix.uk']
+          && m.to in [['onlinerepairbooking@gmail.com'], ['hello@onlinefix.uk']]
           && m.replyTo == b.customer.email
           && m.meta.keys().hasOnly(['kind', 'bookingId', 'reference', 'when'])
           && m.meta.kind == 'booking-request'
