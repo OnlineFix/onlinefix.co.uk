@@ -85,8 +85,7 @@
         },
         "geo": {"@type": "GeoCoordinates", "latitude": 51.233845, "longitude": -0.573885},
         "openingHoursSpecification": [
-            {"@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "10:00", "closes": "18:00"},
-            {"@type": "OpeningHoursSpecification", "dayOfWeek": "Saturday", "opens": "11:00", "closes": "16:00"}
+            {"@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"], "opens": "10:00", "closes": "22:00"}
         ],
         "potentialAction": {
             "@type": "ReserveAction",
@@ -206,7 +205,7 @@
                         <li>Leave your contact details and submit.</li>
                         <li>We'll email you back to confirm or ask follow-up questions, usually within a few hours.</li>
                     </ol>
-                    <p><strong>Workshop:</strong> 13 Quarry Street, Guildford, Surrey, GU1 3UY &middot; <strong>Hours:</strong> Mon-Fri 10:00-18:00, Sat 11:00-16:00, Sun closed.</p>
+                    <p><strong>Workshop:</strong> 13 Quarry Street, Guildford, Surrey, GU1 3UY &middot; <strong>Hours:</strong> by appointment, 7 days, 10:00-22:00.</p>
                     <p id="booking-loading">Loading the booking form&hellip;</p>
                 </div>
 
@@ -290,7 +289,7 @@
                         <div class="field">
                             <label for="preferred-date" class="field-label">Preferred drop-off date</label>
                             <input type="date" id="preferred-date" name="preferred-date" required>
-                            <p class="field-hint" id="date-hint">We're open Mon-Fri 10:00-18:00 and Sat 11:00-16:00.</p>
+                            <p class="field-hint" id="date-hint">We're open 7 days, 10:00-22:00.</p>
                             <p class="field-error" data-error="preferred-date"></p>
                         </div>
 
@@ -414,8 +413,8 @@
                         <li><a href="tel:+447940730537">07940 730537</a></li>
                         <li><a href="mailto:hello@onlinefix.uk">hello@onlinefix.uk</a></li>
                         <li>GUILDFORD, SURREY</li>
-                        <li style="margin-top: 1rem; color: #ccc;">MON-FRI: 10:00-18:00</li>
-                        <li style="color: #ccc;">SAT: 11:00-16:00</li>
+                        <li style="margin-top: 1rem; color: #ccc;">BY APPOINTMENT &mdash; 7 DAYS</li>
+                        <li style="color: #ccc;">CALLS &amp; MESSAGES: 10AM - 10PM</li>
                     </ul>
                 </div>
             </div>
@@ -456,7 +455,7 @@
 
     <script src="/js/core.js?v=20260712" defer></script>
     <script src="/js/cookies.js?v=20260611" defer></script>
-    <script src="/book/booking.js?v=20260924" defer></script>
+    <script src="/book/booking.js?v=20260927" defer></script>
 </body>
 
 </html>
