@@ -1312,6 +1312,10 @@
                 delivery.push(['warn', 'Staff copy could not be sent — use the button below instead.']);
             }
 
+            if (emailLayoutMissing()) {
+                delivery.push(['warn', 'The email layout did not load, so the emails went as plain text. Reload this page before the next intake.']);
+            }
+
             state.submitted = true;
             showDone(repairData, trackUrl, delivery);
 
@@ -1361,36 +1365,64 @@
     // Email (Firestore "Trigger Email" extension reads the mail collection)
     // ------------------------------------------------------------------
 
-    function emailShell(bodyHtml) {
-        return '<div style="font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;max-width:600px;margin:0 auto;' +
-            'background:#0B0E14;color:#E5E9F0;padding:32px 28px;border-radius:16px;">' +
-            '<div style="font-size:22px;font-weight:800;margin-bottom:24px;">Online<span style="color:#00E4FF;">Fix</span></div>' +
-            bodyHtml +
-            '<hr style="border:none;border-top:1px solid rgba(255,255,255,.12);margin:28px 0;">' +
-            '<p style="font-size:12px;color:#94A3B8;line-height:1.6;margin:0;">OnlineFix · ' + escapeHTML(SHOP_ADDRESS) +
-            '<br>' + escapeHTML(SHOP_PHONE) + ' · ' + escapeHTML(SHOP_EMAIL) + '</p></div>';
+    // Shop details as the shared email layout wants them.
+    var EMAIL_SHOP = { name: 'OnlineFix', address: SHOP_ADDRESS, phone: SHOP_PHONE, email: SHOP_EMAIL };
+
+    /* The HTML part of an email, drawn by email-layout.js in the site's
+       look. If that file did not load (a dropped connection on the iPad),
+       or drawing fails, the email goes as plain text instead: the text part
+       carries the same details and links, and a plain email beats no email
+       while the customer is at the counter. Returns null in that case, and
+       the done screen says so (see emailLayoutMissing). */
+    function emailHtml(draw) {
+        if (!window.OnlineFixEmail) {
+            console.error('email-layout.js did not load; sending the email as plain text');
+            return null;
+        }
+        try {
+            return draw(window.OnlineFixEmail);
+        } catch (err) {
+            console.error('Email layout failed; sending the email as plain text', err);
+            return null;
+        }
+    }
+
+    function emailLayoutMissing() { return !window.OnlineFixEmail; }
+
+    // A mail message: subject and text, plus the HTML when there is one.
+    function mailMessage(subject, text, html) {
+        var message = { subject: subject, text: text };
+        if (html) message.html = html;
+        return message;
     }
 
     function queueCustomerEmail(repair, trackUrl) {
         var price = repair.estimatedCost !== null ? '£' + repair.estimatedCost.toFixed(2) : 'To be quoted after diagnostics';
+        var subject = 'Your repair is booked in — ' + repair.repairId;
 
-        var html = emailShell(
-            '<p style="font-size:16px;margin:0 0 16px;">Hi ' + escapeHTML(repair.firstName) + ',</p>' +
-            '<p style="line-height:1.6;margin:0 0 20px;">Thanks for bringing your device in. It is booked into the workshop and here are the details we recorded.</p>' +
-            '<table style="width:100%;border-collapse:collapse;font-size:14px;margin-bottom:24px;">' +
-            row('Repair reference', repair.repairId) +
-            row('Device', repair.device) +
-            row('Reported fault', repair.issueDescription) +
-            row('Estimated price', price) +
-            (repair.turnaround ? row('Expected turnaround', repair.turnaround) : '') +
-            (repair.accessories.length ? row('Left with device', repair.accessories.join(', ')) : '') +
-            '</table>' +
-            '<a href="' + escapeHTML(trackUrl) + '" style="display:inline-block;background:#0033FF;color:#fff;' +
-            'text-decoration:none;padding:14px 28px;border-radius:10px;font-weight:700;">Track your repair</a>' +
-            '<p style="font-size:13px;color:#94A3B8;line-height:1.6;margin:24px 0 0;">Keep this email — the link above is how you check progress at any time. ' +
-            'We will contact you before carrying out any chargeable work, and again when the device is ready to collect. ' +
-            'Payment on collection is by cash or bank transfer.</p>'
-        );
+        var html = emailHtml(function (E) {
+            return E.layout({
+                subject: subject,
+                headerLabel: repair.repairId,
+                body: [
+                    E.paragraph('Hi ' + repair.firstName + ',', { gap: 12 }),
+                    E.paragraph('Thanks for bringing your device in. It is booked into the workshop and here are the details we recorded.', { gap: 22 }),
+                    E.details([
+                        E.row('Repair reference', repair.repairId, { kind: 'ref' }),
+                        E.row('Device', repair.device, { kind: 'strong' }),
+                        E.row('Reported fault', repair.issueDescription),
+                        E.row('Estimated price', price),
+                        repair.turnaround && E.row('Expected turnaround', repair.turnaround),
+                        repair.accessories.length && E.row('Left with device', repair.accessories.join(', '))
+                    ]),
+                    E.button(trackUrl, 'Track your repair', { gap: 20 }),
+                    E.note('Keep this email — the link above is how you check progress at any time. ' +
+                        'We will contact you before carrying out any chargeable work, and again when the device is ready to collect. ' +
+                        'Payment on collection is by cash or bank transfer.', { gap: 18 })
+                ],
+                footer: E.shopFooter(EMAIL_SHOP)
+            });
+        });
 
         var text = 'Hi ' + repair.firstName + ',\n\n' +
             'Thanks for bringing your device in. It is booked into the workshop.\n\n' +
@@ -1407,11 +1439,7 @@
         return db.collection('mail').add({
             to: [repair.customerEmail],
             replyTo: SHOP_EMAIL,
-            message: {
-                subject: 'Your repair is booked in — ' + repair.repairId,
-                text: text,
-                html: html
-            },
+            message: mailMessage(subject, text, html),
             meta: { kind: 'repair-created', repairId: repair.repairId, createdAt: firebase.firestore.Timestamp.now() }
         });
     }
@@ -1423,47 +1451,46 @@
            directly in an email is stripped by most mail clients. */
         var textPageUrl = SITE_URL + '/new-repair/text.html?id=' + encodeURIComponent(repair.repairId);
         var labelUrl = SITE_URL + '/new-repair/label.html?id=' + encodeURIComponent(repair.repairId);
+        var subject = 'New intake ' + repair.repairId + ' — ' + repair.customerName + ' — ' + repair.device;
 
-        var html = emailShell(
-            '<p style="font-size:16px;margin:0 0 8px;font-weight:700;">New intake — ' + escapeHTML(repair.repairId) + '</p>' +
-            '<p style="color:#94A3B8;margin:0 0 20px;font-size:14px;">Logged by ' + escapeHTML(repair.createdBy) + '</p>' +
-            '<table style="width:100%;border-collapse:collapse;font-size:14px;margin-bottom:24px;">' +
-            row('Customer', repair.customerName) +
-            row('Phone', repair.customerPhone) +
-            row('Email', repair.customerEmail) +
-            row('Device', repair.device) +
-            row('Fault', repair.issueDescription) +
-            row('Estimate', repair.estimatedCost !== null ? '£' + repair.estimatedCost.toFixed(2) : 'TBC') +
-            '</table>' +
-            '<p style="font-weight:700;margin:0 0 12px;">Open this on your phone to text the customer:</p>' +
-            '<a href="' + escapeHTML(textPageUrl) + '" style="display:inline-block;background:#0033FF;color:#fff;' +
-            'text-decoration:none;padding:14px 28px;border-radius:10px;font-weight:700;margin-bottom:16px;">Text the customer</a>' +
-            '<p style="font-size:13px;color:#94A3B8;margin:16px 0 0;">' +
-            'Print the device label: <a href="' + escapeHTML(labelUrl) + '" style="color:#00E4FF;">' + escapeHTML(labelUrl) + '</a><br>' +
-            'Tracking page: <a href="' + escapeHTML(trackUrl) + '" style="color:#00E4FF;">' + escapeHTML(trackUrl) + '</a></p>'
-        );
+        var html = emailHtml(function (E) {
+            var small = { breakAll: true, bold: false };
+            return E.layout({
+                subject: subject,
+                headerLabel: repair.repairId,
+                body: [
+                    // 20px, so the reference fits one line on a 320px phone.
+                    E.heading('New intake — ' + repair.repairId, { accent: repair.repairId, size: 20, gap: 8 }),
+                    E.note('Logged by ' + repair.createdBy, { gap: 20 }),
+                    E.details([
+                        E.row('Customer', repair.customerName, { kind: 'strong' }),
+                        E.row('Phone', repair.customerPhone),
+                        E.row('Email', repair.customerEmail),
+                        E.row('Device', repair.device),
+                        E.row('Fault', repair.issueDescription),
+                        E.row('Estimate', repair.estimatedCost !== null ? '£' + repair.estimatedCost.toFixed(2) : 'TBC')
+                    ]),
+                    E.paragraph('Open this on your phone to text the customer:', { bold: true, gap: 12 }),
+                    E.button(textPageUrl, 'Text the customer', { gap: 20 }),
+                    E.note(E.join('Print the device label: ', E.link(labelUrl, labelUrl, small), E.br(),
+                        'Tracking page: ', E.link(trackUrl, trackUrl, small)), { gap: 18 })
+                ],
+                footer: E.shopFooter(EMAIL_SHOP)
+            });
+        });
+
+        var text = 'New intake ' + repair.repairId + '\n' +
+            repair.customerName + ' · ' + repair.customerPhone + ' · ' + repair.customerEmail + '\n' +
+            repair.device + ' — ' + repair.issueDescription + '\n\n' +
+            'Text the customer: ' + textPageUrl + '\n' +
+            'Print label: ' + labelUrl + '\n' +
+            'Tracking: ' + trackUrl + '\n';
 
         return db.collection('mail').add({
             to: [STAFF_INBOX],
-            message: {
-                subject: 'New intake ' + repair.repairId + ' — ' + repair.customerName + ' — ' + repair.device,
-                text: 'New intake ' + repair.repairId + '\n' +
-                    repair.customerName + ' · ' + repair.customerPhone + ' · ' + repair.customerEmail + '\n' +
-                    repair.device + ' — ' + repair.issueDescription + '\n\n' +
-                    'Text the customer: ' + textPageUrl + '\n' +
-                    'Print label: ' + labelUrl + '\n' +
-                    'Tracking: ' + trackUrl + '\n',
-                html: html
-            },
+            message: mailMessage(subject, text, html),
             meta: { kind: 'staff-intake', repairId: repair.repairId, createdAt: firebase.firestore.Timestamp.now() }
         });
-    }
-
-    function row(key, value) {
-        return '<tr>' +
-            '<td style="padding:8px 12px 8px 0;color:#94A3B8;vertical-align:top;white-space:nowrap;">' + escapeHTML(key) + '</td>' +
-            '<td style="padding:8px 0;font-weight:600;">' + escapeHTML(value) + '</td>' +
-            '</tr>';
     }
 
     // ------------------------------------------------------------------
