@@ -21,12 +21,6 @@
 
     var SITE_URL = 'https://onlinefix.co.uk';
     var SHOP_EMAIL = 'hello@onlinefix.uk';
-    // Where the staff copy of each intake goes. Not SHOP_EMAIL: mail is sent
-    // through this same Gmail account, and hello@ forwards to it, so a copy
-    // sent to hello@ came back to the mailbox that sent it and Gmail kept it
-    // under Sent only, out of the inbox. Mail an account sends to itself
-    // directly does land in the inbox.
-    var STAFF_INBOX = 'onlinerepairbooking@gmail.com';
     var SHOP_PHONE = '07940 730537';
     var SHOP_ADDRESS = '13 Quarry Street, Guildford, Surrey, GU1 3UY';
 
@@ -1299,21 +1293,14 @@
             try {
                 await queueCustomerEmail(repairData, trackUrl);
                 delivery.push(['ok', 'Confirmation email queued to ' + email]);
+                // Only when it went: beside "could NOT be queued" it would
+                // say the one email went as plain text.
+                if (emailLayoutMissing()) {
+                    delivery.push(['warn', 'The email layout did not load, so the confirmation email went as plain text. Reload this page before the next intake.']);
+                }
             } catch (err) {
                 console.error('Customer email failed', err);
                 delivery.push(['fail', 'Confirmation email could NOT be queued — send it by hand.']);
-            }
-
-            try {
-                await queueStaffEmail(repairData, trackUrl);
-                delivery.push(['ok', 'Text-the-customer link sent to ' + STAFF_INBOX]);
-            } catch (err) {
-                console.error('Staff email failed', err);
-                delivery.push(['warn', 'Staff copy could not be sent — use the button below instead.']);
-            }
-
-            if (emailLayoutMissing()) {
-                delivery.push(['warn', 'The email layout did not load, so the emails went as plain text. Reload this page before the next intake.']);
             }
 
             state.submitted = true;
@@ -1441,55 +1428,6 @@
             replyTo: SHOP_EMAIL,
             message: mailMessage(subject, text, html),
             meta: { kind: 'repair-created', repairId: repair.repairId, createdAt: firebase.firestore.Timestamp.now() }
-        });
-    }
-
-    function queueStaffEmail(repair, trackUrl) {
-        /* The shop iPad has no SIM, so it cannot send the customer's text.
-           This email lands on the owner's phone with a button that opens a
-           page which in turn fires the sms: link — an sms: href placed
-           directly in an email is stripped by most mail clients. */
-        var textPageUrl = SITE_URL + '/new-repair/text.html?id=' + encodeURIComponent(repair.repairId);
-        var labelUrl = SITE_URL + '/new-repair/label.html?id=' + encodeURIComponent(repair.repairId);
-        var subject = 'New intake ' + repair.repairId + ' — ' + repair.customerName + ' — ' + repair.device;
-
-        var html = emailHtml(function (E) {
-            var small = { breakAll: true, bold: false };
-            return E.layout({
-                subject: subject,
-                headerLabel: repair.repairId,
-                body: [
-                    // 20px, so the reference fits one line on a 320px phone.
-                    E.heading('New intake — ' + repair.repairId, { accent: repair.repairId, size: 20, gap: 8 }),
-                    E.note('Logged by ' + repair.createdBy, { gap: 20 }),
-                    E.details([
-                        E.row('Customer', repair.customerName, { kind: 'strong' }),
-                        E.row('Phone', repair.customerPhone),
-                        E.row('Email', repair.customerEmail),
-                        E.row('Device', repair.device),
-                        E.row('Fault', repair.issueDescription),
-                        E.row('Estimate', repair.estimatedCost !== null ? '£' + repair.estimatedCost.toFixed(2) : 'TBC')
-                    ]),
-                    E.paragraph('Open this on your phone to text the customer:', { bold: true, gap: 12 }),
-                    E.button(textPageUrl, 'Text the customer', { gap: 20 }),
-                    E.note(E.join('Print the device label: ', E.link(labelUrl, labelUrl, small), E.br(),
-                        'Tracking page: ', E.link(trackUrl, trackUrl, small)), { gap: 18 })
-                ],
-                footer: E.shopFooter(EMAIL_SHOP)
-            });
-        });
-
-        var text = 'New intake ' + repair.repairId + '\n' +
-            repair.customerName + ' · ' + repair.customerPhone + ' · ' + repair.customerEmail + '\n' +
-            repair.device + ' — ' + repair.issueDescription + '\n\n' +
-            'Text the customer: ' + textPageUrl + '\n' +
-            'Print label: ' + labelUrl + '\n' +
-            'Tracking: ' + trackUrl + '\n';
-
-        return db.collection('mail').add({
-            to: [STAFF_INBOX],
-            message: mailMessage(subject, text, html),
-            meta: { kind: 'staff-intake', repairId: repair.repairId, createdAt: firebase.firestore.Timestamp.now() }
         });
     }
 

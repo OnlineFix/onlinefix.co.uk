@@ -14,12 +14,14 @@ nothing installed. Part 3 is the label printer.
 ### How it works
 
 The intake page never talks to an email provider directly. When a repair is
-created it writes two documents into a Firestore collection called `mail`:
+created it writes one document into a Firestore collection called `mail`:
 
 | Document | Goes to | Contains |
 |---|---|---|
 | Customer confirmation | The customer | Repair reference, device, fault, price, tracking link |
-| Staff copy | `hello@onlinefix.uk` | Everything above, plus a **Text the customer** button |
+
+There is no staff copy: you are the only member of staff, so the intake no
+longer emails you one.
 
 A Firebase extension watches that collection and sends anything that lands in
 it. So the website's only job is "write a row"; the extension does the sending.
@@ -43,8 +45,8 @@ plan.
    will email you long before anything costs real money.
 
 **What this actually costs you:** the free monthly allowance is 2 million
-function invocations. One repair uses two. At even 500 repairs a month you are
-using 1,000 of 2,000,000. The realistic bill is **£0.00**, and the card exists
+function invocations. One repair uses one. At even 500 repairs a month you are
+using 500 of 2,000,000. The realistic bill is **£0.00**, and the card exists
 so Google has someone to charge if the site is ever hammered. That is why the
 budget alert matters more than the plan itself.
 
@@ -148,21 +150,22 @@ send a text no matter what software is on it.
 So the flow does this instead:
 
 1. Repair is created on the iPad.
-2. A staff email lands at `hello@onlinefix.uk` with a **Text the customer**
-   button.
-3. You open that email **on your phone** and tap the button.
-4. `onlinefix.co.uk/new-repair/text.html` opens, showing the message ready to
-   go.
-5. Tap **Open Messages** — your Messages app opens with the customer's number
+2. On the done screen, tap **Staff**, then **Text the customer**. (Or, on
+   your phone, open `text.html?id=REP_...` as shown below.)
+3. `onlinefix.co.uk/new-repair/text.html` opens, showing the message ready to
+   go. On the iPad, Messages can only send it as an iMessage, or as a text if
+   your iPhone forwards texts to the iPad (Settings → Messages → Text Message
+   Forwarding).
+4. Tap **Open Messages** — your Messages app opens with the customer's number
    and the full text already filled in.
-6. Press send.
+5. Press send.
 
 Cost: £0, it comes from your own number, and customers can reply to a human.
 
-**Why the extra page instead of putting the text link straight in the email:**
-mail apps strip `sms:` links out of email bodies for security. An ordinary
-`https://` link always survives, and once you are on a real web page the `sms:`
-link works properly. That bounce is the whole reason `text.html` exists.
+**Why a separate page:** it opens on any device, for any repair, so you can
+send the text from your phone (link below). It began as the target of a staff
+email, because mail apps strip `sms:` links out of email bodies; that email was
+dropped once it was clear you are the only member of staff.
 
 ### What you get on that page
 

@@ -4393,8 +4393,8 @@
         }
 
         /* The email telling a customer their online booking is confirmed,
-           sent by Confirm booking when its box is ticked. THE WORDING IS A
-           DRAFT until the owner approves it. The HTML is drawn by the shared
+           sent by Confirm booking when its box is ticked. The owner approved
+           the wording on 27 Sep 2026; any change to it needs their OK too. The HTML is drawn by the shared
            email layout (new-repair/email-layout.js), which also gives the
            time as UK clocks show it, whatever the zone of this device. There
            is no plain-text fallback here: confirmEmailBlocker keeps the box
@@ -4424,7 +4424,7 @@
             const street = shop.address.split(', ')[0];
             const town = shop.address.slice(street.length + 2);
 
-            // ---- Draft wording (the owner to approve) ----
+            // ---- Wording (approved by the owner; ask before changing) ----
             const subject = `Your booking is confirmed — ${w.full}`;
             const preheader = `Drop-off at 13 Quarry Street, Guildford. Your reference: ${reference}.`;
             const hi = `Hi ${name},`;
@@ -4434,7 +4434,7 @@
                 'We\'ll check the device and quote you before doing any chargeable work.',
                 'Payment is on collection, by cash or bank transfer. We don\'t take cards, Apple Pay or Google Pay.'
             ];
-            const change = phone => `You can do this any time before drop-off. Just reply to this email or call us on ${phone}. There's no cancellation fee.`;
+            const change = phone => `You can do this any time before drop-off. Just reply to this email or call us on ${phone} (7 days, 10am to 10pm). There's no cancellation fee.`;
 
             const html = E.layout({
                 subject,

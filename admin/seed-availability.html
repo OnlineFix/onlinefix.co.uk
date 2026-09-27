@@ -252,15 +252,18 @@
             $('status').textContent = '';
         }
 
+        // Must match DEFAULT_AVAILABILITY in book/booking.js: 7 days,
+        // 10:00-22:00, last slot 21:30. If availability/settings exists, the
+        // booking page uses it instead of its own defaults.
         const DEFAULTS = {
             workingHours: {
-                mon: { open: '10:00', close: '18:00', closed: false },
-                tue: { open: '10:00', close: '18:00', closed: false },
-                wed: { open: '10:00', close: '18:00', closed: false },
-                thu: { open: '10:00', close: '18:00', closed: false },
-                fri: { open: '10:00', close: '18:00', closed: false },
-                sat: { open: '11:00', close: '16:00', closed: false },
-                sun: { open: '00:00', close: '00:00', closed: true }
+                mon: { open: '10:00', close: '22:00', closed: false },
+                tue: { open: '10:00', close: '22:00', closed: false },
+                wed: { open: '10:00', close: '22:00', closed: false },
+                thu: { open: '10:00', close: '22:00', closed: false },
+                fri: { open: '10:00', close: '22:00', closed: false },
+                sat: { open: '10:00', close: '22:00', closed: false },
+                sun: { open: '10:00', close: '22:00', closed: false }
             },
             blockedDates: [],
             minNoticeHours: 4,

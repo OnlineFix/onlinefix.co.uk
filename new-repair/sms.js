@@ -2,13 +2,16 @@
    OnlineFix — text-the-customer handoff
    ---------------------------------------------------------------------
    The shop iPad has no SIM, so it can never send the customer's text.
-   Instead the intake emails the shop (see STAFF_INBOX in intake.js) a link to this page; the
-   owner opens it on their phone and taps once.
+   This page builds the text and hands it to the device's messages app in
+   one tap. It is opened from the Text the customer button on the intake's
+   done screen (on the iPad), or on the owner's phone at
+   text.html?id=REP_... (see docs/setup-notifications.md, Part 2).
 
-   An sms: href placed directly in an email body gets stripped by most
-   mail clients, which is exactly why this bounce page exists: the email
-   carries an ordinary https link, and the sms: URI is only ever built
-   inside a real web page where it works.
+   The intake used to email the owner a link to this page as well (an
+   sms: href placed directly in an email body gets stripped by most mail
+   clients, so the email carried an ordinary https link to this page).
+   The owner is the only member of staff and asked for that email to be
+   dropped, so this page is only reached from the done screen now.
    ===================================================================== */
 
 (function () {
