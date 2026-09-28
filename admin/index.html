@@ -8,7 +8,7 @@
     <meta http-equiv="X-Frame-Options" content="DENY">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com https://www.gstatic.com https://cdnjs.cloudflare.com https://www.googletagmanager.com https://www.google.com https://www.recaptcha.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.firebasestorage.app https://firebasestorage.googleapis.com; connect-src 'self' https://cloudflareinsights.com https://*.googleapis.com https://*.firebaseio.com https://*.firebasestorage.app wss://*.firebaseio.com https://*.google-analytics.com https://www.google.com https://www.recaptcha.net; font-src 'self' data: https://cdnjs.cloudflare.com; frame-src https://www.google.com https://www.recaptcha.net; frame-ancestors 'none';">
-    <title>Admin Dashboard - OnlineFix Repair Management</title>
+    <title>Admin Dashboard - OnlineFix™ Repair Management</title>
 
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -112,6 +112,17 @@
             color: var(--text-main);
             margin-bottom: 0.5rem;
             text-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        /* The ™ after the wordmark, sized and raised like the site's top bar
+           logo (.nav-logo::after in css/core.css). */
+        .logo::after {
+            content: "\2122";
+            font-size: 0.4em;
+            margin-left: 2px;
+            line-height: 0;
+            /* Lifts the top of the ™ level with the top of the capitals. */
+            vertical-align: 1.08em;
         }
 
         .user-info {
@@ -3009,8 +3020,7 @@
             <div
                 style="background: rgba(21, 26, 35, 0.7); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); padding: 3rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-md), inset 0 0 0 1px var(--border-color); max-width: 400px; width: 90%; z-index: 1;">
                 <div style="text-align: center; margin-bottom: 2.5rem;">
-                    <div class="logo" style="font-size: 2.5rem; margin-bottom: 0.5rem; letter-spacing: -1px;">OnlineFix
-                    </div>
+                    <div class="logo" style="font-size: 2.5rem; margin-bottom: 0.5rem; letter-spacing: -1px;">OnlineFix</div>
                     <p style="color: var(--text-muted); font-size: 0.95rem;">Admin Dashboard Secure Auth</p>
                 </div>
                 <form id="login-form">
@@ -4515,7 +4525,7 @@
             const device = (looksLikeLink(typed) ? '' : typed)
                 || (form.category !== 'other' ? BOOKING_CATEGORIES[form.category] || '' : '');
             const reference = bookingReference(booking);
-            const shop = { name: 'OnlineFix', address: BOOKING_SHOP_ADDRESS, phone: SHOP_PHONE, email: SHOP_EMAIL };
+            const shop = { name: 'OnlineFix™', address: BOOKING_SHOP_ADDRESS, phone: SHOP_PHONE, email: SHOP_EMAIL };
             const mapsUrl = E.mapsUrl(shop.address);
             const termsUrl = SITE_URL + '/booking-terms.html';
             // "13 Quarry Street" over "Guildford, Surrey, GU1 3UY".
@@ -5608,7 +5618,7 @@
                     E.button(trackUrl, 'Track your repair', { gap: 20 }),
                     E.note('Keep this email — the link above is how you check progress at any time.', { gap: 18 })
                 ],
-                footer: E.shopFooter({ name: 'OnlineFix', address: SHOP_ADDRESS, phone: SHOP_PHONE, email: SHOP_EMAIL })
+                footer: E.shopFooter({ name: 'OnlineFix™', address: SHOP_ADDRESS, phone: SHOP_PHONE, email: SHOP_EMAIL })
             }));
 
             const text = 'Hi ' + greeting + ',\n\n' +
@@ -5616,7 +5626,7 @@
                 'Repair reference: ' + repair.repairId + '\n' +
                 'Device: ' + device + '\n\n' +
                 'Track your repair: ' + trackUrl + '\n\n' +
-                'OnlineFix · ' + SHOP_ADDRESS + '\n' + SHOP_PHONE + ' · ' + SHOP_EMAIL + '\n';
+                'OnlineFix™ · ' + SHOP_ADDRESS + '\n' + SHOP_PHONE + ' · ' + SHOP_EMAIL + '\n';
 
             const message = { subject, text };
             if (html) message.html = html;
@@ -6704,6 +6714,7 @@
                         body { font-family: 'Segoe UI', Tahoma, sans-serif; padding: 2rem; color: #1a1a1a; max-width: 800px; margin: 0 auto; }
                         .invoice-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 3px solid #0033FF; }
                         .company-name { font-size: 2rem; font-weight: 800; color: #0033FF; letter-spacing: -1px; }
+                        .tm { font-size: 0.5em; line-height: 0; vertical-align: 0.75em; margin-left: 1px; }
                         .company-details { font-size: 0.85rem; color: #666; line-height: 1.6; text-align: right; }
                         .invoice-title { font-size: 1.5rem; font-weight: 700; color: #333; margin-bottom: 0.5rem; }
                         .invoice-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem; }
@@ -6745,11 +6756,11 @@
                     <button class="print-btn" onclick="window.print()">Print Invoice</button>
                     <div class="invoice-header">
                         <div>
-                            <div class="company-name">OnlineFix</div>
+                            <div class="company-name">OnlineFix<span class="tm">™</span></div>
                             <div style="color: #666; font-size: 0.9rem;">Device Repair Specialists</div>
                         </div>
                         <div class="company-details">
-                            OnlineFix<br>
+                            OnlineFix™<br>
                             13 Quarry Street, Guildford, Surrey GU1 3UY<br>
                             07940 730537<br>
                             hello@onlinefix.uk
@@ -7017,7 +7028,7 @@
             const statusLabel = statusConfig[currentStatus]?.label || currentStatus;
 
             const subject = `Repair Update: ${repair.repairId} - ${statusLabel}`;
-            const body = `Hi ${repair.firstName || repair.customerName},\n\nThis is an update from OnlineFix regarding your repair.\n\nRepair ID: ${repair.repairId}\nDevice: ${repair.brand} ${repair.model}\nStatus: ${statusLabel}\n\nTrack your repair online: ${window.location.origin}/track/?id=${repair.repairId}\n\nThank you for choosing OnlineFix!\nOnlineFix - Device Repair Specialists\nPhone: 07940 730537`;
+            const body = `Hi ${repair.firstName || repair.customerName},\n\nThis is an update from OnlineFix regarding your repair.\n\nRepair ID: ${repair.repairId}\nDevice: ${repair.brand} ${repair.model}\nStatus: ${statusLabel}\n\nTrack your repair online: ${window.location.origin}/track/?id=${repair.repairId}\n\nThank you for choosing OnlineFix!\nOnlineFix™ - Device Repair Specialists\nPhone: 07940 730537`;
 
             // Use mailto as fallback (works without EmailJS setup). The
             // address is encoded too, so a "?subject=" inside it cannot set

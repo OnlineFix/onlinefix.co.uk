@@ -84,20 +84,20 @@
             {
                 label: 'Booked in',
                 body: 'Hi ' + name + ', your ' + device + ' is booked in at OnlineFix. ' +
-                    'Track it any time here: ' + track + ' — OnlineFix, ' + SHOP_PHONE
+                    'Track it any time here: ' + track + ' — OnlineFix™, ' + SHOP_PHONE
             },
             {
                 label: 'Quote ready',
                 body: 'Hi ' + name + ', we\'ve had a look at your ' + device + '. ' +
                     (price ? 'The repair comes to ' + price + '. ' : 'We\'ve got a quote for you. ') +
-                    'Let us know if you\'re happy for us to go ahead: ' + track + ' — OnlineFix, ' + SHOP_PHONE
+                    'Let us know if you\'re happy for us to go ahead: ' + track + ' — OnlineFix™, ' + SHOP_PHONE
             },
             {
                 label: 'Ready to collect',
                 body: 'Hi ' + name + ', good news — your ' + device + ' is repaired and ready to collect ' +
                     'from 13 Quarry Street, Guildford GU1 3UY. ' +
                     (price ? 'Balance due is ' + price + ', cash or bank transfer. ' : 'Cash or bank transfer on collection. ') +
-                    'Details: ' + track + ' — OnlineFix, ' + SHOP_PHONE
+                    'Details: ' + track + ' — OnlineFix™, ' + SHOP_PHONE
             },
             {
                 label: 'Chasing collection',
