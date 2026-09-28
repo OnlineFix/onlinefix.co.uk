@@ -1494,7 +1494,7 @@
     // ------------------------------------------------------------------
 
     // Shop details as the shared email layout wants them.
-    var EMAIL_SHOP = { name: 'OnlineFix', address: SHOP_ADDRESS, phone: SHOP_PHONE, email: SHOP_EMAIL };
+    var EMAIL_SHOP = { name: 'OnlineFix™', address: SHOP_ADDRESS, phone: SHOP_PHONE, email: SHOP_EMAIL };
 
     /* The HTML part of an email, drawn by email-layout.js in the site's
        look. If that file did not load (a dropped connection on the iPad),
@@ -1562,7 +1562,7 @@
             '\nTrack your repair: ' + trackUrl + '\n\n' +
             'We will contact you before any chargeable work, and again when it is ready to collect.\n' +
             'Payment on collection is by cash or bank transfer.\n\n' +
-            'OnlineFix · ' + SHOP_ADDRESS + '\n' + SHOP_PHONE + ' · ' + SHOP_EMAIL + '\n';
+            'OnlineFix™ · ' + SHOP_ADDRESS + '\n' + SHOP_PHONE + ' · ' + SHOP_EMAIL + '\n';
 
         return db.collection('mail').add({
             to: [repair.customerEmail],
