@@ -628,7 +628,9 @@
             if (!state.customerName || !state.customerName.trim()) fail('customer-name', 'Your name please.');
             else if (state.customerName.length > 99) fail('customer-name', 'Name is too long.');
 
-            if (!state.customerEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(state.customerEmail)) {
+            // One plain address, the shape firestore.rules requires: no
+            // list of addresses and no display name ('"Name" <a@b.com>').
+            if (!state.customerEmail || !/^[^\s@,;:<>()"\[\]\\]+@[^\s@,;:<>()"\[\]\\]+\.[^\s@,;:<>()"\[\]\\]{2,}$/.test(state.customerEmail)) {
                 fail('customer-email', 'A valid email so we can reach you.');
             }
             if (!isUkPhone(state.customerPhone)) {
@@ -971,7 +973,7 @@
             + 'What the customer wrote:\n' + doc.issue + '\n\n'
             + 'Reply to this email to answer the customer. The booking is on the '
             + 'dashboard under Online Bookings: https://onlinefix.co.uk/admin/';
-        return {
+        const notice = {
             to: [SHOP_INBOX],
             replyTo: doc.customer.email,
             message: {
@@ -980,6 +982,38 @@
             },
             meta: { kind: 'booking-request', bookingId: state.tempId, reference: reference, when: when }
         };
+        // The rules refuse the notice above if anything the customer typed
+        // looks like a link (hasNoLink in firestore.rules): it goes from the
+        // shop's Gmail to itself, so a link in it would skip the spam filter.
+        // A real customer can type one too ("cracked.The screen"), so then
+        // the short notice goes instead: reference and time only, none of
+        // the customer's words.
+        const fields = [doc.customer.name, doc.customer.phone, doc.device.brand, doc.device.model, doc.issue];
+        if (fields.some(looksLikeLink)) {
+            notice.message = {
+                subject: 'Booking request ' + reference + ', ' + when,
+                text: 'New booking request from the website booking form.\n\n'
+                    + 'Reference: ' + reference + '\n'
+                    + 'Wants to drop off: ' + when + '\n\n'
+                    + 'Part of what the customer typed looks like a web address, so it is '
+                    + 'left out of this email. Read the booking on the dashboard under '
+                    + 'Online Bookings: https://onlinefix.co.uk/admin/\n\n'
+                    + 'Replying to this email answers the address the booking gave.'
+            };
+        }
+        return notice;
+    }
+
+    // The same test as hasNoLink in firestore.rules: a web address
+    // ("https:", "www.", "//") or a domain in any alphabet ("bit.ly/x",
+    // "payé.com"). Built with new RegExp so a browser too old for \p{L}
+    // falls back to Latin letters instead of failing to load this file.
+    const LINK_RE = (function () {
+        try { return new RegExp('https?:|www\\.|//|[\\p{L}\\p{N}-]\\.\\p{L}{2,}', 'iu'); }
+        catch (e) { return /https?:|www\.|\/\/|[A-Za-z0-9\u00C0-\u024F-]\.[A-Za-z\u00C0-\u024F]{2,}/i; }
+    })();
+    function looksLikeLink(s) {
+        return LINK_RE.test(String(s || ''));
     }
 
     function friendlyError(err) {

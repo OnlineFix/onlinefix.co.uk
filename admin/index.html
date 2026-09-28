@@ -3252,7 +3252,8 @@
                     </div>
                 </div>
                 <p id="bookings-truncated" class="hidden" style="color: var(--warning); margin: 0 0 0.75rem;">
-                    More bookings are waiting than this board shows. Book in or remove some and the rest will appear.
+                    More bookings are waiting than this board shows (it shows the newest). Book in or remove some and the rest will appear.
+                    <button type="button" class="btn btn-secondary" id="bookings-more" style="margin-left: 0.5rem;">Show more</button>
                 </p>
                 <div class="section-content board-content">
                     <div class="kanban-container" id="bookings-board"></div>
@@ -3884,25 +3885,51 @@
         };
         const OPEN_BOOKING_STATUSES = ['pending', 'confirmed', 'responded'];
         const BOOKINGS_LIMIT = 300;
+        let bookingsLimit = BOOKINGS_LIMIT;   // raised by "Show more"
+        let bookingsUnordered = false;        // the index below is missing
 
         /* Only the bookings still waiting on the shop are fetched. Fetching
            the newest few hundred of every kind and filtering here let removed
            and booked-in ones take up the window: a burst of junk bookings
            would push every real one out of it, and removing the junk would
-           not bring them back. */
+           not bring them back.
+
+           They are fetched newest first. With no order the window was
+           filled in document id order, and anyone can make bookings: a
+           script filed 400 under ids sorting before "BK_" and no real
+           booking made it onto the board. (The rules now also tie each
+           booking's id to its own BK_ id.) Newest first, a booking made
+           after a burst of junk is still shown, and "Show more" widens the
+           window to reach older ones. A script that keeps on booking can
+           still bury real bookings; only App Check or a server in front of
+           the bookings would stop that.
+
+           "status in [...]" with an order on createdAt needs a composite
+           index (bookings: status Ascending, createdAt Descending). Until it
+           is created in the Firebase console the ordered query is refused
+           with failed-precondition, and the board falls back to the old
+           unordered query so it keeps working; the console warning carries
+           Firebase's link that creates the index. */
         function startBookings() {
             if (unsubscribeBookings) unsubscribeBookings();
-            unsubscribeBookings = db.collection('bookings')
-                .where('status', 'in', OPEN_BOOKING_STATUSES)
-                .limit(BOOKINGS_LIMIT)
+            let q = db.collection('bookings').where('status', 'in', OPEN_BOOKING_STATUSES);
+            if (!bookingsUnordered) q = q.orderBy('createdAt', 'desc');
+            const limit = bookingsLimit;
+            unsubscribeBookings = q.limit(limit)
                 .onSnapshot((snapshot) => {
                     allBookings = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    bookingsTruncated = snapshot.size >= BOOKINGS_LIMIT;
+                    bookingsTruncated = snapshot.size >= limit;
                     bookingsLoaded = true;
                     updateBookingsBadge();
                     if (isBookingsBoardShown()) renderBookings();
                 }, (error) => {
                     unsubscribeBookings = null;
+                    if (!bookingsUnordered && error && error.code === 'failed-precondition' && auth.currentUser) {
+                        console.warn('Online bookings: the index for newest-first order is missing, so the board shows them unordered until it is created. ' + error.message);
+                        bookingsUnordered = true;
+                        startBookings();
+                        return;
+                    }
                     bookingsLoaded = false;
                     if (!auth.currentUser) return;   // signed out, nothing to report
                     console.warn('Online bookings unavailable:', error);
@@ -3916,7 +3943,14 @@
             unsubscribeBookings = null;
             bookingsLoaded = false;
             allBookings = [];
+            bookingsLimit = BOOKINGS_LIMIT;
         }
+
+        // "Show more" under the board: the next BOOKINGS_LIMIT older ones.
+        document.getElementById('bookings-more')?.addEventListener('click', () => {
+            bookingsLimit += BOOKINGS_LIMIT;
+            startBookings();
+        });
 
         function isBookingsBoardShown() {
             return !!document.getElementById('bookings-board')?.offsetParent;
@@ -4149,7 +4183,7 @@
                                 <div><span>Status</span><span class="booking-chip${isNew ? ' booking-chip--new' : ''}">${isNew ? 'New, not yet confirmed' : 'Confirmed'}</span></div>
                                 <div><span>Reference</span>${escapeHTML(bookingReference(booking))}</div>
                                 <div><span>Requested</span>${escapeHTML(formatBookingTime(booking.createdAt))}</div>
-                                <div><span>Email</span><a href="mailto:${escapeHTML(encodeURIComponent(email))}">${escapeHTML(email || 'None')}</a></div>
+                                <div><span>Email</span><a href="mailto:${escapeHTML(mailtoAddress(email))}">${escapeHTML(email || 'None')}</a></div>
                                 <div><span>Phone</span><a href="tel:${escapeHTML(phone.replace(/[^0-9+]/g, ''))}">${escapeHTML(phone || 'None')}</a></div>
                                 ${emailedAt ? `<div><span>Confirmation</span>Emailed ${escapeHTML(emailedAt)}${emailedTo ? ' to ' + escapeHTML(emailedTo) : ''}</div>` : ''}
                             </div>
@@ -4280,13 +4314,73 @@
             });
         }
 
+        /* Removing a booking deletes its photos: the booking terms tell
+           customers their photos are "deleted when the booking is closed or
+           declined", and Remove used to leave them in Storage for good.
+           Everything in the booking's folder goes, not just the photos the
+           booking lists: a photo from a submit that failed and was retried
+           with fewer photos is left in the same folder. If the folder cannot
+           be listed, every name the rules allow there (photo-1.jpg to
+           photo-3.jpg) is tried instead. Called after the booking is marked
+           removed, so a booking booked in meanwhile keeps its photos.
+           Returns '' when none is left, else why. The booking itself, and
+           the shop's notice at mail/<id>, keep the customer's details: how
+           long to keep those is the owner's call.
+
+           The folder is named by the booking's tempId. That is also its
+           document id now, but bookings made before 23 Sep 2026 were given
+           a random document id, with their photos still under the tempId. */
+        function bookingPhotoFolder(booking) {
+            const tempId = String(booking.tempId || '');
+            return 'bookings/' + (/^BK_[0-9A-F]{32}$/.test(tempId) ? tempId : booking.id);
+        }
+
+        async function deleteBookingPhotos(booking) {
+            const folder = bookingPhotoFolder(booking);
+            let paths;
+            try {
+                paths = (await storage.ref(folder).listAll()).items.map(item => item.fullPath);
+            } catch (error) {
+                paths = [1, 2, 3].map(i => `${folder}/photo-${i}.jpg`);
+            }
+            const failures = [];
+            for (const path of paths) {
+                try {
+                    await storage.ref(path).delete();
+                } catch (error) {
+                    if (error && error.code === 'storage/object-not-found') continue;
+                    failures.push(errorText(error));
+                }
+            }
+            return failures.join('; ');
+        }
+
+        /* A booking photo is shown as an image in a tab of its own, never by
+           sending the tab to the file's download link. Whoever uploads the
+           file also chooses how that link hands it out, and a "photo" set to
+           download as Booking-details.html (HTML inside, labelled a JPEG)
+           arrived as a web page on the staff computer's own disk. An <img>
+           only ever draws an image, whatever the file's settings say. */
         async function openBookingPhoto(path) {
-            // Opened first, so an iPad does not treat the later navigation as
-            // an unrequested popup.
+            // Opened first, so an iPad does not treat it as an unrequested
+            // popup once the link has been fetched.
             const win = window.open('', '_blank');
             try {
                 const url = await storage.ref(path).getDownloadURL();
-                if (win) { win.opener = null; win.location.href = url; } else safeOpen(url);
+                if (!win) {
+                    showAlert('Could not open a tab for the photo. Allow pop-ups for this page and try again.', 'error');
+                    return;
+                }
+                win.opener = null;
+                const d = win.document;
+                d.title = 'Booking photo';
+                const body = d.body || d.documentElement.appendChild(d.createElement('body'));
+                body.style.cssText = 'margin: 0; background: #111; min-height: 100vh; display: flex; align-items: center; justify-content: center;';
+                const img = d.createElement('img');
+                img.alt = 'Booking photo';
+                img.style.cssText = 'max-width: 100%; max-height: 100vh; display: block;';
+                img.src = url;
+                body.appendChild(img);
             } catch (error) {
                 if (win) win.close();
                 showAlert('Could not open that photo: ' + error.message, 'error');
@@ -4411,10 +4505,14 @@
             const w = E.ukWhen(form.preferredAt);
             if (!w) throw new Error('the booking has no drop-off time');
 
-            const name = form.firstName || 'there';
+            // The name and device come from whoever filled in the booking
+            // form, and may not carry a message of their own: see
+            // greetingName and looksLikeLink.
+            const name = greetingName(form.firstName) || 'there';
             // As Book in names the device, but "Other" says nothing, so then
-            // the row is left out.
-            const device = [form.brand, form.model].filter(Boolean).join(' ')
+            // the row is left out, as it is for a device that holds a link.
+            const typed = [form.brand, form.model].filter(Boolean).join(' ');
+            const device = (looksLikeLink(typed) ? '' : typed)
                 || (form.category !== 'other' ? BOOKING_CATEGORIES[form.category] || '' : '');
             const reference = bookingReference(booking);
             const shop = { name: 'OnlineFix', address: BOOKING_SHOP_ADDRESS, phone: SHOP_PHONE, email: SHOP_EMAIL };
@@ -4478,6 +4576,9 @@
             return {
                 ref: db.collection('mail').doc(),
                 when: w.full,
+                // For the prompt before it goes (runBookingAction).
+                greeting: hi,
+                device,
                 data: {
                     to: [form.email],
                     replyTo: SHOP_EMAIL,
@@ -4505,11 +4606,14 @@
 
             try {
                 if (action === 'remove') {
-                    if (!confirm(`Remove the booking from ${name}? It leaves the board and cannot be booked in afterwards. The customer is not told.`)) return;
+                    const hasPhotos = Array.isArray(booking.photoPaths) && booking.photoPaths.length > 0;
+                    if (!confirm(`Remove the booking from ${name}? It leaves the board and cannot be booked in afterwards.${hasPhotos ? ' Its photos are deleted.' : ''} The customer is not told.`)) return;
                     setBusy(true);
                     await updateOpenBooking(bookingId, { status: 'removed', deleted: true, deletedAt: firebase.firestore.Timestamp.now() });
                     modal.remove();
-                    showAlert('Booking removed.', 'success');
+                    const photosLeft = await deleteBookingPhotos(booking);
+                    if (photosLeft) showAlert(`Booking removed, but its photos could not be deleted (${photosLeft}). They are in Firebase Storage under ${bookingPhotoFolder(booking)}/.`, 'error', { sticky: true });
+                    else showAlert('Booking removed.', 'success');
                     return;
                 }
 
@@ -4526,8 +4630,16 @@
                     emailing = !!box && box.checked && !box.disabled && !confirmEmailBlocker(form.email, form.preferredAt);
                     // Drawn before anything is saved, so a problem with the
                     // email stops the confirm too.
+                    //
+                    // The prompt quotes the email's greeting and device line.
+                    // Anyone can book with anyone's address, and this email
+                    // goes from the shop's own Gmail, so staff see the words
+                    // taken from the booking before they are sent in the
+                    // shop's name.
                     const mail = emailing ? buildBookingConfirmedMail(booking, form) : null;
-                    if (mail && !confirm(`Confirm ${form.customerName}'s booking for ${mail.when}?\n\nThe confirmation email will be sent to ${form.email}.`)) return;
+                    if (mail && !confirm(`Confirm ${form.customerName}'s booking for ${mail.when}?\n\n` +
+                        `The confirmation email will be sent to ${form.email}. It starts "${mail.greeting}"` +
+                        (mail.device ? ` and gives the device as "${mail.device}".` : ' and names no device.'))) return;
                     setBusy(true);
                     const now = firebase.firestore.Timestamp.now();
                     const changes = { ...bookingEdits(form), status: 'confirmed', confirmedAt: now };
@@ -5071,7 +5183,10 @@
                                             <i class="fas fa-phone"></i> ${escapeHTML(repair.customerPhone)}
                                         </a>` : ''}
                                     ${repair.customerEmail ? `
-                                        <a class="btn btn-secondary" href="mailto:${escapeHTML(repair.customerEmail)}">
+                                        <!-- The address is URL-encoded (mailtoAddress): raw,
+                                             "a@b.com?subject=...&body=..." filled in the
+                                             email's subject and text. -->
+                                        <a class="btn btn-secondary" href="mailto:${escapeHTML(mailtoAddress(repair.customerEmail))}">
                                             <i class="fas fa-envelope"></i> ${escapeHTML(repair.customerEmail)}
                                         </a>` : ''}
                                 </div>
@@ -5250,9 +5365,52 @@
         const BOOKING_SHOP_ADDRESS = '13 Quarry Street, Guildford, Surrey, GU1 3UY';
         const SITE_URL = 'https://onlinefix.co.uk';
 
+        /* One plain address, the shape firestore.rules holds a booking's
+           address to. The old check only barred spaces and a second @, so
+           it passed a display name ('"Pay_at_evil.example"<someone@x.com>'),
+           which Confirm booking then put in the customer email's To line
+           as the name it is addressed to. */
+        /* An address for a mailto: link. Encoded, so a "?" or "&" in it
+           cannot start the subject or text, but with the @ left as it is,
+           which every mail app reads. */
+        function mailtoAddress(email) {
+            return encodeURIComponent(String(email || '')).replace(/%40/g, '@');
+        }
+
         function isValidEmail(raw) {
             const v = String(raw || '').trim();
-            return v.length > 3 && v.length < 200 && /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
+            return v.length > 3 && v.length < 200 && /^[^\s@,;:<>()"\[\]\\]+@[^\s@,;:<>()"\[\]\\]+\.[^\s@,;:<>()"\[\]\\]{2,}$/.test(v);
+        }
+
+        /* Customer emails repeat the name and device from the job or the
+           booking, and a booking's were typed by whoever filled in the
+           public form, with whatever address they liked: Confirm booking
+           then sends them, from the shop's own Gmail, to that address. So
+           the words taken from a booking must not be able to carry a
+           message of their own ("Pay the £20 deposit at evil-pay.example").
+
+           looksLikeLink: a web address ("https:", "www.", "//"), an email
+           address, or a domain in any alphabet ("evil-pay.example",
+           "bit.ly/x", "payé.com", "оплата.рф"). Much the same test as
+           hasNoLink in firestore.rules, which has no need to look for email
+           addresses.
+
+           greetingName: the first of the names given that reads as a name,
+           for "Hi <name>,": letters (any alphabet), spaces, apostrophes,
+           dots and hyphens, 40 characters at most, and no link. '' if none
+           does, and the email then says "Hi there,", as it always has when
+           there is no name. No new wording: an odd name or device just
+           gets the words used when there is none. */
+        function looksLikeLink(s) {
+            return /(https?:|www\.|\/\/|@|[\p{L}\p{N}-]\.\p{L}{2,})/iu.test(String(s || ''));
+        }
+
+        function greetingName(...names) {
+            for (const n of names) {
+                const v = String(n || '').trim();
+                if (v && v.length <= 40 && /^[\p{L}\p{M}' ’.-]+$/u.test(v) && !looksLikeLink(v)) return v;
+            }
+            return '';
         }
 
         function editCustomer(repairId) {
@@ -5430,8 +5588,11 @@
         // wording.
         function queueTrackingEmail(repair, email) {
             const trackUrl = `${window.location.origin}/track/?id=${encodeURIComponent(repair.repairId)}`;
-            const device = [repair.brand, repair.model].filter(Boolean).join(' ') || repair.deviceType || 'your device';
-            const greeting = repair.firstName || repair.customerName || 'there';
+            // A job booked in from an online booking carries the words typed
+            // on the public form: see greetingName and looksLikeLink.
+            const typed = [repair.brand, repair.model].filter(Boolean).join(' ');
+            const device = (looksLikeLink(typed) ? '' : typed) || repair.deviceType || 'your device';
+            const greeting = greetingName(repair.firstName, repair.customerName) || 'there';
             const subject = 'Your repair tracking link — ' + repair.repairId;
 
             const html = emailHtml(E => E.layout({
@@ -6858,8 +7019,10 @@
             const subject = `Repair Update: ${repair.repairId} - ${statusLabel}`;
             const body = `Hi ${repair.firstName || repair.customerName},\n\nThis is an update from OnlineFix regarding your repair.\n\nRepair ID: ${repair.repairId}\nDevice: ${repair.brand} ${repair.model}\nStatus: ${statusLabel}\n\nTrack your repair online: ${window.location.origin}/track/?id=${repair.repairId}\n\nThank you for choosing OnlineFix!\nOnlineFix - Device Repair Specialists\nPhone: 07940 730537`;
 
-            // Use mailto as fallback (works without EmailJS setup)
-            safeOpen(`mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
+            // Use mailto as fallback (works without EmailJS setup). The
+            // address is encoded too, so a "?subject=" inside it cannot set
+            // the subject or text.
+            safeOpen(`mailto:${mailtoAddress(email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
             trackEvent('email_notification_sent', { repair_id: repair.repairId, status: currentStatus });
             showAlert('Email client opened with pre-filled message', 'info');
         }
