@@ -2,24 +2,16 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Admin access is granted via a custom claim (admin == true) set with the
-    // Firebase Admin SDK, with the email allow-list kept as a transitional
-    // fallback. Once the custom claim is provisioned on the admin account,
-    // delete the email branch entirely — the dashboard's "admin access" line
-    // says when that is safe to do.
-    //
-    // The fallback now also requires a verified address. Firebase can be
-    // configured to allow several accounts on one email address, and a token's
-    // `email` is whatever the account was registered with, verified or not. On
-    // its own the address was therefore enough to become an admin: sign up
-    // with it, never confirm it, and the branch below matched. Requiring
-    // email_verified closes that, because the real mailbox is needed to
-    // confirm the address.
+    // Staff are the accounts carrying the admin security claim (admin ==
+    // true). Only someone with full access to the Firebase project can set
+    // it (scripts/set-admin-claim.mjs, or Identity Toolkit's
+    // accounts:update with customAttributes), so it
+    // cannot be gained by signing up. The shop account got it on 28 Sep
+    // 2026. Until then an allow-listed, verified email address also counted;
+    // that fallback is gone, so a new staff account needs the claim before
+    // it can see anything. Keep this function identical in storage.rules.
     function isAdmin() {
-      return request.auth != null
-        && (request.auth.token.admin == true
-            || (request.auth.token.email in ['onlinerepairbooking@gmail.com']
-                && request.auth.token.email_verified == true));
+      return request.auth != null && request.auth.token.admin == true;
     }
 
     match /repairs/{repairDoc} {
