@@ -698,6 +698,23 @@
             background: rgba(255, 255, 255, 0.1);
         }
 
+        /* Shop address under the help buttons; opens Google Maps. */
+        .contact-address {
+            margin-top: 1.5rem;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .contact-address a {
+            color: var(--text-main);
+            text-underline-offset: 3px;
+        }
+
+        .contact-address i {
+            margin-right: 0.35rem;
+        }
+
         /* Photo Modal
            -----------
            Full-viewport, and the image is sized by the viewport rather than
@@ -932,11 +949,16 @@
                         <i class="fab fa-whatsapp"></i>
                         WhatsApp
                     </a>
-                    <a href="mailto:info@onlinefix.co.uk" class="contact-btn secondary">
+                    <a href="mailto:hello@onlinefix.uk" class="contact-btn secondary">
                         <i class="fas fa-envelope"></i>
                         Email Us
                     </a>
                 </div>
+                <p class="contact-address">
+                    <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
+                    <a href="https://www.google.com/maps/search/?api=1&amp;query=13%20Quarry%20Street%2C%20Guildford%2C%20Surrey%2C%20GU1%203UY" target="_blank"
+                        rel="noopener noreferrer">13 Quarry Street, Guildford, Surrey GU1&nbsp;3UY</a>
+                </p>
             </div>
         </div>
     </div>
