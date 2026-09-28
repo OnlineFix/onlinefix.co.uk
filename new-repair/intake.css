@@ -18,34 +18,46 @@
 [hidden] { display: none !important; }
 
 :root {
-    --bg-base: #0B0E14;
-    --bg-surface: #151A23;
-    --bg-elevated: #1F2735;
-    --bg-input: #0E121A;
+    /* The main site's palette (css/core.css): concrete page, white panels,
+       hard black borders, one blue accent. The page used to be dark; a light
+       page is easier for a customer to read at the counter, and it now looks
+       like the site they booked from. */
+    --bg-base: #F2F2F2;
+    --bg-surface: #FFFFFF;
+    --bg-elevated: #E2E2E2;
+    --bg-input: #FFFFFF;
+    --grid-line: #DCDCDC;
 
     --primary-blue: #0033FF;
-    --primary-glow: rgba(0, 51, 255, 0.4);
-    --accent-cyan: #00E4FF;
+    --gradient-blue: linear-gradient(135deg, #0033FF 0%, #00C6FF 100%);
+    /* Kept under its old name so every accent rule follows the switch; on a
+       light page cyan text is unreadable, so the accent is the site blue. */
+    --accent-cyan: #0033FF;
+    --accent-tint: rgba(0, 51, 255, 0.08);
 
-    --text-main: #FFFFFF;
-    --text-muted: #B4C0D0;
-    /* Was #64748B — about 4:1 on this background, and it carried the field
-       hints and the terms small print, which are exactly the words a customer
-       has to be able to read before signing. */
-    --text-dark: #94A3B8;
+    --text-main: #111111;
+    --text-muted: #3A3A3A;
+    /* Field hints and the terms small print: the words a customer has to be
+       able to read before signing, so kept well above 4.5:1 on white. */
+    --text-dark: #5C5C5C;
 
-    --border-color: rgba(255, 255, 255, 0.10);
-    --border-strong: rgba(255, 255, 255, 0.18);
+    --border-color: #111111;
+    --border-soft: #C8C8C8;
+    --border-strong: #111111;
 
-    --success: #10B981;
-    --warning: #F59E0B;
-    --danger: #EF4444;
-    --info: #3B82F6;
+    /* Darker than the usual Tailwind greens and reds: they carry text on
+       white here, not on near-black. */
+    --success: #047857;
+    --warning: #B45309;
+    --danger: #C81E1E;
+    --info: #0033FF;
 
-    --radius-md: 14px;
-    --radius-lg: 22px;
+    /* Square corners throughout, as on the rest of the site. */
+    --radius-md: 0;
+    --radius-lg: 0;
 
-    --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+    --shadow-hard: 6px 6px 0 #111111;
+    --shadow-md: 4px 4px 0 #111111;
 
     /* Fixed chrome heights — content padding is derived from these */
     --topbar-h: 84px;
@@ -55,8 +67,14 @@
 html { -webkit-text-size-adjust: 100%; }
 
 body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    background: var(--bg-base);
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    /* The 40px grid the site's page headers sit on. Set on body (not html) so
+       it paints as the page canvas and the dots layer above it still shows. */
+    background-color: var(--bg-base);
+    background-image:
+        linear-gradient(90deg, var(--grid-line) 1px, transparent 1px),
+        linear-gradient(180deg, var(--grid-line) 1px, transparent 1px);
+    background-size: 40px 40px;
     color: var(--text-main);
     line-height: 1.6;
     /* Raised from 17px. This is a counter iPad held at arm's length, often by
@@ -69,9 +87,10 @@ body {
 }
 
 /* ====================== Ambient background ====================== */
-/* Three large blurred orbs drifting behind the content — the same treatment
-   the tracking page uses, so the page a customer signs on and the page they
-   check later read as the same product. Sits at z-index -1 and is inert. */
+/* The small blue squares that drift up the home page hero (css/core.css
+   .float-dot, spawned by js/core.js). intake.js spawns them into this fixed
+   layer, so they rise behind the whole form rather than one header. The
+   layer is inert and sits under everything. */
 
 .bg-dots {
     position: fixed;
@@ -81,46 +100,19 @@ body {
     overflow: hidden;
 }
 
-.dot {
+@keyframes float-up {
+    0%   { transform: translateY(0) rotate(0deg); opacity: 0.7; }
+    100% { transform: translateY(-100vh) rotate(90deg); opacity: 0; }
+}
+
+.float-dot {
     position: absolute;
-    border-radius: 50%;
-    filter: blur(40px);
-    opacity: 0.4;
-    animation: float 20s infinite ease-in-out alternate;
-}
-
-.dot-1 {
-    width: 300px;
-    height: 300px;
+    top: 100%;
     background: var(--primary-blue);
-    top: -100px;
-    left: -100px;
-}
-
-.dot-2 {
-    width: 400px;
-    height: 400px;
-    background: var(--accent-cyan);
-    bottom: -150px;
-    right: -100px;
-    opacity: 0.2;
-    animation-delay: -5s;
-}
-
-.dot-3 {
-    width: 250px;
-    height: 250px;
-    background: rgba(139, 92, 246, 0.4);
-    top: 40%;
-    left: 30%;
-    animation-delay: -10s;
-}
-
-@keyframes float {
-    0%   { transform: translate(0, 0) scale(1); }
-    33%  { transform: translate(30px, -50px) scale(1.1); }
-    66%  { transform: translate(-20px, 20px) scale(0.9); }
-    100% { transform: translate(0, 0) scale(1); }
+    opacity: 0.7;
+    pointer-events: none;
+    animation: float-up 8s linear infinite;
+    will-change: transform, opacity;
 }
 
 /* ============================ Top bar ============================ */
@@ -129,10 +121,8 @@ body {
     position: fixed;
     top: 0; left: 0; right: 0;
     height: var(--topbar-h);
-    background: rgba(11, 14, 20, 0.92);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border-color);
+    background: var(--bg-surface);
+    border-bottom: 2px solid var(--border-color);
     display: flex;
     align-items: center;
     gap: 1rem;
@@ -144,6 +134,7 @@ body {
     font-size: 1.35rem;
     font-weight: 800;
     letter-spacing: -0.02em;
+    text-transform: uppercase;
     white-space: nowrap;
 }
 .topbar__brand span { color: var(--accent-cyan); }
@@ -167,14 +158,14 @@ body {
     align-items: center;
 }
 .steprail__seg {
-    height: 6px;
+    height: 8px;
     flex: 1;
-    border-radius: 3px;
-    background: var(--bg-elevated);
+    border: 1.5px solid var(--border-color);
+    background: var(--bg-surface);
     transition: background 0.25s ease;
 }
 .steprail__seg.is-done { background: var(--success); }
-.steprail__seg.is-current { background: var(--accent-cyan); }
+.steprail__seg.is-current { background: var(--primary-blue); }
 
 /* ============================ Layout ============================ */
 
@@ -201,12 +192,15 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
     .step { animation: none; }
-    .dot { animation: none !important; }
+    .float-dot { display: none !important; }
     * { transition-duration: 0.01ms !important; }
 }
 
 .step__eyebrow {
-    color: var(--accent-cyan);
+    display: inline-block;
+    color: #FFFFFF;
+    background: var(--primary-blue);
+    padding: 0.2rem 0.6rem;
     font-size: 0.8rem;
     font-weight: 700;
     letter-spacing: 0.12em;
@@ -218,6 +212,7 @@ body {
     font-size: 2rem;
     font-weight: 800;
     letter-spacing: -0.02em;
+    text-transform: uppercase;
     line-height: 1.15;
     margin-bottom: 0.5rem;
 }
@@ -230,17 +225,15 @@ body {
 }
 
 .card {
-    /* Translucent so the orbs read through, matching the tracking page's
-       .repair-card. That card also sets backdrop-filter, deliberately not
-       copied here: what sits behind is already blurred 40px, so a second
-       blur is invisible, and this page stacks six cards in a form the
-       customer scrolls — per-card backdrop filters cost a real frame budget
-       on the iPad for no visible gain. */
-    background: rgba(21, 26, 35, 0.7);
-    border: 1px solid var(--border-color);
+    /* The site's white box: 2px black border and a hard offset shadow, as on
+       the page headers and the emails. Opaque, so text never sits on the grid
+       or a passing dot. */
+    background: var(--bg-surface);
+    border: 2px solid var(--border-color);
     border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-hard);
     padding: 1.75rem;
-    margin-bottom: 1.5rem;
+    margin: 0 6px 1.75rem 0;
 }
 
 /* The last card's own bottom margin sits on top of the page padding, which
@@ -248,19 +241,23 @@ body {
 .step .card:last-child { margin-bottom: 0; }
 
 .card__title {
-    font-size: 1.2rem;
-    font-weight: 700;
+    font-size: 1.1rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
     margin-bottom: 1.25rem;
     display: flex;
     align-items: center;
     gap: 0.6rem;
     color: var(--text-main);
 }
-.card__title i { color: var(--accent-cyan); }
+.card__title .icon { color: var(--primary-blue); flex: 0 0 auto; }
 .card__title .card__hint {
     margin-left: auto;
     font-size: 0.8rem;
     font-weight: 500;
+    text-transform: none;
+    letter-spacing: 0;
     color: var(--text-dark);
 }
 
@@ -295,7 +292,7 @@ body {
 select.input {
     width: 100%;
     background: var(--bg-input);
-    border: 1.5px solid var(--border-color);
+    border: 2px solid var(--border-color);
     border-radius: var(--radius-md);
     color: var(--text-main);
     font-family: inherit;
@@ -308,7 +305,7 @@ select.input {
 select.input {
     appearance: none;
     -webkit-appearance: none;
-    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23111111' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 1rem center;
     background-size: 22px;
@@ -319,15 +316,15 @@ select.input {
 
 .input:focus, .textarea:focus {
     outline: none;
-    border-color: var(--accent-cyan);
-    box-shadow: 0 0 0 4px rgba(0, 228, 255, 0.14);
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 4px rgba(0, 51, 255, 0.18);
 }
 
 .input::placeholder, .textarea::placeholder { color: var(--text-dark); }
 
 .input.is-invalid, .textarea.is-invalid {
     border-color: var(--danger);
-    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.14);
+    box-shadow: 0 0 0 4px rgba(200, 30, 30, 0.14);
 }
 
 .field__error {
@@ -354,9 +351,9 @@ select.input {
     min-height: 62px;
     padding: 0.6rem 1.25rem;
     background: var(--bg-input);
-    border: 1.5px solid var(--border-color);
-    border-radius: 999px;
-    color: var(--text-muted);
+    border: 2px solid var(--border-color);
+    border-radius: 0;
+    color: var(--text-main);
     font-family: inherit;
     font-size: 1rem;
     font-weight: 600;
@@ -364,11 +361,57 @@ select.input {
     transition: all 0.18s ease;
 }
 .chip i { font-size: 1.05rem; }
-.chip:hover { border-color: var(--border-strong); color: var(--text-main); }
 .chip.is-selected {
-    background: rgba(0, 228, 255, 0.12);
-    border-color: var(--accent-cyan);
-    color: var(--accent-cyan);
+    background: var(--primary-blue);
+    border-color: var(--border-color);
+    color: #FFFFFF;
+    box-shadow: 3px 3px 0 #111111;
+}
+
+/* Preset jobs: device picker, then that device's job chips. The picker is
+   a joined black strip so it reads as "which list", not as another job. */
+.jobdevices {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border: 2px solid var(--border-color);
+    margin-bottom: 1rem;
+}
+
+.jobdevice {
+    min-height: 62px;
+    padding: 0.5rem 0.75rem;
+    background: var(--bg-surface);
+    border: 0;
+    border-left: 2px solid var(--border-color);
+    color: var(--text-main);
+    font-family: inherit;
+    font-size: 1.02rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    line-height: 1.2;
+    cursor: pointer;
+}
+.jobdevice:first-child { border-left: 0; }
+.jobdevice.is-selected { background: #111111; color: #FFFFFF; }
+
+.quickjobs { margin-bottom: 1.25rem; }
+
+/* A tick on a picked job, so "on" does not rely on colour alone. */
+.quickjobs .chip.is-selected::before {
+    content: "\2713";
+    font-weight: 800;
+}
+
+/* Hover tints only where there is a real pointer. On the iPad a tapped
+   button keeps :hover until the next tap elsewhere, which on a light page
+   makes an unticked box look half-ticked. */
+@media (hover: hover) {
+    .chip:not(.is-selected):hover,
+    .jobdevice:not(.is-selected):hover,
+    .checkbox:hover,
+    .photo-btn:not(.photo-btn--camera):hover,
+    .btn--ghost:hover { background: var(--accent-tint); }
 }
 
 /* Multi-select tick boxes for condition + accessories */
@@ -381,13 +424,12 @@ select.input {
     min-height: 66px;
     padding: 1.1rem 1.15rem;
     background: var(--bg-input);
-    border: 1.5px solid var(--border-color);
+    border: 2px solid var(--border-color);
     border-radius: var(--radius-md);
     cursor: pointer;
     transition: all 0.18s ease;
 }
-.checkbox:hover { border-color: var(--border-strong); }
-.checkbox.is-checked { border-color: var(--accent-cyan); background: rgba(0, 228, 255, 0.08); }
+.checkbox.is-checked { border-color: var(--primary-blue); background: var(--accent-tint); }
 
 .checkbox input { position: absolute; opacity: 0; pointer-events: none; }
 
@@ -396,19 +438,19 @@ select.input {
     width: 30px; height: 30px;
     margin-top: 1px;
     border: 2px solid var(--border-strong);
-    border-radius: 7px;
+    border-radius: 0;
     display: grid;
     place-items: center;
-    color: var(--bg-base);
+    color: #FFFFFF;
     font-size: 0.8rem;
     transition: all 0.18s ease;
 }
 .checkbox.is-checked .checkbox__box {
-    background: var(--accent-cyan);
-    border-color: var(--accent-cyan);
+    background: var(--primary-blue);
+    border-color: var(--primary-blue);
 }
-.checkbox__box i { opacity: 0; }
-.checkbox.is-checked .checkbox__box i { opacity: 1; }
+.checkbox__box .icon { opacity: 0; }
+.checkbox.is-checked .checkbox__box .icon { opacity: 1; }
 
 .checkbox__text { font-size: 1.05rem; font-weight: 600; line-height: 1.45; }
 .checkbox__text small {
@@ -443,15 +485,18 @@ select.input {
     cursor: pointer;
     transition: all 0.18s ease;
 }
-.photo-btn i { font-size: 2rem; color: var(--accent-cyan); }
+.photo-btn .icon { color: var(--primary-blue); }
 .photo-btn small { font-weight: 500; font-size: 0.82rem; color: var(--text-dark); }
-.photo-btn:hover { border-color: var(--accent-cyan); background: rgba(0, 228, 255, 0.06); }
 
 .photo-btn--camera {
-    background: linear-gradient(135deg, rgba(0, 51, 255, 0.22), rgba(0, 228, 255, 0.12));
+    background: var(--gradient-blue);
     border-style: solid;
-    border-color: var(--primary-blue);
+    border-color: var(--border-color);
+    color: #FFFFFF;
+    box-shadow: var(--shadow-md);
 }
+.photo-btn--camera .icon,
+.photo-btn--camera small { color: #FFFFFF; }
 
 .photo-grid {
     display: grid;
@@ -465,7 +510,7 @@ select.input {
     border-radius: var(--radius-md);
     overflow: hidden;
     background: var(--bg-input);
-    border: 1px solid var(--border-color);
+    border: 2px solid var(--border-color);
 }
 .photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
@@ -475,8 +520,8 @@ select.input {
     width: 40px; height: 40px;
     border-radius: 50%;
     border: none;
-    background: rgba(11, 14, 20, 0.85);
-    color: var(--text-main);
+    background: rgba(17, 17, 17, 0.85);
+    color: #FFFFFF;
     font-size: 1.1rem;
     cursor: pointer;
     display: grid;
@@ -493,11 +538,12 @@ select.input {
     font-size: 0.75rem;
     font-weight: 700;
     text-align: center;
-    background: rgba(11, 14, 20, 0.88);
+    background: rgba(17, 17, 17, 0.88);
 }
-.photo__state.is-uploading { color: var(--warning); }
-.photo__state.is-done { color: var(--success); }
-.photo__state.is-failed { color: var(--danger); }
+/* Light tints of the status colours: this strip is dark. */
+.photo__state.is-uploading { color: #FBBF24; }
+.photo__state.is-done { color: #34D399; }
+.photo__state.is-failed { color: #F87171; }
 
 .photo.is-uploading img { opacity: 0.45; }
 
@@ -510,32 +556,36 @@ select.input {
     gap: 0.6rem;
     min-height: 60px;
     padding: 0 1.75rem;
-    border: 1.5px solid transparent;
+    border: 2px solid transparent;
     border-radius: var(--radius-md);
     font-family: inherit;
     font-size: 1.05rem;
     font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
     cursor: pointer;
     text-decoration: none;
     transition: all 0.18s ease;
     white-space: nowrap;
 }
 
+/* The site's call-to-action button (css/core.css .cta-button): blue
+   gradient, black border, hard shadow. It presses into its shadow on tap. */
 .btn--primary {
-    background: var(--primary-blue);
-    color: #fff;
-    box-shadow: 0 6px 20px -6px var(--primary-glow);
+    background: var(--gradient-blue);
+    border-color: var(--border-color);
+    color: #FFFFFF;
+    box-shadow: var(--shadow-md);
 }
-.btn--primary:hover { background: #0029cc; }
+.btn--primary:active { transform: translate(4px, 4px); box-shadow: none; }
 
 .btn--ghost {
-    background: transparent;
-    border-color: var(--border-strong);
-    color: var(--text-muted);
+    background: var(--bg-surface);
+    border-color: var(--border-color);
+    color: var(--text-main);
 }
-.btn--ghost:hover { color: var(--text-main); border-color: var(--text-muted); }
 
-.btn--success { background: var(--success); color: #06251A; }
+.btn--success { background: var(--success); color: #FFFFFF; }
 .btn--danger  { background: transparent; border-color: var(--danger); color: var(--danger); }
 
 .btn[disabled], .btn.is-disabled {
@@ -552,10 +602,8 @@ select.input {
     position: fixed;
     bottom: 0; left: 0; right: 0;
     height: var(--actionbar-h);
-    background: rgba(11, 14, 20, 0.94);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-top: 1px solid var(--border-color);
+    background: var(--bg-surface);
+    border-top: 2px solid var(--border-color);
     display: flex;
     align-items: center;
     gap: 1rem;
@@ -613,7 +661,7 @@ select.input {
     align-items: center;
     gap: 0.4rem;
     padding: 0.3rem 0.7rem 0.3rem 0.45rem;
-    border: 1px solid var(--border-strong);
+    border: 1.5px solid var(--border-soft);
     border-radius: 999px;
     font-size: 0.9rem;
     font-weight: 600;
@@ -622,8 +670,8 @@ select.input {
 }
 
 .checklist__item.is-done {
-    border-color: rgba(16, 185, 129, 0.45);
-    background: rgba(16, 185, 129, 0.12);
+    border-color: var(--success);
+    background: rgba(4, 120, 87, 0.08);
     color: var(--success);
 }
 
@@ -645,7 +693,7 @@ select.input {
 .checklist__item.is-done .checklist__mark {
     background: var(--success);
     border-color: var(--success);
-    color: #06251A;
+    color: #FFFFFF;
 }
 
 /* The bar grows by a row on the customer step, so the page has to end
@@ -661,8 +709,8 @@ body[data-step="customer"] .actionbar {
 /* Brief highlight on the card the Continue button jumped to, so it is
    obvious which one still needs attention. */
 .card.is-flagged {
-    border-color: var(--accent-cyan);
-    box-shadow: 0 0 0 3px rgba(0, 228, 255, 0.18);
+    border-color: var(--primary-blue);
+    box-shadow: 6px 6px 0 var(--primary-blue);
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -671,8 +719,9 @@ body[data-step="customer"] .actionbar {
 .handover {
     text-align: center;
     padding: 3rem 1.5rem;
-    background: linear-gradient(160deg, rgba(0, 51, 255, 0.16), rgba(0, 228, 255, 0.06));
-    border: 1px solid rgba(0, 228, 255, 0.28);
+    background: var(--bg-surface);
+    border: 2px solid var(--border-color);
+    box-shadow: var(--shadow-hard);
     border-radius: var(--radius-lg);
 }
 .handover__icon {
@@ -685,16 +734,16 @@ body[data-step="customer"] .actionbar {
 
 /* ============================ Summary table ============================ */
 
-.summary { border: 1px solid var(--border-color); border-radius: var(--radius-md); overflow: hidden; }
+.summary { border: 2px solid var(--border-color); border-radius: var(--radius-md); overflow: hidden; }
 .summary__row {
     display: grid;
     grid-template-columns: 190px 1fr;
     gap: 1rem;
     padding: 0.95rem 1.25rem;
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-soft);
 }
 .summary__row:last-child { border-bottom: none; }
-.summary__row:nth-child(odd) { background: rgba(255, 255, 255, 0.02); }
+.summary__row:nth-child(odd) { background: var(--bg-base); }
 .summary__key { color: var(--text-muted); font-size: 1rem; font-weight: 600; }
 .summary__val { font-weight: 600; word-break: break-word; }
 .summary__val.is-price { color: var(--success); font-size: 1.15rem; }
@@ -721,7 +770,7 @@ body[data-step="customer"] .actionbar {
     height: 96px;
     object-fit: cover;
     border-radius: var(--radius-md);
-    border: 1px solid var(--border-color);
+    border: 2px solid var(--border-color);
     background: var(--bg-input);
 }
 
@@ -736,8 +785,8 @@ body[data-step="customer"] .actionbar {
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
-    background: var(--bg-input);
-    border: 1.5px solid var(--border-color);
+    background: var(--bg-base);
+    border: 2px solid var(--border-color);
     border-radius: var(--radius-md);
     padding: 1.5rem;
     font-size: 1.02rem;
@@ -809,9 +858,10 @@ body[data-step="done"] .steprail { display: none; }
 .thanks {
     text-align: center;
     padding: 3.5rem 1.75rem 3rem;
-    background: linear-gradient(160deg, rgba(16, 185, 129, 0.14), rgba(0, 228, 255, 0.05));
-    border: 1px solid rgba(16, 185, 129, 0.3);
+    background: var(--bg-surface);
+    border: 2px solid var(--border-color);
     border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-hard);
 }
 
 .thanks__icon {
@@ -821,12 +871,13 @@ body[data-step="done"] .steprail { display: none; }
     border-radius: 50%;
     display: grid;
     place-items: center;
-    background: rgba(16, 185, 129, 0.16);
-    border: 2px solid var(--success);
-    color: var(--success);
+    background: var(--success);
+    border: 2px solid var(--border-color);
+    color: #FFFFFF;
 }
 
 .thanks__title {
+    text-transform: uppercase;
     font-size: 2.6rem;
     font-weight: 800;
     letter-spacing: -0.03em;
@@ -866,7 +917,8 @@ body[data-step="done"] .steprail { display: none; }
     font-size: 0.9rem;
     font-weight: 600;
     color: var(--text-dark);
-    border-color: var(--border-color);
+    border-color: var(--border-soft);
+    background: transparent;
 }
 
 .staff-reveal .btn:hover { color: var(--text-muted); }
@@ -888,9 +940,9 @@ body[data-step="done"] .steprail { display: none; }
     border-radius: 50%;
     display: grid;
     place-items: center;
-    background: rgba(16, 185, 129, 0.15);
-    border: 2px solid var(--success);
-    color: var(--success);
+    background: var(--success);
+    border: 2px solid var(--border-color);
+    color: #FFFFFF;
     font-size: 2.5rem;
 }
 .done-hero__title { font-size: 2rem; font-weight: 800; margin-bottom: 0.4rem; }
@@ -901,9 +953,9 @@ body[data-step="done"] .steprail { display: none; }
     font-size: 1.35rem;
     font-weight: 700;
     letter-spacing: 0.04em;
-    color: var(--accent-cyan);
-    background: var(--bg-input);
-    border: 1px solid rgba(0, 228, 255, 0.3);
+    color: var(--primary-blue);
+    background: var(--bg-base);
+    border: 2px solid var(--border-color);
     border-radius: var(--radius-md);
     padding: 1rem 1.25rem;
     text-align: center;
@@ -920,8 +972,8 @@ body[data-step="done"] .steprail { display: none; }
     align-items: center;
     gap: 0.75rem;
     padding: 0.85rem 1.1rem;
-    background: var(--bg-input);
-    border: 1px solid var(--border-color);
+    background: var(--bg-base);
+    border: 1.5px solid var(--border-soft);
     border-radius: var(--radius-md);
     font-size: 0.95rem;
 }
@@ -936,9 +988,7 @@ body[data-step="done"] .steprail { display: none; }
 .overlay {
     position: fixed;
     inset: 0;
-    background: rgba(11, 14, 20, 0.94);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
+    background: rgba(242, 242, 242, 0.96);
     display: none;
     place-items: center;
     z-index: 200;
@@ -953,7 +1003,7 @@ body[data-step="done"] .steprail { display: none; }
     width: 56px; height: 56px;
     margin: 0 auto;
     border: 4px solid var(--bg-elevated);
-    border-top-color: var(--accent-cyan);
+    border-top-color: var(--primary-blue);
     border-radius: 50%;
     animation: spin 0.9s linear infinite;
 }
@@ -971,14 +1021,15 @@ body[data-step="done"] .steprail { display: none; }
     max-width: 90vw;
     padding: 1rem 1.5rem;
     border-radius: var(--radius-md);
+    border: 2px solid var(--border-color);
     font-weight: 600;
     z-index: 300;
     box-shadow: var(--shadow-md);
     animation: rise 0.2s ease both;
 }
-.toast--success { background: var(--success); color: #06251A; }
-.toast--error   { background: var(--danger); color: #fff; }
-.toast--info    { background: var(--bg-elevated); color: var(--text-main); border: 1px solid var(--border-strong); }
+.toast--success { background: var(--success); color: #FFFFFF; }
+.toast--error   { background: var(--danger); color: #FFFFFF; }
+.toast--info    { background: var(--bg-surface); color: var(--text-main); }
 
 /* Returning-customer banner */
 .recall {
@@ -986,14 +1037,15 @@ body[data-step="done"] .steprail { display: none; }
     align-items: center;
     gap: 1rem;
     padding: 1rem 1.25rem;
-    background: rgba(0, 228, 255, 0.09);
-    border: 1px solid rgba(0, 228, 255, 0.3);
+    background: var(--bg-surface);
+    border: 2px solid var(--primary-blue);
     border-radius: var(--radius-md);
+    box-shadow: 4px 4px 0 var(--primary-blue);
     margin-bottom: 1.25rem;
 }
 .recall.is-shown { display: flex; }
 .recall__text { flex: 1; font-size: 0.95rem; }
-.recall__text strong { color: var(--accent-cyan); }
+.recall__text strong { color: var(--primary-blue); }
 
 .banner {
     padding: 1rem 1.25rem;
@@ -1006,14 +1058,14 @@ body[data-step="done"] .steprail { display: none; }
 }
 .banner i { margin-top: 0.2rem; }
 .banner--warn {
-    background: rgba(245, 158, 11, 0.1);
-    border: 1px solid rgba(245, 158, 11, 0.32);
-    color: #FBBF24;
+    background: #FFF7E6;
+    border: 2px solid #B45309;
+    color: #7C2D12;
 }
 .banner--info {
-    background: rgba(59, 130, 246, 0.1);
-    border: 1px solid rgba(59, 130, 246, 0.32);
-    color: #93C5FD;
+    background: var(--accent-tint);
+    border: 2px solid var(--primary-blue);
+    color: #0A1F7A;
 }
 
 .gate { max-width: 520px; margin: 6rem auto; text-align: center; }
@@ -1024,6 +1076,9 @@ body[data-step="done"] .steprail { display: none; }
    two-column grids collapse rather than squeeze. */
 @media (max-width: 700px) {
     .grid-2, .grid-3, .checkgrid, .done-actions { grid-template-columns: 1fr; }
+    .jobdevices { grid-template-columns: repeat(2, 1fr); }
+    .jobdevice:nth-child(3) { border-left: 0; }
+    .jobdevice:nth-child(n+3) { border-top: 2px solid var(--border-color); }
     .photo-actions { grid-template-columns: 1fr; }
     .step__title { font-size: 1.6rem; }
     .summary__row { grid-template-columns: 1fr; gap: 0.2rem; }
