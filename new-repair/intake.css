@@ -138,6 +138,16 @@ body {
     white-space: nowrap;
 }
 .topbar__brand span { color: var(--accent-cyan); }
+/* The ™ after the wordmark, sized and raised like the site's top bar logo
+   (.nav-logo::after in css/core.css). */
+.topbar__brand::after {
+    content: "\2122";
+    font-size: 0.4em;
+    margin-left: 2px;
+    line-height: 0;
+    /* Lifts the top of the ™ level with the top of the capitals. */
+    vertical-align: 1.08em;
+}
 
 .topbar__meta {
     margin-left: auto;
