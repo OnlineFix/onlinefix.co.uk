@@ -24,6 +24,8 @@
     <link rel="stylesheet" href="/new-repair/label.css?v=20260910b">
     <script src="/new-repair/label-render.js?v=20260910b"></script>
     <script src="/new-repair/tracking-copy.js?v=20260922"></script>
+    <!-- The look of the emails, shared with the intake page -->
+    <script src="/new-repair/email-layout.js?v=20260926"></script>
     <style>
         * {
             margin: 0;
@@ -2916,6 +2918,24 @@
             margin-top: 0.2rem;
         }
 
+        .booking-check input:disabled {
+            cursor: not-allowed;
+        }
+
+        .booking-check input:disabled + span {
+            color: var(--text-muted);
+        }
+
+        .booking-check small {
+            display: block;
+            color: var(--text-muted);
+        }
+
+        /* Why the box cannot be ticked. */
+        .booking-check input:disabled + span small {
+            color: var(--warning);
+        }
+
         .kanban-card[data-booking-open] {
             cursor: pointer;
         }
@@ -3789,6 +3809,8 @@
         let unsubscribeRepairs = null;
         let repairsLoaded = false;
 
+        let emailLayoutWarned = false;
+
         function loadDashboardData() {
             document.getElementById('loading').style.display = 'block';
 
@@ -3832,6 +3854,11 @@
                 showAlert('Tracking page script did not load — reload the page', 'error');
             } else if (!unsubscribeTracking) {
                 startTrackingSync();
+            }
+            // Sticky, so shown once: this runs again after each deleted repair.
+            if (!window.OnlineFixEmail && !emailLayoutWarned) {
+                emailLayoutWarned = true;
+                showAlert('Email layout script did not load — reload the page. Until then emails go as plain text, and Confirm booking cannot email the customer.', 'error', { sticky: true });
             }
         }
 
@@ -4101,6 +4128,8 @@
             const phone = String(customer.phone || '');
             const photos = Array.isArray(booking.photoPaths) ? booking.photoPaths : [];
             const cost = typeof booking.estimatedCost === 'number' ? booking.estimatedCost : '';
+            const emailedAt = bookingDate(booking.confirmationEmailedAt) ? formatBookingTime(booking.confirmationEmailedAt) : '';
+            const emailedTo = String(booking.confirmationEmailedTo || '');
 
             const modal = document.createElement('div');
             modal.className = 'modal show';
@@ -4122,6 +4151,7 @@
                                 <div><span>Requested</span>${escapeHTML(formatBookingTime(booking.createdAt))}</div>
                                 <div><span>Email</span><a href="mailto:${escapeHTML(encodeURIComponent(email))}">${escapeHTML(email || 'None')}</a></div>
                                 <div><span>Phone</span><a href="tel:${escapeHTML(phone.replace(/[^0-9+]/g, ''))}">${escapeHTML(phone || 'None')}</a></div>
+                                ${emailedAt ? `<div><span>Confirmation</span>Emailed ${escapeHTML(emailedAt)}${emailedTo ? ' to ' + escapeHTML(emailedTo) : ''}</div>` : ''}
                             </div>
                             ${photos.length ? `<div class="booking-photos">${photos.map((path, i) =>
                                 `<button type="button" class="btn btn-secondary" data-booking-photo="${escapeHTML(path)}"><i class="fas fa-image"></i> Photo ${i + 1}</button>`).join('')}</div>` : ''}
@@ -4171,6 +4201,10 @@
                                 <label class="form-label" for="bk-cost">Estimated price (£, optional)</label>
                                 <input type="number" class="form-input" id="bk-cost" min="0" step="0.01" inputmode="decimal" value="${escapeHTML(cost)}">
                             </div>
+                            ${isNew ? `<label class="booking-check">
+                                <input type="checkbox" id="bk-confirm-email">
+                                <span>When confirming, email the customer that their booking is confirmed, with the drop-off time, address and reference. <small id="bk-confirm-email-note"></small></span>
+                            </label>` : ''}
                             <label class="booking-check">
                                 <input type="checkbox" id="bk-send-email"${isValidEmail(email) ? ' checked' : ''}>
                                 <span>When booking in, email the customer their tracking link (the same email as the Send tracking email button).</span>
@@ -4193,6 +4227,36 @@
             modal.dataset.bookingId = booking.id;
             document.body.appendChild(modal);
             modal.querySelector('#bk-first').focus({ preventScroll: true });
+
+            /* The booking confirmation email box (only with Confirm). It
+               follows the email and drop-off boxes as they are edited: it
+               cannot be ticked without a valid address and a drop-off time
+               still to come, and says why. Otherwise it is ticked, unless a
+               confirmation was already emailed (Mark as new, then Confirm
+               again, must not send a second by accident) or staff have
+               ticked or unticked it themselves. */
+            const confirmBox = modal.querySelector('#bk-confirm-email');
+            if (confirmBox) {
+                const note = modal.querySelector('#bk-confirm-email-note');
+                const sentNote = emailedAt
+                    ? `A confirmation email was already sent${emailedTo ? ' to ' + emailedTo : ''} on ${emailedAt}.`
+                    : '';
+                let choice = null;
+                confirmBox.addEventListener('change', () => { choice = confirmBox.checked; });
+                const refresh = () => {
+                    const when = modal.querySelector('#bk-when').value;
+                    const why = confirmEmailBlocker(modal.querySelector('#bk-email').value, when ? new Date(when) : null);
+                    confirmBox.disabled = !!why;
+                    if (why) confirmBox.checked = false;
+                    else confirmBox.checked = choice !== null ? choice : !emailedAt;
+                    note.textContent = why || sentNote;
+                };
+                ['#bk-email', '#bk-when'].forEach(sel => {
+                    modal.querySelector(sel).addEventListener('input', refresh);
+                    modal.querySelector(sel).addEventListener('change', refresh);
+                });
+                refresh();
+            }
 
             const BUSY_LABELS = { save: 'Saving…', confirm: 'Saving…', unconfirm: 'Saving…', remove: 'Removing…', 'book-in': 'Booking in…' };
             modal.addEventListener('click', async (e) => {
@@ -4284,21 +4348,149 @@
         /* Every change to a booking checks, in the same transaction, that it
            is still waiting. A box left open in another tab could otherwise
            set a booked-in booking back to confirmed, or write over its
-           details after the job was made. */
-        async function updateOpenBooking(bookingId, changes) {
+           details after the job was made.
+           A booking confirmation email (`mail`, from
+           buildBookingConfirmedMail) is written in the same transaction, so
+           the booking is confirmed and its email queued together or not at
+           all: no email for a booking removed or booked in elsewhere, and no
+           booking marked as emailed when the email was refused.
+           The email also goes only if the booking is still as it was when
+           its box was opened (`opened`): still New, and not confirmed,
+           emailed or edited since in another tab or on another device.
+           Otherwise a box left open would email the customer a second
+           time, perhaps with an old drop-off time. */
+        async function updateOpenBooking(bookingId, changes, mail, opened) {
             const ref = db.collection('bookings').doc(bookingId);
+            const millis = ts => { const d = bookingDate(ts); return d ? d.getTime() : 0; };
             await db.runTransaction(async (tx) => {
                 const fresh = await tx.get(ref);
                 const data = fresh.exists ? { id: fresh.id, ...fresh.data() } : null;
                 if (!data || data.deleted === true || data.status === 'removed') throw new Error('this booking has been removed.');
                 if (data.status === 'booked' || data.linkedRepairId) throw new Error('this booking is already booked in.');
+                if (mail && (!opened || (data.status && data.status !== 'pending')
+                    || String(data.confirmationMailId || '') !== String(opened.confirmationMailId || '')
+                    || millis(data.updatedAt) !== millis(opened.updatedAt))) {
+                    throw new Error('this booking was changed in another tab or on another device after this box was opened. Close this box and open the booking again');
+                }
                 tx.update(ref, changes);
+                if (mail) tx.set(mail.ref, mail.data);
             });
         }
 
         // Firebase messages already end in a full stop.
         function errorText(error) {
             return String((error && error.message) || error || 'unknown error').replace(/\.\s*$/, '');
+        }
+
+        // Why Confirm booking cannot email the customer, or '' if it can.
+        // when: the drop-off time as a Date, or null.
+        function confirmEmailBlocker(email, when) {
+            if (!window.OnlineFixEmail) return 'The email layout did not load. Reload the page to send this email.';
+            if (!isValidEmail(email)) return 'Needs a valid email address.';
+            if (!when || isNaN(when)) return 'Needs a drop-off time.';
+            if (when <= new Date()) return 'The drop-off time has already passed.';
+            return '';
+        }
+
+        /* The email telling a customer their online booking is confirmed,
+           sent by Confirm booking when its box is ticked. The owner approved
+           the wording on 27 Sep 2026; any change to it needs their OK too. The HTML is drawn by the shared
+           email layout (new-repair/email-layout.js), which also gives the
+           time as UK clocks show it, whatever the zone of this device. There
+           is no plain-text fallback here: confirmEmailBlocker keeps the box
+           off when the layout did not load.
+
+           Returns the mail document and where it goes, for
+           updateOpenBooking to write with the booking. The id is made here,
+           before the transaction, so a retried transaction writes the same
+           document, not a second one. It is never mail/{bookingId}: that is
+           the shop's own notice of the booking. */
+        function buildBookingConfirmedMail(booking, form) {
+            const E = window.OnlineFixEmail;
+            if (!E) throw new Error('the email layout did not load; reload the page');
+            const w = E.ukWhen(form.preferredAt);
+            if (!w) throw new Error('the booking has no drop-off time');
+
+            const name = form.firstName || 'there';
+            // As Book in names the device, but "Other" says nothing, so then
+            // the row is left out.
+            const device = [form.brand, form.model].filter(Boolean).join(' ')
+                || (form.category !== 'other' ? BOOKING_CATEGORIES[form.category] || '' : '');
+            const reference = bookingReference(booking);
+            const shop = { name: 'OnlineFix', address: BOOKING_SHOP_ADDRESS, phone: SHOP_PHONE, email: SHOP_EMAIL };
+            const mapsUrl = E.mapsUrl(shop.address);
+            const termsUrl = SITE_URL + '/booking-terms.html';
+            // "13 Quarry Street" over "Guildford, Surrey, GU1 3UY".
+            const street = shop.address.split(', ')[0];
+            const town = shop.address.slice(street.length + 2);
+
+            // ---- Wording (approved by the owner; ask before changing) ----
+            const subject = `Your booking is confirmed — ${w.full}`;
+            const preheader = `Drop-off at 13 Quarry Street, Guildford. Your reference: ${reference}.`;
+            const hi = `Hi ${name},`;
+            const lead = 'Thanks for booking with us. We\'ve confirmed your drop-off, and the details are below.';
+            const before = [
+                'Back up your data. Some repairs need a factory reset. We\'ll do our best to keep your data, but we can\'t guarantee it.',
+                'We\'ll check the device and quote you before doing any chargeable work.',
+                'Payment is on collection, by cash or bank transfer. We don\'t take cards, Apple Pay or Google Pay.'
+            ];
+            const change = phone => `You can do this any time before drop-off. Just reply to this email or call us on ${phone} (7 days, 10am to 10pm). There's no cancellation fee.`;
+
+            const html = E.layout({
+                subject,
+                preheader,
+                headerLabel: 'Ref ' + reference,
+                body: [
+                    E.heading('Booking confirmed', { accent: 'confirmed', gap: 12 }),
+                    E.chip('Drop-off booking // Guildford'),
+                    E.paragraph(hi, { gap: 8 }),
+                    E.paragraph(lead, { gap: 22 }),
+                    E.factCard([
+                        E.row('When', E.when(w.date, w.time)),
+                        E.row('Where', E.join(E.strong(shop.name), E.br(), street, E.br(), E.keepPostcode(town))),
+                        device && E.row('Device', device, { kind: 'strong' }),
+                        E.row('Your reference', reference, { kind: 'ref' })
+                    ], { gap: 20 }),
+                    E.button(mapsUrl, 'Get directions', { gap: 30 }),
+                    E.subheading('Before you come in'),
+                    E.list(before, { gap: 18 }),
+                    E.subheading('Need to change or cancel?'),
+                    // No-break spaces keep the phone number on one line.
+                    E.paragraph(change(shop.phone.replace(/ /g, '\u00a0'))),
+                    E.button(E.telHref(shop.phone), 'Call ' + shop.phone, { variant: 'secondary', gap: 26 }),
+                    E.paragraph(E.join('See you soon,', E.br(), E.strong(shop.name)), { gap: 18 })
+                ],
+                footer: E.shopFooter(shop, [E.link(termsUrl, 'Booking terms', { color: E.colors.footText, bold: false, tap: true })])
+            });
+
+            const text = `${hi}\n\n${lead}\n\n` +
+                `When: ${w.full}\n` +
+                `Where: ${shop.name}, ${shop.address}\n` +
+                (device ? `Device: ${device}\n` : '') +
+                `Your reference: ${reference}\n\n` +
+                `Get directions: ${mapsUrl}\n\n` +
+                'Before you come in:\n' + before.map(line => '- ' + line).join('\n') + '\n\n' +
+                'Need to change or cancel? ' + change(shop.phone) + '\n\n' +
+                `See you soon,\n${shop.name}\n\n` +
+                `${shop.name} · ${shop.address}\n${shop.phone} · ${shop.email}\n` +
+                `Booking terms: ${termsUrl}\n`;
+
+            return {
+                ref: db.collection('mail').doc(),
+                when: w.full,
+                data: {
+                    to: [form.email],
+                    replyTo: SHOP_EMAIL,
+                    message: { subject, text, html },
+                    meta: {
+                        kind: 'booking-confirmed',
+                        bookingId: booking.id,
+                        reference,
+                        sentBy: currentUser ? currentUser.email : 'unknown',
+                        createdAt: firebase.firestore.Timestamp.now()
+                    }
+                }
+            };
         }
 
         async function runBookingAction(opened, action, modal, setBusy) {
@@ -4309,6 +4501,7 @@
             const booking = allBookings.find(b => b.id === opened.id) || opened;
             const bookingId = booking.id;
             const name = (booking.customer && booking.customer.name) || 'this customer';
+            let emailing = false;   // Confirm booking with its email
 
             try {
                 if (action === 'remove') {
@@ -4329,10 +4522,23 @@
                     modal.remove();
                     showAlert('Booking saved.', 'success');
                 } else if (action === 'confirm') {
+                    const box = modal.querySelector('#bk-confirm-email');
+                    emailing = !!box && box.checked && !box.disabled && !confirmEmailBlocker(form.email, form.preferredAt);
+                    // Drawn before anything is saved, so a problem with the
+                    // email stops the confirm too.
+                    const mail = emailing ? buildBookingConfirmedMail(booking, form) : null;
+                    if (mail && !confirm(`Confirm ${form.customerName}'s booking for ${mail.when}?\n\nThe confirmation email will be sent to ${form.email}.`)) return;
                     setBusy(true);
-                    await updateOpenBooking(bookingId, { ...bookingEdits(form), status: 'confirmed', confirmedAt: firebase.firestore.Timestamp.now() });
+                    const now = firebase.firestore.Timestamp.now();
+                    const changes = { ...bookingEdits(form), status: 'confirmed', confirmedAt: now };
+                    // Kept on the booking so its box can say the email went,
+                    // and does not tick the box again. Mark as new keeps them.
+                    if (mail) Object.assign(changes, { confirmationEmailedAt: now, confirmationEmailedTo: form.email, confirmationMailId: mail.ref.id });
+                    await updateOpenBooking(bookingId, changes, mail, opened);
                     modal.remove();
-                    showAlert('Booking confirmed. Nothing is sent to the customer; reply to their email or call them.', 'success');
+                    showAlert(mail
+                        ? `Booking confirmed. The confirmation email is queued to ${form.email}.`
+                        : 'Booking confirmed. No email was sent; reply to their email or call them.', 'success');
                 } else if (action === 'unconfirm') {
                     setBusy(true);
                     await updateOpenBooking(bookingId, { ...bookingEdits(form), status: 'pending', confirmedAt: null });
@@ -4362,12 +4568,19 @@
                         failed ? 'error' : 'success', { sticky: failed || !repair.customerSaved });
                 }
             } catch (error) {
+                // With the email, say plainly that it did not go, and how to
+                // confirm without it (unless the booking has gone, or this
+                // box is out of date).
+                const message = emailing
+                    ? `Could not confirm: ${errorText(error)}. Nothing was saved or sent.` +
+                      (/has been removed|already booked in|another tab or on another device/.test(errorText(error)) ? '' : ' To confirm without the email, untick the email box and press Confirm booking again.')
+                    : '';
                 const err = modal.isConnected && modal.querySelector('#bk-error');
                 if (err) {
-                    err.textContent = 'Could not save: ' + errorText(error) + '.';
+                    err.textContent = message || 'Could not save: ' + errorText(error) + '.';
                     err.classList.remove('hidden');
                 } else {
-                    showAlert('Could not update that booking: ' + errorText(error) + '.', 'error', { sticky: true });
+                    showAlert(message || 'Could not update that booking: ' + errorText(error) + '.', 'error', { sticky: true });
                 }
             }
         }
@@ -5031,6 +5244,11 @@
         const SHOP_EMAIL = 'hello@onlinefix.uk';
         const SHOP_PHONE = '07940 730537';
         const SHOP_ADDRESS = '13 Quarry Street, Guildford GU1 3UY';
+        // The booking confirmation email spells the address as the booking
+        // page and the booking terms do, and links to those terms on the
+        // live site (not this page's address).
+        const BOOKING_SHOP_ADDRESS = '13 Quarry Street, Guildford, Surrey, GU1 3UY';
+        const SITE_URL = 'https://onlinefix.co.uk';
 
         function isValidEmail(raw) {
             const v = String(raw || '').trim();
@@ -5192,6 +5410,21 @@
             }
         }
 
+        /* The HTML part of an email, drawn by the shared email layout
+           (new-repair/email-layout.js) in the site's look. If that script
+           did not load (a warning shows at sign-in), or drawing fails, this
+           gives null and the email goes as plain text: its text part has
+           the same words and link, and a plain email beats none. */
+        function emailHtml(draw) {
+            if (!window.OnlineFixEmail) return null;
+            try {
+                return draw(window.OnlineFixEmail);
+            } catch (error) {
+                console.error('Email layout failed; sending plain text only', error);
+                return null;
+            }
+        }
+
         // The tracking-link email itself. Shared by the Send tracking email
         // button and by booking in an online booking, so both send the same
         // wording.
@@ -5199,23 +5432,23 @@
             const trackUrl = `${window.location.origin}/track/?id=${encodeURIComponent(repair.repairId)}`;
             const device = [repair.brand, repair.model].filter(Boolean).join(' ') || repair.deviceType || 'your device';
             const greeting = repair.firstName || repair.customerName || 'there';
+            const subject = 'Your repair tracking link — ' + repair.repairId;
 
-            const html =
-                '<div style="font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;max-width:600px;margin:0 auto;' +
-                'background:#0B0E14;color:#E5E9F0;padding:32px 28px;border-radius:16px;">' +
-                '<div style="font-size:22px;font-weight:800;margin-bottom:24px;">Online<span style="color:#00E4FF;">Fix</span></div>' +
-                '<p style="font-size:16px;margin:0 0 16px;">Hi ' + escapeHTML(greeting) + ',</p>' +
-                '<p style="line-height:1.6;margin:0 0 20px;">Here is the tracking link for your repair with us.</p>' +
-                '<table style="width:100%;border-collapse:collapse;font-size:14px;margin-bottom:24px;">' +
-                '<tr><td style="padding:6px 0;color:#94A3B8;">Repair reference</td><td style="padding:6px 0;text-align:right;">' + escapeHTML(repair.repairId) + '</td></tr>' +
-                '<tr><td style="padding:6px 0;color:#94A3B8;">Device</td><td style="padding:6px 0;text-align:right;">' + escapeHTML(device) + '</td></tr>' +
-                '</table>' +
-                '<a href="' + escapeHTML(trackUrl) + '" style="display:inline-block;background:#0033FF;color:#fff;' +
-                'text-decoration:none;padding:14px 28px;border-radius:10px;font-weight:700;">Track your repair</a>' +
-                '<p style="font-size:13px;color:#94A3B8;line-height:1.6;margin:24px 0 0;">Keep this email — the link above is how you check progress at any time.</p>' +
-                '<hr style="border:none;border-top:1px solid rgba(255,255,255,.12);margin:28px 0;">' +
-                '<p style="font-size:12px;color:#94A3B8;line-height:1.6;margin:0;">OnlineFix · ' + escapeHTML(SHOP_ADDRESS) +
-                '<br>' + escapeHTML(SHOP_PHONE) + ' · ' + escapeHTML(SHOP_EMAIL) + '</p></div>';
+            const html = emailHtml(E => E.layout({
+                subject,
+                headerLabel: repair.repairId,
+                body: [
+                    E.paragraph('Hi ' + greeting + ',', { gap: 12 }),
+                    E.paragraph('Here is the tracking link for your repair with us.', { gap: 22 }),
+                    E.details([
+                        E.row('Repair reference', repair.repairId, { kind: 'ref' }),
+                        E.row('Device', device, { kind: 'strong' })
+                    ]),
+                    E.button(trackUrl, 'Track your repair', { gap: 20 }),
+                    E.note('Keep this email — the link above is how you check progress at any time.', { gap: 18 })
+                ],
+                footer: E.shopFooter({ name: 'OnlineFix', address: SHOP_ADDRESS, phone: SHOP_PHONE, email: SHOP_EMAIL })
+            }));
 
             const text = 'Hi ' + greeting + ',\n\n' +
                 'Here is the tracking link for your repair with us.\n\n' +
@@ -5224,14 +5457,13 @@
                 'Track your repair: ' + trackUrl + '\n\n' +
                 'OnlineFix · ' + SHOP_ADDRESS + '\n' + SHOP_PHONE + ' · ' + SHOP_EMAIL + '\n';
 
+            const message = { subject, text };
+            if (html) message.html = html;
+
             return db.collection('mail').add({
                 to: [email],
                 replyTo: SHOP_EMAIL,
-                message: {
-                    subject: 'Your repair tracking link — ' + repair.repairId,
-                    text: text,
-                    html: html
-                },
+                message,
                 meta: {
                     kind: 'tracking-link-resend',
                     repairId: repair.repairId,

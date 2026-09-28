@@ -74,14 +74,18 @@
     const DAY_KEYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 
     const DEFAULT_AVAILABILITY = {
+        // Drop-offs by appointment, 7 days, 10am to 10pm, as every page
+        // says. The last slot offered is 21:30. Used only while the
+        // availability/settings doc does not exist: when it does, it wins.
+        // admin/seed-availability.html writes these same values.
         workingHours: {
-            mon: { open: '10:00', close: '18:00', closed: false },
-            tue: { open: '10:00', close: '18:00', closed: false },
-            wed: { open: '10:00', close: '18:00', closed: false },
-            thu: { open: '10:00', close: '18:00', closed: false },
-            fri: { open: '10:00', close: '18:00', closed: false },
-            sat: { open: '11:00', close: '16:00', closed: false },
-            sun: { open: '00:00', close: '00:00', closed: true }
+            mon: { open: '10:00', close: '22:00', closed: false },
+            tue: { open: '10:00', close: '22:00', closed: false },
+            wed: { open: '10:00', close: '22:00', closed: false },
+            thu: { open: '10:00', close: '22:00', closed: false },
+            fri: { open: '10:00', close: '22:00', closed: false },
+            sat: { open: '10:00', close: '22:00', closed: false },
+            sun: { open: '10:00', close: '22:00', closed: false }
         },
         blockedDates: [],
         minNoticeHours: 4,
