@@ -2,24 +2,16 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Admin access is granted via a custom claim (admin == true) set with the
-    // Firebase Admin SDK, with the email allow-list kept as a transitional
-    // fallback. Once the custom claim is provisioned on the admin account,
-    // delete the email branch entirely — the dashboard's "admin access" line
-    // says when that is safe to do.
-    //
-    // The fallback now also requires a verified address. Firebase can be
-    // configured to allow several accounts on one email address, and a token's
-    // `email` is whatever the account was registered with, verified or not. On
-    // its own the address was therefore enough to become an admin: sign up
-    // with it, never confirm it, and the branch below matched. Requiring
-    // email_verified closes that, because the real mailbox is needed to
-    // confirm the address.
+    // Staff are the accounts carrying the admin security claim (admin ==
+    // true). Only someone with full access to the Firebase project can set
+    // it (scripts/set-admin-claim.mjs, or Identity Toolkit's
+    // accounts:update with customAttributes), so it
+    // cannot be gained by signing up. The shop account got it on 28 Sep
+    // 2026. Until then an allow-listed, verified email address also counted;
+    // that fallback is gone, so a new staff account needs the claim before
+    // it can see anything. Keep this function identical in storage.rules.
     function isAdmin() {
-      return request.auth != null
-        && (request.auth.token.admin == true
-            || (request.auth.token.email in ['onlinerepairbooking@gmail.com']
-                && request.auth.token.email_verified == true));
+      return request.auth != null && request.auth.token.admin == true;
     }
 
     match /repairs/{repairDoc} {
@@ -81,11 +73,28 @@ service cloud.firestore {
     // shape checks all passed while arbitrary extra keys rode along beside
     // them, so a booking could be padded out to Firestore's 1 MB document
     // limit with anything at all.
+    //
+    // The document id must be the booking's own tempId, which is what the
+    // booking page writes (book/booking.js). Any id used to be accepted, so a
+    // script could file junk bookings under ids that sort before "BK_"
+    // ("A0000", ...) and fill the dashboard's window of waiting bookings,
+    // hiding every real one. Booking pages loaded before 23 Sep 2026 used
+    // add() and a random id; one still open that long is refused, with the
+    // page's usual "server rejected the booking" message, and works again
+    // once reloaded.
+    //
+    // The customer's email must be one plain address: no second address
+    // after a comma and no display name ("Shop" <someone@else>). The booking
+    // notice below makes it the Reply-To, so a list or a display name let a
+    // reply to the shop's own inbox go to strangers, or to an address posing
+    // as the shop's. admin/index.html (isValidEmail) and book/booking.js
+    // hold addresses to the same shape.
     match /bookings/{bookingId} {
 
       function isValidBookingCreate() {
         let d = request.resource.data;
-        return d.keys().hasOnly([
+        return bookingId == d.tempId
+          && d.keys().hasOnly([
                'createdAt', 'status', 'respondedAt', 'linkedRepairId',
                'adminNotes', 'deleted', 'tempId', 'customer', 'device',
                'issue', 'preferredAt', 'photos', 'photoPaths'
@@ -100,7 +109,9 @@ service cloud.firestore {
           && d.deleted == false
           && d.tempId is string && d.tempId.matches('BK_[0-9A-F]{32}')
           && d.customer.name is string && d.customer.name.size() > 0 && d.customer.name.size() < 100
-          && d.customer.email is string && d.customer.email.matches('.*@.*\\..*') && d.customer.email.size() < 200
+          && d.customer.email is string
+          && d.customer.email.matches('[^\\s@,;:<>()"\\[\\]\\\\]+@[^\\s@,;:<>()"\\[\\]\\\\]+\\.[^\\s@,;:<>()"\\[\\]\\\\]{2,}')
+          && d.customer.email.size() < 200
           && d.customer.phone is string && d.customer.phone.size() > 5 && d.customer.phone.size() < 30
           && d.device.category in ['phone', 'laptop', 'console', 'tablet', 'desktop', 'other']
           && d.device.brand is string && d.device.brand.size() < 50
@@ -174,19 +185,45 @@ service cloud.firestore {
       //     inbox or use up the day's sending allowance that customer
       //     emails share. A booking refused its notice is still saved, and
       //     still shows on the dashboard;
-      //   - fixed wording: the subject and text must be exactly the
-      //     template below, filled in from the booking itself. Nobody can
-      //     send the shop an email in the shop's own name that says
-      //     whatever they like; the customer's words appear only under
-      //     their labels. book/booking.js builds the same template and
-      //     the two must be changed together;
+      //   - fixed wording around the customer's words: the subject and text
+      //     must be exactly one of the two templates below, filled in from
+      //     the booking itself, so the customer's words appear only under
+      //     their labels. Those words are still whatever the visitor typed
+      //     (the name is also in the subject, and the description can run
+      //     to 999 characters over several lines), so a notice can carry a
+      //     made-up message in the shop's own name. What it cannot carry is
+      //     a link: see hasNoLink below. book/booking.js builds the same
+      //     templates and the two must be changed together;
       //   - plain text only, with no html, attachments or extra headers
       //     (the extension would fetch an attachment's URL itself);
       //   - Reply-To set to the address on that booking, so replying in the
       //     inbox answers the customer.
       // "reference" is the last six characters of the booking id, which is
       // what the customer is shown. "when" is the drop-off time in UK time,
-      // formatted by the booking page and held to that one shape here.
+      // formatted by the booking page and held to that one shape here. It is
+      // not checked against the booking's preferredAt (rules cannot turn a
+      // timestamp into UK clock time), so the time on the dashboard is the
+      // one to trust.
+      //
+      // No customer text printed in the full notice may hold anything that
+      // looks like a link: a web address ("https:", "www.", "//") or a
+      // domain in any alphabet ("evil-pay.example", "bit.ly/x", "payé.com",
+      // "оплата.рф"). The notice is sent from the shop's Gmail to itself,
+      // so it skips the spam filter, and Gmail makes any address in it
+      // clickable; a description could otherwise end in a convincing
+      // "Review now: https://..." block. The email line is left out of this
+      // (an address always has a domain) and is held to one plain address
+      // by the booking rule. A real customer can type something that looks
+      // like a link too ("cracked.The screen", "bought on amazon.co.uk"),
+      // so for those bookings the page sends the short notice instead
+      // (bookingShortNoticeText): the reference and time only, pointing to
+      // the dashboard, with none of the customer's words. Every booking
+      // still gets an email, and none carries a link the visitor chose.
+      // [\s\S] rather than . so the check sees every line.
+      function hasNoLink(s) {
+        return !s.matches('[\\s\\S]*(?:[hH][tT][tT][pP][sS]?:|[wW][wW][wW][.]|//|[\\pL\\pN-][.]\\pL{2,})[\\s\\S]*');
+      }
+
       function bookingNoticeText(b, meta) {
         return 'New booking request from the website booking form.\n\n'
           + 'Reference: ' + meta.reference + '\n'
@@ -201,6 +238,16 @@ service cloud.firestore {
           + 'What the customer wrote:\n' + b.issue + '\n\n'
           + 'Reply to this email to answer the customer. The booking is on the '
           + 'dashboard under Online Bookings: https://onlinefix.co.uk/admin/';
+      }
+
+      function bookingShortNoticeText(meta) {
+        return 'New booking request from the website booking form.\n\n'
+          + 'Reference: ' + meta.reference + '\n'
+          + 'Wants to drop off: ' + meta.when + '\n\n'
+          + 'Part of what the customer typed looks like a web address, so it is '
+          + 'left out of this email. Read the booking on the dashboard under '
+          + 'Online Bookings: https://onlinefix.co.uk/admin/\n\n'
+          + 'Replying to this email answers the address the booking gave.';
       }
 
       function isBookingNotice() {
@@ -230,9 +277,16 @@ service cloud.firestore {
                + '(January|February|March|April|May|June|July|August|September|October|November|December)'
                + ' at [0-9]{2}:[0-9]{2}')
           && m.message.keys().hasOnly(['subject', 'text'])
-          && m.message.subject == 'Booking request ' + m.meta.reference + ': '
+          && ((m.message.subject == 'Booking request ' + m.meta.reference + ': '
                + b.customer.name + ', ' + m.meta.when
-          && m.message.text == bookingNoticeText(b, m.meta);
+               && m.message.text == bookingNoticeText(b, m.meta)
+               && hasNoLink(b.customer.name)
+               && hasNoLink(b.customer.phone)
+               && hasNoLink(b.device.brand)
+               && hasNoLink(b.device.model)
+               && hasNoLink(b.issue))
+            || (m.message.subject == 'Booking request ' + m.meta.reference + ', ' + m.meta.when
+               && m.message.text == bookingShortNoticeText(m.meta)));
       }
 
       allow create: if isBookingNotice();

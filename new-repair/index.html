@@ -9,9 +9,9 @@
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="Content-Security-Policy"
         content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://www.google.com https://www.recaptcha.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.firebasestorage.app https://firebasestorage.googleapis.com; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebasestorage.app wss://*.firebaseio.com https://www.google.com https://www.recaptcha.net; font-src 'self' data:; frame-src https://www.google.com https://www.recaptcha.net; base-uri 'none'; form-action 'none';">
-    <title>Repair Intake — OnlineFix</title>
+    <title>Repair Intake — OnlineFix™</title>
 
-    <link rel="stylesheet" href="intake.css?v=20260923">
+    <link rel="stylesheet" href="intake.css?v=20260929">
 
     <!-- Firebase (compat build, loaded in dependency order before intake.js) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -22,17 +22,14 @@
 
     <script defer src="tracking-copy.js?v=20260922"></script>
     <script defer src="email-layout.js?v=20260926"></script>
-    <script defer src="intake.js?v=20260928"></script>
+    <script defer src="intake.js?v=20260929"></script>
 </head>
 
 <body>
 
-    <!-- Ambient background, matching the customer-facing tracking page. -->
-    <div class="bg-dots" aria-hidden="true">
-        <div class="dot dot-1"></div>
-        <div class="dot dot-2"></div>
-        <div class="dot dot-3"></div>
-    </div>
+    <!-- Ambient background: the home page's floating blue dots, spawned
+         into this layer by intake.js. -->
+    <div class="bg-dots" aria-hidden="true"></div>
 
 
     <!-- ==================================================================
@@ -316,8 +313,10 @@
 
             <div class="card">
                 <h2 class="card__title"><svg class="icon" width="20" height="20"><use href="#i-wrench" /></svg>The
-                    job<span class="card__hint">Tap a common job to prefill</span></h2>
-                <div class="chips" id="quickjobs" style="margin-bottom:1.25rem;"></div>
+                    job<span class="card__hint">Pick the device, then tap the jobs</span></h2>
+                <!-- Both rows are built by intake.js from JOB_PRESETS. -->
+                <div class="jobdevices" id="jobdevices" role="group" aria-label="Show jobs for"></div>
+                <div class="chips quickjobs" id="quickjobs" hidden></div>
                 <div class="field">
                     <label class="field__label" for="f-issue">Reported fault &amp; work agreed</label>
                     <textarea class="textarea" id="f-issue" name="issue" maxlength="2000"
@@ -462,6 +461,15 @@
                     <label class="checkbox"><input type="checkbox" value="Bag / box"><span class="checkbox__box"><svg
                                 class="icon" width="14" height="14"><use href="#i-check" /></svg></span><span
                             class="checkbox__text">Bag / box</span></label>
+                    <label class="checkbox"><input type="checkbox" value="Other" id="f-acc-other"><span
+                            class="checkbox__box"><svg class="icon" width="14" height="14"><use
+                                    href="#i-check" /></svg></span><span class="checkbox__text">Other</span></label>
+                </div>
+                <div class="field" id="acc-other-field" style="margin-top:1.25rem;" hidden>
+                    <label class="field__label" for="f-acc-other-text">What else is being left?</label>
+                    <input class="input" id="f-acc-other-text" name="accessoryOther" maxlength="80"
+                        autocomplete="off" placeholder="e.g. HDMI cable, headset, USB stick">
+                    <p class="field__error" data-error-for="accessoryOther">Say what the other item is.</p>
                 </div>
             </div>
 
@@ -629,7 +637,7 @@
                 <p class="thanks__text" id="thanks-text">Your device is booked in with us.</p>
                 <p class="thanks__meta" id="thanks-meta">Your confirmation is on its way by email, and we'll be in
                     touch as soon as we have news.</p>
-                <p class="thanks__shop">OnlineFix &middot; 13 Quarry Street, Guildford GU1 3UY &middot; 07940 730537</p>
+                <p class="thanks__shop">OnlineFix™ &middot; 13 Quarry Street, Guildford GU1 3UY &middot; 07940 730537</p>
             </div>
 
             <div class="staff-reveal">

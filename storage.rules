@@ -2,21 +2,16 @@ rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
 
-    // Admin access is granted via a custom claim (admin == true) set with the
-    // Firebase Admin SDK, with the email allow-list kept as a transitional
-    // fallback until set-admin-claim.mjs has been run for every admin
-    // account. Delete the email branch once that is done.
-    //
-    // The fallback also requires a verified address, for the reason spelled
-    // out on the matching function in firestore.rules: an address alone was
-    // enough to become an admin, because a token carries whatever address the
-    // account was registered with whether or not anyone confirmed it. Keep
-    // the two functions identical.
+    // Staff are the accounts carrying the admin security claim (admin ==
+    // true). Only someone with full access to the Firebase project can set
+    // it (scripts/set-admin-claim.mjs, or Identity Toolkit's
+    // accounts:update with customAttributes), so it
+    // cannot be gained by signing up. The shop account got it on 28 Sep
+    // 2026. Until then an allow-listed, verified email address also counted;
+    // that fallback is gone, so a new staff account needs the claim before
+    // it can see anything. Keep this function identical in firestore.rules.
     function isAdmin() {
-      return request.auth != null
-        && (request.auth.token.admin == true
-            || (request.auth.token.email in ['onlinerepairbooking@gmail.com']
-                && request.auth.token.email_verified == true));
+      return request.auth != null && request.auth.token.admin == true;
     }
 
     // Repair photos

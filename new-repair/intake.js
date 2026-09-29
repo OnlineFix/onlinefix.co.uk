@@ -48,16 +48,47 @@
     };
     var RECAPTCHA_SITE_KEY = '6LdZJRIsAAAAAOx4EZqupxMVvX4B3u3YlK5ez-3r';
 
-    var QUICK_JOBS = [
-        { label: 'PS5 HDMI port', category: 'console', brand: 'Sony', model: 'PlayStation 5', issue: 'No display output. HDMI port damaged — replace port and test on 4K set.', price: '' },
-        { label: 'Xbox Series X HDMI', category: 'console', brand: 'Microsoft', model: 'Xbox Series X', issue: 'No display output. HDMI port damaged — replace port and test on 4K set.', price: '' },
-        { label: 'Console deep clean', category: 'console', brand: '', model: '', issue: 'Overheating / loud fan. Full strip-down, dust removal, new thermal paste and pads.', price: '' },
-        { label: 'Phone screen', category: 'phone', brand: '', model: '', issue: 'Cracked screen — replace display assembly and test touch, brightness and front camera.', price: '' },
-        { label: 'Phone battery', category: 'phone', brand: '', model: '', issue: 'Battery health degraded / device shutting down. Replace battery and verify charge cycle.', price: '' },
-        { label: 'Charging port', category: 'phone', brand: '', model: '', issue: 'Not charging or intermittent connection. Clean or replace charging port, test charge and data.', price: '' },
-        { label: 'Laptop diagnostics', category: 'laptop', brand: '', model: '', issue: 'Fault to be identified. Full diagnostics, findings and quote to follow before any chargeable work.', price: '' },
-        { label: 'Data recovery', category: 'other', brand: '', model: '', issue: 'Data recovery attempt from device storage. No-fix-no-fee assessment first.', price: '' },
-        { label: 'PC build / rebuild', category: 'desktop', brand: '', model: 'Custom PC', issue: 'Full build / rebuild, cable management, BIOS setup and stress test.', price: '' }
+    /* Preset jobs for "The job", grouped by device. The shop's own list and
+       wording (t, 28 Sep 2026); only capitals tidied. Each job's `issue` is
+       the line it writes into "Reported fault & work agreed", which the
+       customer sees on their tracking page and in their email, so any new
+       wording here is customer-facing copy. `label` is only the button. */
+    var JOB_PRESETS = [
+        {
+            key: 'ps5', label: 'PS5', category: 'console', brand: 'Sony', model: 'PlayStation 5',
+            jobs: [
+                { label: 'Cleaning', issue: 'PS5 cleaning' },
+                { label: 'HDMI port replacement', issue: 'PS5 HDMI port replacement' },
+                { label: 'Disc drive replacement', issue: 'PS5 disc drive replacement' },
+                { label: 'Diagnostics', issue: 'PS5 diagnostics' }
+            ]
+        },
+        {
+            key: 'xbox', label: 'Xbox Series X', category: 'console', brand: 'Microsoft', model: 'Xbox Series X',
+            jobs: [
+                { label: 'Cleaning', issue: 'Xbox Series X cleaning' },
+                { label: 'HDMI port replacement', issue: 'Xbox Series X HDMI port replacement' },
+                { label: 'Diagnostics', issue: 'Xbox Series X diagnostics' }
+            ]
+        },
+        {
+            key: 'pc', label: 'PC', category: 'desktop', brand: '', model: '',
+            jobs: [
+                { label: 'Cleaning', issue: 'PC cleaning' },
+                { label: 'Diagnostics', issue: 'PC diagnostics' },
+                { label: 'No boot', issue: 'PC no boot' }
+            ]
+        },
+        {
+            key: 'laptop', label: 'Laptop', category: 'laptop', brand: '', model: '',
+            jobs: [
+                { label: 'Screen replacement', issue: 'Laptop screen replacement' },
+                { label: 'Diagnostics', issue: 'Laptop diagnostics' },
+                { label: 'Battery replacement', issue: 'Laptop battery replacement' },
+                { label: 'Cleaning', issue: 'Laptop cleaning' },
+                { label: 'Hinge repair', issue: 'Laptop hinge repair' }
+            ]
+        }
     ];
 
     // ------------------------------------------------------------------
@@ -499,6 +530,9 @@
             if (!requireText('#f-brand', 'brand')) fail($('#f-brand'));
             if (!requireText('#f-model', 'model')) fail($('#f-model'));
             if (!requireText('#f-issue', 'issue', 5)) fail($('#f-issue'));
+            if ($('#f-acc-other').checked && !requireText('#f-acc-other-text', 'accessoryOther')) {
+                fail($('#f-acc-other-text'));
+            }
 
             var settled = state.photos.filter(function (p) { return p.status === 'done'; });
             var inflight = state.photos.some(function (p) { return p.status === 'uploading'; });
@@ -601,37 +635,144 @@
         });
     });
 
-    // Quick-job chips
-    (function buildQuickJobs() {
+    // Preset jobs: a row of device buttons, then that device's job chips.
+    //
+    // Jobs toggle, so a clean and an HDMI port can go on one ticket. Each
+    // picked job is one line at the top of the fault box; anything typed
+    // under those lines is left alone. One ticket is one device, so opening
+    // another device's jobs takes the first device's lines back out.
+    var jobPicks = [];      // issue lines, in the order they were tapped
+    var jobDevice = null;   // the JOB_PRESETS entry whose jobs are showing
+
+    var ALL_JOB_LINES = [];
+    JOB_PRESETS.forEach(function (device) {
+        device.jobs.forEach(function (job) { ALL_JOB_LINES.push(job.issue); });
+    });
+
+    function writeJobLines() {
+        var issueEl = $('#f-issue');
+        var rest = issueEl.value.split('\n').filter(function (line) {
+            return ALL_JOB_LINES.indexOf(line.trim()) === -1;
+        });
+        // Drop the blank lines a removed job leaves at the top.
+        while (rest.length && !rest[0].trim()) rest.shift();
+        issueEl.value = jobPicks.concat(rest).join('\n');
+        if (issueEl.value.trim()) {
+            setFieldError('issue', false);
+            issueEl.classList.remove('is-invalid');
+        }
+    }
+
+    function showJobsFor(device) {
+        jobDevice = device;
+        $$('#jobdevices .jobdevice').forEach(function (btn) {
+            var on = btn.dataset.device === device.key;
+            btn.classList.toggle('is-selected', on);
+            btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+        });
+
+        var own = device.jobs.map(function (job) { return job.issue; });
+        jobPicks = jobPicks.filter(function (line) { return own.indexOf(line) !== -1; });
+        writeJobLines();
+
         var wrap = $('#quickjobs');
-        QUICK_JOBS.forEach(function (job, index) {
+        wrap.textContent = '';
+        device.jobs.forEach(function (job, index) {
             var btn = document.createElement('button');
             btn.type = 'button';
             btn.className = 'chip';
-            btn.textContent = job.label;
             btn.dataset.jobIndex = String(index);
+            var on = jobPicks.indexOf(job.issue) !== -1;
+            btn.classList.toggle('is-selected', on);
+            btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+            btn.textContent = job.label;
             wrap.appendChild(btn);
         });
-        wrap.addEventListener('click', function (event) {
+        wrap.hidden = false;
+    }
+
+    (function buildJobPresets() {
+        var devices = $('#jobdevices');
+        JOB_PRESETS.forEach(function (device) {
+            var btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'jobdevice';
+            btn.dataset.device = device.key;
+            btn.setAttribute('aria-pressed', 'false');
+            btn.textContent = device.label;
+            devices.appendChild(btn);
+        });
+        devices.addEventListener('click', function (event) {
+            var btn = event.target.closest('.jobdevice');
+            if (!btn) return;
+            var device = JOB_PRESETS.filter(function (d) { return d.key === btn.dataset.device; })[0];
+            if (device && device !== jobDevice) showJobsFor(device);
+        });
+
+        $('#quickjobs').addEventListener('click', function (event) {
             var chip = event.target.closest('.chip');
-            if (!chip) return;
-            applyQuickJob(QUICK_JOBS[parseInt(chip.dataset.jobIndex, 10)]);
-            $$('.chip', wrap).forEach(function (c) { c.classList.remove('is-selected'); });
-            chip.classList.add('is-selected');
+            if (!chip || !jobDevice) return;
+            var job = jobDevice.jobs[parseInt(chip.dataset.jobIndex, 10)];
+            if (!job) return;
+            var at = jobPicks.indexOf(job.issue);
+            if (at === -1) jobPicks.push(job.issue);
+            else jobPicks.splice(at, 1);
+            chip.classList.toggle('is-selected', at === -1);
+            chip.setAttribute('aria-pressed', at === -1 ? 'true' : 'false');
+            writeJobLines();
+            if (at === -1) fillDeviceFromPreset(jobDevice);
         });
     })();
 
-    function applyQuickJob(job) {
-        if (!job) return;
-        $('#f-issue').value = job.issue;
-        if (job.brand && !$('#f-brand').value.trim()) $('#f-brand').value = job.brand;
-        if (job.model && !$('#f-model').value.trim()) $('#f-model').value = job.model;
-        if (job.category && !state.category) {
-            var chip = document.querySelector('[data-chipgroup="category"] .chip[data-value="' + job.category + '"]');
+    // A job line deleted by hand un-ticks its chip, so the next tap on
+    // another chip does not quietly put it back.
+    $('#f-issue').addEventListener('input', function () {
+        var lines = $('#f-issue').value.split('\n').map(function (line) { return line.trim(); });
+        jobPicks = jobPicks.filter(function (line) { return lines.indexOf(line) !== -1; });
+        $$('#quickjobs .chip').forEach(function (chip) {
+            var job = jobDevice && jobDevice.jobs[parseInt(chip.dataset.jobIndex, 10)];
+            var on = !!job && jobPicks.indexOf(job.issue) !== -1;
+            chip.classList.toggle('is-selected', on);
+            chip.setAttribute('aria-pressed', on ? 'true' : 'false');
+        });
+    });
+
+    // Fill in only what the technician has not already set.
+    function fillDeviceFromPreset(device) {
+        if (device.brand && !$('#f-brand').value.trim()) $('#f-brand').value = device.brand;
+        if (device.model && !$('#f-model').value.trim()) $('#f-model').value = device.model;
+        ['brand', 'model'].forEach(function (name) {
+            if ($('#f-' + name).value.trim()) {
+                setFieldError(name, false);
+                $('#f-' + name).classList.remove('is-invalid');
+            }
+        });
+        if (device.category && !state.category) {
+            var chip = document.querySelector('[data-chipgroup="category"] .chip[data-value="' + device.category + '"]');
             if (chip) chip.click();
         }
-        setFieldError('issue', false);
-        $('#f-issue').classList.remove('is-invalid');
+    }
+
+    // "Other" under Left with the device: a free-text item. It is saved as
+    // one more entry in the accessories list ("Other: headset"), the same
+    // shape as the ticked items, so nothing downstream changes.
+    $('#f-acc-other').addEventListener('change', function (event) {
+        var on = event.target.checked;
+        $('#acc-other-field').hidden = !on;
+        if (on) {
+            $('#f-acc-other-text').focus();
+        } else {
+            $('#f-acc-other-text').value = '';
+            $('#f-acc-other-text').classList.remove('is-invalid');
+            setFieldError('accessoryOther', false);
+        }
+    });
+
+    function accessoryList() {
+        var other = $('#f-acc-other-text').value.trim();
+        return state.accessories.map(function (item) {
+            return item === 'Other' && other ? 'Other: ' + other : item;
+        });
     }
 
     // ------------------------------------------------------------------
@@ -1040,7 +1181,7 @@
             colour: $('#f-colour').value.trim(),
             unlockType: state.unlockType,
             unlockCode: $('#f-unlock').value.trim(),
-            accessories: state.accessories.slice(),
+            accessories: accessoryList(),
             condition: state.condition.slice(),
             conditionNotes: $('#f-condition-notes').value.trim(),
             issue: $('#f-issue').value.trim(),
@@ -1310,7 +1451,7 @@
     // ------------------------------------------------------------------
 
     // Shop details as the shared email layout wants them.
-    var EMAIL_SHOP = { name: 'OnlineFix', address: SHOP_ADDRESS, phone: SHOP_PHONE, email: SHOP_EMAIL };
+    var EMAIL_SHOP = { name: 'OnlineFix™', address: SHOP_ADDRESS, phone: SHOP_PHONE, email: SHOP_EMAIL };
 
     /* The HTML part of an email, drawn by email-layout.js in the site's
        look. If that file did not load (a dropped connection on the iPad),
@@ -1378,7 +1519,7 @@
             '\nTrack your repair: ' + trackUrl + '\n\n' +
             'We will contact you before any chargeable work, and again when it is ready to collect.\n' +
             'Payment on collection is by cash or bank transfer.\n\n' +
-            'OnlineFix · ' + SHOP_ADDRESS + '\n' + SHOP_PHONE + ' · ' + SHOP_EMAIL + '\n';
+            'OnlineFix™ · ' + SHOP_ADDRESS + '\n' + SHOP_PHONE + ' · ' + SHOP_EMAIL + '\n';
 
         return db.collection('mail').add({
             to: [repair.customerEmail],
@@ -1470,6 +1611,35 @@
         // A fresh ticket means a fresh unguessable ID and a clean slate.
         window.location.reload();
     });
+
+    // Floating blue dots behind the page, as on the home page hero
+    // (js/core.js). Same size, speed and rate; spawned into the fixed
+    // .bg-dots layer so they drift up the whole screen. Paused while the tab
+    // is hidden, and skipped for anyone who has asked for less motion.
+    (function floatingDots() {
+        var layer = $('.bg-dots');
+        if (!layer) return;
+        if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        var timer = null;
+
+        function spawn() {
+            var el = document.createElement('div');
+            var size = Math.random() * 2 + 3;
+            el.className = 'float-dot';
+            el.style.width = size + 'px';
+            el.style.height = size + 'px';
+            el.style.left = (Math.random() * 100) + '%';
+            layer.appendChild(el);
+            setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 8000);
+        }
+        function start() { if (!timer) timer = setInterval(spawn, 150); }
+        function stop() { if (timer) { clearInterval(timer); timer = null; } }
+
+        start();
+        document.addEventListener('visibilitychange', function () {
+            if (document.hidden) stop(); else start();
+        });
+    })();
 
     // Clear a field's error the moment the user starts fixing it.
     $$('.input, .textarea').forEach(function (el) {
