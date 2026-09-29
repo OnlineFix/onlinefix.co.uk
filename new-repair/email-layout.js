@@ -446,9 +446,9 @@
     // A moment as a clock and calendar in the UK show it, whatever the
     // zone of the device doing the sending: {date, time, full}, e.g. date
     // "Friday 2 October", time "11:30", full "Friday 2 October at 11:30"
-    // (the same shape as ukWhen in book/booking.js). Takes a Date, a
-    // Firestore Timestamp or anything Date() takes; null if it is not a
-    // real date.
+    // (the same shape as ukWhen in server/submit-booking/index.js). Takes
+    // a Date, a Firestore Timestamp or anything Date() takes; null if it is
+    // not a real date.
     function ukWhen(value) {
         var d = value && typeof value.toDate === 'function' ? value.toDate() : (value instanceof Date ? value : (value ? new Date(value) : null));
         if (!d || isNaN(d.getTime())) return null;

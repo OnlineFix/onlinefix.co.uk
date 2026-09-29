@@ -59,85 +59,21 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
-    // Public booking requests. Anyone can submit one (the page is the
-    // public-facing /book/ form), but reads and mutations are admin-only.
+    // Booking requests from the public /book/ page. Visitors cannot write
+    // here at all. The page sends each booking to the submitBooking Cloud
+    // Function (server/submit-booking/ in this repo), which checks every
+    // field, limits how many bookings one visitor and the whole site can
+    // send (see /bookingLimits at the end), stores the photos, and writes
+    // the booking and the shop's email notice with the admin SDK. The admin
+    // SDK does not go through these rules, so nothing here has to let it in.
     //
-    // This is the site's only endpoint that writes without signing in, so the
-    // validation below is the whole boundary. App Check is NOT active on
-    // /book/ — the page deliberately does not load it (see the comment in
-    // book/index.html), so a rule written as though App Check were enforcing
-    // anything would be describing a control that is not there.
+    // App Check is NOT active on /book/ (see book/index.html), and nothing
+    // here relies on it.
     //
-    // hasOnly is the important line. Listing the fields a booking may carry
-    // is not the same as listing the fields it must have: without hasOnly the
-    // shape checks all passed while arbitrary extra keys rode along beside
-    // them, so a booking could be padded out to Firestore's 1 MB document
-    // limit with anything at all.
-    //
-    // The document id must be the booking's own tempId, which is what the
-    // booking page writes (book/booking.js). Any id used to be accepted, so a
-    // script could file junk bookings under ids that sort before "BK_"
-    // ("A0000", ...) and fill the dashboard's window of waiting bookings,
-    // hiding every real one. Booking pages loaded before 23 Sep 2026 used
-    // add() and a random id; one still open that long is refused, with the
-    // page's usual "server rejected the booking" message, and works again
-    // once reloaded.
-    //
-    // The customer's email must be one plain address: no second address
-    // after a comma and no display name ("Shop" <someone@else>). The booking
-    // notice below makes it the Reply-To, so a list or a display name let a
-    // reply to the shop's own inbox go to strangers, or to an address posing
-    // as the shop's. admin/index.html (isValidEmail) and book/booking.js
-    // hold addresses to the same shape.
+    // Staff read, update and delete bookings from the dashboard. Nobody
+    // creates one from a browser, staff included: the dashboard only updates
+    // bookings, and a job taken in person is a repair ticket, not a booking.
     match /bookings/{bookingId} {
-
-      function isValidBookingCreate() {
-        let d = request.resource.data;
-        return bookingId == d.tempId
-          && d.keys().hasOnly([
-               'createdAt', 'status', 'respondedAt', 'linkedRepairId',
-               'adminNotes', 'deleted', 'tempId', 'customer', 'device',
-               'issue', 'preferredAt', 'photos', 'photoPaths'
-             ])
-          && d.customer.keys().hasOnly(['name', 'email', 'phone'])
-          && d.device.keys().hasOnly(['category', 'brand', 'model'])
-          && d.status == 'pending'
-          && d.createdAt == request.time
-          && d.respondedAt == null
-          && d.linkedRepairId == null
-          && d.adminNotes == ''
-          && d.deleted == false
-          && d.tempId is string && d.tempId.matches('BK_[0-9A-F]{32}')
-          && d.customer.name is string && d.customer.name.size() > 0 && d.customer.name.size() < 100
-          && d.customer.email is string
-          && d.customer.email.matches('[^\\s@,;:<>()"\\[\\]\\\\]+@[^\\s@,;:<>()"\\[\\]\\\\]+\\.[^\\s@,;:<>()"\\[\\]\\\\]{2,}')
-          && d.customer.email.size() < 200
-          && d.customer.phone is string && d.customer.phone.size() > 5 && d.customer.phone.size() < 30
-          && d.device.category in ['phone', 'laptop', 'console', 'tablet', 'desktop', 'other']
-          && d.device.brand is string && d.device.brand.size() < 50
-          && d.device.model is string && d.device.model.size() < 100
-          && d.issue is string && d.issue.size() > 0 && d.issue.size() < 1000
-          && d.preferredAt is timestamp
-          // photos is required to be empty: the booking page no longer puts
-          // download links in it (it could not read them back anyway —
-          // booking photos are admin-read only, by design), and only the
-          // paths are kept.
-          //
-          // photoPaths must be exactly what the booking page writes, in
-          // order. Checking only its length let each entry be any size, so a
-          // booking could be padded out to Firestore's 1 MB document limit,
-          // and the dashboard now loads the waiting bookings on every sign-in.
-          && d.photos is list && d.photos.size() == 0
-          && d.photoPaths in [
-               [],
-               ['bookings/' + d.tempId + '/photo-1.jpg'],
-               ['bookings/' + d.tempId + '/photo-1.jpg', 'bookings/' + d.tempId + '/photo-2.jpg'],
-               ['bookings/' + d.tempId + '/photo-1.jpg', 'bookings/' + d.tempId + '/photo-2.jpg',
-                'bookings/' + d.tempId + '/photo-3.jpg']
-             ];
-      }
-
-      allow create: if isValidBookingCreate();
       allow read, update, delete: if isAdmin();
     }
 
@@ -160,152 +96,22 @@ service cloud.firestore {
     // Mail collection consumed by the "Trigger Email from Firestore"
     // extension, which sends every document that lands here. The extension
     // uses the Admin SDK and bypasses rules entirely; these rules decide who
-    // may queue a message.
+    // may queue a message: staff only.
     //
-    // (This comment used to mention a Cloud Function that emails the shop
-    // when a booking arrives. There is none, which is why online bookings
-    // went unseen until the booking page queued its own notice, below.)
+    // The shop's email about each online booking is queued by the
+    // submitBooking Cloud Function (server/submit-booking/), with the admin
+    // SDK, in the same write as the booking; its wording lives in that
+    // function. Visitors cannot queue mail of any kind.
     match /mail/{mailId} {
       allow read, write: if isAdmin();
-
-      // The booking page's notice to the shop. Anyone can send a booking, so
-      // this is the one place a visitor can queue mail, and it is held to:
-      //   - the shop's own inbox only, so the site can never be used to
-      //     send mail to anyone else. That is the shop's Gmail: mail is sent
-      //     through that account, and a copy sent to hello@onlinefix.uk
-      //     came back to it through hello@'s forwarding and Gmail kept it
-      //     under Sent, out of the inbox. hello@ is still accepted so that
-      //     booking pages loaded before the change keep working;
-      //   - exactly one notice per booking, written in the same batch as
-      //     that booking: the notice takes the booking's id, which must be
-      //     new before the batch and hold a booking with that tempId after
-      //     it;
-      //   - at most one notice every five minutes across the whole site
-      //     (the throttle document below), so a script cannot flood the
-      //     inbox or use up the day's sending allowance that customer
-      //     emails share. A booking refused its notice is still saved, and
-      //     still shows on the dashboard;
-      //   - fixed wording around the customer's words: the subject and text
-      //     must be exactly one of the two templates below, filled in from
-      //     the booking itself, so the customer's words appear only under
-      //     their labels. Those words are still whatever the visitor typed
-      //     (the name is also in the subject, and the description can run
-      //     to 999 characters over several lines), so a notice can carry a
-      //     made-up message in the shop's own name. What it cannot carry is
-      //     a link: see hasNoLink below. book/booking.js builds the same
-      //     templates and the two must be changed together;
-      //   - plain text only, with no html, attachments or extra headers
-      //     (the extension would fetch an attachment's URL itself);
-      //   - Reply-To set to the address on that booking, so replying in the
-      //     inbox answers the customer.
-      // "reference" is the last six characters of the booking id, which is
-      // what the customer is shown. "when" is the drop-off time in UK time,
-      // formatted by the booking page and held to that one shape here. It is
-      // not checked against the booking's preferredAt (rules cannot turn a
-      // timestamp into UK clock time), so the time on the dashboard is the
-      // one to trust.
-      //
-      // No customer text printed in the full notice may hold anything that
-      // looks like a link: a web address ("https:", "www.", "//") or a
-      // domain in any alphabet ("evil-pay.example", "bit.ly/x", "payé.com",
-      // "оплата.рф"). The notice is sent from the shop's Gmail to itself,
-      // so it skips the spam filter, and Gmail makes any address in it
-      // clickable; a description could otherwise end in a convincing
-      // "Review now: https://..." block. The email line is left out of this
-      // (an address always has a domain) and is held to one plain address
-      // by the booking rule. A real customer can type something that looks
-      // like a link too ("cracked.The screen", "bought on amazon.co.uk"),
-      // so for those bookings the page sends the short notice instead
-      // (bookingShortNoticeText): the reference and time only, pointing to
-      // the dashboard, with none of the customer's words. Every booking
-      // still gets an email, and none carries a link the visitor chose.
-      // [\s\S] rather than . so the check sees every line.
-      function hasNoLink(s) {
-        return !s.matches('[\\s\\S]*(?:[hH][tT][tT][pP][sS]?:|[wW][wW][wW][.]|//|[\\pL\\pN-][.]\\pL{2,})[\\s\\S]*');
-      }
-
-      function bookingNoticeText(b, meta) {
-        return 'New booking request from the website booking form.\n\n'
-          + 'Reference: ' + meta.reference + '\n'
-          + 'Customer: ' + b.customer.name + '\n'
-          + 'Email: ' + b.customer.email + '\n'
-          + 'Phone: ' + b.customer.phone + '\n'
-          + 'Wants to drop off: ' + meta.when + '\n'
-          + 'Device type: ' + b.device.category + '\n'
-          + 'Brand: ' + b.device.brand + '\n'
-          + 'Model: ' + b.device.model + '\n'
-          + 'Photos: ' + string(b.photoPaths.size()) + '\n\n'
-          + 'What the customer wrote:\n' + b.issue + '\n\n'
-          + 'Reply to this email to answer the customer. The booking is on the '
-          + 'dashboard under Online Bookings: https://onlinefix.co.uk/admin/';
-      }
-
-      function bookingShortNoticeText(meta) {
-        return 'New booking request from the website booking form.\n\n'
-          + 'Reference: ' + meta.reference + '\n'
-          + 'Wants to drop off: ' + meta.when + '\n\n'
-          + 'Part of what the customer typed looks like a web address, so it is '
-          + 'left out of this email. Read the booking on the dashboard under '
-          + 'Online Bookings: https://onlinefix.co.uk/admin/\n\n'
-          + 'Replying to this email answers the address the booking gave.';
-      }
-
-      function isBookingNotice() {
-        let m = request.resource.data;
-        let b = getAfter(/databases/$(database)/documents/bookings/$(mailId)).data;
-        let throttle = getAfter(/databases/$(database)/documents/throttle/bookingNotice).data;
-        return mailId.matches('BK_[0-9A-F]{32}')
-          && !exists(/databases/$(database)/documents/bookings/$(mailId))
-          && b.tempId == mailId
-          && throttle.mailId == mailId
-          && b.customer.name.matches('[^\\r\\n]+')
-          // Every other field printed on a labelled line must stay on it.
-          && b.customer.email.matches('[^\\r\\n]+')
-          && b.customer.phone.matches('[^\\r\\n]+')
-          && b.device.brand.matches('[^\\r\\n]*')
-          && b.device.model.matches('[^\\r\\n]*')
-          && m.keys().hasOnly(['to', 'replyTo', 'message', 'meta'])
-          && m.to in [['onlinerepairbooking@gmail.com'], ['hello@onlinefix.uk']]
-          && m.replyTo == b.customer.email
-          && m.meta.keys().hasOnly(['kind', 'bookingId', 'reference', 'when'])
-          && m.meta.kind == 'booking-request'
-          && m.meta.bookingId == mailId
-          && m.meta.reference is string && m.meta.reference.matches('[0-9A-F]{6}')
-          && mailId.matches('BK_[0-9A-F]{26}' + m.meta.reference)
-          && m.meta.when is string
-          && m.meta.when.matches('(Mon|Tues|Wednes|Thurs|Fri|Satur|Sun)day [0-9]{1,2} '
-               + '(January|February|March|April|May|June|July|August|September|October|November|December)'
-               + ' at [0-9]{2}:[0-9]{2}')
-          && m.message.keys().hasOnly(['subject', 'text'])
-          && ((m.message.subject == 'Booking request ' + m.meta.reference + ': '
-               + b.customer.name + ', ' + m.meta.when
-               && m.message.text == bookingNoticeText(b, m.meta)
-               && hasNoLink(b.customer.name)
-               && hasNoLink(b.customer.phone)
-               && hasNoLink(b.device.brand)
-               && hasNoLink(b.device.model)
-               && hasNoLink(b.issue))
-            || (m.message.subject == 'Booking request ' + m.meta.reference + ', ' + m.meta.when
-               && m.message.text == bookingShortNoticeText(m.meta)));
-      }
-
-      allow create: if isBookingNotice();
     }
 
-    // The booking notice throttle: one document holding when the last
-    // notice went. Written in the same batch as each notice (see /mail),
-    // and refused until five minutes have passed since the one before.
-    // Nobody reads it but the rules.
-    match /throttle/bookingNotice {
-      allow create, update: if request.resource.data.keys().hasOnly(['at', 'mailId'])
-        && request.resource.data.at == request.time
-        && request.resource.data.mailId is string
-        && !exists(/databases/$(database)/documents/mail/$(request.resource.data.mailId))
-        && existsAfter(/databases/$(database)/documents/mail/$(request.resource.data.mailId))
-        && (resource == null || request.time > resource.data.at + duration.value(5, 'm'));
-    }
-
-    // Block everything else
+    // Block everything else. That includes /bookingLimits, the
+    // submitBooking function's rate-limit counts (per UK day, and per
+    // visitor under a salted hash, never an address): only the function
+    // reads and writes them, through the admin SDK, and no browser may
+    // read or write them. Also the old /throttle/bookingNotice document,
+    // which nothing uses any more.
     match /{document=**} {
       allow read, write: if false;
     }

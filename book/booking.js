@@ -1,7 +1,11 @@
 /* /book/ — Customer booking flow.
    Vanilla JS, no build step, Firebase compat v9.22.0 (matches the rest of the
-   site). App Check via reCAPTCHA Enterprise sits between anonymous form posts
-   and Firestore so we don't get bot-spam writes.
+   site), used here only to read the availability settings. The page never
+   writes to Firestore or Storage: submitBooking() posts the booking, photos
+   included, to the submitBooking Cloud Function (server/submit-booking/),
+   which checks every field, rate-limits, and writes the booking, its photos
+   and the shop's email with the admin SDK. App Check is not used on this
+   page (see the note below and in /book/index.html).
 
    State lives in `state` and survives validation errors (intentional — the
    user spec is explicit that we never lose form data on error).
@@ -54,12 +58,17 @@
     // in /book/index.html for the full reasoning. Short version: production
     // Cloudflare CSP blocks the reCAPTCHA Enterprise token fetch, repeated
     // failures hit Google's 24h throttle, and after that every public
-    // Firestore write fails. firestore.rules already validates every field
-    // shape on create, and admin approval is a manual gate before anything
-    // chargeable happens, so the security floor without App Check is fine.
+    // Firestore call fails. The booking function validates every field
+    // and limits how many bookings one visitor and the whole site can send,
+    // and admin approval is a manual gate before anything chargeable
+    // happens.
 
     const db = firebase.firestore();
-    const storage = firebase.storage();
+
+    // Where bookings go: the submitBooking Cloud Function
+    // (server/submit-booking/). Its host is in connect-src in the page's
+    // CSP, in _headers and in the Cloudflare Transform Rule.
+    const BOOKING_ENDPOINT = 'https://europe-west2-onlinefix-repair.cloudfunctions.net/submitBooking';
 
     // ---- Constants -------------------------------------------------------
     const BRANDS = {
@@ -104,6 +113,7 @@
         availability: null,
         photos: [],          // [{ id, file, sizeKB }]
         tempId: null,
+        sentAs: null,        // what tempId was last sent with (see submitBooking)
         submitting: false,
         // form values (mirrored from inputs to survive re-renders)
         category: '',
@@ -122,8 +132,11 @@
     // ---- Init ------------------------------------------------------------
     document.addEventListener('DOMContentLoaded', init);
 
-    // A CSPRNG booking id, used as the Storage folder for the photos, the
-    // booking's document id and its notice's id.
+    // A CSPRNG booking id, sent as the booking's requestId. The booking
+    // function uses it as the booking's document id, its notice's id and
+    // its photo folder, so a retry after a lost reply is recognised as the
+    // same booking. Kept while the same details are retried; a new one for
+    // a new booking, or when the details were changed before a retry.
     function newTempId() {
         const idBytes = new Uint8Array(16);
         crypto.getRandomValues(idBytes);
@@ -135,8 +148,7 @@
         const fallback = $('#booking-fallback');
         if (!form) return;
 
-        // Generate a CSPRNG temp id used as both the Storage path and a marker
-        // on the Firestore doc (so admins can match doc <-> photos later).
+        // The id this booking is sent under (see newTempId).
         state.tempId = newTempId();
 
         // Reveal the form (and hide the fallback paragraph since the form is here)
@@ -412,7 +424,8 @@
 
     // Canvas-based resize. Images are scaled to fit within `maxDim` on the
     // longest side, JPEG-encoded at 0.85 quality. Keeps the file under the
-    // Storage rule's 5MB cap and avoids re-uploading 12MP raw camera blobs.
+    // booking function's 5MB-per-photo cap and avoids sending 12MP raw
+    // camera blobs.
     // Resize via createImageBitmap, not FileReader + Image.src. Same end
     // result (a JPEG-encoded File scaled to maxDim on the longest side)
     // but the file taint chain never touches a `.src` attribute, which
@@ -444,8 +457,8 @@
                 canvas.toBlob((blob) => {
                     if (!blob) return reject(new Error('Could not encode image'));
                     // Constant filename. Don't carry file.name through — it's a
-                    // DOM-derived string and we don't need it (the Storage path
-                    // is built from tempId + index in submitBooking).
+                    // DOM-derived string and we don't need it (the booking
+                    // function names the stored files itself).
                     resolve(new File([blob], 'photo.jpg', { type: 'image/jpeg' }));
                 }, 'image/jpeg', 0.85);
             });
@@ -615,9 +628,16 @@
         }
         if (step === 3) {
             if (!state.preferredDate) fail('preferred-date', 'Pick a date.');
+            // A date typed past the picker's range: the booking function
+            // would refuse it, so ask again here instead.
+            else if (state.preferredDate < ukIsoDate(0)
+                || state.preferredDate > ukIsoDate((state.availability && state.availability.maxFutureDays) || 60)) {
+                fail('preferred-date', 'Pick a date.');
+            }
             if (!state.preferredTime) fail('preferred-time', 'Pick a time slot.');
             // The description and these notes are saved as one text, which
-            // the rule holds to 999 characters: say so rather than cut it.
+            // the booking function holds to 999 characters: say so rather
+            // than cut it.
             const over = issueWithNotes().length - 999;
             if (state.extraNotes && over > 0) {
                 fail('extra-notes', 'Together with your description this is ' + over
@@ -628,8 +648,8 @@
             if (!state.customerName || !state.customerName.trim()) fail('customer-name', 'Your name please.');
             else if (state.customerName.length > 99) fail('customer-name', 'Name is too long.');
 
-            // One plain address, the shape firestore.rules requires: no
-            // list of addresses and no display name ('"Name" <a@b.com>').
+            // One plain address, the shape the booking function requires:
+            // no list of addresses and no display name ('"Name" <a@b.com>').
             if (!state.customerEmail || !/^[^\s@,;:<>()"\[\]\\]+@[^\s@,;:<>()"\[\]\\]+\.[^\s@,;:<>()"\[\]\\]{2,}$/.test(state.customerEmail)) {
                 fail('customer-email', 'A valid email so we can reach you.');
             }
@@ -642,7 +662,7 @@
     }
 
     // The description as saved: the issue, then any extra notes under a
-    // heading. The rule allows fewer than 1000 characters in all.
+    // heading. The booking function allows fewer than 1000 characters in all.
     function issueWithNotes() {
         return (state.extraNotes
             ? `${state.issue}\n\n--- Additional notes ---\n${state.extraNotes}`
@@ -778,117 +798,65 @@
         if (errEl) errEl.hidden = true;
 
         try {
-            // 1) Upload photos to Storage. Done sequentially so a partial
-            //    upload set is easy to clean up on the admin side later.
+            // The whole booking goes to the booking function in one request,
+            // photos included (the resized JPEGs, as base64). The function
+            // checks it, stores the photos, and saves the booking and the
+            // shop's email notice; the page writes nothing itself.
             //
-            //    Only the storage paths are kept. This used to call
-            //    getDownloadURL() on each upload, which cannot work from here
-            //    and was failing every booking that had a photo attached:
-            //    reading a booking photo is admin-only in storage.rules, and
-            //    getDownloadURL is a read. The visitor uploaded fine, the
-            //    read after it was refused, and the whole submit landed in
-            //    the catch below as "Photo upload failed" without a booking
-            //    ever being created.
-            //
-            //    Keeping paths rather than links is also the safer shape: a
-            //    download link carries its own access token and opens the
-            //    file for anyone holding it, whatever the rules say, so it
-            //    would have handed out a permanent public link to a
-            //    customer's photo. Staff read these through the admin SDK,
-            //    which resolves a path without one.
-            //
-            //    A photo that already went up on an earlier attempt is not
-            //    sent again when the visitor retries after a failure.
-            const photoPaths = [];
-            for (let i = 0; i < state.photos.length; i++) {
-                const p = state.photos[i];
-                const filename = `photo-${i + 1}.jpg`;
-                const path = `bookings/${state.tempId}/${filename}`;
-                if (p.uploadedPath !== path) {
-                    await storage.ref().child(path).put(p.file, { contentType: 'image/jpeg' });
-                    p.uploadedPath = path;
-                }
-                photoPaths.push(path);
-            }
-
-            // 2) Build the booking doc. Field shape is locked in by the
-            //    Firestore rule (firestore.rules:46-67) — any drift here will
-            //    be rejected server-side.
-            const [y, m, d] = state.preferredDate.split('-').map(Number);
-            const [hh, mm] = state.preferredTime.split(':').map(Number);
-            // The slots are the shop's hours, so the time picked is UK time
-            // whatever the visitor's device is set to.
-            const preferredAt = ukTime(y, m, d, hh, mm);
-
-            const issueText = issueWithNotes();
-
-            const docData = {
-                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                status: 'pending',
-                respondedAt: null,
-                linkedRepairId: null,
-                adminNotes: '',
-                deleted: false,
-                tempId: state.tempId,
-                customer: {
-                    name: state.customerName.trim(),
-                    email: state.customerEmail.trim(),
-                    phone: state.customerPhone.trim()
-                },
-                device: {
-                    category: state.category,
-                    brand: state.brand,
-                    model: state.model.trim()
-                },
-                // The rule wants fewer than 1000 characters.
-                issue: issueText.slice(0, 999),
-                preferredAt: firebase.firestore.Timestamp.fromDate(preferredAt),
-                // Always empty, and required to be by the rule: see the
-                // upload loop above. Kept as a field so a booking's shape
-                // does not change for whatever reads these later.
-                photos: [],
-                photoPaths: photoPaths
+            // requestId is this booking's id (state.tempId), and it stays the
+            // same when the visitor tries again after a failure with the
+            // same details. If an earlier try was saved but its reply was
+            // lost, the function finds the booking already there and
+            // answers with the same reference, so a retry never makes a
+            // second booking. That answer says nothing about what was
+            // saved, so when anything (photos included) was changed since
+            // the last try, this one goes under a new id: at worst staff
+            // see the booking twice, but never the old details alone.
+            const details = {
+                category: state.category,
+                brand: state.brand,
+                model: state.model,
+                // The function wants fewer than 1000 characters.
+                issue: issueWithNotes().slice(0, 999),
+                date: state.preferredDate,
+                time: state.preferredTime,
+                name: state.customerName,
+                email: state.customerEmail,
+                phone: state.customerPhone
             };
+            const sentAs = JSON.stringify([details, state.photos.map((p) => p.id)]);
+            if (state.sentAs !== null && state.sentAs !== sentAs) state.tempId = newTempId();
+            state.sentAs = sentAs;
 
-            // The booking takes its tempId as its document id, and the notice
-            // to the shop takes the same id, so the rules can tie exactly one
-            // notice to each new booking (see /mail in firestore.rules).
-            // Written together: either both land or neither does.
-            //
-            // The five-minute throttle (see /throttle in firestore.rules) is
-            // written in the same batch. When the notice is refused (another
-            // booking went out in the last five minutes, or the rules that
-            // allow it are not published yet) the booking is saved on its own:
-            // saving it matters more than the email about it, and it still
-            // shows on the dashboard.
-            const ref = db.collection('bookings').doc(state.tempId);
-            let notice = null;
+            const photos = [];
+            for (const p of state.photos) photos.push(await fileToBase64(p.file));
+
+            const payload = Object.assign({ requestId: state.tempId }, details, { photos: photos });
+
+            let res;
             try {
-                notice = shopNotice(docData, preferredAt);
-            } catch (err) {
-                console.warn('Could not build the booking notice:', err);
-            }
-            let saved = false;
-            if (notice) {
-                const batch = db.batch();
-                batch.set(ref, docData);
-                batch.set(db.collection('mail').doc(state.tempId), notice);
-                batch.set(db.collection('throttle').doc('bookingNotice'), {
-                    at: firebase.firestore.FieldValue.serverTimestamp(),
-                    mailId: state.tempId
+                res = await fetch(BOOKING_ENDPOINT, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                    credentials: 'omit',
+                    cache: 'no-store'
                 });
-                try {
-                    await batch.commit();
-                    saved = true;
-                } catch (err) {
-                    if (!err || err.code !== 'permission-denied') throw err;
-                    console.warn('Booking notice refused, saving the booking alone:', err);
-                }
+            } catch (err) {
+                const netErr = new Error('Could not reach the booking service');
+                netErr.code = 'network';
+                throw netErr;
             }
-            if (!saved) await ref.set(docData);
+            let answer = null;
+            try { answer = await res.json(); } catch (err) { /* not JSON: handled below */ }
+            if (!res.ok || !answer || answer.ok !== true || typeof answer.reference !== 'string') {
+                const refused = new Error('Booking not accepted (HTTP ' + res.status + ')');
+                refused.status = res.status;
+                throw refused;
+            }
 
-            // 3) Show confirmation
-            const refId = ref.id.slice(-6).toUpperCase();
+            // Show confirmation
+            const refId = answer.reference.slice(-6).toUpperCase();
             const refEl = $('#reference-id');
             if (refEl) refEl.textContent = refId;
             if (typeof window.gtag === 'function') {
@@ -897,11 +865,6 @@
             showStep(6);
         } catch (err) {
             console.error('Booking submit failed:', err);
-            // An upload that reached the server but whose reply was lost looks
-            // like a failure here, and sending that photo again would replace
-            // a file, which storage.rules refuses. So after a refused upload
-            // the next try starts in a new folder, and uploads every photo.
-            if (err && err.code === 'storage/unauthorized') state.tempId = newTempId();
             if (errEl) {
                 errEl.hidden = false;
                 errEl.textContent = friendlyError(err) + ' Your details are still here — try again, or call 07940 730537.';
@@ -912,17 +875,20 @@
         }
     }
 
-    // The email the shop gets for each booking. The rule on /mail accepts
-    // exactly this wording and nothing else (see bookingNoticeText in
-    // firestore.rules), so any change here has to be made there too, and a
-    // mismatch just means the booking is saved without its email.
-    //
-    // It goes straight to the shop's Gmail rather than hello@onlinefix.uk.
-    // The mail is sent through that same Gmail account, and hello@ forwards
-    // to it, so a copy sent to hello@ came back to the mailbox that sent it
-    // and Gmail kept it under Sent only: it never reached the inbox. Mail an
-    // account sends to itself directly does land in the inbox.
-    const SHOP_INBOX = 'onlinerepairbooking@gmail.com';
+    // A photo File as base64, without the "data:image/jpeg;base64," prefix.
+    function fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+                const s = String(reader.result || '');
+                const comma = s.indexOf(',');
+                if (comma === -1) reject(new Error('Could not read photo'));
+                else resolve(s.slice(comma + 1));
+            };
+            reader.onerror = () => reject(reader.error || new Error('Could not read photo'));
+            reader.readAsDataURL(file);
+        });
+    }
 
     // Parts of a moment as a UK clock shows them.
     function ukParts(date, options) {
@@ -946,81 +912,11 @@
         return new Date(asUtc - (ukAsUtc - asUtc));
     }
 
-    // "Friday 25 September at 11:00", in UK time. Built from parts rather
-    // than toLocaleString, whose punctuation differs between browsers; the
-    // rule holds it to exactly this shape.
-    function ukWhen(date) {
-        const p = ukParts(date, {
-            weekday: 'long', day: 'numeric', month: 'long',
-            hour: '2-digit', minute: '2-digit', hourCycle: 'h23'
-        });
-        return `${p.weekday} ${p.day} ${p.month} at ${p.hour}:${p.minute}`;
-    }
-
-    function shopNotice(doc, preferredAt) {
-        const reference = state.tempId.slice(-6);
-        const when = ukWhen(preferredAt);
-        const text = 'New booking request from the website booking form.\n\n'
-            + 'Reference: ' + reference + '\n'
-            + 'Customer: ' + doc.customer.name + '\n'
-            + 'Email: ' + doc.customer.email + '\n'
-            + 'Phone: ' + doc.customer.phone + '\n'
-            + 'Wants to drop off: ' + when + '\n'
-            + 'Device type: ' + doc.device.category + '\n'
-            + 'Brand: ' + doc.device.brand + '\n'
-            + 'Model: ' + doc.device.model + '\n'
-            + 'Photos: ' + doc.photoPaths.length + '\n\n'
-            + 'What the customer wrote:\n' + doc.issue + '\n\n'
-            + 'Reply to this email to answer the customer. The booking is on the '
-            + 'dashboard under Online Bookings: https://onlinefix.co.uk/admin/';
-        const notice = {
-            to: [SHOP_INBOX],
-            replyTo: doc.customer.email,
-            message: {
-                subject: 'Booking request ' + reference + ': ' + doc.customer.name + ', ' + when,
-                text: text
-            },
-            meta: { kind: 'booking-request', bookingId: state.tempId, reference: reference, when: when }
-        };
-        // The rules refuse the notice above if anything the customer typed
-        // looks like a link (hasNoLink in firestore.rules): it goes from the
-        // shop's Gmail to itself, so a link in it would skip the spam filter.
-        // A real customer can type one too ("cracked.The screen"), so then
-        // the short notice goes instead: reference and time only, none of
-        // the customer's words.
-        const fields = [doc.customer.name, doc.customer.phone, doc.device.brand, doc.device.model, doc.issue];
-        if (fields.some(looksLikeLink)) {
-            notice.message = {
-                subject: 'Booking request ' + reference + ', ' + when,
-                text: 'New booking request from the website booking form.\n\n'
-                    + 'Reference: ' + reference + '\n'
-                    + 'Wants to drop off: ' + when + '\n\n'
-                    + 'Part of what the customer typed looks like a web address, so it is '
-                    + 'left out of this email. Read the booking on the dashboard under '
-                    + 'Online Bookings: https://onlinefix.co.uk/admin/\n\n'
-                    + 'Replying to this email answers the address the booking gave.'
-            };
-        }
-        return notice;
-    }
-
-    // The same test as hasNoLink in firestore.rules: a web address
-    // ("https:", "www.", "//") or a domain in any alphabet ("bit.ly/x",
-    // "payé.com"). Built with new RegExp so a browser too old for \p{L}
-    // falls back to Latin letters instead of failing to load this file.
-    const LINK_RE = (function () {
-        try { return new RegExp('https?:|www\\.|//|[\\p{L}\\p{N}-]\\.\\p{L}{2,}', 'iu'); }
-        catch (e) { return /https?:|www\.|\/\/|[A-Za-z0-9\u00C0-\u024F-]\.[A-Za-z\u00C0-\u024F]{2,}/i; }
-    })();
-    function looksLikeLink(s) {
-        return LINK_RE.test(String(s || ''));
-    }
-
+    // The booking function answers 400 when it refuses the details, and
+    // anything else (busy, a server fault) gets the general message.
     function friendlyError(err) {
-        const code = (err && err.code) || '';
-        if (code === 'permission-denied') return 'The server rejected the booking — most likely a validation issue.';
-        if (code === 'unavailable' || code === 'deadline-exceeded') return 'Network issue — couldn\'t reach the server.';
-        if (code.indexOf('storage/') === 0) return 'Photo upload failed.';
+        if (err && err.status === 400) return 'The server rejected the booking — most likely a validation issue.';
+        if (err && err.code === 'network') return 'Network issue — couldn\'t reach the server.';
         return 'Something went wrong submitting your booking.';
     }
 
@@ -1044,6 +940,7 @@
         });
         // New tempId for the next booking
         state.tempId = newTempId();
+        state.sentAs = null;
 
         const form = $('#booking-form');
         if (form) form.reset();
