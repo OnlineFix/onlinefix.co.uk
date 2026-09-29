@@ -4,8 +4,9 @@
 // that fetch one document get the full picture: services, prices, FAQs,
 // policies and rating. Regenerate after content/schema changes:
 //   node scripts/build-llms-full.mjs
-// The update-freshness workflow also runs this on every push, so the file
-// stays in lockstep with the pages (including the nightly GBP rating sync).
+// The update-freshness workflow runs this on every push to main, and the
+// daily sync-gbp-reviews workflow runs it straight after the Google sync,
+// so the file stays in lockstep with the pages.
 
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
