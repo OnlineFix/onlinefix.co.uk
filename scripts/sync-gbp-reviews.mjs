@@ -1,9 +1,13 @@
 #!/usr/bin/env node
-/* Sync Google Business Profile rating + review count into on-page schema.
+/* Sync Google Business Profile rating + review count into on-page schema,
+   and into the visible "N+ reviews" wording.
 
    Runs in CI (see .github/workflows/sync-gbp-reviews.yml). Calls the Places
    API (New) for the configured place, then rewrites every `aggregateRating`
-   JSON-LD block in the repo to match.
+   JSON-LD block in the repo to match, plus every visible "170+ reviews"
+   style count (HTML pages and llms.txt), rounded down to the nearest 10 so
+   the wording stays true until the next ten. The visible "5.0" / "five-star"
+   wording is hand-written; see rewriteVisibleCount.
 
    Env:
      GOOGLE_PLACES_API_KEY  - Places API (New) key from Google Cloud Console
@@ -94,24 +98,58 @@ function rewriteSchema(html, ratingStr, countStr) {
     return { out, changed };
 }
 
+/* Rewrite the visible review count people read: "170+ reviews",
+   "170+ Google reviews", "READ 170+ REVIEWS", "170+ five-star reviews",
+   "170+ 5-star reviews", and the animated "Google Reviews" counter on
+   reviews.html (data-target="150" data-suffix="+"). plusStr is the count
+   rounded down to the nearest 10, shown with a "+" after it. The count
+   covers reviews of every star rating, so the "five-star" phrases are only
+   updated while the rating is 5.0; otherwise they are left for a person. */
+function rewriteVisibleCount(text, plusStr, fiveStar = true) {
+    let changed = 0;
+    const phrase = fiveStar
+        ? /\b\d{2,}(?=\+\s*(?:five-star\s+|5-star\s+|Google\s+)?reviews\b)/gi
+        : /\b\d{2,}(?=\+\s*(?:Google\s+)?reviews\b)/gi;
+    const out = text
+        .replace(phrase, (num) => {
+            if (num !== plusStr) changed++;
+            return plusStr;
+        })
+        .replace(/(data-target=")\d+("\s+data-suffix="\+">[^<]*<\/span>\s*<div class="stat-label">Google Reviews<)/g,
+            (block, head, tail) => {
+                const next = `${head}${plusStr}${tail}`;
+                if (next !== block) changed++;
+                return next;
+            });
+    return { out, changed };
+}
+
 async function main() {
     const place = await fetchPlace();
     sanityCheck(place);
 
     const ratingStr = place.rating.toFixed(1);            // "4.9"
     const countStr = String(Math.round(place.userRatingCount)); // "187"
+    const plusStr = String(Math.floor(place.userRatingCount / 10) * 10); // "180", shown as "180+"
     const name = place.displayName?.text || 'unknown';
 
     console.log(`GBP: "${name}" — rating ${ratingStr}, count ${countStr}`);
+    const fiveStar = ratingStr === '5.0';
+    if (!fiveStar) {
+        console.warn(`Rating is ${ratingStr}: leaving "five-star reviews" and "Rated 5.0" wording for a person to update.`);
+    }
 
-    const files = await listHtmlFiles(ROOT);
+    // Every HTML page, plus llms.txt (the hand-written summary for AI assistants).
+    const files = [...await listHtmlFiles(ROOT), join(ROOT, 'llms.txt')];
     let totalFiles = 0;
     let totalBlocks = 0;
 
     for (const file of files) {
         const before = await readFile(file, 'utf8');
-        if (!before.includes('"aggregateRating"')) continue;
-        const { out, changed } = rewriteSchema(before, ratingStr, countStr);
+        const schema = rewriteSchema(before, ratingStr, countStr);
+        const visible = rewriteVisibleCount(schema.out, plusStr, fiveStar);
+        const out = visible.out;
+        const changed = schema.changed + visible.changed;
         if (out !== before) {
             await writeFile(file, out, 'utf8');
             const rel = file.slice(ROOT.length + 1);
@@ -133,4 +171,4 @@ if (isEntry) {
     });
 }
 
-export { rewriteSchema, sanityCheck };
+export { rewriteSchema, rewriteVisibleCount, sanityCheck };
