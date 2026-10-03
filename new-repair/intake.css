@@ -189,7 +189,7 @@ body {
        row for the customer checklist, and that row rewraps as items are ticked
        off and on rotation. Padding to a constant left ~100px of dead page
        between the last card and the bar at the bottom of the scroll. */
-    padding: calc(var(--topbar-h) + 1.75rem) 1.5rem calc(var(--actionbar-real-h, var(--actionbar-h)) + var(--actionbar-lift, 0px) + 1.75rem);
+    padding: calc(var(--topbar-h) + 1.75rem) 1.5rem calc(var(--actionbar-real-h, var(--actionbar-h)) + 1.75rem);
 }
 
 .step { display: none; animation: rise 0.28s ease both; }
@@ -381,13 +381,16 @@ select.input {
 /* Preset jobs: device picker, then that device's job chips. The picker is
    a joined black strip so it reads as "which list", not as another job. */
 .jobdevices {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    display: flex;
     border: 2px solid var(--border-color);
     margin-bottom: 1rem;
 }
 
 .jobdevice {
+    /* Sized to the label, sharing the spare width, so "Xbox Series X" gets
+       the room it needs on one line. */
+    flex: 1 1 auto;
+    white-space: nowrap;
     min-height: 62px;
     padding: 0.5rem 0.75rem;
     background: var(--bg-surface);
@@ -621,6 +624,11 @@ select.input {
     padding-bottom: env(safe-area-inset-bottom, 0);
     z-index: 60;
 }
+/* Stood aside while someone types on a touch screen (see intake.js): with
+   the keyboard up the bar floated over the form, and drawing it afresh when
+   the keyboard goes puts it back on the bottom edge. */
+body.is-typing .actionbar { display: none; }
+
 .actionbar__inner {
     max-width: 880px;
     margin: 0 auto;
@@ -1025,7 +1033,7 @@ body[data-step="done"] .steprail { display: none; }
     /* The same measurement .shell's bottom padding uses, not the static
        height: the bar grows a row on the customer step — 111px against the
        96px assumed — so a toast placed off the constant landed under it. */
-    bottom: calc(var(--actionbar-real-h, var(--actionbar-h)) + var(--actionbar-lift, 0px) + 1.5rem);
+    bottom: calc(var(--actionbar-real-h, var(--actionbar-h)) + 1.5rem);
     transform: translateX(-50%);
     min-width: 280px;
     max-width: 90vw;
@@ -1086,9 +1094,11 @@ body[data-step="done"] .steprail { display: none; }
    two-column grids collapse rather than squeeze. */
 @media (max-width: 700px) {
     .grid-2, .grid-3, .checkgrid, .done-actions { grid-template-columns: 1fr; }
-    .jobdevices { grid-template-columns: repeat(2, 1fr); }
-    .jobdevice:nth-child(3) { border-left: 0; }
+    .jobdevices { display: grid; grid-template-columns: repeat(2, 1fr); }
+    .jobdevice { white-space: normal; }
+    .jobdevice:nth-child(odd) { border-left: 0; }
     .jobdevice:nth-child(n+3) { border-top: 2px solid var(--border-color); }
+    .jobdevice:last-child:nth-child(odd) { grid-column: 1 / -1; }
     .photo-actions { grid-template-columns: 1fr; }
     .step__title { font-size: 1.6rem; }
     .summary__row { grid-template-columns: 1fr; gap: 0.2rem; }
