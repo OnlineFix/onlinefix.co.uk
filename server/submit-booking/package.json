@@ -1,0 +1,14 @@
+{
+  "name": "submit-booking",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Cloud Function that receives bookings from the public /book/ page, validates and rate-limits them, and writes them with the admin SDK.",
+  "main": "index.js",
+  "engines": {
+    "node": "22"
+  },
+  "dependencies": {
+    "@google-cloud/functions-framework": "^5.0.5",
+    "firebase-admin": "^14.5.0"
+  }
+}
