@@ -11,7 +11,7 @@
         content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://www.google.com https://www.recaptcha.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.firebasestorage.app https://firebasestorage.googleapis.com; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebasestorage.app wss://*.firebaseio.com https://www.google.com https://www.recaptcha.net; font-src 'self' data:; frame-src https://www.google.com https://www.recaptcha.net; base-uri 'none'; form-action 'none';">
     <title>Repair Intake — OnlineFix™</title>
 
-    <link rel="stylesheet" href="intake.css?v=20260928b">
+    <link rel="stylesheet" href="intake.css?v=20261003">
 
     <!-- Firebase (compat build, loaded in dependency order before intake.js) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -22,7 +22,7 @@
 
     <script defer src="tracking-copy.js?v=20260922"></script>
     <script defer src="email-layout.js?v=20260926"></script>
-    <script defer src="intake.js?v=20260928b"></script>
+    <script defer src="intake.js?v=20261003"></script>
 </head>
 
 <body>
@@ -316,6 +316,12 @@
                     job<span class="card__hint">Pick the device, then tap the jobs</span></h2>
                 <!-- Both rows are built by intake.js from JOB_PRESETS. -->
                 <div class="jobdevices" id="jobdevices" role="group" aria-label="Show jobs for"></div>
+                <div class="field" id="jobother-field" hidden>
+                    <label class="field__label" for="f-job-device">Which device?</label>
+                    <input class="input" id="f-job-device" maxlength="60" autocomplete="off"
+                        autocapitalize="words" placeholder="e.g. Xbox Series S">
+                    <p class="field__help">The jobs you tap start with this name, like "Xbox Series S cleaning".</p>
+                </div>
                 <div class="chips quickjobs" id="quickjobs" hidden></div>
                 <div class="field">
                     <label class="field__label" for="f-issue">Reported fault &amp; work agreed</label>
