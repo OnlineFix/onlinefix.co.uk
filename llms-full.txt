@@ -76,7 +76,7 @@ Electronics repair services in Guildford: phone, laptop, PC, tablet & console re
 - Tablet Repair. Professional tablet repair for iPad, Samsung Galaxy Tab, and Surface
 - Gaming Console Repair. PlayStation, Xbox, and Nintendo Switch repair services
 - Desktop PC Repair. Desktop computer repair, upgrades, and custom builds
-- Data Recovery. Professional data recovery for damaged hard drives, SSDs, and USB drives
+- Data Recovery. Professional data recovery for damaged hard drives, SSDs, and phones
 
 ## Console Repair Guildford | PS5, Xbox & Switch Fix | OnlineFix™
 
@@ -430,11 +430,11 @@ Absolutely. Even if your iPad still functions with a cracked screen, we strongly
 
 URL: https://onlinefix.co.uk/data-recovery.html
 
-Data recovery in Guildford from £45. Hard drives, SSDs, USB sticks & phones. No data, no fee &mdash; free assessment. Call 07940 730537.
+Data recovery in Guildford from £45. Hard drives, SSDs, phones & laptops. No data, no fee &mdash; free assessment. Call 07940 730537.
 
 ### Prices
 
-- Accidental Deletion Recovery — from £45. Recovery of accidentally deleted files, emptied recycle bin contents, and formatted drive data from hard drives, SSDs, and USB devices
+- Accidental Deletion Recovery — from £45. Recovery of accidentally deleted files, emptied recycle bin contents, and formatted drive data from hard drives and SSDs
 - Hard Drive Failure Recovery — from £55. Data recovery from failed, clicking, or undetected hard drives including mechanical failure, head crashes, and motor seizure
 - SSD Data Recovery — from £65. Professional data recovery from dead or corrupted solid state drives including SATA, NVMe, and M.2 SSDs with firmware-level recovery
 - Water and Fire Damage Recovery — from £75. Data recovery from water-damaged, flood-damaged, or fire-damaged storage devices with specialist cleaning and component-level repair
@@ -461,7 +461,7 @@ Absolutely. Confidentiality is central to our data recovery service. We never br
 
 **What devices can you recover data from?**
 
-We recover data from virtually all storage devices including internal and external hard drives (HDD), solid state drives (SSD, NVMe, M.2), USB flash drives, SD cards, microSD cards, iPhones, Android phones, laptops, MacBooks, RAID arrays, and NAS devices. If your data was stored on it, we can almost certainly attempt recovery.
+We recover data from internal and external hard drives (HDD), solid state drives (SSD, NVMe, M.2), iPhones, Android phones, laptops, MacBooks, RAID arrays, and NAS devices.
 
 **Should I attempt recovery myself before bringing it in?**
 
