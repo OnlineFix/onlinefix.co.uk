@@ -414,7 +414,7 @@
         .nav-menu{display:flex;list-style:none;gap:0;align-items:stretch;flex-grow:1;justify-content:flex-end}
         .nav-menu li{display:flex;align-items:stretch}
         .nav-link{text-decoration:none;color:var(--hex-black);font-weight:500;text-transform:uppercase;font-size:0.9rem;padding:0 2rem;display:flex;align-items:center;border-left:1px solid var(--hex-grid);position:relative;transition:all 0.2s}
-        .nav-cta{background:var(--hex-black);color:var(--hex-white);padding:0 2rem;text-decoration:none;font-weight:500;text-transform:uppercase;display:flex;align-items:center;gap:10px;font-size:0.8rem;border-left:2px solid var(--hex-black)}.nav-cta::before,.nav-cta::after{content:none}
+        .nav-cta{background:var(--hex-black);color:var(--hex-white);padding:0 2rem;text-decoration:none;font-weight:500;text-transform:uppercase;display:flex;align-items:center;gap:10px;font-size:0.8rem;border-left:2px solid var(--hex-black)}.nav-cta-book{background:var(--gradient-blue)}@media(min-width:769px) and (max-width:1199px){.nav-logo{padding:0 1rem}.nav-link,.nav-cta{padding:0 1rem}}@media(min-width:769px) and (max-width:899px){.nav-menu>li:first-child{display:none}.nav-link,.nav-cta{padding:0 0.75rem}}.nav-cta::before,.nav-cta::after{content:none}
         .mobile-menu-toggle{display:none;background:transparent;border:none;font-size:1.5rem;color:var(--hex-black);cursor:pointer;padding:0 1.5rem;min-width:60px;outline:none}.hamburger{display:inline-flex;flex-direction:column;justify-content:center;gap:5px;width:22px;height:28px}.hamburger span{display:block;height:3px;width:100%;background:currentColor;transition:transform 0.2s,opacity 0.2s}.mobile-menu-toggle[aria-expanded="true"] .hamburger span:nth-child(1){transform:translateY(8px) rotate(45deg)}.mobile-menu-toggle[aria-expanded="true"] .hamburger span:nth-child(2){opacity:0}.mobile-menu-toggle[aria-expanded="true"] .hamburger span:nth-child(3){transform:translateY(-8px) rotate(-45deg)}.nav-item-services{position:relative}.nav-dropdown{display:none}.nav-caret{font-size:0.65em;margin-left:6px}.nav-menu li.nav-menu-meta{display:none}
         .container{max-width:1400px;margin:0 auto;padding:0 20px;position:relative;z-index:2;width:100%}
         .cta-button{display:inline-flex;align-items:center;justify-content:center;background:var(--gradient-blue);color:var(--hex-white);padding:1rem 2rem;text-decoration:none;font-weight:600;text-transform:uppercase;font-size:0.9rem;border:2px solid var(--hex-black);margin:0.5rem;white-space:nowrap}.cta-secondary{background:transparent;color:var(--hex-black)}
@@ -424,9 +424,9 @@
         @media(max-width:768px){.navbar{background:var(--hex-white);border-bottom:2px solid var(--hex-black)}.nav-logo{font-size:1.1rem;padding:0 1rem;letter-spacing:-0.5px}.nav-container{justify-content:space-between;height:54px}.mobile-menu-toggle{display:flex;align-items:center;background:transparent;border:none;padding:0 1rem;color:var(--hex-black)}.nav-menu{display:none;flex-direction:column;justify-content:flex-start;position:absolute;top:54px;left:0;right:0;height:calc(100vh - 54px);height:calc(100dvh - 54px);overflow-y:auto;background:var(--hex-white);border-top:2px solid var(--hex-black)}.nav-menu li.nav-cta-item{margin-top:auto}.nav-menu.active{display:flex}.nav-link{flex:1;padding:1.5rem;border-left:none;border-bottom:1px solid #eee;min-height:48px}.nav-cta{flex:1;padding:1.5rem;justify-content:center;border-left:none;min-height:48px}.container{padding:0 12px}.section-title{padding-top:2rem;margin-bottom:0}.cta-button{width:100%;margin:0.5rem 0}body:has(.mobile-contact-bar) .hero .cta-button[href^="tel:"],body:has(.mobile-contact-bar) .hero .cta-button[href*="wa.me"]{display:none}}
     </style>
     <!-- Deferred stylesheets (non-render-blocking) -->
-    <link rel="stylesheet" href="/css/core.min.css?v=20260716" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="/css/core.min.css?v=20261006" media="print" onload="this.media='all'">
     <link rel="stylesheet" href="/css/icons.min.css?v=20260611" media="print" onload="this.media='all'">
-    <noscript><link rel="stylesheet" href="/css/core.min.css?v=20260716"><link rel="stylesheet" href="/css/icons.min.css?v=20260611"></noscript>
+    <noscript><link rel="stylesheet" href="/css/core.min.css?v=20261006"><link rel="stylesheet" href="/css/icons.min.css?v=20260611"></noscript>
     <style>
         .hero {
             min-height: 90vh;
@@ -518,25 +518,7 @@
             text-transform: uppercase;
             letter-spacing: 0.03em;
             color: #555;
-            margin: 0 auto 0.75rem;
-        }
-
-        .hero-location {
-            font-family: 'Courier New', Courier, monospace;
-            font-size: clamp(0.8rem, 2vw, 0.95rem);
             margin: 0 auto 2rem;
-        }
-
-        .hero-location a {
-            color: var(--hex-black);
-            font-weight: 700;
-            text-decoration: underline;
-            text-underline-offset: 3px;
-        }
-
-        .hero-location i {
-            color: var(--hex-accent);
-            margin-right: 0.35rem;
         }
 
         .features {
@@ -886,6 +868,7 @@
                 <li class="nav-cta-item"><a href="tel:+447940730537" class="nav-cta">
                         <span>Call Now</span>
                     </a></li>
+                <li class="nav-book-item"><a href="/book/" class="nav-cta nav-cta-book"><span>Book Now</span></a></li>
                 <li class="nav-menu-meta">
                     <p><a href="https://maps.app.goo.gl/zqbFNuYM2z7u8xux8" target="_blank" rel="noopener noreferrer">13 QUARRY STREET, GUILDFORD GU1&nbsp;3UY</a><br>BY APPOINTMENT, 7 DAYS<br>CALLS &amp; MESSAGES: 10AM &ndash; 10PM</p>
                     <a href="mailto:hello@onlinefix.uk">hello@onlinefix.uk</a>
@@ -906,7 +889,6 @@
                     <p class="logo">ONLINE<span>FIX</span></p>
                     <h1 class="hero-description">Phone, laptop, PC &amp; console repairs in <span class="nosplit">Guildford, Surrey.</span></h1>
                     <p class="hero-trust">90-day warranty &bull; No fix, no fee &bull; <span class="nosplit">190+ five-star reviews</span></p>
-                    <p class="hero-location"><a href="https://maps.app.goo.gl/zqbFNuYM2z7u8xux8" target="_blank" rel="noopener noreferrer"><i class="fas fa-map-marker-alt" aria-hidden="true"></i>13 Quarry Street, <span class="nosplit">Guildford GU1 3UY</span></a></p>
                     <div>
                         <a href="tel:+447940730537" class="cta-button">
                             CALL NOW
@@ -1178,7 +1160,7 @@
     <nav class="mobile-contact-bar" aria-label="Quick contact">
         <a href="tel:+447940730537"><i class="fas fa-phone" aria-hidden="true"></i><span>Call</span></a>
         <a href="https://wa.me/447940730537" target="_blank" rel="noopener noreferrer"><i class="fab fa-whatsapp" aria-hidden="true"></i><span>WhatsApp</span></a>
-        <a href="https://maps.app.goo.gl/zqbFNuYM2z7u8xux8" target="_blank" rel="noopener noreferrer" aria-label="Find us at 13 Quarry Street, Guildford (opens Google Maps)"><i class="fas fa-map-marker-alt" aria-hidden="true"></i><span>Find us</span></a>
+        <a href="/book/"><i class="fas fa-calendar-check" aria-hidden="true"></i><span>Book</span></a>
     </nav>
 
     <!-- Footer -->
