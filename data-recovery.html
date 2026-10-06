@@ -13,7 +13,7 @@
     <!-- SEO Meta Tags - DATA RECOVERY LANDING PAGE -->
     <title>Data Recovery Guildford | No Data, No Fee | OnlineFix™</title>
     <meta name="description" content="Data recovery in Guildford from £45. Hard drives, SSDs, phones &amp; laptops. No data, no fee &mdash; free assessment. Call 07940 730537.">
-    <meta name="keywords" content="data recovery Guildford, hard drive recovery Surrey, SSD data recovery, phone data recovery, laptop data recovery, RAID recovery, no data no fee, confidential data recovery, data recovery near me, data recovery Woking, data recovery Godalming, data recovery Farnham, hard drive not detected, deleted file recovery Guildford">
+    <meta name="keywords" content="data recovery Guildford, hard drive recovery Surrey, SSD data recovery, phone data recovery, laptop data recovery, no data no fee, confidential data recovery, data recovery near me, data recovery Woking, data recovery Godalming, data recovery Farnham, hard drive not detected, deleted file recovery Guildford">
     <meta name="author" content="OnlineFix - Tomas">
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
     <link rel="canonical" href="https://onlinefix.co.uk/data-recovery.html">
@@ -248,21 +248,6 @@
                                         "unitText": "starts from"
                                 },
                                 "availability": "https://schema.org/InStock"
-                        },
-                        {
-                                "@type": "Offer",
-                                "itemOffered": {
-                                        "@type": "Service",
-                                        "name": "RAID and Server Recovery",
-                                        "description": "RAID array and NAS data recovery for failed server configurations including RAID 0, RAID 1, RAID 5, and RAID 6 rebuilds"
-                                },
-                                "priceSpecification": {
-                                        "@type": "UnitPriceSpecification",
-                                        "priceCurrency": "GBP",
-                                        "price": "85",
-                                        "unitText": "starts from"
-                                },
-                                "availability": "https://schema.org/InStock"
                         }
                 ]
         }
@@ -288,7 +273,7 @@
                 "name": "How much does data recovery cost in Guildford?",
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "Data recovery at OnlineFix Guildford starts from £45 for straightforward deleted file recovery. Hard drive failure recovery starts from £55, SSD recovery from £65, and RAID or server recovery from £85. We provide a fixed quote after diagnosis before any work begins. No data, no fee — you only pay if we successfully recover your files."
+                    "text": "Data recovery at OnlineFix Guildford starts from £45 for straightforward deleted file recovery. Hard drive failure recovery starts from £55 and SSD recovery from £65. We provide a fixed quote after diagnosis before any work begins. No data, no fee — you only pay if we successfully recover your files."
                 }
             },
             {
@@ -296,7 +281,7 @@
                 "name": "How long does data recovery take?",
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "Simple deleted file recovery can often be completed within 24 hours. Hard drive and SSD recovery typically takes 2-5 working days depending on the severity of the failure. RAID and server recovery may take up to 7 working days. We offer a 24-hour priority service for urgent cases. You will receive a time estimate when you book your drop-off."
+                    "text": "Simple deleted file recovery can often be completed within 24 hours. Hard drive and SSD recovery typically takes 2-5 working days depending on the severity of the failure. We offer a 24-hour priority service for urgent cases. You will receive a time estimate when you book your drop-off."
                 }
             },
             {
@@ -312,7 +297,7 @@
                 "name": "What devices can you recover data from?",
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "We recover data from internal and external hard drives (HDD), solid state drives (SSD, NVMe, M.2), iPhones, Android phones, laptops, MacBooks, RAID arrays, and NAS devices."
+                    "text": "We recover data from internal and external hard drives (HDD), solid state drives (SSD, NVMe, M.2), iPhones, Android phones, laptops, and MacBooks."
                 }
             },
             {
@@ -385,6 +370,8 @@
 
         .issues-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
         @media (max-width: 900px) { .issues-grid { grid-template-columns: 1fr; } }
+        /* Five cards: three across, then the last two share the row half and half */
+        @media (min-width: 901px) { .issues-grid { grid-template-columns: repeat(6, 1fr); } .issue-card { grid-column: span 2; } .issue-card:nth-last-of-type(-n+2) { grid-column: span 3; } }
         .issues-grid-cta { grid-column: 1 / -1; display: flex; align-items: center; justify-content: center; gap: 0.6rem; background: var(--gradient-blue); color: var(--hex-white); padding: 1.25rem 2rem; text-decoration: none; font-weight: 800; text-transform: uppercase; font-size: 1rem; border: 2px solid var(--hex-black); box-shadow: 6px 6px 0 var(--hex-black); transition: all 0.1s; cursor: pointer; }
         @media (hover: hover) { .issues-grid-cta:hover { transform: translate(4px, 4px); box-shadow: 2px 2px 0 var(--hex-black); } }
 
@@ -722,7 +709,7 @@
                         <p class="issue-subtitle">Common Scenarios:</p>
                         <ul class="issue-symptoms">
                             <li>Hard drive or laptop submerged in water</li>
-                            <li>Flood-damaged external drives or NAS</li>
+                            <li>Flood-damaged external drives</li>
                             <li>Coffee or liquid spill on laptop</li>
                             <li>Smoke or heat damage from fire</li>
                             <li>Corroded connectors or circuit boards</li>
@@ -754,29 +741,6 @@
                             <div class="issue-pricing">
                                 <div class="price-text">Starting From</div>
                                 <div class="issue-price">&pound;45</div>
-                            </div>
-                        </div>
-                    </article>
-
-                    <!-- RAID & SERVER RECOVERY -->
-                    <article class="issue-card fade-in" data-issue-num="CASE_06">
-                        <div class="issue-header">
-                            <div class="issue-icon"><i class="fas fa-server" aria-hidden="true"></i></div>
-                            <h3 class="issue-title">RAID &amp; Server Recovery</h3>
-                        </div>
-                        <p class="issue-description">RAID arrays and NAS devices are designed for redundancy — but multiple drive failures, controller malfunctions, or failed rebuilds can bring the entire array down. We recover data from RAID 0, 1, 5, 6, and 10 configurations, including Synology, QNAP, and custom server setups. We rebuild the array virtually and extract your data without risking further damage.</p>
-                        <p class="issue-subtitle">Common Scenarios:</p>
-                        <ul class="issue-symptoms">
-                            <li>Multiple drives failed in RAID array</li>
-                            <li>RAID rebuild failed or interrupted</li>
-                            <li>NAS device not booting or inaccessible</li>
-                            <li>RAID controller failure or corruption</li>
-                            <li>Accidental RAID reconfiguration or initialisation</li>
-                        </ul>
-                        <div class="issue-bottom">
-                            <div class="issue-pricing">
-                                <div class="price-text">Starting From</div>
-                                <div class="issue-price">&pound;85</div>
                             </div>
                         </div>
                     </article>
@@ -909,11 +873,6 @@
                                 <td data-label="Repair type">Phone data recovery</td>
                                 <td data-label="Estimated cost">from &pound;45</td>
                             </tr>
-                            <tr>
-                                <td>Failed RAID array or NAS</td>
-                                <td data-label="Repair type">RAID &amp; server recovery</td>
-                                <td data-label="Estimated cost">from &pound;85</td>
-                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -936,13 +895,13 @@
                     <div class="faq-item fade-in">
                         <button class="faq-question" aria-expanded="false">How much does data recovery cost in Guildford?</button>
                         <div class="faq-answer" role="region">
-                            <p>Data recovery at OnlineFix Guildford starts from <strong>&pound;45</strong> for straightforward deleted file recovery. Hard drive failure recovery starts from &pound;55, SSD recovery from &pound;65, and RAID or server recovery from &pound;85. We provide a <strong>fixed quote after diagnosis</strong> before any work begins. No data, no fee — you only pay if we successfully recover your files.</p>
+                            <p>Data recovery at OnlineFix Guildford starts from <strong>&pound;45</strong> for straightforward deleted file recovery. Hard drive failure recovery starts from &pound;55 and SSD recovery from &pound;65. We provide a <strong>fixed quote after diagnosis</strong> before any work begins. No data, no fee — you only pay if we successfully recover your files.</p>
                         </div>
                     </div>
                     <div class="faq-item fade-in">
                         <button class="faq-question" aria-expanded="false">How long does data recovery take?</button>
                         <div class="faq-answer" role="region">
-                            <p>Simple deleted file recovery can often be completed within <strong>24 hours</strong>. Hard drive and SSD recovery typically takes 2-5 working days depending on the severity of the failure. RAID and server recovery may take up to 7 working days. We offer a <strong>24-hour priority service</strong> for urgent cases. You will receive a time estimate when you <strong>book your drop-off</strong>.</p>
+                            <p>Simple deleted file recovery can often be completed within <strong>24 hours</strong>. Hard drive and SSD recovery typically takes 2-5 working days depending on the severity of the failure. We offer a <strong>24-hour priority service</strong> for urgent cases. You will receive a time estimate when you <strong>book your drop-off</strong>.</p>
                         </div>
                     </div>
                     <div class="faq-item fade-in">
@@ -954,7 +913,7 @@
                     <div class="faq-item fade-in">
                         <button class="faq-question" aria-expanded="false">What devices can you recover data from?</button>
                         <div class="faq-answer" role="region">
-                            <p>We recover data from internal and external <strong>hard drives (HDD)</strong>, <strong>solid state drives</strong> (SSD, NVMe, M.2), iPhones, Android phones, laptops, MacBooks, RAID arrays, and NAS devices. <strong>Call to book your drop-off</strong> at our Guildford workshop.</p>
+                            <p>We recover data from internal and external <strong>hard drives (HDD)</strong>, <strong>solid state drives</strong> (SSD, NVMe, M.2), iPhones, Android phones, laptops, and MacBooks. <strong>Call to book your drop-off</strong> at our Guildford workshop.</p>
                         </div>
                     </div>
                     <div class="faq-item fade-in">

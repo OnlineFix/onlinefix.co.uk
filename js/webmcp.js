@@ -31,7 +31,7 @@
         { device: 'Laptop (HP, Lenovo, Dell, ASUS, Acer, MSI and more)', url: 'https://onlinefix.co.uk/laptop-repair.html', prices: 'screens from £60, diagnosis from £30, SSD upgrades from £40 plus the drive, virus removal from £35' },
         { device: 'Desktop PC and gaming PC', url: 'https://onlinefix.co.uk/pc-repair.html', prices: 'hardware diagnosis from £30, virus removal from £35, SSD/RAM upgrade labour from £25, Windows installation from £35' },
         { device: 'Tablet and iPad', url: 'https://onlinefix.co.uk/tablet-repair.html', prices: 'screens from £55, batteries from £45, charging ports from £45' },
-        { device: 'Data recovery (drives, SSDs, phones, RAID)', url: 'https://onlinefix.co.uk/data-recovery.html', prices: 'deleted files from £45, failed hard drives from £55, SSDs from £65, phones from £45, RAID from £85 — no data recovered, no fee' }
+        { device: 'Data recovery (drives, SSDs, phones)', url: 'https://onlinefix.co.uk/data-recovery.html', prices: 'deleted files from £45, failed hard drives from £55, SSDs from £65, phones from £45 — no data recovered, no fee' }
     ];
 
     function text(s) {
