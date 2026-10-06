@@ -2994,6 +2994,113 @@
         #booking-modal .close-btn {
             flex-shrink: 0;
         }
+
+        /* Booking hours: the button beside the board's legend, and the box
+           it opens. One row per day; on a phone each row stacks into the
+           day and its Open box, then the two times, then what it offers. */
+        .bookings-header-tools {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.75rem 1.25rem;
+        }
+
+        #hours-modal form {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-height: 0;
+        }
+
+        #hours-modal .hours-actions,
+        #hours-modal #hours-error {
+            flex: none;
+        }
+
+        #hours-modal .hours-actions {
+            margin-top: 1rem;
+        }
+
+        .hours-intro {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .hours-row {
+            display: grid;
+            grid-template-columns: 7rem auto 1fr 1fr;
+            align-items: end;
+            gap: 0.5rem 0.75rem;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .hours-row__day {
+            font-weight: 600;
+            align-self: center;
+        }
+
+        .hours-row__open {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            min-height: 44px;
+            align-self: center;
+            cursor: pointer;
+        }
+
+        .hours-row__open input {
+            width: 22px;
+            height: 22px;
+            accent-color: var(--primary-blue);
+            cursor: pointer;
+        }
+
+        .hours-row__time span {
+            display: block;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--text-muted);
+            margin-bottom: 0.2rem;
+        }
+
+        .hours-row__time select {
+            padding: 0.6rem 0.75rem;
+            min-height: 44px;
+        }
+
+        .hours-row__time select:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        .hours-row__note {
+            grid-column: 1 / -1;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .hours-row__note.is-wrong {
+            color: var(--danger);
+        }
+
+        .hours-other {
+            font-size: 0.8rem;
+            color: var(--text-dark);
+            margin-top: 0.75rem;
+        }
+
+        @media (max-width: 600px) {
+            .hours-row {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .hours-row__open {
+                justify-self: end;
+            }
+        }
     </style>
 </head>
 
@@ -3257,8 +3364,13 @@
             <div id="bookings-section" class="content-section is-board hidden">
                 <div class="section-header">
                     <h2 class="section-title">Online Bookings <span class="results-count" id="bookings-count"></span></h2>
-                    <div class="board-legend">
-                        <span class="board-legend__item"><span class="board-flag board-flag--warn"></span>New, not yet confirmed</span>
+                    <div class="bookings-header-tools">
+                        <div class="board-legend">
+                            <span class="board-legend__item"><span class="board-flag board-flag--warn"></span>New, not yet confirmed</span>
+                        </div>
+                        <button type="button" class="btn btn-secondary" id="booking-hours-btn">
+                            <i class="fas fa-clock"></i> Booking hours
+                        </button>
                     </div>
                 </div>
                 <p id="bookings-truncated" class="hidden" style="color: var(--warning); margin: 0 0 0.75rem;">
@@ -4091,6 +4203,231 @@
         document.addEventListener('visibilitychange', () => {
             if (!document.hidden && isBookingsBoardShown()) renderBookings();
         });
+
+        // === BOOKING HOURS ===
+        // The drop-off times the public /book/ page offers come from
+        // availability/settings: workingHours holds each day's opening and
+        // closing time and whether it is closed. The booking page offers a
+        // slot every slotIntervalMinutes from opening, the last one starting
+        // before closing, so 10:00 to 22:00 offers 10:00 up to 21:30. It
+        // reads the doc each time it is opened, so a saved change reaches the
+        // next customer who opens it.
+        //
+        // Only workingHours is edited here. The doc's other settings (notice
+        // needed, how far ahead, closed dates) are left as they are; when the
+        // doc does not exist yet, saving creates it with the booking page's
+        // own defaults for them.
+        const BOOKING_HOURS_DAYS = [
+            ['mon', 'Monday'], ['tue', 'Tuesday'], ['wed', 'Wednesday'], ['thu', 'Thursday'],
+            ['fri', 'Friday'], ['sat', 'Saturday'], ['sun', 'Sunday']
+        ];
+        // Must match DEFAULT_AVAILABILITY in book/booking.js, which the
+        // booking page uses while the doc does not exist.
+        const BOOKING_AVAILABILITY_DEFAULTS = {
+            workingHours: Object.fromEntries(BOOKING_HOURS_DAYS.map(([key]) =>
+                [key, { open: '10:00', close: '22:00', closed: false }])),
+            blockedDates: [],
+            minNoticeHours: 4,
+            maxFutureDays: 60,
+            slotIntervalMinutes: 30
+        };
+        const HOURS_TIME_RE = /^([01]\d|2[0-3]):[0-5]\d$/;
+
+        function hoursToMinutes(t) {
+            const [h, m] = String(t).split(':').map(Number);
+            return h * 60 + m;
+        }
+
+        function minutesToHours(n) {
+            return String(Math.floor(n / 60)).padStart(2, '0') + ':' + String(n % 60).padStart(2, '0');
+        }
+
+        // Every half hour of the day, plus the saved time if it is not on
+        // the half hour, so opening the box never changes it unseen.
+        function hoursTimeOptions(selected) {
+            const times = [];
+            for (let m = 0; m < 24 * 60; m += 30) times.push(minutesToHours(m));
+            if (HOURS_TIME_RE.test(selected) && !times.includes(selected)) times.push(selected);
+            return times.sort().map(t =>
+                `<option value="${t}"${t === selected ? ' selected' : ''}>${t}</option>`).join('');
+        }
+
+        // What a day offers, worked out the way the booking page does it.
+        function hoursRowNote(open, close, closed, interval) {
+            if (closed) return { text: 'Closed: no drop-off times offered.', wrong: false };
+            const start = hoursToMinutes(open);
+            const end = hoursToMinutes(close);
+            if (end <= start) return { text: 'The closing time must be after the opening time.', wrong: true };
+            const count = Math.ceil((end - start) / interval);
+            if (count === 1) return { text: `One drop-off time, ${open}.`, wrong: false };
+            return { text: `Drop-off times ${open} to ${minutesToHours(start + (count - 1) * interval)} (${count} slots).`, wrong: false };
+        }
+
+        async function openBookingHours() {
+            if (document.getElementById('hours-modal')) return;
+            const modal = document.createElement('div');
+            modal.className = 'modal show';
+            modal.id = 'hours-modal';
+            modal.setAttribute('role', 'dialog');
+            modal.setAttribute('aria-modal', 'true');
+            modal.setAttribute('aria-labelledby', 'hours-modal-title');
+            modal.innerHTML = `
+                <div class="modal-content modal-content--job" style="max-width: 680px;">
+                    <div class="modal-header">
+                        <h2 class="modal-title" id="hours-modal-title">Booking hours</h2>
+                        <button type="button" class="close-btn" data-hours-close aria-label="Close">&times;</button>
+                    </div>
+                    <form id="hours-form" novalidate>
+                        <div class="job-body" id="hours-body">
+                            <p class="hours-intro">Loading the current hours…</p>
+                        </div>
+                        <div class="alert alert-error hidden" id="hours-error" style="margin: 1rem 0 0;"></div>
+                        <div class="modal-actions hours-actions">
+                            <span class="modal-actions__spacer"></span>
+                            <button type="button" class="btn btn-secondary" data-hours-close>Cancel</button>
+                            <button type="submit" class="btn btn-primary" id="hours-save" disabled><i class="fas fa-save"></i> Save hours</button>
+                        </div>
+                    </form>
+                </div>`;
+            document.body.appendChild(modal);
+            // Not closed by a tap outside it: on an iPad that is easy to do
+            // by accident, and it would throw away the changes.
+            modal.addEventListener('click', (e) => {
+                if (!modal.dataset.busy && e.target.closest('[data-hours-close]')) modal.remove();
+            });
+
+            let settings;
+            try {
+                const snap = await db.collection('availability').doc('settings').get();
+                settings = snap.exists ? snap.data() : null;
+            } catch (error) {
+                if (modal.isConnected) {
+                    modal.querySelector('#hours-body').innerHTML =
+                        `<p class="hours-intro">The current hours could not be loaded, so nothing can be changed yet: ${escapeHTML(error.message)}</p>`;
+                }
+                return;
+            }
+            if (modal.isConnected) fillBookingHours(modal, settings);
+        }
+
+        function fillBookingHours(modal, settings) {
+            // Read the doc the way book/booking.js does, so the box shows what
+            // customers are actually offered: no doc means its defaults, and
+            // a day missing from a saved doc means closed.
+            const a = settings || BOOKING_AVAILABILITY_DEFAULTS;
+            const saved = a.workingHours || {};
+            const interval = Number(a.slotIntervalMinutes) || 30;
+            const notice = Number(a.minNoticeHours) || 0;
+            const ahead = Number(a.maxFutureDays) || 60;
+            const savedAt = settings && bookingDate(settings.updatedAt) ? formatBookingTime(settings.updatedAt) : '';
+            const savedBy = settings && settings.updatedAt ? String(settings.updatedBy || '') : '';
+
+            const body = modal.querySelector('#hours-body');
+            body.innerHTML = `
+                <p class="hours-intro">The drop-off times customers can pick on the online booking page.
+                    A time is offered every ${interval} minutes from opening; the last one is ${interval} minutes before closing.</p>
+                ${settings ? '' : `<p class="hours-intro">These have never been saved, so the booking page is using its built-in hours, shown here. Saving stores them.</p>`}
+                ${BOOKING_HOURS_DAYS.map(([key, label]) => {
+                    const h = saved[key] || {};
+                    const closed = !saved[key] || !!h.closed;
+                    const open = HOURS_TIME_RE.test(h.open) ? h.open : '10:00';
+                    const close = HOURS_TIME_RE.test(h.close) ? h.close : '22:00';
+                    return `
+                        <div class="hours-row" data-day="${key}">
+                            <span class="hours-row__day">${label}</span>
+                            <label class="hours-row__open">
+                                <input type="checkbox" data-hours-open aria-label="Open on ${label}"${closed ? '' : ' checked'}>
+                                Open
+                            </label>
+                            <label class="hours-row__time">
+                                <span>Opens</span>
+                                <select class="form-input" data-hours-from aria-label="${label} opens">${hoursTimeOptions(open)}</select>
+                            </label>
+                            <label class="hours-row__time">
+                                <span>Closes</span>
+                                <select class="form-input" data-hours-to aria-label="${label} closes">${hoursTimeOptions(close)}</select>
+                            </label>
+                            <p class="hours-row__note" aria-live="polite"></p>
+                        </div>`;
+                }).join('')}
+                <p class="hours-other">Customers can book from ${notice} hours ahead up to ${ahead} days ahead.
+                    This changes the booking page only: the opening hours written on the rest of the website, and on Google, stay as they are.</p>
+                ${savedAt ? `<p class="hours-other">Last saved ${escapeHTML(savedAt)}${savedBy ? ' by ' + escapeHTML(savedBy) : ''}.</p>` : ''}`;
+
+            const refreshRow = (row) => {
+                const closed = !row.querySelector('[data-hours-open]').checked;
+                const from = row.querySelector('[data-hours-from]');
+                const to = row.querySelector('[data-hours-to]');
+                from.disabled = closed;
+                to.disabled = closed;
+                const note = hoursRowNote(from.value, to.value, closed, interval);
+                const el = row.querySelector('.hours-row__note');
+                el.textContent = note.text;
+                el.classList.toggle('is-wrong', note.wrong);
+            };
+            body.querySelectorAll('.hours-row').forEach(row => {
+                refreshRow(row);
+                row.addEventListener('change', () => refreshRow(row));
+            });
+
+            const save = modal.querySelector('#hours-save');
+            save.disabled = false;
+            modal.querySelector('#hours-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if (modal.dataset.busy) return;
+                const err = modal.querySelector('#hours-error');
+                const fail = (msg) => {
+                    err.textContent = msg;
+                    err.classList.remove('hidden');
+                };
+                err.classList.add('hidden');
+
+                const workingHours = {};
+                for (const [key, label] of BOOKING_HOURS_DAYS) {
+                    const row = body.querySelector(`.hours-row[data-day="${key}"]`);
+                    const closed = !row.querySelector('[data-hours-open]').checked;
+                    const open = row.querySelector('[data-hours-from]').value;
+                    const close = row.querySelector('[data-hours-to]').value;
+                    if (!HOURS_TIME_RE.test(open) || !HOURS_TIME_RE.test(close)) return fail(`${label}: pick an opening and a closing time.`);
+                    if (!closed && hoursToMinutes(close) <= hoursToMinutes(open)) {
+                        return fail(`${label} closes before it opens. Pick a later closing time, or untick Open.`);
+                    }
+                    workingHours[key] = { open, close, closed };
+                }
+                if (Object.values(workingHours).every(d => d.closed)
+                    && !confirm('Every day is closed, so nobody will be able to book online. Save anyway?')) return;
+
+                modal.dataset.busy = '1';
+                save.disabled = true;
+                save.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving…';
+                try {
+                    const ref = db.collection('availability').doc('settings');
+                    const snap = await ref.get();
+                    const payload = {
+                        workingHours,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        updatedBy: currentUser ? currentUser.email : 'unknown'
+                    };
+                    // A first save also stores the booking page's defaults
+                    // for the settings not edited here, so they stay as
+                    // customers see them now.
+                    if (!snap.exists) {
+                        ['blockedDates', 'minNoticeHours', 'maxFutureDays', 'slotIntervalMinutes']
+                            .forEach(k => { payload[k] = BOOKING_AVAILABILITY_DEFAULTS[k]; });
+                    }
+                    await ref.set(payload, { merge: true });
+                    modal.remove();
+                    showAlert('Booking hours saved. The booking page offers them from the next time it is opened.', 'success');
+                } catch (error) {
+                    delete modal.dataset.busy;
+                    save.disabled = false;
+                    save.innerHTML = '<i class="fas fa-save"></i> Save hours';
+                    fail('Could not save: ' + error.message);
+                }
+            });
+        }
+
+        document.getElementById('booking-hours-btn')?.addEventListener('click', openBookingHours);
 
         function bookingDeviceText(b) {
             const device = b.device || {};
