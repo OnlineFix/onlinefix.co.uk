@@ -77,7 +77,8 @@
         // Drop-offs by appointment, 7 days, 10am to 10pm, as every page
         // says. The last slot offered is 21:30. Used only while the
         // availability/settings doc does not exist: when it does, it wins.
-        // admin/seed-availability.html writes these same values.
+        // Staff set the hours in that doc on the dashboard (Online
+        // Bookings, Booking hours), whose defaults match these.
         workingHours: {
             mon: { open: '10:00', close: '22:00', closed: false },
             tue: { open: '10:00', close: '22:00', closed: false },
@@ -462,6 +463,8 @@
             state.availability = DEFAULT_AVAILABILITY;
         }
         const a = state.availability;
+        const hint = $('#date-hint');
+        if (hint) hint.textContent = hoursSummary(a.workingHours);
         const dateInput = $('#preferred-date');
         if (dateInput) {
             const min = ukIsoDate(0);
@@ -472,6 +475,40 @@
         // If a date was already picked before availability finished loading,
         // re-render slots with the now-loaded settings.
         if (state.preferredDate) renderTimeSlots(state.preferredDate);
+    }
+
+    // The line under the date box, from the hours staff set on the
+    // dashboard (Online Bookings, Booking hours). Days next to each other
+    // with the same hours are put together: "We're open 7 days,
+    // 10:00-22:00." or "We're open Mon-Fri 10:00-18:00, Sat 10:00-16:00;
+    // closed Sun."
+    function hoursSummary(workingHours) {
+        const order = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+        const names = { mon: 'Mon', tue: 'Tue', wed: 'Wed', thu: 'Thu', fri: 'Fri', sat: 'Sat', sun: 'Sun' };
+        const isTime = (t) => /^([01]\d|2[0-3]):[0-5]\d$/.test(t);
+        const groups = [];
+        order.forEach((key) => {
+            const h = (workingHours || {})[key];
+            const text = h && !h.closed && isTime(h.open) && isTime(h.close) && h.open < h.close
+                ? h.open + '-' + h.close : '';
+            const last = groups[groups.length - 1];
+            if (last && last.text === text) last.end = key;
+            else groups.push({ start: key, end: key, text });
+        });
+        const days = (g) => g.start === g.end ? names[g.start] : names[g.start] + '-' + names[g.end];
+        const open = groups.filter((g) => g.text);
+        const closed = groups.filter((g) => !g.text);
+        if (!open.length) return 'Online booking is closed at the moment. Please call us on 07940 730537.';
+        if (!closed.length && open.length === 1) return "We're open 7 days, " + open[0].text + '.';
+        // Day ranges with the same hours share them: "Mon-Tue & Thu-Sun".
+        const byHours = [];
+        open.forEach((g) => {
+            const same = byHours.find((b) => b.text === g.text);
+            if (same) same.days.push(days(g));
+            else byHours.push({ text: g.text, days: [days(g)] });
+        });
+        return "We're open " + byHours.map((b) => b.days.join(' & ') + ' ' + b.text).join(', ')
+            + (closed.length ? '; closed ' + closed.map(days).join(' & ') : '') + '.';
     }
 
     function wireDatePicker() {
