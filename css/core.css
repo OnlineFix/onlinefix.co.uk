@@ -269,6 +269,43 @@ a[aria-label] > i[class*="fa-"]:only-child,
     }
 }
 
+/* Book Now: the blue partner to the black Call Now, last in the menu */
+.nav-cta-book {
+    background: var(--gradient-blue);
+}
+
+@media (hover: hover) {
+    .nav-cta-book:hover {
+        background: var(--hex-black);
+    }
+}
+
+/* Tablet widths (iPad portrait and landscape): the full menu with both
+   buttons needs ~1080px at desktop spacing, so tighten it. Below 900px
+   Home drops out too (the logo already links home), so Call Now and
+   Book Now always stay on screen. */
+@media (min-width: 769px) and (max-width: 1199px) {
+    .nav-logo {
+        padding: 0 1rem;
+    }
+
+    .nav-link,
+    .nav-cta {
+        padding: 0 1rem;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 899px) {
+    .nav-menu > li:first-child {
+        display: none;
+    }
+
+    .nav-link,
+    .nav-cta {
+        padding: 0 0.75rem;
+    }
+}
+
 .mobile-menu-toggle {
     display: none;
     background: transparent;
