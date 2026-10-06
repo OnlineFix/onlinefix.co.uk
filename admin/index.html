@@ -4884,7 +4884,6 @@
             const html = E.layout({
                 subject,
                 preheader,
-                headerLabel: 'Ref ' + reference,
                 body: [
                     E.heading('Booking confirmed', { accent: 'confirmed', gap: 12 }),
                     E.chip('Drop-off booking // Guildford'),
@@ -5944,7 +5943,6 @@
 
             const html = emailHtml(E => E.layout({
                 subject,
-                headerLabel: repair.repairId,
                 body: [
                     E.paragraph('Hi ' + greeting + ',', { gap: 12 }),
                     E.paragraph('Here is the tracking link for your repair with us.', { gap: 22 }),
