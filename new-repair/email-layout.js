@@ -366,7 +366,9 @@
     // opts:
     //   subject      the <title> and the screen-reader label (required)
     //   preheader    inbox preview text (optional)
-    //   headerLabel  shown right of the wordmark, e.g. the reference
+    //   headerLabel  shown right of the wordmark (none of the site's emails
+    //                use it: the owner asked for the reference to show only
+    //                in the body, where every email already has it)
     //   body         helper output, or an array of it
     //   footer       footer lines (see shopFooter)
     function layout(opts) {
@@ -377,8 +379,8 @@
             escapeHTML(opts.preheader) + PREHEADER_FILL + '</div>' : '';
 
         // Like the site's top bar: the gradient wordmark block with a black
-        // edge, then white. The label there repeats the reference that is
-        // in the email body, so screen readers skip it.
+        // edge, then white. A label there would repeat what is in the email
+        // body, so screen readers skip it.
         var header =
             '<tr><td style="border-bottom:2px solid ' + C.black + ';">' +
             '<table ' + TABLE + ' width="100%" style="width:100%;"><tr>' +

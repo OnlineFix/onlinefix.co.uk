@@ -1559,7 +1559,6 @@
         var html = emailHtml(function (E) {
             return E.layout({
                 subject: subject,
-                headerLabel: repair.repairId,
                 body: [
                     E.paragraph('Hi ' + repair.firstName + ',', { gap: 12 }),
                     E.paragraph('Thanks for bringing your device in. It is booked into the workshop and here are the details we recorded.', { gap: 22 }),
