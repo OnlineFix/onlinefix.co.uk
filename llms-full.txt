@@ -439,7 +439,6 @@ Data recovery in Guildford from £45. Hard drives, SSDs, phones & laptops. No da
 - SSD Data Recovery — from £65. Professional data recovery from dead or corrupted solid state drives including SATA, NVMe, and M.2 SSDs with firmware-level recovery
 - Water and Fire Damage Recovery — from £75. Data recovery from water-damaged, flood-damaged, or fire-damaged storage devices with specialist cleaning and component-level repair
 - Phone Data Recovery — from £45. Data retrieval from dead, broken, or water-damaged smartphones including iPhone and Android devices with broken screens or no power
-- RAID and Server Recovery — from £85. RAID array and NAS data recovery for failed server configurations including RAID 0, RAID 1, RAID 5, and RAID 6 rebuilds
 
 ### Frequently asked questions
 
@@ -449,11 +448,11 @@ Our data recovery success rate is approximately 90% across all device types. Log
 
 **How much does data recovery cost in Guildford?**
 
-Data recovery at OnlineFix Guildford starts from £45 for straightforward deleted file recovery. Hard drive failure recovery starts from £55, SSD recovery from £65, and RAID or server recovery from £85. We provide a fixed quote after diagnosis before any work begins. No data, no fee — you only pay if we successfully recover your files.
+Data recovery at OnlineFix Guildford starts from £45 for straightforward deleted file recovery. Hard drive failure recovery starts from £55 and SSD recovery from £65. We provide a fixed quote after diagnosis before any work begins. No data, no fee — you only pay if we successfully recover your files.
 
 **How long does data recovery take?**
 
-Simple deleted file recovery can often be completed within 24 hours. Hard drive and SSD recovery typically takes 2-5 working days depending on the severity of the failure. RAID and server recovery may take up to 7 working days. We offer a 24-hour priority service for urgent cases. You will receive a time estimate when you book your drop-off.
+Simple deleted file recovery can often be completed within 24 hours. Hard drive and SSD recovery typically takes 2-5 working days depending on the severity of the failure. We offer a 24-hour priority service for urgent cases. You will receive a time estimate when you book your drop-off.
 
 **Is my data kept confidential during recovery?**
 
@@ -461,7 +460,7 @@ Absolutely. Confidentiality is central to our data recovery service. We never br
 
 **What devices can you recover data from?**
 
-We recover data from internal and external hard drives (HDD), solid state drives (SSD, NVMe, M.2), iPhones, Android phones, laptops, MacBooks, RAID arrays, and NAS devices.
+We recover data from internal and external hard drives (HDD), solid state drives (SSD, NVMe, M.2), iPhones, Android phones, laptops, and MacBooks.
 
 **Should I attempt recovery myself before bringing it in?**
 
