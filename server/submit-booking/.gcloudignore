@@ -1,0 +1,5 @@
+# Not uploaded to Cloud Functions.
+node_modules/
+tests/
+.gitignore
+.gcloudignore

@@ -8,7 +8,7 @@
 
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com https://www.gstatic.com https://www.googletagmanager.com https://www.google.com https://www.recaptcha.net https://*.googleapis.com; style-src 'self' 'unsafe-inline'; font-src 'self' data: https://cdnjs.cloudflare.com; img-src 'self' data: blob: https://*.firebasestorage.app https://firebasestorage.googleapis.com https://www.googletagmanager.com https://*.google-analytics.com; connect-src 'self' https://cloudflareinsights.com https://*.googleapis.com https://*.firebaseio.com https://*.firebasestorage.app wss://*.firebaseio.com https://*.google-analytics.com https://www.googletagmanager.com https://www.google.com https://www.recaptcha.net; frame-src https://www.google.com https://www.recaptcha.net; object-src 'none'; base-uri 'self'; form-action 'self'">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com https://www.gstatic.com https://www.googletagmanager.com https://www.google.com https://www.recaptcha.net https://*.googleapis.com; style-src 'self' 'unsafe-inline'; font-src 'self' data: https://cdnjs.cloudflare.com; img-src 'self' data: blob: https://*.firebasestorage.app https://firebasestorage.googleapis.com https://www.googletagmanager.com https://*.google-analytics.com; connect-src 'self' https://europe-west2-onlinefix-repair.cloudfunctions.net https://cloudflareinsights.com https://*.googleapis.com https://*.firebaseio.com https://*.firebasestorage.app wss://*.firebaseio.com https://*.google-analytics.com https://www.googletagmanager.com https://www.google.com https://www.recaptcha.net; frame-src https://www.google.com https://www.recaptcha.net; object-src 'none'; base-uri 'self'; form-action 'self'">
 
     <title>Book a Repair - OnlineFix™ Guildford</title>
     <meta name="description" content="Book a phone, laptop, console, or tablet repair in Guildford. Pick a drop-off time, describe the issue, get a fast response. Same-day repairs available.">
@@ -327,7 +327,7 @@
 
                         <div class="field">
                             <label for="customer-email" class="field-label">Email</label>
-                            <input type="email" id="customer-email" name="customer-email" autocomplete="email" maxlength="200" required
+                            <input type="email" id="customer-email" name="customer-email" autocomplete="email" maxlength="199" required
                                    placeholder="you@example.com">
                             <p class="field-error" data-error="customer-email"></p>
                         </div>
@@ -439,24 +439,29 @@
         </div>
     </div>
 
-    <!-- Firebase compat SDK. App Check is intentionally NOT loaded here: the
-         production CSP served by the Cloudflare Transform Rule blocks the
-         reCAPTCHA Enterprise token fetch (same failure that broke /track/
-         in commit 3ef98dd), and repeated failures trigger Google's 24h
-         throttle which then fails every public Firestore write. The booking
-         endpoint is gated by strict shape validation in firestore.rules and
-         an admin approval step before any repair work happens; that's the
-         real security boundary. To re-enable App Check later: fix the
-         Cloudflare Transform Rule CSP to allow https://www.google.com and
-         https://www.recaptcha.net in script-src + connect-src, wait 24h
+    <!-- Firebase compat SDK, used on this page only to read the availability
+         settings. Bookings are not written from the browser: booking.js
+         posts each one, photos included, to the submitBooking Cloud Function
+         (server/submit-booking/, host in connect-src above), which checks
+         every field, limits how many bookings one visitor and the whole site
+         can send, and writes the booking, its photos and the shop's email
+         with the admin SDK. The rules give visitors no write access.
+         App Check is intentionally NOT loaded here: the production CSP
+         served by the Cloudflare Transform Rule blocks the reCAPTCHA
+         Enterprise token fetch (same failure that broke /track/ in commit
+         3ef98dd), and repeated failures trigger Google's 24h throttle, which
+         then fails every public Firestore call. The function's validation
+         and rate limits, and an admin approval step before any repair work
+         happens, are the security boundary. To re-enable App Check later:
+         fix the Cloudflare Transform Rule CSP to allow https://www.google.com
+         and https://www.recaptcha.net in script-src + connect-src, wait 24h
          for the throttle to clear, then re-add the SDK + appCheck.activate. -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
 
     <script src="/js/core.js?v=20260712" defer></script>
     <script src="/js/cookies.js?v=20260611" defer></script>
-    <script src="/book/booking.js?v=20261006" defer></script>
+    <script src="/book/booking.js?v=20261007" defer></script>
 </body>
 
 </html>

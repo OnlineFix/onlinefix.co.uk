@@ -3986,12 +3986,12 @@
         }
 
         // === ONLINE BOOKINGS ===
-        // Requests from the public /book/ page land in `bookings`, and the
-        // booking page emails the shop about each one (see /mail in
-        // firestore.rules). This board lays them out by the day and time the
-        // customer asked to drop off. Opening one lets staff correct the
-        // details, confirm it, and book it in, which turns it into a job on
-        // the jobs board.
+        // Requests from the public /book/ page land in `bookings`, written,
+        // with an email to the shop about each one, by the submitBooking
+        // Cloud Function (server/submit-booking/). This board lays them out
+        // by the day and time the customer asked to drop off. Opening one
+        // lets staff correct the details, confirm it, and book it in, which
+        // turns it into a job on the jobs board.
         //
         // A booking moves pending (New) -> confirmed -> booked, or to
         // removed. Older ones may say 'responded', from before this board,
@@ -5711,11 +5711,12 @@
         const BOOKING_SHOP_ADDRESS = '13 Quarry Street, Guildford, Surrey, GU1 3UY';
         const SITE_URL = 'https://onlinefix.co.uk';
 
-        /* One plain address, the shape firestore.rules holds a booking's
-           address to. The old check only barred spaces and a second @, so
-           it passed a display name ('"Pay_at_evil.example"<someone@x.com>'),
-           which Confirm booking then put in the customer email's To line
-           as the name it is addressed to. */
+        /* One plain address, the shape the booking function
+           (server/submit-booking/) holds a booking's address to. The old
+           check only barred spaces and a second @, so it passed a display
+           name ('"Pay_at_evil.example"<someone@x.com>'), which Confirm
+           booking then put in the customer email's To line as the name it
+           is addressed to. */
         /* An address for a mailto: link. Encoded, so a "?" or "&" in it
            cannot start the subject or text, but with the @ left as it is,
            which every mail app reads. */
@@ -5738,8 +5739,8 @@
            looksLikeLink: a web address ("https:", "www.", "//"), an email
            address, or a domain in any alphabet ("evil-pay.example",
            "bit.ly/x", "payé.com", "оплата.рф"). Much the same test as
-           hasNoLink in firestore.rules, which has no need to look for email
-           addresses.
+           looksLikeLink in server/submit-booking/index.js, which has no need
+           to look for email addresses.
 
            greetingName: the first of the names given that reads as a name,
            for "Hi <name>,": letters (any alphabet), spaces, apostrophes,

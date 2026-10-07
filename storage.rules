@@ -30,26 +30,13 @@ service firebase.storage {
       allow list: if isAdmin();
     }
 
-    // Public booking photos. The /book/ page is open to anonymous visitors,
-    // so create must work without auth, but reads and deletes are gated to
-    // the admin account so customers can't enumerate other bookings' photos.
-    //
-    // This is the only path on the bucket that anyone can write to without
-    // signing in, and App Check is not active on /book/, so the path shape is
-    // doing the work. Both wildcards used to accept anything, which made the
-    // bucket a general-purpose drop for any 5 MB image under any name. The
-    // booking form writes exactly photo-1.jpg to photo-3.jpg inside a folder
-    // named after its CSPRNG booking id, so that is all this accepts now:
-    // three files per folder, and a folder name nobody can collide with.
-    //
-    // Note that create is the only write verb here: an existing file cannot
-    // be replaced or removed except by an admin.
+    // Booking photos from the public /book/ page. Visitors cannot upload
+    // here: the page sends its photos to the submitBooking Cloud Function
+    // (server/submit-booking/), which checks each is a JPEG under 5 MB and
+    // stores it as bookings/<booking id>/photo-1.jpg to photo-3.jpg with the
+    // admin SDK, which does not go through these rules. Staff open and
+    // delete them from the dashboard; nobody else can read or list them.
     match /bookings/{tempId}/{filename} {
-      allow create: if tempId.matches('BK_[0-9A-F]{32}')
-                    && filename.matches('photo-[1-3]\\.jpg')
-                    && request.resource.size < 5 * 1024 * 1024
-                    && request.resource.contentType == 'image/jpeg';
-
       allow read, delete: if isAdmin();
     }
 
