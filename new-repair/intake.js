@@ -88,6 +88,22 @@
                 { label: 'Cleaning', issue: 'Laptop cleaning' },
                 { label: 'Hinge repair', issue: 'Laptop hinge repair' }
             ]
+        },
+        {
+            // Any device without buttons of its own (an Xbox Series S, say).
+            // The technician types its name, and each job line is that name
+            // followed by the job, the same pattern as the lines above.
+            key: 'other', label: 'Other', other: true, category: '', brand: '', model: '',
+            jobs: [
+                { label: 'Cleaning', suffix: 'cleaning' },
+                { label: 'Diagnostics', suffix: 'diagnostics' },
+                { label: 'HDMI port replacement', suffix: 'HDMI port replacement' },
+                { label: 'Disc drive replacement', suffix: 'disc drive replacement' },
+                { label: 'Screen replacement', suffix: 'screen replacement' },
+                { label: 'Battery replacement', suffix: 'battery replacement' },
+                { label: 'Hinge repair', suffix: 'hinge repair' },
+                { label: 'No boot', suffix: 'no boot' }
+            ]
         }
     ];
 
@@ -388,6 +404,9 @@
     function syncActionbarHeight() {
         var bar = $('#actionbar');
         if (!bar) return;
+        // While the bar is stood aside for the keyboard it measures 0; keep
+        // the page's bottom reserve so nothing jumps when it comes back.
+        if (document.body.classList.contains('is-typing')) return;
         var h = bar.hidden ? 0 : Math.round(bar.getBoundingClientRect().height);
         // Writing the variable changes .shell's padding, which changes page
         // height, which can change whether a scrollbar is present and so the
@@ -407,54 +426,45 @@
     }
 
     // ------------------------------------------------------------------
-    // Keeping the bar on the bottom edge (iOS/iPadOS Safari)
+    // The bar while the on-screen keyboard is up
     //
-    // position:fixed is laid out against the LAYOUT viewport. Safari's own
-    // toolbar collapses and expands as you scroll, which changes the VISUAL
-    // viewport and leaves the layout one alone — so the bar ends up parked an
-    // inch or so above the real bottom edge, with page content showing under
-    // it and the bar covering whatever it now overlaps.
+    // The bar is plain position:fixed, bottom:0, which sits on the bottom
+    // edge on the shop iPad (checked with a probe page on 17 Sep 2026). What
+    // goes wrong is the keyboard: while it is up the bar floats somewhere
+    // above it, covering the form, and the iPad's browser could leave it
+    // parked short of the bottom edge after the keyboard went away.
     //
-    // visualViewport reports exactly that difference, so translate the bar by
-    // it. Every other browser reports zero here and nothing moves.
-    //
-    // The on-screen keyboard shrinks the visual viewport too, by far more.
-    // Riding above the keyboard would eat a third of what is left to type
-    // into, so past a threshold the bar stays put — behind the keyboard, out
-    // of the way, which is what it did before any of this.
+    // So while someone is typing on a touch screen the bar steps out of the
+    // way, and it is drawn afresh when they finish, which puts it back on the
+    // bottom edge. No viewport arithmetic: an earlier version lifted the bar
+    // by the visual-viewport difference, and on the shop iPad that difference
+    // never settles to zero, so the bar stayed lifted with a gap beneath it.
+    // A mouse and keyboard never trigger any of this.
     // ------------------------------------------------------------------
-    var vv = window.visualViewport;
-    var lastPin = null;
+    var TYPING_INPUT_TYPES = ['', 'text', 'email', 'tel', 'number', 'search', 'url', 'password'];
 
-    function pinActionbar() {
-        var bar = $('#actionbar');
-        if (!bar || !vv) return;
-        var keyboardLikely = (window.innerHeight - vv.height) > window.innerHeight * 0.25;
-        var delta = (vv.offsetTop + vv.height) - window.innerHeight;
-        // Only ever lift the bar. If the visual viewport reports taller than
-        // the layout one, pushing the bar down by the difference would send it
-        // off the bottom of the screen, and that is not the fault being fixed.
-        var pin = (delta < 0 && !keyboardLikely) ? 'translateY(' + Math.round(delta) + 'px)' : '';
-        // The scroll handler fires continuously while the toolbar animates;
-        // writing only on a change keeps that off the style recalc path.
-        if (pin === lastPin) return;
-        lastPin = pin;
-        bar.style.transform = pin;
-        // A lifted bar covers content the page padding did not reserve, so the
-        // reserve grows by however far it was lifted. Without this the last
-        // card is clipped by the difference at the very bottom of the scroll.
-        document.documentElement.style.setProperty('--actionbar-lift',
-            (pin ? Math.abs(Math.round(delta)) : 0) + 'px');
+    function isTypingField(el) {
+        if (!el || el.readOnly || el.disabled) return false;
+        if (el.tagName === 'TEXTAREA') return true;
+        if (el.tagName !== 'INPUT') return false;
+        return TYPING_INPUT_TYPES.indexOf((el.getAttribute('type') || '').toLowerCase()) !== -1;
     }
 
-    if (vv) {
-        vv.addEventListener('resize', pinActionbar);
-        vv.addEventListener('scroll', pinActionbar);
-        // Rotation settles a beat after the event fires.
-        window.addEventListener('orientationchange', function () {
-            setTimeout(pinActionbar, 250);
+    if (window.matchMedia && window.matchMedia('(hover: none) and (pointer: coarse)').matches) {
+        var typingTimer = null;
+        document.addEventListener('focusin', function (event) {
+            if (!isTypingField(event.target)) return;
+            clearTimeout(typingTimer);
+            document.body.classList.add('is-typing');
         });
-        pinActionbar();
+        // Moving to the next field fires focusout then focusin; the short
+        // wait stops the bar flashing up in between.
+        document.addEventListener('focusout', function () {
+            clearTimeout(typingTimer);
+            typingTimer = setTimeout(function () {
+                if (!isTypingField(document.activeElement)) document.body.classList.remove('is-typing');
+            }, 150);
+        });
     }
 
     function refreshChecklist() {
@@ -684,39 +694,55 @@
     // picked job is one line at the top of the fault box; anything typed
     // under those lines is left alone. One ticket is one device, so opening
     // another device's jobs takes the first device's lines back out.
-    var jobPicks = [];      // issue lines, in the order they were tapped
     var jobDevice = null;   // the JOB_PRESETS entry whose jobs are showing
+    var jobPicks = [];      // indexes into jobDevice.jobs, in the order tapped
+    var writtenLines = [];  // the lines last put in the fault box, to take back out
 
-    var ALL_JOB_LINES = [];
-    JOB_PRESETS.forEach(function (device) {
-        device.jobs.forEach(function (job) { ALL_JOB_LINES.push(job.issue); });
-    });
+    function otherDeviceName() {
+        return $('#f-job-device').value.trim().replace(/\s+/g, ' ');
+    }
+
+    function jobLine(device, job) {
+        if (!device.other) return job.issue;
+        var name = otherDeviceName();
+        return name ? name + ' ' + job.suffix : job.suffix.charAt(0).toUpperCase() + job.suffix.slice(1);
+    }
 
     function writeJobLines() {
         var issueEl = $('#f-issue');
+        var lines = jobDevice ? jobPicks.map(function (i) { return jobLine(jobDevice, jobDevice.jobs[i]); }) : [];
         var rest = issueEl.value.split('\n').filter(function (line) {
-            return ALL_JOB_LINES.indexOf(line.trim()) === -1;
+            return writtenLines.indexOf(line.trim()) === -1;
         });
         // Drop the blank lines a removed job leaves at the top.
         while (rest.length && !rest[0].trim()) rest.shift();
-        issueEl.value = jobPicks.concat(rest).join('\n');
+        issueEl.value = lines.concat(rest).join('\n');
+        writtenLines = lines;
         if (issueEl.value.trim()) {
             setFieldError('issue', false);
             issueEl.classList.remove('is-invalid');
         }
     }
 
+    function markJobChips() {
+        $$('#quickjobs .chip').forEach(function (chip) {
+            var on = jobPicks.indexOf(parseInt(chip.dataset.jobIndex, 10)) !== -1;
+            chip.classList.toggle('is-selected', on);
+            chip.setAttribute('aria-pressed', on ? 'true' : 'false');
+        });
+    }
+
     function showJobsFor(device) {
         jobDevice = device;
+        jobPicks = [];
+        writeJobLines();
+
         $$('#jobdevices .jobdevice').forEach(function (btn) {
             var on = btn.dataset.device === device.key;
             btn.classList.toggle('is-selected', on);
             btn.setAttribute('aria-pressed', on ? 'true' : 'false');
         });
-
-        var own = device.jobs.map(function (job) { return job.issue; });
-        jobPicks = jobPicks.filter(function (line) { return own.indexOf(line) !== -1; });
-        writeJobLines();
+        $('#jobother-field').hidden = !device.other;
 
         var wrap = $('#quickjobs');
         wrap.textContent = '';
@@ -725,13 +751,12 @@
             btn.type = 'button';
             btn.className = 'chip';
             btn.dataset.jobIndex = String(index);
-            var on = jobPicks.indexOf(job.issue) !== -1;
-            btn.classList.toggle('is-selected', on);
-            btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+            btn.setAttribute('aria-pressed', 'false');
             btn.textContent = job.label;
             wrap.appendChild(btn);
         });
         wrap.hidden = false;
+        if (device.other && !otherDeviceName()) $('#f-job-device').focus();
     }
 
     (function buildJobPresets() {
@@ -755,35 +780,38 @@
         $('#quickjobs').addEventListener('click', function (event) {
             var chip = event.target.closest('.chip');
             if (!chip || !jobDevice) return;
-            var job = jobDevice.jobs[parseInt(chip.dataset.jobIndex, 10)];
-            if (!job) return;
-            var at = jobPicks.indexOf(job.issue);
-            if (at === -1) jobPicks.push(job.issue);
+            var index = parseInt(chip.dataset.jobIndex, 10);
+            if (!jobDevice.jobs[index]) return;
+            var at = jobPicks.indexOf(index);
+            if (at === -1) jobPicks.push(index);
             else jobPicks.splice(at, 1);
-            chip.classList.toggle('is-selected', at === -1);
-            chip.setAttribute('aria-pressed', at === -1 ? 'true' : 'false');
+            markJobChips();
             writeJobLines();
             if (at === -1) fillDeviceFromPreset(jobDevice);
         });
+
+        // Renaming the device rewrites the lines already picked for it.
+        $('#f-job-device').addEventListener('input', writeJobLines);
     })();
 
     // A job line deleted by hand un-ticks its chip, so the next tap on
     // another chip does not quietly put it back.
     $('#f-issue').addEventListener('input', function () {
-        var lines = $('#f-issue').value.split('\n').map(function (line) { return line.trim(); });
-        jobPicks = jobPicks.filter(function (line) { return lines.indexOf(line) !== -1; });
-        $$('#quickjobs .chip').forEach(function (chip) {
-            var job = jobDevice && jobDevice.jobs[parseInt(chip.dataset.jobIndex, 10)];
-            var on = !!job && jobPicks.indexOf(job.issue) !== -1;
-            chip.classList.toggle('is-selected', on);
-            chip.setAttribute('aria-pressed', on ? 'true' : 'false');
-        });
+        var present = $('#f-issue').value.split('\n').map(function (line) { return line.trim(); });
+        if (jobDevice) {
+            jobPicks = jobPicks.filter(function (i) {
+                return present.indexOf(jobLine(jobDevice, jobDevice.jobs[i])) !== -1;
+            });
+        }
+        writtenLines = writtenLines.filter(function (line) { return present.indexOf(line) !== -1; });
+        markJobChips();
     });
 
     // Fill in only what the technician has not already set.
     function fillDeviceFromPreset(device) {
+        var model = device.other ? otherDeviceName() : device.model;
         if (device.brand && !$('#f-brand').value.trim()) $('#f-brand').value = device.brand;
-        if (device.model && !$('#f-model').value.trim()) $('#f-model').value = device.model;
+        if (model && !$('#f-model').value.trim()) $('#f-model').value = model;
         ['brand', 'model'].forEach(function (name) {
             if ($('#f-' + name).value.trim()) {
                 setFieldError(name, false);
@@ -1531,7 +1559,6 @@
         var html = emailHtml(function (E) {
             return E.layout({
                 subject: subject,
-                headerLabel: repair.repairId,
                 body: [
                     E.paragraph('Hi ' + repair.firstName + ',', { gap: 12 }),
                     E.paragraph('Thanks for bringing your device in. It is booked into the workshop and here are the details we recorded.', { gap: 22 }),

@@ -38,7 +38,7 @@
         .navbar{position:fixed;top:0;left:0;right:0;background:var(--hex-white);z-index:1000;border-bottom:2px solid var(--hex-black);padding:0}
         .nav-container{max-width:100%;display:flex;justify-content:space-between;align-items:stretch;height:60px}
         .nav-logo{font-size:1.5rem;font-weight:700;color:var(--hex-white);text-decoration:none;text-transform:uppercase;letter-spacing:-1px;padding:0 1.5rem;display:flex;align-items:center;background:var(--gradient-blue);border-right:2px solid var(--hex-black);position:relative}.nav-logo::after{content:"\2122";font-size:0.4em;position:relative;top:-0.6em;margin-left:2px;line-height:0;vertical-align:baseline}
-        .nav-cta{background:var(--hex-black);color:var(--hex-white);padding:0 2rem;text-decoration:none;font-weight:500;text-transform:uppercase;display:flex;align-items:center;gap:10px;font-size:0.8rem;border-left:2px solid var(--hex-black)}.nav-cta::before,.nav-cta::after{content:none}
+        .nav-cta{background:var(--hex-black);color:var(--hex-white);padding:0 2rem;text-decoration:none;font-weight:500;text-transform:uppercase;display:flex;align-items:center;gap:10px;font-size:0.8rem;border-left:2px solid var(--hex-black)}.nav-cta-book{background:var(--gradient-blue)}@media(min-width:769px) and (max-width:1199px){.nav-logo{padding:0 1rem}.nav-link,.nav-cta{padding:0 1rem}}@media(min-width:769px) and (max-width:899px){.nav-menu>li:first-child{display:none}.nav-link,.nav-cta{padding:0 0.75rem}}.nav-cta::before,.nav-cta::after{content:none}
         .nav-menu{display:flex;list-style:none;gap:0;align-items:stretch;flex-grow:1;justify-content:flex-end}
         .nav-menu li{display:flex;align-items:stretch}
         .nav-link{text-decoration:none;color:var(--hex-black);font-weight:500;text-transform:uppercase;font-size:0.9rem;padding:0 2rem;display:flex;align-items:center;border-left:1px solid var(--hex-grid);position:relative;transition:all 0.2s}
@@ -55,8 +55,8 @@
         @media(max-width:768px){.navbar{background:var(--hex-white);border-bottom:2px solid var(--hex-black)}.nav-logo{font-size:1.1rem;padding:0 1rem;letter-spacing:-0.5px}.nav-container{justify-content:space-between;height:54px}.mobile-menu-toggle{display:flex;align-items:center;background:transparent;border:none;padding:0 1rem;color:var(--hex-black)}.nav-menu{display:none;flex-direction:column;justify-content:flex-start;position:absolute;top:54px;left:0;right:0;height:calc(100vh - 54px);height:calc(100dvh - 54px);overflow-y:auto;background:var(--hex-white);border-top:2px solid var(--hex-black)}.nav-menu li.nav-cta-item{margin-top:auto}.nav-menu.active{display:flex}.nav-link{flex:1;padding:1.5rem;border-left:none;border-bottom:1px solid #eee;min-height:48px}.nav-cta{flex:1;padding:1.5rem;justify-content:center;border-left:none;min-height:48px}.container{padding:0 12px}.section-title{padding-top:2rem;margin-bottom:0}.page-header-box{padding:1.5rem 1rem;box-shadow:6px 6px 0 var(--hex-black)}.page-title{font-size:clamp(1.8rem,7vw,2.5rem);letter-spacing:-1px}.page-subtitle{font-size:clamp(0.65rem,2.5vw,0.85rem);word-break:break-word;padding:4px 6px}.page-header-content{padding:2.5rem 12px}}
     </style>
     <!-- Deferred stylesheets (non-render-blocking) -->
-    <link rel="stylesheet" href="/css/core.min.css?v=20260716" media="print" onload="this.media='all'">
-    <noscript><link rel="stylesheet" href="/css/core.min.css?v=20260716"></noscript>
+    <link rel="stylesheet" href="/css/core.min.css?v=20261006" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="/css/core.min.css?v=20261006"></noscript>
     <link rel="stylesheet" href="/css/icons.min.css?v=20260611" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="/css/icons.min.css?v=20260611"></noscript>
     <style>
@@ -141,6 +141,7 @@
                 <li><a href="reviews.html" class="nav-link">Reviews</a></li>
                 <li><a href="contact.html" class="nav-link">Contact</a></li>
                 <li class="nav-cta-item"><a href="tel:+447940730537" class="nav-cta"><span>Call Now</span></a></li>
+                <li class="nav-book-item"><a href="/book/" class="nav-cta nav-cta-book"><span>Book Now</span></a></li>
                 <li class="nav-menu-meta">
                     <p><a href="https://maps.app.goo.gl/zqbFNuYM2z7u8xux8" target="_blank" rel="noopener noreferrer">13 QUARRY STREET, GUILDFORD GU1&nbsp;3UY</a><br>BY APPOINTMENT, 7 DAYS<br>CALLS &amp; MESSAGES: 10AM &ndash; 10PM</p>
                     <a href="mailto:hello@onlinefix.uk">hello@onlinefix.uk</a>
