@@ -134,7 +134,7 @@
         '<p>We photograph every device at drop-off and record any existing damage. Those photos and notes form the agreed record of how the device arrived. Please check the summary above before you sign.</p>',
 
         '<h3>8. Devices we cannot repair</h3>',
-        '<p>Some faults — severe liquid or motherboard damage in particular — cannot be repaired reliably. Where that is the case we will tell you, explain the odds honestly before you commit, and charge nothing beyond any agreed diagnostics fee.</p>',
+        '<p>Some faults — severe liquid or motherboard damage in particular — cannot be repaired reliably. Where that is the case we will tell you, explain the odds honestly before you commit. If we cannot repair the device there is no charge, except that in some cases we charge £20 for a repair attempt.</p>',
 
         '<h3>9. Limit of liability</h3>',
         '<p>Except where the law says otherwise, our maximum liability for any repair is the value of the repair charge itself.</p>',

@@ -18,7 +18,7 @@
         areaServed: 'Guildford, Woking, Farnham, Godalming and the rest of Surrey',
         hours: 'Open 7 days a week, 10:00-22:00 (calls and messages)',
         booking: 'Appointment only — no walk-ins. Call or message 07940 730537 to arrange a drop-off time.',
-        policies: 'No fix, no fee: if we cannot fix it, the diagnostic fee is all you pay. 90-day warranty on all repairs. Diagnostics cost £20 for phones, tablets, games consoles and laptops, and £40 for desktop PCs; the fee is credited towards the repair.',
+        policies: 'No fix, no fee: if we cannot fix it, there is no charge, except a £20 fee in some cases where a repair was attempted. 90-day warranty on all repairs. Diagnostics cost £20 for phones, tablets, games consoles and laptops, and £40 for desktop PCs; the fee is credited towards the repair.',
         turnaround: 'Most repairs same-day or within 24-48 hours, on-site (devices are not sent away). Complex board-level or motherboard repairs start from £90 and can take 1-2 weeks.'
     };
 
