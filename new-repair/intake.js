@@ -28,8 +28,8 @@
        consent records the version it agreed to, which is the whole point of
        collecting a signature — "which terms did they actually sign?" has to
        be answerable months later. */
-    var TERMS_VERSION = 'dropoff-1.1';
-    var TERMS_EFFECTIVE = '29 August 2026';
+    var TERMS_VERSION = 'dropoff-1.2';
+    var TERMS_EFFECTIVE = '8 October 2026';
 
     var MAX_PHOTO_BYTES = 10 * 1024 * 1024;
     var MAX_PHOTOS = 12;
@@ -113,13 +113,13 @@
 
     var TERMS_HTML = [
         '<h3>1. What we will do</h3>',
-        '<p>We will diagnose the device, tell you what we find, and quote you before carrying out any chargeable work. We test the device after the repair before handing it back. We use suitable parts for the job — original or quality-matched aftermarket — and we will tell you which.</p>',
+        '<p>We will diagnose the device, tell you what we find, and quote you before carrying out any repair work. Diagnostics cost £20 for phones, tablets, games consoles and laptops, and £40 for desktop PCs. We test the device after the repair before handing it back. We use suitable parts for the job — original or quality-matched aftermarket — and we will tell you which.</p>',
 
         '<h3>2. Your data — back it up</h3>',
         '<p>Repairs sometimes require a factory reset, especially anything involving storage or the motherboard. We take care with your data, but <strong>we cannot guarantee it survives the repair, and we are not liable for data loss.</strong> Please back up anything you cannot lose before leaving the device with us.</p>',
 
         '<h3>3. Quotes and approval</h3>',
-        '<p>Any price recorded today is an estimate based on the fault as described. If we open the device and find something different, we stop and contact you with a revised quote. Work continues only once you confirm. If you decide not to proceed after diagnostics, there is no charge and we hand the device back as it came in.</p>',
+        '<p>Any price recorded today is an estimate based on the fault as described. If we open the device and find something different, we stop and contact you with a revised quote. Work continues only once you confirm. If you decide not to proceed after diagnostics, you pay only the diagnostic fee and we hand the device back as it came in.</p>',
 
         '<h3>4. Payment</h3>',
         '<p>Payment is due on collection, by cash or bank transfer. We do not accept credit or debit cards, Apple Pay or Google Pay. Ask us if you need an invoice for business expenses or an insurance claim.</p>',
@@ -1572,7 +1572,7 @@
                     ]),
                     E.button(trackUrl, 'Track your repair', { gap: 20 }),
                     E.note('Keep this email — the link above is how you check progress at any time. ' +
-                        'We will contact you before carrying out any chargeable work, and again when the device is ready to collect. ' +
+                        'We will contact you before carrying out any repair work, and again when the device is ready to collect. ' +
                         'Payment on collection is by cash or bank transfer.', { gap: 18 })
                 ],
                 footer: E.shopFooter(EMAIL_SHOP)
@@ -1587,7 +1587,7 @@
             'Estimated price: ' + price + '\n' +
             (repair.turnaround ? 'Expected turnaround: ' + repair.turnaround + '\n' : '') +
             '\nTrack your repair: ' + trackUrl + '\n\n' +
-            'We will contact you before any chargeable work, and again when it is ready to collect.\n' +
+            'We will contact you before any repair work, and again when it is ready to collect.\n' +
             'Payment on collection is by cash or bank transfer.\n\n' +
             'OnlineFix™ · ' + SHOP_ADDRESS + '\n' + SHOP_PHONE + ' · ' + SHOP_EMAIL + '\n';
 

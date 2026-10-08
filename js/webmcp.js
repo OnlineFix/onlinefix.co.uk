@@ -18,7 +18,7 @@
         areaServed: 'Guildford, Woking, Farnham, Godalming and the rest of Surrey',
         hours: 'Open 7 days a week, 10:00-22:00 (calls and messages)',
         booking: 'Appointment only — no walk-ins. Call or message 07940 730537 to arrange a drop-off time.',
-        policies: 'No fix, no fee. 90-day warranty on all repairs. A small diagnostic fee applies and is credited towards the repair.',
+        policies: 'No fix, no fee: if we cannot fix it, the diagnostic fee is all you pay. 90-day warranty on all repairs. Diagnostics cost £20 for phones, tablets, games consoles and laptops, and £40 for desktop PCs; the fee is credited towards the repair.',
         turnaround: 'Most repairs same-day or within 24-48 hours, on-site (devices are not sent away). Complex board-level or motherboard repairs start from £90 and can take 1-2 weeks.'
     };
 
@@ -28,8 +28,8 @@
         { device: 'Nintendo Switch and other consoles', url: 'https://onlinefix.co.uk/console-repair.html', prices: 'HDMI ports from £60, disk drives from £55, overheating/deep clean from £30' },
         { device: 'iPhone and other phones (Samsung, Google Pixel)', url: 'https://onlinefix.co.uk/iphone-repair.html', prices: 'screens from £45, batteries from £35, charging ports from £45, water damage from £55' },
         { device: 'MacBook', url: 'https://onlinefix.co.uk/macbook-repair.html', prices: 'logic board repair from £95, screens from £149, batteries from £79, keyboards from £89, water damage from £85' },
-        { device: 'Laptop (HP, Lenovo, Dell, ASUS, Acer, MSI and more)', url: 'https://onlinefix.co.uk/laptop-repair.html', prices: 'screens from £60, diagnosis from £30, SSD upgrades from £40 plus the drive, virus removal from £35' },
-        { device: 'Desktop PC and gaming PC', url: 'https://onlinefix.co.uk/pc-repair.html', prices: 'hardware diagnosis from £30, virus removal from £35, SSD/RAM upgrade labour from £25, Windows installation from £35' },
+        { device: 'Laptop (HP, Lenovo, Dell, ASUS, Acer, MSI and more)', url: 'https://onlinefix.co.uk/laptop-repair.html', prices: 'screens from £60, diagnosis £20, SSD upgrades from £40 plus the drive, virus removal from £35' },
+        { device: 'Desktop PC and gaming PC', url: 'https://onlinefix.co.uk/pc-repair.html', prices: 'hardware diagnosis £40, virus removal from £35, SSD/RAM upgrade labour from £25, Windows installation from £35' },
         { device: 'Tablet and iPad', url: 'https://onlinefix.co.uk/tablet-repair.html', prices: 'screens from £55, batteries from £45, charging ports from £45' },
         { device: 'Data recovery (drives, SSDs, phones)', url: 'https://onlinefix.co.uk/data-recovery.html', prices: 'deleted files from £45, failed hard drives from £55, SSDs from £65, phones from £45 — no data recovered, no fee' }
     ];
@@ -92,7 +92,7 @@
                 });
                 if (!hits.length) hits = SERVICES; // unknown device: return the full list
                 return text(
-                    'Prices (exact quote after free-with-repair diagnosis):\n' + serviceLines(hits) +
+                    'Prices (exact quote after diagnosis):\n' + serviceLines(hits) +
                     '\n\n' + BUSINESS.policies + '\nTurnaround: ' + BUSINESS.turnaround +
                     '\nBook: ' + BUSINESS.booking
                 );
