@@ -89,6 +89,14 @@
     <priority>0.8</priority>
   </url>
 
+  <!-- Online booking page - High priority, where customers book a drop-off -->
+  <url>
+    <loc>https://onlinefix.co.uk/book/</loc>
+    <lastmod>2026-10-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
   <!-- Contact page - High priority, rarely changes -->
   <url>
     <loc>https://onlinefix.co.uk/contact.html</loc>
@@ -117,6 +125,14 @@
   <url>
     <loc>https://onlinefix.co.uk/privacy.html</loc>
     <lastmod>2026-10-06</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+  <!-- Booking terms page - linked from the booking form -->
+  <url>
+    <loc>https://onlinefix.co.uk/booking-terms.html</loc>
+    <lastmod>2026-10-15</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
