@@ -3462,9 +3462,27 @@
             margin-top: 0.75rem;
         }
 
+        /* How soon customers can book, and the minutes between times. */
+        .hours-rules {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem 0.75rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .hours-rules select {
+            padding: 0.6rem 0.75rem;
+            min-height: 44px;
+        }
+
         @media (max-width: 600px) {
             .hours-row {
                 grid-template-columns: 1fr 1fr;
+            }
+
+            .hours-rules {
+                grid-template-columns: 1fr;
             }
 
             .hours-row__open {
@@ -4592,14 +4610,16 @@
         // availability/settings: workingHours holds each day's opening and
         // closing time and whether it is closed. The booking page offers a
         // slot every slotIntervalMinutes from opening, the last one starting
-        // before closing, so 10:00 to 22:00 offers 10:00 up to 21:30. It
-        // reads the doc each time it is opened, so a saved change reaches the
-        // next customer who opens it.
+        // before closing, so 10:00 to 22:00 every 15 minutes offers 10:00 up
+        // to 21:45, and none sooner than minNoticeHours from now. It reads
+        // the doc each time it is opened, so a saved change reaches the next
+        // customer who opens it. The booking function (server/submit-booking/)
+        // reads slotIntervalMinutes too, to tell which times are taken.
         //
-        // Only workingHours is edited here. The doc's other settings (notice
-        // needed, how far ahead, closed dates) are left as they are; when the
-        // doc does not exist yet, saving creates it with the booking page's
-        // own defaults for them.
+        // workingHours, minNoticeHours and slotIntervalMinutes are edited
+        // here. The doc's other settings (how far ahead, closed dates) are
+        // left as they are; when the doc does not exist yet, saving creates
+        // it with the booking page's own defaults for them.
         const BOOKING_HOURS_DAYS = [
             ['mon', 'Monday'], ['tue', 'Tuesday'], ['wed', 'Wednesday'], ['thu', 'Thursday'],
             ['fri', 'Friday'], ['sat', 'Saturday'], ['sun', 'Sunday']
@@ -4610,11 +4630,38 @@
             workingHours: Object.fromEntries(BOOKING_HOURS_DAYS.map(([key]) =>
                 [key, { open: '10:00', close: '22:00', closed: false }])),
             blockedDates: [],
-            minNoticeHours: 4,
+            minNoticeHours: 1,
             maxFutureDays: 60,
-            slotIntervalMinutes: 30
+            slotIntervalMinutes: 15
         };
         const HOURS_TIME_RE = /^([01]\d|2[0-3]):[0-5]\d$/;
+        // The choices offered for how soon a customer can book (hours) and
+        // the minutes between drop-off times. A saved value not listed is
+        // added, so opening the box never changes it unseen.
+        const HOURS_NOTICE_CHOICES = [0.5, 1, 2, 3, 4, 6, 12, 24, 48];
+        const HOURS_INTERVAL_CHOICES = [10, 15, 20, 30, 45, 60];
+
+        // The minutes between drop-off times, read the way book/booking.js
+        // and the booking function read them (slotMinutes, readSettings).
+        function bookingSlotMinutes(a) {
+            const v = a && a.slotIntervalMinutes;
+            return Number.isInteger(v) && v >= 5 && v <= 240 ? v : BOOKING_AVAILABILITY_DEFAULTS.slotIntervalMinutes;
+        }
+
+        function noticeText(hours) {
+            if (hours <= 0) return 'Any time from now';
+            if (hours < 1) return `${Math.round(hours * 60)} minutes`;
+            return hours === 1 ? '1 hour' : `${hours} hours`;
+        }
+
+        function intervalText(minutes) {
+            return minutes === 60 ? '1 hour' : `${minutes} minutes`;
+        }
+
+        function choiceOptions(choices, selected, text) {
+            const list = choices.includes(selected) ? choices : choices.concat(selected).sort((x, y) => x - y);
+            return list.map(v => `<option value="${v}"${v === selected ? ' selected' : ''}>${escapeHTML(text(v))}</option>`).join('');
+        }
 
         function hoursToMinutes(t) {
             const [h, m] = String(t).split(':').map(Number);
@@ -4668,7 +4715,7 @@
                         <div class="modal-actions hours-actions">
                             <span class="modal-actions__spacer"></span>
                             <button type="button" class="btn btn-secondary" data-hours-close>Cancel</button>
-                            <button type="submit" class="btn btn-primary" id="hours-save" disabled><i class="fas fa-save"></i> Save hours</button>
+                            <button type="submit" class="btn btn-primary" id="hours-save" disabled><i class="fas fa-save"></i> Save</button>
                         </div>
                     </form>
                 </div>`;
@@ -4699,7 +4746,7 @@
             // a day missing from a saved doc means closed.
             const a = settings || BOOKING_AVAILABILITY_DEFAULTS;
             const saved = a.workingHours || {};
-            const interval = Number(a.slotIntervalMinutes) || 30;
+            const interval = bookingSlotMinutes(a);
             const notice = Number(a.minNoticeHours) || 0;
             const ahead = Number(a.maxFutureDays) || 60;
             const savedAt = settings && bookingDate(settings.updatedAt) ? formatBookingTime(settings.updatedAt) : '';
@@ -4708,8 +4755,19 @@
             const body = modal.querySelector('#hours-body');
             body.innerHTML = `
                 <p class="hours-intro">The drop-off times customers can pick on the online booking page.
-                    A time is offered every ${interval} minutes from opening; the last one is ${interval} minutes before closing.</p>
+                    A time is offered every <span data-hours-interval-text>${escapeHTML(intervalText(interval))}</span> from opening; the last one is that long before closing.
+                    A time you have confirmed a booking for shows as booked.</p>
                 ${settings ? '' : `<p class="hours-intro">These have never been saved, so the booking page is using its built-in hours, shown here. Saving stores them.</p>`}
+                <div class="hours-rules">
+                    <label class="hours-row__time">
+                        <span>Earliest booking, from now</span>
+                        <select class="form-input" id="hours-notice">${choiceOptions(HOURS_NOTICE_CHOICES, notice, noticeText)}</select>
+                    </label>
+                    <label class="hours-row__time">
+                        <span>A drop-off time every</span>
+                        <select class="form-input" id="hours-interval">${choiceOptions(HOURS_INTERVAL_CHOICES, interval, intervalText)}</select>
+                    </label>
+                </div>
                 ${BOOKING_HOURS_DAYS.map(([key, label]) => {
                     const h = saved[key] || {};
                     const closed = !saved[key] || !!h.closed;
@@ -4733,17 +4791,19 @@
                             <p class="hours-row__note" aria-live="polite"></p>
                         </div>`;
                 }).join('')}
-                <p class="hours-other">Customers can book from ${notice} hours ahead up to ${ahead} days ahead.
+                <p class="hours-other">Customers can book up to ${ahead} days ahead.
                     This changes the booking page only: the opening hours written on the rest of the website, and on Google, stay as they are.</p>
                 ${savedAt ? `<p class="hours-other">Last saved ${escapeHTML(savedAt)}${savedBy ? ' by ' + escapeHTML(savedBy) : ''}.</p>` : ''}`;
 
+            const intervalSelect = body.querySelector('#hours-interval');
+            const noticeSelect = body.querySelector('#hours-notice');
             const refreshRow = (row) => {
                 const closed = !row.querySelector('[data-hours-open]').checked;
                 const from = row.querySelector('[data-hours-from]');
                 const to = row.querySelector('[data-hours-to]');
                 from.disabled = closed;
                 to.disabled = closed;
-                const note = hoursRowNote(from.value, to.value, closed, interval);
+                const note = hoursRowNote(from.value, to.value, closed, Number(intervalSelect.value));
                 const el = row.querySelector('.hours-row__note');
                 el.textContent = note.text;
                 el.classList.toggle('is-wrong', note.wrong);
@@ -4751,6 +4811,10 @@
             body.querySelectorAll('.hours-row').forEach(row => {
                 refreshRow(row);
                 row.addEventListener('change', () => refreshRow(row));
+            });
+            intervalSelect.addEventListener('change', () => {
+                body.querySelector('[data-hours-interval-text]').textContent = intervalText(Number(intervalSelect.value));
+                body.querySelectorAll('.hours-row').forEach(refreshRow);
             });
 
             const save = modal.querySelector('#hours-save');
@@ -4777,6 +4841,12 @@
                     }
                     workingHours[key] = { open, close, closed };
                 }
+                const minNoticeHours = Number(noticeSelect.value);
+                const slotIntervalMinutes = Number(intervalSelect.value);
+                if (!(minNoticeHours >= 0 && minNoticeHours <= 168)) return fail('Pick how soon customers can book.');
+                if (!(Number.isInteger(slotIntervalMinutes) && slotIntervalMinutes >= 5 && slotIntervalMinutes <= 240)) {
+                    return fail('Pick how often a drop-off time is offered.');
+                }
                 if (Object.values(workingHours).every(d => d.closed)
                     && !confirm('Every day is closed, so nobody will be able to book online. Save anyway?')) return;
 
@@ -4788,6 +4858,8 @@
                     const snap = await ref.get();
                     const payload = {
                         workingHours,
+                        minNoticeHours,
+                        slotIntervalMinutes,
                         updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
                         updatedBy: currentUser ? currentUser.email : 'unknown'
                     };
@@ -4795,7 +4867,7 @@
                     // for the settings not edited here, so they stay as
                     // customers see them now.
                     if (!snap.exists) {
-                        ['blockedDates', 'minNoticeHours', 'maxFutureDays', 'slotIntervalMinutes']
+                        ['blockedDates', 'maxFutureDays']
                             .forEach(k => { payload[k] = BOOKING_AVAILABILITY_DEFAULTS[k]; });
                     }
                     await ref.set(payload, { merge: true });
@@ -4804,7 +4876,7 @@
                 } catch (error) {
                     delete modal.dataset.busy;
                     save.disabled = false;
-                    save.innerHTML = '<i class="fas fa-save"></i> Save hours';
+                    save.innerHTML = '<i class="fas fa-save"></i> Save';
                     fail('Could not save: ' + error.message);
                 }
             });
@@ -5618,6 +5690,22 @@
             return String((error && error.message) || error || 'unknown error').replace(/\.\s*$/, '');
         }
 
+        // Another booking already confirmed for this drop-off time, or null.
+        // The booking page shows a confirmed booking's time as booked, and
+        // the booking function refuses new requests for it; two requests
+        // that came in for the same time before either was confirmed are
+        // caught here instead.
+        function confirmedClash(bookingId, when) {
+            if (!when || isNaN(when)) return null;
+            return allBookings.find(b => b.id !== bookingId && isOpenBooking(b) && b.status && b.status !== 'pending'
+                && (bookingDate(b.preferredAt) || 0).valueOf() === when.valueOf()) || null;
+        }
+
+        function clashText(clash) {
+            const who = (clash.customer && clash.customer.name) || 'Another customer';
+            return `${who}'s booking (${bookingReference(clash)}) is already confirmed for ${formatBookingTime(clash.preferredAt)}.`;
+        }
+
         // Why Confirm booking cannot email the customer, or '' if it can.
         // when: the drop-off time as a Date, or null.
         function confirmEmailBlocker(email, when) {
@@ -5880,6 +5968,11 @@
                 }
 
                 if (action === 'save') {
+                    // Moving a confirmed booking onto another one's time.
+                    const moved = (bookingDate(booking.preferredAt) || 0).valueOf() !== (form.preferredAt || 0).valueOf();
+                    const clash = moved && booking.status && booking.status !== 'pending'
+                        ? confirmedClash(bookingId, form.preferredAt) : null;
+                    if (clash && !confirm(`${clashText(clash)}\n\nMove this booking to the same time anyway?`)) return;
                     setBusy(true);
                     const changes = bookingEdits(form);
                     await updateOpenBooking(bookingId, changes);
@@ -5932,7 +6025,9 @@
                     // taken from the booking before they are sent in the
                     // shop's name.
                     const mail = emailing ? buildBookingConfirmedMail(booking, form) : null;
-                    if (mail && !confirm(`Confirm ${form.customerName}'s booking for ${mail.when}?\n\n` +
+                    const clash = confirmedClash(bookingId, form.preferredAt);
+                    if (clash && !mail && !confirm(`${clashText(clash)}\n\nConfirm this one for the same time anyway?`)) return;
+                    if (mail && !confirm((clash ? clashText(clash) + '\n\n' : '') + `Confirm ${form.customerName}'s booking for ${mail.when}?\n\n` +
                         `The confirmation email will be sent to ${form.email}. It starts "${mail.greeting}"` +
                         (mail.device ? ` and gives the device as "${mail.device}".` : ' and names no device.'))) return;
                     setBusy(true);

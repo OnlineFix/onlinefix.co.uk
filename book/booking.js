@@ -4,8 +4,9 @@
    writes to Firestore or Storage: submitBooking() posts the booking, photos
    included, to the submitBooking Cloud Function (server/submit-booking/),
    which checks every field, rate-limits, and writes the booking, its photos
-   and the shop's email with the admin SDK. App Check is not used on this
-   page (see the note below and in /book/index.html).
+   and the shop's email with the admin SDK. The same function says which
+   drop-off times are already taken (loadTakenTimes). App Check is not used
+   on this page (see the note below and in /book/index.html).
 
    State lives in `state` and survives validation errors (intentional — the
    user spec is explicit that we never lose form data on error).
@@ -84,10 +85,12 @@
 
     const DEFAULT_AVAILABILITY = {
         // Drop-offs by appointment, 7 days, 10am to 10pm, as every page
-        // says. The last slot offered is 21:30. Used only while the
-        // availability/settings doc does not exist: when it does, it wins.
-        // Staff set the hours in that doc on the dashboard (Online
-        // Bookings, Booking hours), whose defaults match these.
+        // says, a time every 15 minutes from an hour ahead. The last slot
+        // offered is 21:45. Used only while the availability/settings doc
+        // does not exist: when it does, it wins. Staff set the hours, the
+        // notice and the minutes between times in that doc on the
+        // dashboard (Online Bookings, Booking hours), whose defaults match
+        // these.
         workingHours: {
             mon: { open: '10:00', close: '22:00', closed: false },
             tue: { open: '10:00', close: '22:00', closed: false },
@@ -98,9 +101,9 @@
             sun: { open: '10:00', close: '22:00', closed: false }
         },
         blockedDates: [],
-        minNoticeHours: 4,
+        minNoticeHours: 1,
         maxFutureDays: 60,
-        slotIntervalMinutes: 30
+        slotIntervalMinutes: 15
     };
 
     // ---- DOM helpers -----------------------------------------------------
@@ -112,6 +115,8 @@
     const state = {
         step: 1,
         availability: null,
+        taken: {},           // date -> UK times already taken ['18:00', ...]
+        takenLoading: {},    // date -> true while asking the booking function
         photos: [],          // [{ id, file, sizeKB }]
         tempId: null,
         sentAs: null,        // what tempId was last sent with (see submitBooking)
@@ -213,6 +218,7 @@
             if (label) label.textContent = 'BOOKED';
             if (fill) fill.style.width = '100%';
         }
+        if (n === 3 && state.preferredDate) loadTakenTimes(state.preferredDate);
         if (n === 5) renderReview();
         // Scroll the active step into view on mobile so users don't lose context.
         const formEl = $('#booking-form');
@@ -531,7 +537,55 @@
             state.preferredDate = e.target.value;
             state.preferredTime = '';
             clearError('preferred-date');
+            clearError('preferred-time');
             renderTimeSlots(state.preferredDate);
+            loadTakenTimes(state.preferredDate);
+        });
+    }
+
+    // Minutes between drop-off times. Read the same way by the booking
+    // function (readSettings there), which refuses a time another booking
+    // has taken within one of these.
+    function slotMinutes(a) {
+        const v = a && a.slotIntervalMinutes;
+        return Number.isInteger(v) && v >= 5 && v <= 240 ? v : DEFAULT_AVAILABILITY.slotIntervalMinutes;
+    }
+
+    // The times already taken on a date: those of bookings the shop has
+    // confirmed, from the booking function, times only. Asked each time the
+    // date is picked or step 3 is shown again, so a page left open catches
+    // up. If the answer does not come, every time stays offered: the
+    // function checks again when the booking is sent.
+    async function loadTakenTimes(dateStr) {
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr || '') || state.takenLoading[dateStr]) return;
+        state.takenLoading[dateStr] = true;
+        if (state.preferredDate === dateStr) renderTimeSlots(dateStr);
+        try {
+            const res = await fetch(BOOKING_ENDPOINT + '?date=' + encodeURIComponent(dateStr), {
+                method: 'GET',
+                credentials: 'omit',
+                cache: 'no-store'
+            });
+            const answer = await res.json();
+            if (res.ok && answer && answer.ok === true && Array.isArray(answer.taken)) {
+                state.taken[dateStr] = answer.taken.filter((t) => typeof t === 'string' && /^([01]\d|2[0-3]):[0-5]\d$/.test(t));
+            }
+        } catch (err) {
+            console.warn('Could not check which times are taken:', err);
+        } finally {
+            delete state.takenLoading[dateStr];
+        }
+        if (state.preferredDate === dateStr) renderTimeSlots(dateStr);
+    }
+
+    // Whether a taken time falls in the slot starting at h:min, that is
+    // before the next slot starts. Same test as the booking function's.
+    function slotTaken(slot, interval, takenTimes) {
+        const start = slot.h * 60 + slot.min;
+        return (takenTimes || []).some((t) => {
+            const [h, m] = t.split(':').map(Number);
+            const at = h * 60 + m;
+            return at >= start && at < start + interval;
         });
     }
 
@@ -567,22 +621,37 @@
             return renderEmpty("We're closed that day. Pick another.");
         }
 
-        const slots = generateSlots(hours.open, hours.close, a.slotIntervalMinutes || 30);
+        const interval = slotMinutes(a);
+        const slots = generateSlots(hours.open, hours.close, interval);
         if (!slots.length) return renderEmpty('No slots available.');
 
         const minNoticeMs = (a.minNoticeHours || 0) * 60 * 60 * 1000;
         const earliest = new Date(Date.now() + minNoticeMs);
+
+        if (state.takenLoading[dateStr]) {
+            const note = document.createElement('p');
+            note.className = 'time-slots-note';
+            note.textContent = 'Checking which times are already booked…';
+            container.appendChild(note);
+        }
 
         slots.forEach((slot) => {
             // Slots are the shop's hours, so compare them as UK times (the
             // same way submitBooking stores the one picked), not as times on
             // the visitor's own clock.
             const slotDate = ukTime(y, m, d, slot.h, slot.min);
-            const disabled = slotDate < earliest;
+            const taken = slotTaken(slot, interval, state.taken[dateStr]);
+            const disabled = slotDate < earliest || taken;
+            // A time picked before it was known to be taken is let go,
+            // with a word about why.
+            if (disabled && state.preferredTime === slot.label) {
+                state.preferredTime = '';
+                if (taken) showError('preferred-time', `Sorry, ${slot.label} has just been booked. Please pick another time.`);
+            }
             const isSelected = state.preferredTime === slot.label;
 
             const label = document.createElement('label');
-            label.className = 'time-slot' + (disabled ? ' disabled' : '') + (isSelected ? ' selected' : '');
+            label.className = 'time-slot' + (disabled ? ' disabled' : '') + (taken ? ' taken' : '') + (isSelected ? ' selected' : '');
             label.dataset.slot = slot.label;
 
             const input = document.createElement('input');
@@ -594,6 +663,12 @@
 
             label.appendChild(input);
             label.appendChild(document.createTextNode(slot.label));
+            if (taken) {
+                const tag = document.createElement('span');
+                tag.className = 'time-slot-tag';
+                tag.textContent = 'Booked';
+                label.appendChild(tag);
+            }
 
             if (!disabled) {
                 label.addEventListener('click', () => {
@@ -889,6 +964,7 @@
             if (!res.ok || !answer || answer.ok !== true || typeof answer.reference !== 'string') {
                 const refused = new Error('Booking not accepted (HTTP ' + res.status + ')');
                 refused.status = res.status;
+                if (res.status === 409 && answer && answer.error === 'taken') refused.code = 'taken';
                 throw refused;
             }
 
@@ -901,6 +977,19 @@
             }
             showStep(6);
         } catch (err) {
+            if (err && err.code === 'taken') {
+                // Someone else's booking for this time was confirmed while
+                // this one was being filled in. Nothing was saved: back to
+                // step 3 to pick another time, everything else kept.
+                const date = state.preferredDate;
+                const time = state.preferredTime;
+                state.taken[date] = (state.taken[date] || []).concat(time);
+                state.preferredTime = '';
+                showStep(3);
+                renderTimeSlots(date);
+                showError('preferred-time', `Sorry, ${time} has just been booked by someone else. Please pick another time.`);
+                return;
+            }
             console.error('Booking submit failed:', err);
             if (errEl) {
                 errEl.hidden = false;
@@ -962,6 +1051,7 @@
         state.photos = [];
         Object.assign(state, {
             step: 1,
+            taken: {},
             category: '',
             brand: '',
             model: '',
