@@ -2937,13 +2937,6 @@
             word-break: break-all;
         }
 
-        .booking-photos {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-        }
-
         .booking-check {
             display: flex;
             align-items: flex-start;
@@ -3021,6 +3014,355 @@
 
         #booking-modal .close-btn {
             flex-shrink: 0;
+        }
+
+        /* The booking box opens as a page to read, with Edit to change the
+           details. data-mode on the box says which half shows. */
+        #booking-modal[data-mode="view"] .bk-edit-only,
+        #booking-modal[data-mode="edit"] .bk-view-only {
+            display: none;
+        }
+
+        .booking-modal-content:focus {
+            outline: none;
+        }
+
+        .bk-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .booking-card-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.3rem;
+        }
+
+        .booking-chip--missed {
+            background: rgba(239, 68, 68, 0.18);
+            color: #FCA5A5;
+        }
+
+        .bk-label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--text-dark);
+            margin-bottom: 0.35rem;
+        }
+
+        .bk-when {
+            margin-bottom: 1.25rem;
+        }
+
+        .bk-when__day {
+            display: block;
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .bk-when__time {
+            display: block;
+            font-size: 2.25rem;
+            font-weight: 800;
+            line-height: 1.1;
+            color: var(--accent-cyan);
+        }
+
+        .bk-when__note {
+            display: block;
+            margin-top: 0.25rem;
+            font-size: 0.85rem;
+            color: var(--warning);
+        }
+
+        /* What the customer wrote, kept as they typed it, line breaks and all. */
+        .bk-fault {
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+            background: var(--bg-base);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 0.75rem 1rem;
+            margin-bottom: 1.25rem;
+            line-height: 1.5;
+        }
+
+        .bk-none {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .bk-options {
+            border-top: 1px solid var(--border-color);
+            padding-top: 1rem;
+        }
+
+        /* Customer photos as pictures, not "Photo 1" buttons. A tap opens
+           them over the whole screen (the photo viewer, below). */
+        .booking-thumbs {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(min(200px, 100%), 1fr));
+            gap: 0.6rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .booking-thumb {
+            position: relative;
+            aspect-ratio: 4 / 3;
+            min-height: 80px;
+            padding: 0;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background: var(--bg-base);
+            color: var(--text-muted);
+            font: inherit;
+            overflow: hidden;
+            cursor: zoom-in;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .booking-thumb img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .booking-thumb__label {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.5rem;
+            font-size: 0.85rem;
+            text-align: center;
+        }
+
+        .booking-thumb.is-loaded .booking-thumb__label {
+            display: none;
+        }
+
+        /* A small magnifier in the corner says the picture opens larger. */
+        .booking-thumb__zoom {
+            position: absolute;
+            right: 6px;
+            bottom: 6px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.6);
+            color: #FFFFFF;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
+
+        .booking-thumb.is-loaded .booking-thumb__zoom {
+            display: flex;
+        }
+
+        .booking-thumb:focus-visible {
+            outline: 2px solid var(--accent-cyan);
+            outline-offset: 2px;
+        }
+
+        /* The photo viewer: one photo at a time over the whole screen, above
+           any open box. touch-action: none hands every touch to the viewer,
+           so a pinch zooms the photo rather than the page. */
+        .photo-viewer {
+            position: fixed;
+            inset: 0;
+            z-index: 3000;
+            background: rgba(0, 0, 0, 0.95);
+            color: #FFFFFF;
+            touch-action: none;
+            overscroll-behavior: contain;
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+        }
+
+        .photo-viewer__bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 2;
+            height: calc(64px + env(safe-area-inset-top, 0px));
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: env(safe-area-inset-top, 0px) max(0.75rem, env(safe-area-inset-right, 0px)) 0 max(0.75rem, env(safe-area-inset-left, 0px));
+        }
+
+        .photo-viewer__count {
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .photo-viewer__hint {
+            flex: 1;
+            min-width: 0;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.7);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .photo-viewer__btn,
+        .photo-viewer__nav {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            background: rgba(40, 40, 40, 0.75);
+            color: #FFFFFF;
+            font: inherit;
+            cursor: pointer;
+        }
+
+        .photo-viewer__btn {
+            width: 48px;
+            height: 48px;
+            font-size: 1.05rem;
+        }
+
+        .photo-viewer__btn--close {
+            font-size: 1.6rem;
+            line-height: 1;
+        }
+
+        .photo-viewer__nav {
+            position: absolute;
+            top: 50%;
+            z-index: 2;
+            width: 56px;
+            height: 56px;
+            margin-top: -28px;
+            font-size: 2rem;
+            line-height: 1;
+        }
+
+        .photo-viewer__nav--prev {
+            left: max(0.75rem, env(safe-area-inset-left, 0px));
+        }
+
+        .photo-viewer__nav--next {
+            right: max(0.75rem, env(safe-area-inset-right, 0px));
+        }
+
+        .photo-viewer__nav:disabled {
+            opacity: 0.25;
+            cursor: default;
+        }
+
+        .photo-viewer__nav[hidden] {
+            display: none;
+        }
+
+        .photo-viewer__stage {
+            position: absolute;
+            top: calc(64px + env(safe-area-inset-top, 0px));
+            left: 0;
+            right: 0;
+            bottom: env(safe-area-inset-bottom, 0px);
+            overflow: hidden;
+        }
+
+        .photo-viewer__stage.is-zoomed {
+            cursor: grab;
+        }
+
+        /* Sized to fit the stage and centred, so the box is the photo
+           itself and a zoomed photo can be held to its own edges. */
+        .photo-viewer__img {
+            position: absolute;
+            inset: 0;
+            margin: auto;
+            max-width: 100%;
+            max-height: 100%;
+            transform-origin: center center;
+            -webkit-user-drag: none;
+        }
+
+        .photo-viewer.is-animating .photo-viewer__img {
+            transition: transform 0.2s ease-out;
+        }
+
+        .photo-viewer__msg {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            pointer-events: none;
+        }
+
+        @media (max-width: 640px) {
+            .photo-viewer__hint {
+                display: none;
+            }
+
+            .photo-viewer__count {
+                flex: 1;
+            }
+
+            .photo-viewer__nav {
+                width: 48px;
+                height: 48px;
+                margin-top: -24px;
+            }
+
+            .bk-when__time {
+                font-size: 1.9rem;
+            }
+
+            /* Three small photos in a row, and the booking's buttons two to
+               a row with Book in on top and Remove last. Stacked one to a
+               row, five buttons took most of a phone's screen and left the
+               booking itself a slot to be read through. */
+            .booking-thumbs {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            #booking-modal .booking-actions {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+            }
+
+            #booking-modal[data-mode="edit"] .booking-actions {
+                grid-template-columns: 1fr;
+            }
+
+            #booking-modal .booking-actions .btn {
+                padding: 0.6rem 0.75rem;
+                text-align: center;
+            }
+
+            #booking-modal .booking-actions .btn-primary {
+                grid-column: 1 / -1;
+                order: -1;
+            }
+
+            #booking-modal .booking-actions .btn-danger {
+                order: 1;
+            }
         }
 
         /* Booking hours: the button beside the board's legend, and the box
@@ -4102,6 +4444,8 @@
         function stopBookings() {
             if (unsubscribeBookings) unsubscribeBookings();
             unsubscribeBookings = null;
+            if (closePhotoViewer) closePhotoViewer();
+            bookingPhotoUrls.clear();
             bookingsLoaded = false;
             allBookings = [];
             bookingsLimit = BOOKINGS_LIMIT;
@@ -4474,6 +4818,15 @@
                 || BOOKING_CATEGORIES[device.category] || 'Device not given';
         }
 
+        /* True once the missed-appointment email has gone for the drop-off
+           time the booking holds now. A booking moved to a new time after
+           the email is no longer marked missed. */
+        function missedEmailSent(b) {
+            const sent = bookingDate(b.missedEmailedAt);
+            const when = bookingDate(b.preferredAt);
+            return !!(sent && when && when <= sent);
+        }
+
         function renderBookingCard(b, withDate) {
             const isNew = isNewBooking(b);
             const photos = Array.isArray(b.photoPaths) ? b.photoPaths.length : 0;
@@ -4484,7 +4837,10 @@
                     <div class="kanban-card-customer">${escapeHTML((b.customer && b.customer.name) || 'No name')}</div>
                     <div class="kanban-card-device">${escapeHTML(bookingDeviceText(b))}</div>
                     <div class="kanban-card-footer">
-                        <span class="booking-chip${isNew ? ' booking-chip--new' : ''}">${isNew ? 'New' : 'Confirmed'}</span>
+                        <span class="booking-card-chips">
+                            <span class="booking-chip${isNew ? ' booking-chip--new' : ''}">${isNew ? 'New' : 'Confirmed'}</span>
+                            ${missedEmailSent(b) ? '<span class="booking-chip booking-chip--missed">Missed, emailed</span>' : ''}
+                        </span>
                         ${photos ? `<span class="kanban-card-age"><i class="fas fa-image"></i> ${photos}</span>` : ''}
                     </div>
                 </div>`;
@@ -4493,12 +4849,17 @@
         document.addEventListener('click', (e) => {
             const card = e.target.closest('[data-booking-open]');
             if (card) openBooking(card.dataset.bookingOpen);
-            // Booking photo buttons, in the booking box and on a booked-in
-            // job. The path is carried in a data attribute, never written
-            // into an onclick: it came from the booking form, and older
-            // bookings were not held to a fixed shape.
+            // Booking photos, in the booking box and on a booked-in job. The
+            // path is carried in a data attribute, never written into an
+            // onclick: it came from the booking form, and older bookings
+            // were not held to a fixed shape. The viewer steps through the
+            // other photos in the same group.
             const photo = e.target.closest('[data-booking-photo]');
-            if (photo) openBookingPhoto(photo.dataset.bookingPhoto);
+            if (photo) {
+                const group = photo.closest('[data-booking-gallery]');
+                const tiles = group ? [...group.querySelectorAll('[data-booking-photo]')] : [photo];
+                openPhotoViewer(tiles.map(t => t.dataset.bookingPhoto), Math.max(0, tiles.indexOf(photo)), photo);
+            }
         });
         document.addEventListener('keydown', (e) => {
             if (e.key !== 'Enter' && e.key !== ' ') return;
@@ -4533,8 +4894,19 @@
             return Object.prototype.hasOwnProperty.call(BOOKING_BRAND_MAKERS, b) ? BOOKING_BRAND_MAKERS[b] : b;
         }
 
-        function openBooking(bookingId) {
-            const booking = allBookings.find(b => b.id === bookingId);
+        /* The booking box. It opens as a page to read: the drop-off time,
+           the customer's photos, what they wrote and how to reach them, with
+           the buttons that act on the booking. Edit turns the same box into
+           the form to correct the details, Save or Cancel turns it back.
+
+           Both halves are drawn at once, and the buttons always act on what
+           the form holds. On the page to read that is the booking as shown,
+           because leaving the form (Cancel, or Save) draws the box again
+           from the booking. opts.booking: the copy to draw (after a save,
+           before the board has caught up); opts.mode: 'edit' to open on
+           the form. */
+        function openBooking(bookingId, opts = {}) {
+            const booking = opts.booking || allBookings.find(b => b.id === bookingId);
             if (!booking) return;
             document.getElementById('booking-modal')?.remove();
 
@@ -4550,103 +4922,168 @@
             const cost = typeof booking.estimatedCost === 'number' ? booking.estimatedCost : '';
             const emailedAt = bookingDate(booking.confirmationEmailedAt) ? formatBookingTime(booking.confirmationEmailedAt) : '';
             const emailedTo = String(booking.confirmationEmailedTo || '');
+            const missedAt = bookingDate(booking.missedEmailedAt) ? formatBookingTime(booking.missedEmailedAt) : '';
+            const missedTo = String(booking.missedEmailedTo || '');
+            const when = bookingDate(booking.preferredAt);
+            const passed = !!when && when <= new Date();
+            const statusChip = `<span class="booking-chip${isNew ? ' booking-chip--new' : ''}">${isNew ? 'New, not yet confirmed' : 'Confirmed'}</span>`;
+            const emailLink = email
+                ? `<a href="mailto:${escapeHTML(mailtoAddress(email))}">${escapeHTML(email)}</a>`
+                : 'None';
+            const phoneLink = phone
+                ? `<a href="tel:${escapeHTML(phone.replace(/[^0-9+]/g, ''))}">${escapeHTML(phone)}</a>`
+                : 'None';
+            const confirmationFact = emailedAt
+                ? `<div><span>Confirmation email</span>Sent ${escapeHTML(emailedAt)}${emailedTo ? ' to ' + escapeHTML(emailedTo) : ''}</div>` : '';
+            const missedFact = missedAt
+                ? `<div><span>Missed appointment email</span>Sent ${escapeHTML(missedAt)}${missedTo ? ' to ' + escapeHTML(missedTo) : ''}</div>` : '';
 
             const modal = document.createElement('div');
             modal.className = 'modal show';
             modal.id = 'booking-modal';
+            modal.dataset.mode = opts.mode === 'edit' ? 'edit' : 'view';
             modal.setAttribute('role', 'dialog');
             modal.setAttribute('aria-modal', 'true');
             modal.setAttribute('aria-labelledby', 'booking-modal-title');
             modal.innerHTML = `
-                <div class="modal-content modal-content--job booking-modal-content">
+                <div class="modal-content modal-content--job booking-modal-content" tabindex="-1">
                     <div class="modal-header">
                         <h2 class="modal-title" id="booking-modal-title">Booking: ${escapeHTML(customer.name || 'No name')}</h2>
                         <button type="button" class="close-btn" data-booking-close aria-label="Close">&times;</button>
                     </div>
                     <form id="booking-edit-form" novalidate>
                         <div class="job-body">
-                            <div class="booking-facts">
-                                <div><span>Status</span><span class="booking-chip${isNew ? ' booking-chip--new' : ''}">${isNew ? 'New, not yet confirmed' : 'Confirmed'}</span></div>
-                                <div><span>Reference</span>${escapeHTML(bookingReference(booking))}</div>
-                                <div><span>Requested</span>${escapeHTML(formatBookingTime(booking.createdAt))}</div>
-                                <div><span>Email</span><a href="mailto:${escapeHTML(mailtoAddress(email))}">${escapeHTML(email || 'None')}</a></div>
-                                <div><span>Phone</span><a href="tel:${escapeHTML(phone.replace(/[^0-9+]/g, ''))}">${escapeHTML(phone || 'None')}</a></div>
-                                ${emailedAt ? `<div><span>Confirmation</span>Emailed ${escapeHTML(emailedAt)}${emailedTo ? ' to ' + escapeHTML(emailedTo) : ''}</div>` : ''}
-                            </div>
-                            ${photos.length ? `<div class="booking-photos">${photos.map((path, i) =>
-                                `<button type="button" class="btn btn-secondary" data-booking-photo="${escapeHTML(path)}"><i class="fas fa-image"></i> Photo ${i + 1}</button>`).join('')}</div>` : ''}
-                            <div class="form-grid booking-form-grid">
-                                <div class="form-group">
-                                    <label class="form-label" for="bk-first">First name</label>
-                                    <input type="text" class="form-input" id="bk-first" maxlength="60" autocomplete="off" autocapitalize="words" value="${escapeHTML(first)}">
+                            <!-- The booking to read. Everything the customer
+                                 typed goes through escapeHTML. -->
+                            <div class="bk-view-only">
+                                <div class="bk-chips">
+                                    ${statusChip}
+                                    ${missedEmailSent(booking) ? '<span class="booking-chip booking-chip--missed">Missed, emailed</span>' : ''}
                                 </div>
-                                <div class="form-group">
-                                    <label class="form-label" for="bk-last">Last name</label>
-                                    <input type="text" class="form-input" id="bk-last" maxlength="60" autocomplete="off" autocapitalize="words" value="${escapeHTML(last)}">
+                                <div class="bk-when">
+                                    <span class="bk-label">Drop-off</span>
+                                    ${when ? `
+                                        <span class="bk-when__day">${escapeHTML(when.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }))}</span>
+                                        <span class="bk-when__time">${escapeHTML(when.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }))}</span>
+                                        ${passed ? '<span class="bk-when__note">This time has passed.</span>' : ''}`
+                                    : '<span class="bk-when__day">No time given</span>'}
                                 </div>
-                                <div class="form-group">
-                                    <label class="form-label" for="bk-email">Email</label>
-                                    <input type="email" class="form-input" id="bk-email" maxlength="200" inputmode="email" autocapitalize="off" spellcheck="false" value="${escapeHTML(email)}">
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label" for="bk-phone">Mobile number</label>
-                                    <input type="tel" class="form-input" id="bk-phone" maxlength="24" inputmode="tel" value="${escapeHTML(phone)}">
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label" for="bk-when">Drop-off</label>
-                                    <input type="datetime-local" class="form-input" id="bk-when" value="${escapeHTML(toLocalInputValue(bookingDate(booking.preferredAt)))}">
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label" for="bk-category">Device type</label>
-                                    <select class="form-input" id="bk-category">
-                                        ${Object.entries(BOOKING_CATEGORIES).map(([value, label]) =>
-                                            `<option value="${value}"${device.category === value ? ' selected' : ''}>${label}</option>`).join('')}
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label" for="bk-brand">Brand</label>
-                                    <input type="text" class="form-input" id="bk-brand" maxlength="50" autocomplete="off" value="${escapeHTML(bookingBrandForJob(device.brand))}">
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label" for="bk-model">Model</label>
-                                    <input type="text" class="form-input" id="bk-model" maxlength="100" autocomplete="off" value="${escapeHTML(device.model || '')}">
+                                <span class="bk-label">${photos.length ? `Photos from the customer (${photos.length})` : 'Photos'}</span>
+                                ${photos.length ? bookingPhotoTiles(photos) : '<p class="bk-none">No photos were sent with this booking.</p>'}
+                                <span class="bk-label">Fault, as the customer wrote it</span>
+                                <div class="bk-fault">${escapeHTML(booking.issue || 'Not given')}</div>
+                                <div class="booking-facts">
+                                    <div><span>Name</span>${escapeHTML(customer.name || 'Not given')}</div>
+                                    <div><span>Phone</span>${phoneLink}</div>
+                                    <div><span>Email</span>${emailLink}</div>
+                                    <div><span>Device type</span>${escapeHTML(BOOKING_CATEGORIES[device.category] || 'Not given')}</div>
+                                    <div><span>Brand</span>${escapeHTML(bookingBrandForJob(device.brand) || 'Not given')}</div>
+                                    <div><span>Model</span>${escapeHTML(device.model || 'Not given')}</div>
+                                    ${cost !== '' ? `<div><span>Estimated price</span>£${escapeHTML(cost.toFixed(2))}</div>` : ''}
+                                    <div><span>Reference</span>${escapeHTML(bookingReference(booking))}</div>
+                                    <div><span>Requested</span>${escapeHTML(formatBookingTime(booking.createdAt))}</div>
+                                    ${confirmationFact}
+                                    ${missedFact}
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <label class="form-label" for="bk-issue">Fault</label>
-                                <textarea class="form-input form-textarea" id="bk-issue" maxlength="1000">${escapeHTML(booking.issue || '')}</textarea>
-                                <small style="color: var(--text-muted);">Shown to the customer on their tracking page once booked in.</small>
+                            <!-- The form, as the box used to open. -->
+                            <div class="bk-edit-only">
+                                <div class="booking-facts">
+                                    <div><span>Status</span>${statusChip}</div>
+                                    <div><span>Reference</span>${escapeHTML(bookingReference(booking))}</div>
+                                    <div><span>Requested</span>${escapeHTML(formatBookingTime(booking.createdAt))}</div>
+                                    ${confirmationFact}
+                                </div>
+                                ${photos.length ? bookingPhotoTiles(photos) : ''}
+                                <div class="form-grid booking-form-grid">
+                                    <div class="form-group">
+                                        <label class="form-label" for="bk-first">First name</label>
+                                        <input type="text" class="form-input" id="bk-first" maxlength="60" autocomplete="off" autocapitalize="words" value="${escapeHTML(first)}">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="bk-last">Last name</label>
+                                        <input type="text" class="form-input" id="bk-last" maxlength="60" autocomplete="off" autocapitalize="words" value="${escapeHTML(last)}">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="bk-email">Email</label>
+                                        <input type="email" class="form-input" id="bk-email" maxlength="200" inputmode="email" autocapitalize="off" spellcheck="false" value="${escapeHTML(email)}">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="bk-phone">Mobile number</label>
+                                        <input type="tel" class="form-input" id="bk-phone" maxlength="24" inputmode="tel" value="${escapeHTML(phone)}">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="bk-when">Drop-off</label>
+                                        <input type="datetime-local" class="form-input" id="bk-when" value="${escapeHTML(toLocalInputValue(when))}">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="bk-category">Device type</label>
+                                        <select class="form-input" id="bk-category">
+                                            ${Object.entries(BOOKING_CATEGORIES).map(([value, label]) =>
+                                                `<option value="${value}"${device.category === value ? ' selected' : ''}>${label}</option>`).join('')}
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="bk-brand">Brand</label>
+                                        <input type="text" class="form-input" id="bk-brand" maxlength="50" autocomplete="off" value="${escapeHTML(bookingBrandForJob(device.brand))}">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="bk-model">Model</label>
+                                        <input type="text" class="form-input" id="bk-model" maxlength="100" autocomplete="off" value="${escapeHTML(device.model || '')}">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="bk-issue">Fault</label>
+                                    <textarea class="form-input form-textarea" id="bk-issue" maxlength="1000">${escapeHTML(booking.issue || '')}</textarea>
+                                    <small style="color: var(--text-muted);">Shown to the customer on their tracking page once booked in.</small>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="bk-cost">Estimated price (£, optional)</label>
+                                    <input type="number" class="form-input" id="bk-cost" min="0" step="0.01" inputmode="decimal" value="${escapeHTML(cost)}">
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label class="form-label" for="bk-cost">Estimated price (£, optional)</label>
-                                <input type="number" class="form-input" id="bk-cost" min="0" step="0.01" inputmode="decimal" value="${escapeHTML(cost)}">
+                            <!-- What Confirm booking and Book in also send. -->
+                            <div class="bk-view-only bk-options">
+                                ${isNew ? `<label class="booking-check">
+                                    <input type="checkbox" id="bk-confirm-email">
+                                    <span>When confirming, email the customer that their booking is confirmed, with the drop-off time, address and reference. <small id="bk-confirm-email-note"></small></span>
+                                </label>` : ''}
+                                <label class="booking-check">
+                                    <input type="checkbox" id="bk-send-email"${isValidEmail(email) ? ' checked' : ''}>
+                                    <span>When booking in, email the customer their tracking link (the same email as the Send tracking email button).</span>
+                                </label>
                             </div>
-                            ${isNew ? `<label class="booking-check">
-                                <input type="checkbox" id="bk-confirm-email">
-                                <span>When confirming, email the customer that their booking is confirmed, with the drop-off time, address and reference. <small id="bk-confirm-email-note"></small></span>
-                            </label>` : ''}
-                            <label class="booking-check">
-                                <input type="checkbox" id="bk-send-email"${isValidEmail(email) ? ' checked' : ''}>
-                                <span>When booking in, email the customer their tracking link (the same email as the Send tracking email button).</span>
-                            </label>
                         </div>
                         <!-- Outside the scrolling part, so a message shows
-                             beside the buttons however far down the form is. -->
+                             beside the buttons however far down the box is. -->
                         <div class="alert alert-error hidden" id="bk-error" style="margin: 1rem 0 0;"></div>
                         <div class="modal-actions booking-actions">
-                            <button type="button" class="btn btn-danger" data-booking-action="remove"><i class="fas fa-trash"></i> Remove</button>
+                            <button type="button" class="btn btn-danger bk-view-only" data-booking-action="remove"><i class="fas fa-trash"></i> Remove</button>
+                            <button type="button" class="btn btn-secondary bk-edit-only" data-booking-action="cancel-edit">Cancel</button>
                             <span class="modal-actions__spacer"></span>
-                            <button type="button" class="btn btn-secondary" data-booking-action="save"><i class="fas fa-save"></i> Save</button>
-                            <button type="button" class="btn btn-secondary" data-booking-action="${isNew ? 'confirm' : 'unconfirm'}">
+                            <button type="button" class="btn btn-secondary bk-view-only" data-booking-action="edit"><i class="fas fa-pen"></i> Edit details</button>
+                            ${passed ? `<button type="button" class="btn btn-secondary bk-view-only" data-booking-action="missed"><i class="fas fa-envelope"></i> Missed appointment email</button>` : ''}
+                            <button type="button" class="btn btn-secondary bk-view-only" data-booking-action="${isNew ? 'confirm' : 'unconfirm'}">
                                 <i class="fas ${isNew ? 'fa-check' : 'fa-rotate-left'}"></i> ${isNew ? 'Confirm booking' : 'Mark as new'}
                             </button>
-                            <button type="button" class="btn btn-primary" data-booking-action="book-in"><i class="fas fa-tools"></i> Book in as job</button>
+                            <button type="button" class="btn btn-primary bk-view-only" data-booking-action="book-in"><i class="fas fa-tools"></i> Book in as job</button>
+                            <button type="button" class="btn btn-primary bk-edit-only" data-booking-action="save"><i class="fas fa-save"></i> Save changes</button>
                         </div>
                     </form>
                 </div>`;
             modal.dataset.bookingId = booking.id;
             document.body.appendChild(modal);
-            modal.querySelector('#bk-first').focus({ preventScroll: true });
+            fillBookingThumbs(modal);
+            // Not a text box: on the iPad that would bring the keyboard up
+            // over a page that is there to be read.
+            modal.querySelector('.booking-modal-content').focus({ preventScroll: true });
+
+            // A message already showing stays: a button on the page to read
+            // can switch to the form to show the box its message is about.
+            const setMode = (mode) => {
+                modal.dataset.mode = mode;
+                modal.querySelector('.job-body').scrollTop = 0;
+            };
 
             /* The booking confirmation email box (only with Confirm). It
                follows the email and drop-off boxes as they are edited: it
@@ -4664,8 +5101,8 @@
                 let choice = null;
                 confirmBox.addEventListener('change', () => { choice = confirmBox.checked; });
                 const refresh = () => {
-                    const when = modal.querySelector('#bk-when').value;
-                    const why = confirmEmailBlocker(modal.querySelector('#bk-email').value, when ? new Date(when) : null);
+                    const whenValue = modal.querySelector('#bk-when').value;
+                    const why = confirmEmailBlocker(modal.querySelector('#bk-email').value, whenValue ? new Date(whenValue) : null);
                     confirmBox.disabled = !!why;
                     if (why) confirmBox.checked = false;
                     else confirmBox.checked = choice !== null ? choice : !emailedAt;
@@ -4678,13 +5115,22 @@
                 refresh();
             }
 
-            const BUSY_LABELS = { save: 'Saving…', confirm: 'Saving…', unconfirm: 'Saving…', remove: 'Removing…', 'book-in': 'Booking in…' };
+            const BUSY_LABELS = { save: 'Saving…', confirm: 'Saving…', unconfirm: 'Saving…', remove: 'Removing…', 'book-in': 'Booking in…', missed: 'Sending…' };
             modal.addEventListener('click', async (e) => {
                 if (modal.dataset.busy) return;
                 if (e.target === modal || e.target.closest('[data-booking-close]')) { modal.remove(); return; }
                 const actionBtn = e.target.closest('[data-booking-action]');
                 if (!actionBtn || actionBtn.disabled) return;
                 const action = actionBtn.dataset.bookingAction;
+                if (action === 'edit') {
+                    modal.querySelector('#bk-error').classList.add('hidden');
+                    setMode('edit');
+                    return;
+                }
+                if (action === 'cancel-edit') {
+                    openBooking(booking.id, { booking: allBookings.find(b => b.id === booking.id) || booking });
+                    return;
+                }
                 const buttons = modal.querySelectorAll('[data-booking-action]');
                 const label = actionBtn.innerHTML;
                 const setBusy = (busy) => {
@@ -4693,11 +5139,349 @@
                     actionBtn.innerHTML = busy ? `<i class="fas fa-spinner fa-spin"></i> ${BUSY_LABELS[action] || 'Saving…'}` : label;
                 };
                 try {
-                    await runBookingAction(booking, action, modal, setBusy);
+                    await runBookingAction(booking, action, modal, setBusy, setMode);
                 } finally {
                     if (modal.isConnected) setBusy(false);
                 }
             });
+        }
+
+        /* === BOOKING PHOTOS ===
+           Each photo is drawn by an <img> from its download link, never by
+           sending a tab to that link (see openPhotoViewer). The links are
+           kept for the session, so a photo seen once opens at once. */
+        const bookingPhotoUrls = new Map();
+
+        function bookingPhotoUrl(path) {
+            if (!bookingPhotoUrls.has(path)) {
+                const url = storage.ref(path).getDownloadURL();
+                bookingPhotoUrls.set(path, url);
+                // A link that could not be fetched is asked for again next time.
+                url.catch(() => { if (bookingPhotoUrls.get(path) === url) bookingPhotoUrls.delete(path); });
+            }
+            return bookingPhotoUrls.get(path);
+        }
+
+        // The photos as tiles; fillBookingThumbs puts the pictures in once
+        // the tiles are on the page.
+        function bookingPhotoTiles(paths) {
+            return `<div class="booking-thumbs" data-booking-gallery>${paths.map((path, i) => `
+                <button type="button" class="booking-thumb" data-booking-photo="${escapeHTML(path)}" aria-label="Open photo ${i + 1} of ${paths.length} large">
+                    <span class="booking-thumb__label"><i class="fas fa-image"></i> Photo ${i + 1}</span>
+                    <span class="booking-thumb__zoom" aria-hidden="true"><i class="fas fa-magnifying-glass-plus"></i></span>
+                </button>`).join('')}</div>`;
+        }
+
+        function fillBookingThumbs(root) {
+            root.querySelectorAll('.booking-thumb[data-booking-photo]').forEach(tile => {
+                if (tile.dataset.filled) return;
+                tile.dataset.filled = '1';
+                const label = tile.querySelector('.booking-thumb__label');
+                const failed = () => {
+                    tile.classList.remove('is-loaded');
+                    label.textContent = 'Photo could not be loaded. Tap to try again.';
+                };
+                bookingPhotoUrl(tile.dataset.bookingPhoto).then(url => {
+                    if (!tile.isConnected) return;
+                    const img = document.createElement('img');
+                    img.alt = '';
+                    img.decoding = 'async';
+                    img.draggable = false;
+                    img.addEventListener('load', () => tile.classList.add('is-loaded'));
+                    img.addEventListener('error', () => { img.remove(); failed(); });
+                    img.src = url;
+                    tile.prepend(img);
+                }, failed);
+            });
+        }
+
+        /* The photo viewer: the photos over the whole screen, one at a time.
+           Swipe, the arrows or the arrow keys for the next one; pinch,
+           double-tap, the scroll wheel or the magnifier to zoom; drag to look
+           round a zoomed photo. It sits above the booking box, which stays
+           as it was underneath, and Escape closes the viewer only.
+
+           A booking photo is shown by an <img>, never by sending a tab to
+           the file's download link. Whoever uploads the file also chooses
+           how that link hands it out, and a "photo" set to download as
+           Booking-details.html (HTML inside, labelled a JPEG) arrived as a
+           web page on the staff computer's own disk. An <img> only ever
+           draws an image, whatever the file's settings say. */
+        let closePhotoViewer = null;
+        const PHOTO_MAX_ZOOM = 5;
+        const PHOTO_TAP_ZOOM = 2.5;
+
+        function openPhotoViewer(paths, start, returnFocus) {
+            if (closePhotoViewer) closePhotoViewer();
+            if (!paths.length) return;
+
+            const touch = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+            const viewer = document.createElement('div');
+            viewer.className = 'photo-viewer';
+            viewer.id = 'photo-viewer';
+            viewer.setAttribute('role', 'dialog');
+            viewer.setAttribute('aria-modal', 'true');
+            viewer.setAttribute('aria-label', 'Customer photos');
+            viewer.innerHTML = `
+                <div class="photo-viewer__stage">
+                    <img class="photo-viewer__img" alt="" draggable="false" hidden>
+                    <p class="photo-viewer__msg" role="status"></p>
+                </div>
+                <div class="photo-viewer__bar">
+                    <span class="photo-viewer__count"></span>
+                    <span class="photo-viewer__hint">${touch ? 'Pinch or double-tap to zoom. Swipe for the next photo.' : 'Scroll or double-click to zoom. Drag to move round.'}</span>
+                    <button type="button" class="photo-viewer__btn" data-pv="zoom"></button>
+                    <button type="button" class="photo-viewer__btn photo-viewer__btn--close" data-pv="close" aria-label="Close photos">&times;</button>
+                </div>
+                <button type="button" class="photo-viewer__nav photo-viewer__nav--prev" data-pv="prev" aria-label="Previous photo">&#8249;</button>
+                <button type="button" class="photo-viewer__nav photo-viewer__nav--next" data-pv="next" aria-label="Next photo">&#8250;</button>`;
+            document.body.appendChild(viewer);
+
+            const stage = viewer.querySelector('.photo-viewer__stage');
+            const img = viewer.querySelector('.photo-viewer__img');
+            const msg = viewer.querySelector('.photo-viewer__msg');
+            const count = viewer.querySelector('.photo-viewer__count');
+            const zoomBtn = viewer.querySelector('[data-pv="zoom"]');
+            const prevBtn = viewer.querySelector('[data-pv="prev"]');
+            const nextBtn = viewer.querySelector('[data-pv="next"]');
+            let index = 0;
+            let scale = 1, tx = 0, ty = 0;   // zoom, and how far the photo is moved from the centre
+            let loading = 0;
+            let zoomedIcon = null;
+
+            const apply = (animate) => {
+                viewer.classList.toggle('is-animating', !!animate);
+                img.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
+                const zoomed = scale > 1.01;
+                stage.classList.toggle('is-zoomed', zoomed);
+                if (zoomedIcon !== zoomed) {
+                    zoomedIcon = zoomed;
+                    zoomBtn.setAttribute('aria-label', zoomed ? 'Zoom out' : 'Zoom in');
+                    zoomBtn.innerHTML = `<i class="fas ${zoomed ? 'fa-magnifying-glass-minus' : 'fa-magnifying-glass-plus'}"></i>`;
+                }
+            };
+            // Keeps a zoomed photo over the screen: it can be moved until its
+            // edge reaches the screen's edge, and no further.
+            const clamp = () => {
+                if (scale <= 1) { scale = 1; tx = 0; ty = 0; return; }
+                const maxX = Math.max(0, (img.offsetWidth * scale - stage.clientWidth) / 2);
+                const maxY = Math.max(0, (img.offsetHeight * scale - stage.clientHeight) / 2);
+                tx = Math.min(maxX, Math.max(-maxX, tx));
+                ty = Math.min(maxY, Math.max(-maxY, ty));
+            };
+            const centre = () => {
+                const r = stage.getBoundingClientRect();
+                return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+            };
+            // Zooms to `next`, keeping the point at (x, y) on the screen where it is.
+            const zoomAt = (next, x, y, animate) => {
+                next = Math.min(PHOTO_MAX_ZOOM, Math.max(1, next));
+                const c = centre();
+                const dx = x - c.x, dy = y - c.y;
+                tx = dx - (next / scale) * (dx - tx);
+                ty = dy - (next / scale) * (dy - ty);
+                scale = next;
+                clamp();
+                apply(animate);
+            };
+            const resetZoom = (animate) => { scale = 1; tx = 0; ty = 0; apply(animate); };
+
+            const show = (i) => {
+                index = Math.max(0, Math.min(paths.length - 1, i));
+                resetZoom(false);
+                count.textContent = paths.length > 1 ? `Photo ${index + 1} of ${paths.length}` : 'Photo';
+                prevBtn.hidden = nextBtn.hidden = paths.length < 2;
+                prevBtn.disabled = index === 0;
+                nextBtn.disabled = index === paths.length - 1;
+                img.hidden = true;
+                img.removeAttribute('src');
+                msg.textContent = 'Loading photo…';
+                const ticket = ++loading;
+                bookingPhotoUrl(paths[index]).then(url => {
+                    if (ticket !== loading || !viewer.isConnected) return;
+                    img.onload = () => {
+                        if (ticket !== loading) return;
+                        msg.textContent = '';
+                        img.hidden = false;
+                    };
+                    img.onerror = () => {
+                        if (ticket === loading) msg.textContent = 'This photo could not be loaded. Check the connection and open it again.';
+                    };
+                    img.src = url;
+                }, error => {
+                    if (ticket === loading) msg.textContent = 'This photo could not be loaded: ' + errorText(error) + '.';
+                });
+            };
+
+            /* Touch, pen and mouse, through pointer events. One pointer drags:
+               a zoomed photo moves with it, an unzoomed one follows the finger
+               sideways and a long enough swipe changes photo. Two pointers
+               pinch: the point of the photo under the fingers stays under
+               them as they spread and move. */
+            const pointers = new Map();
+            let gesture = null;
+            let pinched = false;   // this touch has pinched, so lifting a finger is not a tap
+            let lastTap = null;
+
+            const beginGesture = () => {
+                const pts = [...pointers.values()];
+                if (pts.length >= 2) {
+                    const [a, b] = pts;
+                    pinched = true;
+                    gesture = {
+                        kind: 'pinch', scale, tx, ty,
+                        dist: Math.hypot(a.x - b.x, a.y - b.y) || 1,
+                        mid: { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }
+                    };
+                } else if (pts.length === 1) {
+                    gesture = { kind: 'drag', x: pts[0].x, y: pts[0].y, tx, ty, moved: false };
+                } else {
+                    gesture = null;
+                }
+            };
+
+            const onTap = (x, y) => {
+                const now = Date.now();
+                if (lastTap && now - lastTap.time < 350 && Math.hypot(x - lastTap.x, y - lastTap.y) < 40) {
+                    lastTap = null;
+                    if (scale > 1.01) resetZoom(true);
+                    else zoomAt(PHOTO_TAP_ZOOM, x, y, true);
+                } else {
+                    lastTap = { time: now, x, y };
+                }
+            };
+
+            stage.addEventListener('pointerdown', (e) => {
+                if (e.pointerType === 'mouse' && e.button !== 0) return;
+                e.preventDefault();
+                try { stage.setPointerCapture(e.pointerId); } catch (err) { /* not needed to work */ }
+                pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+                beginGesture();
+            });
+
+            stage.addEventListener('pointermove', (e) => {
+                const p = pointers.get(e.pointerId);
+                if (!p || !gesture) return;
+                p.x = e.clientX;
+                p.y = e.clientY;
+                if (gesture.kind === 'pinch' && pointers.size >= 2) {
+                    const [a, b] = [...pointers.values()];
+                    const dist = Math.hypot(a.x - b.x, a.y - b.y) || 1;
+                    const mid = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+                    const c = centre();
+                    // Where on the photo (unzoomed, from its centre) the pinch began.
+                    const ux = (gesture.mid.x - c.x - gesture.tx) / gesture.scale;
+                    const uy = (gesture.mid.y - c.y - gesture.ty) / gesture.scale;
+                    scale = Math.min(PHOTO_MAX_ZOOM, Math.max(1, gesture.scale * dist / gesture.dist));
+                    tx = mid.x - c.x - scale * ux;
+                    ty = mid.y - c.y - scale * uy;
+                    clamp();
+                    apply(false);
+                } else if (gesture.kind === 'drag') {
+                    const dx = p.x - gesture.x, dy = p.y - gesture.y;
+                    if (Math.abs(dx) > 8 || Math.abs(dy) > 8) gesture.moved = true;
+                    if (scale > 1.01) {
+                        tx = gesture.tx + dx;
+                        ty = gesture.ty + dy;
+                        clamp();
+                    } else {
+                        // Unzoomed: follow the finger sideways, with drag at
+                        // the first and last photo.
+                        const edge = (dx > 0 && index === 0) || (dx < 0 && index === paths.length - 1);
+                        tx = edge ? dx / 3 : dx;
+                        ty = 0;
+                    }
+                    apply(false);
+                }
+            });
+
+            const endPointer = (e) => {
+                const p = pointers.get(e.pointerId);
+                if (!p) return;
+                pointers.delete(e.pointerId);
+                const g = gesture;
+                if (pointers.size > 0) { beginGesture(); return; }
+                gesture = null;
+                const wasPinch = pinched;
+                pinched = false;
+                // A pinch ends where it was let go, unless it was let go
+                // almost unzoomed. It is never a tap or a swipe.
+                if (!g || g.kind !== 'drag' || wasPinch) {
+                    if (scale < 1.05) resetZoom(true);
+                    return;
+                }
+                const tapped = !g.moved && e.type === 'pointerup';
+                if (scale > 1.01) {
+                    if (tapped) onTap(p.x, p.y);
+                    return;
+                }
+                const dx = p.x - g.x, dy = p.y - g.y;
+                if (g.moved && Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)) {
+                    const to = index + (dx < 0 ? 1 : -1);
+                    if (to >= 0 && to < paths.length) { show(to); return; }
+                }
+                resetZoom(true);
+                if (tapped) onTap(p.x, p.y);
+            };
+            stage.addEventListener('pointerup', endPointer);
+            stage.addEventListener('pointercancel', endPointer);
+            stage.addEventListener('lostpointercapture', endPointer);
+
+            // Mouse wheel, and a trackpad pinch (which arrives as a wheel with ctrlKey).
+            stage.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                zoomAt(scale * Math.exp(-e.deltaY * (e.ctrlKey ? 0.01 : 0.002)), e.clientX, e.clientY, false);
+            }, { passive: false });
+            // Older iPad browsers send their own pinch events; keep them off the page.
+            viewer.addEventListener('gesturestart', (e) => e.preventDefault());
+
+            viewer.addEventListener('click', (e) => {
+                const btn = e.target.closest('[data-pv]');
+                if (!btn || btn.disabled) return;
+                const what = btn.dataset.pv;
+                if (what === 'close') close();
+                else if (what === 'prev') show(index - 1);
+                else if (what === 'next') show(index + 1);
+                else if (what === 'zoom') {
+                    if (scale > 1.01) resetZoom(true);
+                    else { const c = centre(); zoomAt(PHOTO_TAP_ZOOM, c.x, c.y, true); }
+                }
+            });
+
+            // Ahead of the page's own keys (Escape there closes every box),
+            // and kept inside the viewer while it is open.
+            const onKey = (e) => {
+                if (e.key === 'Escape') close();
+                else if (e.key === 'ArrowLeft') { if (index > 0) show(index - 1); }
+                else if (e.key === 'ArrowRight') { if (index < paths.length - 1) show(index + 1); }
+                else if (e.key === '+' || e.key === '=') { const c = centre(); zoomAt(scale * 1.5, c.x, c.y, true); }
+                else if (e.key === '-') { const c = centre(); zoomAt(scale / 1.5, c.x, c.y, true); }
+                else if (e.key === 'Tab') {
+                    const stops = [...viewer.querySelectorAll('button')].filter(b => !b.disabled && !b.hidden);
+                    const at = stops.indexOf(document.activeElement);
+                    const to = e.shiftKey ? (at <= 0 ? stops.length - 1 : at - 1) : (at + 1) % stops.length;
+                    if (stops[to]) stops[to].focus();
+                } else return;
+                e.preventDefault();
+                e.stopPropagation();
+            };
+            const onResize = () => { clamp(); apply(false); };
+            window.addEventListener('keydown', onKey, true);
+            window.addEventListener('resize', onResize);
+
+            function close() {
+                window.removeEventListener('keydown', onKey, true);
+                window.removeEventListener('resize', onResize);
+                loading++;
+                viewer.remove();
+                closePhotoViewer = null;
+                if (returnFocus && returnFocus.isConnected) returnFocus.focus({ preventScroll: true });
+            }
+            closePhotoViewer = close;
+
+            apply(false);
+            show(start || 0);
+            viewer.querySelector('[data-pv="close"]').focus({ preventScroll: true });
         }
 
         /* Removing a booking deletes its photos: the booking terms tell
@@ -4739,38 +5523,6 @@
                 }
             }
             return failures.join('; ');
-        }
-
-        /* A booking photo is shown as an image in a tab of its own, never by
-           sending the tab to the file's download link. Whoever uploads the
-           file also chooses how that link hands it out, and a "photo" set to
-           download as Booking-details.html (HTML inside, labelled a JPEG)
-           arrived as a web page on the staff computer's own disk. An <img>
-           only ever draws an image, whatever the file's settings say. */
-        async function openBookingPhoto(path) {
-            // Opened first, so an iPad does not treat it as an unrequested
-            // popup once the link has been fetched.
-            const win = window.open('', '_blank');
-            try {
-                const url = await storage.ref(path).getDownloadURL();
-                if (!win) {
-                    showAlert('Could not open a tab for the photo. Allow pop-ups for this page and try again.', 'error');
-                    return;
-                }
-                win.opener = null;
-                const d = win.document;
-                d.title = 'Booking photo';
-                const body = d.body || d.documentElement.appendChild(d.createElement('body'));
-                body.style.cssText = 'margin: 0; background: #111; min-height: 100vh; display: flex; align-items: center; justify-content: center;';
-                const img = d.createElement('img');
-                img.alt = 'Booking photo';
-                img.style.cssText = 'max-width: 100%; max-height: 100vh; display: block;';
-                img.src = url;
-                body.appendChild(img);
-            } catch (error) {
-                if (win) win.close();
-                showAlert('Could not open that photo: ' + error.message, 'error');
-            }
         }
 
         // What the form says now, checked. Returns null (and shows why) when
@@ -4835,20 +5587,24 @@
            all: no email for a booking removed or booked in elsewhere, and no
            booking marked as emailed when the email was refused.
            The email also goes only if the booking is still as it was when
-           its box was opened (`opened`): still New, and not confirmed,
-           emailed or edited since in another tab or on another device.
-           Otherwise a box left open would email the customer a second
-           time, perhaps with an old drop-off time. */
+           its box was opened (`opened`): not confirmed (for the
+           confirmation email, still New), emailed or edited since in
+           another tab or on another device. Otherwise a box left open
+           would email the customer a second time, perhaps with an old
+           drop-off time. The missed appointment email (from
+           buildMissedAppointmentMail) is held to the same. */
         async function updateOpenBooking(bookingId, changes, mail, opened) {
             const ref = db.collection('bookings').doc(bookingId);
             const millis = ts => { const d = bookingDate(ts); return d ? d.getTime() : 0; };
+            const confirming = !!mail && mail.data.meta.kind === 'booking-confirmed';
             await db.runTransaction(async (tx) => {
                 const fresh = await tx.get(ref);
                 const data = fresh.exists ? { id: fresh.id, ...fresh.data() } : null;
                 if (!data || data.deleted === true || data.status === 'removed') throw new Error('this booking has been removed.');
                 if (data.status === 'booked' || data.linkedRepairId) throw new Error('this booking is already booked in.');
-                if (mail && (!opened || (data.status && data.status !== 'pending')
+                if (mail && (!opened || (confirming && data.status && data.status !== 'pending')
                     || String(data.confirmationMailId || '') !== String(opened.confirmationMailId || '')
+                    || String(data.missedMailId || '') !== String(opened.missedMailId || '')
                     || millis(data.updatedAt) !== millis(opened.updatedAt))) {
                     throw new Error('this booking was changed in another tab or on another device after this box was opened. Close this box and open the booking again');
                 }
@@ -4870,6 +5626,15 @@
             if (!when || isNaN(when)) return 'Needs a drop-off time.';
             if (when <= new Date()) return 'The drop-off time has already passed.';
             return '';
+        }
+
+        // The device as a booking email names it: as Book in does, but
+        // "Other" says nothing, so then the row is left out, as it is for a
+        // device that holds a link (see looksLikeLink).
+        function bookingEmailDevice(form) {
+            const typed = [form.brand, form.model].filter(Boolean).join(' ');
+            return (looksLikeLink(typed) ? '' : typed)
+                || (form.category !== 'other' ? BOOKING_CATEGORIES[form.category] || '' : '');
         }
 
         /* The email telling a customer their online booking is confirmed,
@@ -4895,11 +5660,7 @@
             // form, and may not carry a message of their own: see
             // greetingName and looksLikeLink.
             const name = greetingName(form.firstName) || 'there';
-            // As Book in names the device, but "Other" says nothing, so then
-            // the row is left out, as it is for a device that holds a link.
-            const typed = [form.brand, form.model].filter(Boolean).join(' ');
-            const device = (looksLikeLink(typed) ? '' : typed)
-                || (form.category !== 'other' ? BOOKING_CATEGORIES[form.category] || '' : '');
+            const device = bookingEmailDevice(form);
             const reference = bookingReference(booking);
             const shop = { name: 'OnlineFix™', address: BOOKING_SHOP_ADDRESS, phone: SHOP_PHONE, email: SHOP_EMAIL };
             const mapsUrl = E.mapsUrl(shop.address);
@@ -4979,12 +5740,119 @@
             };
         }
 
-        async function runBookingAction(opened, action, modal, setBusy) {
+        // Why the missed appointment email cannot go, or '' if it can.
+        // when: the drop-off time as a Date, or null.
+        function missedEmailBlocker(email, when, phone) {
+            if (!window.OnlineFixEmail) return 'The email layout did not load. Reload the page to send this email.';
+            if (!isValidEmail(email)) {
+                return 'This booking has no valid email address, so the customer cannot be emailed.' +
+                    (phone ? ` Call or text them on ${phone} instead.` : '');
+            }
+            if (!when || isNaN(when)) return 'This booking has no drop-off time.';
+            if (when > new Date()) return 'The drop-off time has not passed yet.';
+            return '';
+        }
+
+        /* The email to a customer who did not come to their drop-off, sent
+           by the booking box's Missed appointment email button once the
+           drop-off time has passed. It is the one follow-up the booking
+           terms promise: "If you don't show up at the agreed slot and don't
+           get in touch, we'll send one follow-up email. If we still don't
+           hear from you, the booking lapses and you're welcome to book
+           again later."
+
+           DRAFT WORDING, waiting on the owner's OK (asked 16 Oct 2026).
+           Built and written like buildBookingConfirmedMail: the same
+           layout, the same care with the words taken from the booking, and
+           the same transaction, which also marks the booking as emailed. */
+        function buildMissedAppointmentMail(booking, form) {
+            const E = window.OnlineFixEmail;
+            if (!E) throw new Error('the email layout did not load; reload the page');
+            const w = E.ukWhen(form.preferredAt);
+            if (!w) throw new Error('the booking has no drop-off time');
+
+            const name = greetingName(form.firstName) || 'there';
+            const device = bookingEmailDevice(form);
+            const reference = bookingReference(booking);
+            const shop = { name: 'OnlineFix™', address: BOOKING_SHOP_ADDRESS, phone: SHOP_PHONE, email: SHOP_EMAIL };
+            const bookUrl = SITE_URL + '/book/';
+            const termsUrl = SITE_URL + '/booking-terms.html';
+
+            // ---- Wording (draft; the owner approves it before it is used) ----
+            const subject = `We missed you on ${w.date}`;
+            const preheader = `You were booked to drop off at ${w.time}. Book a new time whenever suits you.`;
+            const hi = `Hi ${name},`;
+            const lead = 'You booked a drop-off with us, but we didn\'t see you at the shop. We hope everything is OK.';
+            const rebook = phone => `Book a new time online, or reply to this email or call us on ${phone} (7 days, 10am to 10pm) and we'll find a time that suits you.`;
+            const lapse = 'If we don\'t hear from you, this booking will lapse and there\'s nothing more you need to do. You\'re welcome to book again whenever you\'re ready.';
+
+            const html = E.layout({
+                subject,
+                preheader,
+                body: [
+                    E.heading('We missed you', { accent: 'missed', gap: 12 }),
+                    E.chip('Drop-off booking // Guildford'),
+                    E.paragraph(hi, { gap: 8 }),
+                    E.paragraph(lead, { gap: 22 }),
+                    E.factCard([
+                        E.row('Your drop-off was', E.when(w.date, w.time)),
+                        device && E.row('Device', device, { kind: 'strong' }),
+                        E.row('Your reference', reference, { kind: 'ref' })
+                    ], { gap: 20 }),
+                    E.subheading('Still need a repair?'),
+                    // No-break spaces keep the phone number on one line.
+                    E.paragraph(rebook(shop.phone.replace(/ /g, '\u00a0')), { gap: 18 }),
+                    E.button(bookUrl, 'Book a new time', { gap: 12 }),
+                    E.button(E.telHref(shop.phone), 'Call ' + shop.phone, { variant: 'secondary', gap: 26 }),
+                    E.paragraph(lapse, { gap: 18 }),
+                    E.paragraph(E.join('Thanks,', E.br(), E.strong(shop.name)), { gap: 18 })
+                ],
+                footer: E.shopFooter(shop, [E.link(termsUrl, 'Booking terms', { color: E.colors.footText, bold: false, tap: true })])
+            });
+
+            const text = `${hi}\n\n${lead}\n\n` +
+                `Your drop-off was: ${w.full}\n` +
+                (device ? `Device: ${device}\n` : '') +
+                `Your reference: ${reference}\n\n` +
+                'Still need a repair? ' + rebook(shop.phone) + '\n\n' +
+                `Book a new time: ${bookUrl}\n\n` +
+                `${lapse}\n\n` +
+                `Thanks,\n${shop.name}\n\n` +
+                `${shop.name} · ${shop.address}\n${shop.phone} · ${shop.email}\n` +
+                `Booking terms: ${termsUrl}\n`;
+
+            return {
+                ref: db.collection('mail').doc(),
+                when: w.full,
+                // For the prompt before it goes (runBookingAction).
+                greeting: hi,
+                device,
+                data: {
+                    to: [form.email],
+                    replyTo: SHOP_EMAIL,
+                    message: { subject, text, html },
+                    meta: {
+                        kind: 'booking-missed',
+                        bookingId: booking.id,
+                        reference,
+                        sentBy: currentUser ? currentUser.email : 'unknown',
+                        createdAt: firebase.firestore.Timestamp.now()
+                    }
+                }
+            };
+        }
+
+        async function runBookingAction(opened, action, modal, setBusy, setMode) {
             // The board only holds bookings still waiting, so one booked in or
             // removed elsewhere drops out of it while its box is open here.
             // Carry on with the copy the box was opened from: every write
             // below re-reads the booking and says what happened to it.
-            const booking = allBookings.find(b => b.id === opened.id) || opened;
+            // After a save or an email the box is drawn from what it wrote,
+            // which the board may not have caught up with yet: then the
+            // box's copy is the newer one.
+            const listed = allBookings.find(b => b.id === opened.id);
+            const millis = ts => { const d = bookingDate(ts); return d ? d.getTime() : 0; };
+            const booking = listed && millis(listed.updatedAt) >= millis(opened.updatedAt) ? listed : opened;
             const bookingId = booking.id;
             const name = (booking.customer && booking.customer.name) || 'this customer';
             let emailing = false;   // Confirm booking with its email
@@ -5003,13 +5871,53 @@
                 }
 
                 const form = readBookingForm(modal, action === 'book-in');
-                if (!form) return;
+                if (!form) {
+                    // The message is about a box on the form, so show the form.
+                    if (modal.dataset.mode !== 'edit') setMode('edit');
+                    return;
+                }
 
                 if (action === 'save') {
                     setBusy(true);
-                    await updateOpenBooking(bookingId, bookingEdits(form));
-                    modal.remove();
+                    const changes = bookingEdits(form);
+                    await updateOpenBooking(bookingId, changes);
+                    // Back to the booking to read, as saved. Drawn from the
+                    // saved changes: the board may not have caught up yet.
+                    openBooking(bookingId, { booking: { ...booking, ...changes } });
                     showAlert('Booking saved.', 'success');
+                } else if (action === 'missed') {
+                    const err = modal.querySelector('#bk-error');
+                    const why = missedEmailBlocker(form.email, form.preferredAt, form.phone);
+                    if (why) {
+                        err.textContent = why;
+                        err.classList.remove('hidden');
+                        return;
+                    }
+                    // As with the confirmation email, the prompt quotes the
+                    // words taken from the booking before they are sent in
+                    // the shop's name.
+                    const mail = buildMissedAppointmentMail(booking, form);
+                    const before = bookingDate(booking.missedEmailedAt)
+                        ? `\n\nA missed appointment email was already sent on ${formatBookingTime(booking.missedEmailedAt)}` +
+                          `${booking.missedEmailedTo ? ' to ' + booking.missedEmailedTo : ''}. This sends another one.`
+                        : '';
+                    if (!confirm(`Email ${form.customerName} that they missed their drop-off on ${mail.when}?\n\n` +
+                        `It goes to ${form.email}, starts "${mail.greeting}"` +
+                        (mail.device ? ` and gives the device as "${mail.device}".` : ' and names no device.') +
+                        ' It offers a new time and says the booking lapses if they don\'t get in touch.' + before)) return;
+                    setBusy(true);
+                    const now = firebase.firestore.Timestamp.now();
+                    const changes = {
+                        missedEmailedAt: now,
+                        missedEmailedTo: form.email,
+                        missedMailId: mail.ref.id,
+                        updatedAt: now,
+                        updatedBy: currentUser ? currentUser.email : 'unknown'
+                    };
+                    await updateOpenBooking(bookingId, changes, mail, opened);
+                    // The box stays open, now saying the email went.
+                    openBooking(bookingId, { booking: { ...booking, ...changes } });
+                    showAlert(`The missed appointment email is queued to ${form.email}. The booking stays on the board until you remove it or book it in.`, 'success');
                 } else if (action === 'confirm') {
                     const box = modal.querySelector('#bk-confirm-email');
                     emailing = !!box && box.checked && !box.disabled && !confirmEmailBlocker(form.email, form.preferredAt);
@@ -5068,7 +5976,9 @@
                 // With the email, say plainly that it did not go, and how to
                 // confirm without it (unless the booking has gone, or this
                 // box is out of date).
-                const message = emailing
+                const message = action === 'missed'
+                    ? `Could not send the missed appointment email: ${errorText(error)}. Nothing was sent.`
+                    : emailing
                     ? `Could not confirm: ${errorText(error)}. Nothing was saved or sent.` +
                       (/has been removed|already booked in|another tab or on another device/.test(errorText(error)) ? '' : ' To confirm without the email, untick the email box and press Confirm booking again.')
                     : '';
@@ -5603,12 +6513,7 @@
                                      photos are shown on the tracking page, so
                                      these are opened from here instead. -->
                                 <p><strong>Booking photos:</strong> <span style="color: var(--text-muted);">sent by the customer, staff only</span></p>
-                                <div class="booking-photos">
-                                    ${repair.bookingPhotoPaths.map((path, i) => `
-                                        <button type="button" class="btn btn-secondary" data-booking-photo="${escapeHTML(path)}">
-                                            <i class="fas fa-image"></i> Photo ${i + 1}
-                                        </button>`).join('')}
-                                </div>` : ''}
+                                ${bookingPhotoTiles(repair.bookingPhotoPaths)}` : ''}
                         </div>
                         ${repair.progress && repair.progress.length > 0 ? `
                             <div style="background: var(--bg-surface); border: 1px solid var(--border-color); padding: 1.5rem; border-radius: var(--radius-lg); margin-bottom: 2rem;">
@@ -5664,6 +6569,7 @@
                 </div>
             `;
             document.body.appendChild(modal);
+            fillBookingThumbs(modal);
         }
 
         // Remove a single entry from a repair's progress history.
