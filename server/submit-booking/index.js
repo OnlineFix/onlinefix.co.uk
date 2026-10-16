@@ -16,7 +16,12 @@
 
    The booking id is the page's own CSPRNG id (requestId). It names the
    booking, its notice and its photo folder, so a retry after a lost reply
-   finds the booking already there and gets the same answer back. */
+   finds the booking already there and gets the same answer back.
+
+   It also tells the page which drop-off times are taken: GET ?date=
+   answers with the times of that day's confirmed bookings, times only
+   (see heldTimes), and a booking for a time already taken is refused with
+   409. */
 
 const crypto = require('node:crypto');
 const net = require('node:net');
@@ -117,6 +122,17 @@ const MAX_PHOTOS = 3;
 const LIMITS = Object.freeze({ perClientHour: 3, perClientDay: 6, siteDay: 40 });
 const HOUR_MS = 60 * 60 * 1000;
 
+// A booking takes its drop-off time once the shop has confirmed it (the
+// owner's choice, 16 Oct 2026): from then on /book/ shows that time as
+// booked, and another booking for it is refused. A new request ('pending')
+// does not take its time. Marking it as new again, or removing it, frees
+// the time. 'responded' is the old word for confirmed; 'booked' is booked
+// in as a job.
+const HOLDING_STATUSES = ['confirmed', 'responded', 'booked'];
+// Minutes between drop-off times when availability/settings does not say
+// (DEFAULT_AVAILABILITY in book/booking.js).
+const DEFAULT_SLOT_MINUTES = 15;
+
 // The shop's Gmail. The notice is sent through that same account, so it
 // goes to itself (a copy to hello@onlinefix.uk came back through hello@'s
 // forwarding and Gmail kept it under Sent, out of the inbox).
@@ -158,6 +174,19 @@ async function submitBooking(req, res) {
         return reply(res, 200, { ok: true });
     }
     if (req.method === 'GET') {
+        // ?date=YYYY-MM-DD: the drop-off times taken that day, for the
+        // booking page to grey out.
+        const date = req.query ? req.query.date : undefined;
+        if (date !== undefined) {
+            if (typeof date !== 'string' || !isRealDate(date)) return reply(res, 400, { ok: false, error: 'invalid' });
+            try {
+                if (!dateAllowed(date, await readSettings(), new Date())) return reply(res, 400, { ok: false, error: 'invalid' });
+                return reply(res, 200, { ok: true, taken: await heldTimes(date) });
+            } catch (err) {
+                logError('taken times failed', err);
+                return reply(res, 500, { ok: false, error: 'server' });
+            }
+        }
         // Health check. "you" is the address this visitor is counted under,
         // so after a deploy the owner can check that two devices on
         // different networks get different ones.
@@ -184,9 +213,18 @@ async function submitBooking(req, res) {
         const now = new Date();
         const booking = readBooking(req.body);
         if (!booking) return reply(res, 400, { ok: false, error: 'invalid' });
-        if (!await dateAllowed(booking.date, now)) return reply(res, 400, { ok: false, error: 'invalid' });
+        const settings = await readSettings();
+        if (!dateAllowed(booking.date, settings, now)) return reply(res, 400, { ok: false, error: 'invalid' });
 
         const id = booking.requestId;
+        // Before anything is counted, so a customer who picked a time that
+        // has just been taken is not held to the limits for trying again.
+        // Their own booking is skipped: a retry of one that was saved, and
+        // confirmed since, still gets its answer.
+        if (await timeHeld(booking.date, booking.time, settings.slotMinutes, id)) {
+            return reply(res, 409, { ok: false, error: 'taken' });
+        }
+
         const reference = id.slice(-6);
         const client = clientAddress(req);
         if (!client) console.warn('submitBooking: no usable client address; only the site-wide limit applies');
@@ -329,14 +367,70 @@ function decodeJpeg(p) {
     return buf;
 }
 
-// The drop-off day must be between today and the last day the page offers
-// (availability/settings.maxFutureDays, 60 when unset), in UK dates, with a
-// day's grace for a page left open over midnight.
-async function dateAllowed(date, now) {
+// The settings this function uses from availability/settings, which staff
+// edit on the dashboard: how many days ahead the page offers (60 when
+// unset), and the minutes between drop-off times. The latter is read the
+// way book/booking.js reads it (slotMinutes there).
+async function readSettings() {
     const snap = await db.collection('availability').doc('settings').get();
     const v = snap.exists ? snap.get('maxFutureDays') : undefined;
-    const maxDays = (typeof v === 'number' && Number.isFinite(v) && v > 0) ? Math.min(Math.floor(v), 3650) : 60;
-    return date >= ukIsoDate(0, now) && date <= ukIsoDate(maxDays + 1, now);
+    const slot = snap.exists ? snap.get('slotIntervalMinutes') : undefined;
+    return {
+        maxDays: (typeof v === 'number' && Number.isFinite(v) && v > 0) ? Math.min(Math.floor(v), 3650) : 60,
+        slotMinutes: Number.isInteger(slot) && slot >= 5 && slot <= 240 ? slot : DEFAULT_SLOT_MINUTES
+    };
+}
+
+// The drop-off day must be between today and the last day the page offers,
+// in UK dates, with a day's grace for a page left open over midnight.
+function dateAllowed(date, settings, now) {
+    return date >= ukIsoDate(0, now) && date <= ukIsoDate(settings.maxDays + 1, now);
+}
+
+// ---- Taken times ----------------------------------------------------------
+// Whether a booking takes its drop-off time (see HOLDING_STATUSES).
+function holdsTime(b) {
+    return !!b && b.deleted !== true && HOLDING_STATUSES.includes(b.status)
+        && !!b.preferredAt && typeof b.preferredAt.toDate === 'function';
+}
+
+// Bookings with a drop-off time from `from` up to (not including) `to`.
+// Filtered on status here, not in the query: that would need a composite
+// index, and a day holds few bookings.
+async function bookingsBetween(from, to) {
+    const snap = await db.collection('bookings')
+        .where('preferredAt', '>=', Timestamp.fromDate(from))
+        .where('preferredAt', '<', Timestamp.fromDate(to))
+        .get();
+    return snap.docs;
+}
+
+// The UK times ("18:00") of the bookings that take a time on a UK date,
+// sorted, each once. Nothing else about them leaves this function: the
+// answer goes to anyone who asks.
+async function heldTimes(date) {
+    const [y, m, d] = date.split('-').map(Number);
+    const docs = await bookingsBetween(ukTime(y, m, d, 0, 0), ukTime(y, m, d + 1, 0, 0));
+    const times = new Set();
+    for (const doc of docs) {
+        const b = doc.data();
+        if (!holdsTime(b)) continue;
+        const p = ukParts(b.preferredAt.toDate(), { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
+        times.add(p.hour + ':' + p.minute);
+    }
+    return Array.from(times).sort();
+}
+
+// Whether another booking takes the slot starting at this UK date and
+// time: any held time from its start until the next slot's. Same test as
+// the page's (slotTaken in book/booking.js), so a time the page offers is
+// one this accepts.
+async function timeHeld(date, time, slotMinutes, ownId) {
+    const [y, m, d] = date.split('-').map(Number);
+    const [hh, mm] = time.split(':').map(Number);
+    const start = ukTime(y, m, d, hh, mm);
+    const docs = await bookingsBetween(start, new Date(start.getTime() + slotMinutes * 60 * 1000));
+    return docs.some(doc => doc.id !== ownId && holdsTime(doc.data()));
 }
 
 // ---- Who is asking --------------------------------------------------------
