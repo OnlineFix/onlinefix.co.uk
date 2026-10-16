@@ -341,6 +341,13 @@
             box-shadow: 0 0 15px rgba(245, 158, 11, 0.1);
         }
 
+        .status-waiting-decision {
+            background: rgba(236, 72, 153, 0.15);
+            color: #F472B6;
+            border: 1px solid rgba(236, 72, 153, 0.3);
+            box-shadow: 0 0 15px rgba(236, 72, 153, 0.1);
+        }
+
         .status-waiting-parts {
             background: rgba(239, 68, 68, 0.15);
             color: #F87171;
@@ -489,6 +496,12 @@
             border-color: #FBBF24;
             color: #FBBF24;
             box-shadow: 0 0 10px rgba(251, 191, 36, 0.2);
+        }
+
+        .timeline-icon.status-waiting-decision {
+            border-color: #F472B6;
+            color: #F472B6;
+            box-shadow: 0 0 10px rgba(244, 114, 182, 0.2);
         }
 
         .timeline-icon.status-waiting-parts {
@@ -1049,6 +1062,13 @@
                 icon: 'fas fa-search',
                 class: 'status-diagnosing'
             },
+            // The shop calls this one "Waiting for Customer Decision"; the
+            // customer reads it addressed to them.
+            'waiting-decision': {
+                label: 'Waiting for your decision',
+                icon: 'fas fa-user-clock',
+                class: 'status-waiting-decision'
+            },
             'waiting-parts': {
                 label: 'Waiting for Parts',
                 icon: 'fas fa-clock',
@@ -1274,7 +1294,7 @@
             usedStatuses.add(currentStatus); // Add current status
 
             // Build timeline only for used statuses
-            const statusOrder = ['received', 'diagnosing', 'waiting-parts', 'in-repair', 'testing', 'ready', 'completed'];
+            const statusOrder = ['received', 'diagnosing', 'waiting-decision', 'waiting-parts', 'in-repair', 'testing', 'ready', 'completed'];
 
             const renderItem = ({ statusKey, iconClass, timeText, notes, photos }) => {
                 const status = statusConfig[statusKey];
