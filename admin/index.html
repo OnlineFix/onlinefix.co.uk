@@ -443,6 +443,12 @@
             border: 1px solid rgba(245, 158, 11, 0.3);
         }
 
+        .status-waiting-decision {
+            background: rgba(236, 72, 153, 0.15);
+            color: #F472B6;
+            border: 1px solid rgba(236, 72, 153, 0.3);
+        }
+
         .status-waiting-parts {
             background: rgba(239, 68, 68, 0.15);
             color: #F87171;
@@ -2385,11 +2391,15 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            /* Keeps the count off the end of a long name such as
+               "Waiting for Customer Decision". */
+            gap: 0.5rem;
             font-weight: 600;
             font-size: 0.85rem;
         }
 
         .kanban-column-count {
+            flex-shrink: 0;
             background: var(--bg-elevated);
             color: var(--text-muted);
             font-size: 0.75rem;
@@ -2463,6 +2473,24 @@
             .kanban-column {
                 min-width: 0;
                 flex: 1 1 0;
+            }
+        }
+
+        /* Seven columns share about 820px on a 1194px-wide iPad, so each one
+           is barely over 100px. Tighter gaps and header padding give the
+           names room to wrap inside their own column, with the count kept to
+           the top right, instead of pushing the count past the column edge. */
+        @media (min-width: 1181px) and (max-width: 1559px) {
+            .content-section.is-board .kanban-container {
+                gap: 0.5rem;
+            }
+
+            .kanban-column-header {
+                align-items: flex-start;
+                padding: 0.7rem 0.6rem;
+                gap: 0.35rem;
+                font-size: 0.8rem;
+                line-height: 1.3;
             }
         }
 
@@ -3283,6 +3311,7 @@
                             <option value="">All Statuses</option>
                             <option value="received">Received</option>
                             <option value="diagnosing">Diagnosing</option>
+                            <option value="waiting-decision">Waiting for Customer Decision</option>
                             <option value="waiting-parts">Waiting for Parts</option>
                             <option value="in-repair">In Repair</option>
                             <option value="testing">Testing</option>
@@ -3317,6 +3346,7 @@
                             <option value="">Change status to...</option>
                             <option value="received">Received</option>
                             <option value="diagnosing">Diagnosing</option>
+                            <option value="waiting-decision">Waiting for Customer Decision</option>
                             <option value="waiting-parts">Waiting for Parts</option>
                             <option value="in-repair">In Repair</option>
                             <option value="testing">Testing</option>
@@ -3584,10 +3614,14 @@
         let allRepairs = [];
         let updatePhotos = [];
 
-        // Status configuration
+        // Status configuration. customerLabel is what the customer reads for
+        // that stage, in the WhatsApp and email updates and on the invoice,
+        // when it differs from the shop's name for it. It matches statusConfig
+        // in track/index.html.
         const statusConfig = {
             'received': { label: 'Received', class: 'status-received' },
             'diagnosing': { label: 'Diagnosing', class: 'status-diagnosing' },
+            'waiting-decision': { label: 'Waiting for Customer Decision', customerLabel: 'Waiting for your decision', class: 'status-waiting-decision' },
             'waiting-parts': { label: 'Waiting for Parts', class: 'status-waiting-parts' },
             'in-repair': { label: 'In Repair', class: 'status-in-repair' },
             'testing': { label: 'Testing', class: 'status-testing' },
@@ -3601,6 +3635,11 @@
                 'Initial diagnosis in progress. We are examining your device to identify all issues.',
                 'Running diagnostic tests to determine the exact cause of the problem.',
                 'Device diagnosis complete. We have identified the issues and will proceed with repairs.'
+            ],
+            'waiting-decision': [
+                'We\'ve finished checking your device and sent you a quote. Just let us know if you\'d like us to go ahead.',
+                'We\'re waiting to hear back from you before we carry on with the repair. Get in touch whenever you\'re ready.',
+                'We\'ve tried to reach you about your repair. Please give us a call or send us a message when you can.'
             ],
             'waiting-parts': [
                 'We need to order replacement parts for your device. Expected arrival within 2-3 business days.',
@@ -5450,7 +5489,7 @@
 
 
         // Status progression order
-        const statusOrder = ['received', 'diagnosing', 'waiting-parts', 'in-repair', 'testing', 'ready', 'completed'];
+        const statusOrder = ['received', 'diagnosing', 'waiting-decision', 'waiting-parts', 'in-repair', 'testing', 'ready', 'completed'];
 
         function getNextStatus(currentStatus) {
             const idx = statusOrder.indexOf(currentStatus);
@@ -6006,6 +6045,7 @@
                             <select class="form-input" name="newStatus" id="status-select" onchange="showTemplates(this.value)">
                                 <option value="received" ${repair.currentStatus === 'received' ? 'selected' : ''}>Received</option>
                                 <option value="diagnosing" ${repair.currentStatus === 'diagnosing' ? 'selected' : ''}>Diagnosing</option>
+                                <option value="waiting-decision" ${repair.currentStatus === 'waiting-decision' ? 'selected' : ''}>Waiting for Customer Decision</option>
                                 <option value="waiting-parts" ${repair.currentStatus === 'waiting-parts' ? 'selected' : ''}>Waiting for Parts</option>
                                 <option value="in-repair" ${repair.currentStatus === 'in-repair' ? 'selected' : ''}>In Repair</option>
                                 <option value="testing" ${repair.currentStatus === 'testing' ? 'selected' : ''}>Testing</option>
@@ -6760,7 +6800,7 @@
         function renderKanban(containerId = 'overview-kanban-container') {
             const container = document.getElementById(containerId);
             if (!container) return;
-            const columns = ['received', 'diagnosing', 'waiting-parts', 'in-repair', 'testing', 'ready'];
+            const columns = ['received', 'diagnosing', 'waiting-decision', 'waiting-parts', 'in-repair', 'testing', 'ready'];
 
             container.innerHTML = columns.map(status => {
                 const repairs = allRepairs.filter(r => r.currentStatus === status);
@@ -6784,7 +6824,7 @@
 
         function getStatusColor(status) {
             const colors = {
-                'received': '#60A5FA', 'diagnosing': '#FBBF24', 'waiting-parts': '#F87171',
+                'received': '#60A5FA', 'diagnosing': '#FBBF24', 'waiting-decision': '#F472B6', 'waiting-parts': '#F87171',
                 'in-repair': '#A78BFA', 'testing': '#38BDF8', 'ready': '#34D399', 'completed': '#94A3B8'
             };
             return colors[status] || '#94A3B8';
@@ -7024,7 +7064,7 @@
             if (!repair) return;
 
             const date = repair.dateReceived ? new Date(repair.dateReceived.seconds * 1000).toLocaleDateString('en-GB') : 'N/A';
-            const statusLabel = statusConfig[repair.currentStatus]?.label || repair.currentStatus;
+            const statusLabel = statusConfig[repair.currentStatus]?.customerLabel || statusConfig[repair.currentStatus]?.label || repair.currentStatus;
 
             // NOTE: no 'noopener' here. window.open() returns null when noopener
             // is set — that is what the flag does — and this window has to be
@@ -7330,7 +7370,7 @@
             // Get the currently selected status from the modal (if open)
             const statusSelect = document.getElementById('status-select');
             const currentStatus = statusSelect ? statusSelect.value : repair.currentStatus;
-            const statusLabel = statusConfig[currentStatus]?.label || currentStatus;
+            const statusLabel = statusConfig[currentStatus]?.customerLabel || statusConfig[currentStatus]?.label || currentStatus;
 
             const message = `Hi ${repair.firstName || repair.customerName},\n\nThis is an update from OnlineFix regarding your repair (${repair.repairId}).\n\nStatus: ${statusLabel}\nDevice: ${repair.brand} ${repair.model}\n\nTracking link: ${window.location.origin}/track/?id=${repair.repairId}\n\nThank you for choosing OnlineFix!`;
 
@@ -7361,7 +7401,7 @@
             // Get the currently selected status from the modal (if open)
             const statusSelect = document.getElementById('status-select');
             const currentStatus = statusSelect ? statusSelect.value : repair.currentStatus;
-            const statusLabel = statusConfig[currentStatus]?.label || currentStatus;
+            const statusLabel = statusConfig[currentStatus]?.customerLabel || statusConfig[currentStatus]?.label || currentStatus;
 
             const subject = `Repair Update: ${repair.repairId} - ${statusLabel}`;
             const body = `Hi ${repair.firstName || repair.customerName},\n\nThis is an update from OnlineFix regarding your repair.\n\nRepair ID: ${repair.repairId}\nDevice: ${repair.brand} ${repair.model}\nStatus: ${statusLabel}\n\nTrack your repair online: ${window.location.origin}/track/?id=${repair.repairId}\n\nThank you for choosing OnlineFix!\nOnlineFix™ - Device Repair Specialists\nPhone: 07940 730537`;
@@ -7523,6 +7563,7 @@
             const statusColors = {
                 'received': '#60A5FA',
                 'diagnosing': '#FBBF24',
+                'waiting-decision': '#F472B6',
                 'waiting-parts': '#F87171',
                 'in-repair': '#A78BFA',
                 'testing': '#38BDF8',
