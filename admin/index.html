@@ -5759,9 +5759,12 @@
            terms promise: "If you don't show up at the agreed slot and don't
            get in touch, we'll send one follow-up email. If we still don't
            hear from you, the booking lapses and you're welcome to book
-           again later."
+           again later." (the terms now add that the shop may not accept
+           future bookings, which the email repeats).
 
-           DRAFT WORDING, waiting on the owner's OK (asked 16 Oct 2026).
+           DRAFT WORDING, waiting on the owner's OK (asked 16 Oct 2026; the
+           owner asked the same day for the firmer opening and the line
+           about future bookings).
            Built and written like buildBookingConfirmedMail: the same
            layout, the same care with the words taken from the booking, and
            the same transaction, which also marks the booking as emailed. */
@@ -5780,11 +5783,11 @@
 
             // ---- Wording (draft; the owner approves it before it is used) ----
             const subject = `We missed you on ${w.date}`;
-            const preheader = `You were booked to drop off at ${w.time}. Book a new time whenever suits you.`;
+            const preheader = `Your drop-off was booked for ${w.full}. Book a new time, or let us know.`;
             const hi = `Hi ${name},`;
-            const lead = 'You booked a drop-off with us, but we didn\'t see you at the shop. We hope everything is OK.';
+            const lead = `You had a drop-off appointment with us on ${w.full}, and we haven't heard from you about cancelling or rescheduling it.`;
             const rebook = phone => `Book a new time online, or reply to this email or call us on ${phone} (7 days, 10am to 10pm) and we'll find a time that suits you.`;
-            const lapse = 'If we don\'t hear from you, this booking will lapse and there\'s nothing more you need to do. You\'re welcome to book again whenever you\'re ready.';
+            const lapse = 'If we don\'t hear from you, this booking will lapse. Please be aware that we reserve the right not to accept future bookings.';
 
             const html = E.layout({
                 subject,
@@ -5904,7 +5907,7 @@
                     if (!confirm(`Email ${form.customerName} that they missed their drop-off on ${mail.when}?\n\n` +
                         `It goes to ${form.email}, starts "${mail.greeting}"` +
                         (mail.device ? ` and gives the device as "${mail.device}".` : ' and names no device.') +
-                        ' It offers a new time and says the booking lapses if they don\'t get in touch.' + before)) return;
+                        ' It offers a new time, and says the booking lapses if they don\'t get in touch and that future bookings may be refused.' + before)) return;
                     setBusy(true);
                     const now = firebase.firestore.Timestamp.now();
                     const changes = {
