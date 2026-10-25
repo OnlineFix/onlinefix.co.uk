@@ -433,6 +433,34 @@ select {
 
 .time-slot.disabled:hover { background: #eee; color: #aaa; }
 
+/* A time someone else has booked: greyed out, with "Booked" under it
+   rather than struck through. */
+.time-slot.taken {
+    text-decoration: none;
+    padding-top: 0.55rem;
+    padding-bottom: 0.45rem;
+}
+
+.time-slot-tag {
+    display: block;
+    margin-top: 0.15rem;
+    font-size: 0.65rem;
+    line-height: 1;
+    letter-spacing: 0.04em;
+}
+
+.time-slots-note {
+    grid-column: 1 / -1;
+    margin: 0;
+    padding: 0.5rem;
+    border-bottom: 1px solid var(--hex-black);
+    font-family: monospace;
+    font-size: 0.8rem;
+    color: #555;
+    text-align: center;
+    text-transform: uppercase;
+}
+
 /* Consent */
 .consent-row {
     display: flex;
