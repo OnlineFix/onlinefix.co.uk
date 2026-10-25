@@ -658,6 +658,7 @@
             });
             setChoice(key, chip.dataset.value);
             setFieldError(key, false);
+            if (key === 'category') matchJobsToDevice();
 
             if (key === 'unlockType') {
                 var needsCode = ['pin', 'pattern', 'password'].indexOf(chip.dataset.value) !== -1;
@@ -694,9 +695,14 @@
     // picked job is one line at the top of the fault box; anything typed
     // under those lines is left alone. One ticket is one device, so opening
     // another device's jobs takes the first device's lines back out.
+    //
+    // Device type and Make & model, filled in first, pick the device for
+    // the technician: the row then shows only that device, with a button to
+    // open the full row when the guess is wrong.
     var jobDevice = null;   // the JOB_PRESETS entry whose jobs are showing
     var jobPicks = [];      // indexes into jobDevice.jobs, in the order tapped
     var writtenLines = [];  // the lines last put in the fault box, to take back out
+    var autoJobName = '';   // what "Which device?" was last given from the model
 
     function otherDeviceName() {
         return $('#f-job-device').value.trim().replace(/\s+/g, ' ');
@@ -732,7 +738,9 @@
         });
     }
 
-    function showJobsFor(device) {
+    // `auto` is set when the device fields chose the device, not a tap, so
+    // the cursor stays where the technician is typing.
+    function showJobsFor(device, auto) {
         jobDevice = device;
         jobPicks = [];
         writeJobLines();
@@ -756,7 +764,65 @@
             wrap.appendChild(btn);
         });
         wrap.hidden = false;
-        if (device.other && !otherDeviceName()) $('#f-job-device').focus();
+        if (device.other && !auto && !otherDeviceName()) $('#f-job-device').focus();
+    }
+
+    function presetByKey(key) {
+        return JOB_PRESETS.filter(function (d) { return d.key === key; })[0] || null;
+    }
+
+    // The preset device for what is filled in under Device type and Make &
+    // model, or null when there is not enough to go on. The PS5 and the
+    // Series X are known by name whatever type is ticked; a desktop or a
+    // laptop goes to PC or Laptop; any other type has no list of its own,
+    // so it goes to Other.
+    function presetForDevice() {
+        var name = $('#f-brand').value + ' ' + $('#f-model').value;
+        if (/\b(ps\s*5|playstation\s*5)\b/i.test(name)) return presetByKey('ps5');
+        if (/\b(xbox|microsoft)\b.*\bseries\s*x\b/i.test(name)) return presetByKey('xbox');
+        if (state.category === 'desktop') return presetByKey('pc');
+        if (state.category === 'laptop') return presetByKey('laptop');
+        if (state.category) return presetByKey('other');
+        return null;
+    }
+
+    // The "Show all devices" button is only in the row while it is cut down
+    // to one device, so the full row's first/last-child borders still hold.
+    var allDevicesBtn = document.createElement('button');
+    allDevicesBtn.type = 'button';
+    allDevicesBtn.className = 'jobdevice jobdevice--all';
+    allDevicesBtn.textContent = 'Show all devices';
+
+    function showOnlyJobDevice(on) {
+        var row = $('#jobdevices');
+        row.classList.toggle('is-matched', on);
+        if (on) row.appendChild(allDevicesBtn);
+        else if (allDevicesBtn.parentNode) allDevicesBtn.remove();
+    }
+
+    // `typing` is set on each keystroke in Brand or Model. Mid-edit ("PS"
+    // on the way to "PS5", or a cleared box) can look like another device,
+    // so jobs already ticked are only swapped out once the box is left.
+    function matchJobsToDevice(typing) {
+        var device = presetForDevice();
+        if (typing === true && device !== jobDevice && jobPicks.length) return;
+        if (!device) {
+            showOnlyJobDevice(false);
+            return;
+        }
+        // Other's lines start with the device's name: take it from the model
+        // until the technician types their own.
+        if (device.other) {
+            var field = $('#f-job-device');
+            var model = $('#f-model').value.trim().replace(/\s+/g, ' ');
+            if (!field.value.trim() || field.value === autoJobName) {
+                field.value = model;
+                autoJobName = model;
+            }
+        }
+        if (device !== jobDevice) showJobsFor(device, true);
+        else if (device.other) writeJobLines();
+        showOnlyJobDevice(true);
     }
 
     (function buildJobPresets() {
@@ -773,7 +839,13 @@
         devices.addEventListener('click', function (event) {
             var btn = event.target.closest('.jobdevice');
             if (!btn) return;
-            var device = JOB_PRESETS.filter(function (d) { return d.key === btn.dataset.device; })[0];
+            if (btn === allDevicesBtn) {
+                showOnlyJobDevice(false);
+                var picked = $('#jobdevices .jobdevice.is-selected');
+                if (picked) picked.focus();
+                return;
+            }
+            var device = presetByKey(btn.dataset.device);
             if (device && device !== jobDevice) showJobsFor(device);
         });
 
@@ -792,6 +864,11 @@
 
         // Renaming the device rewrites the lines already picked for it.
         $('#f-job-device').addEventListener('input', writeJobLines);
+
+        ['#f-brand', '#f-model'].forEach(function (sel) {
+            $(sel).addEventListener('input', function () { matchJobsToDevice(true); });
+            $(sel).addEventListener('change', function () { matchJobsToDevice(); });
+        });
     })();
 
     // A job line deleted by hand un-ticks its chip, so the next tap on
