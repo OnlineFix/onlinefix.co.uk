@@ -408,6 +408,18 @@ select.input {
 .jobdevice:first-child { border-left: 0; }
 .jobdevice.is-selected { background: #111111; color: #FFFFFF; }
 
+/* Cut down to the device named under Device type and Make & model
+   (intake.js adds .is-matched): that device and "Show all devices", one
+   strip at every width. */
+.jobdevices.is-matched { display: flex; }
+.jobdevices.is-matched .jobdevice:not(.is-selected):not(.jobdevice--all) { display: none; }
+.jobdevices.is-matched .jobdevice { border-top: 0; border-left: 0; }
+.jobdevices.is-matched .jobdevice--all {
+    flex: 0 1 auto;
+    border-left: 2px solid var(--border-color);
+    font-size: 0.85rem;
+}
+
 .quickjobs { margin-bottom: 1.25rem; }
 
 /* A tick on a picked job, so "on" does not rely on colour alone. */
