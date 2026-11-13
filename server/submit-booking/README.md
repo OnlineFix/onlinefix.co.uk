@@ -13,7 +13,14 @@ each booking here as JSON, photos included. The function:
   and old counts are deleted after about two days;
 - stores up to three JPEG photos at `bookings/<id>/photo-1.jpg` to
   `photo-3.jpg`, then writes `bookings/<id>` and the shop's email notice
-  `mail/<id>` together with the admin SDK.
+  `mail/<id>` together with the admin SDK;
+- tells the booking page which drop-off times are taken: `GET ?date=YYYY-MM-DD`
+  answers `{"ok":true,"taken":["18:00", ...]}`, the UK times of that day's
+  bookings the shop has confirmed (or booked in), and nothing else about
+  them. A booking for a time taken within one slot (`slotIntervalMinutes` in
+  `availability/settings`) is refused with `409` before anything is counted
+  or stored. A new request does not take its time; marking it as new again
+  or removing it on the dashboard frees the time.
 
 Visitors cannot write to Firestore or Storage directly any more:
 `firestore.rules` and `storage.rules` allow bookings, booking photos and mail
