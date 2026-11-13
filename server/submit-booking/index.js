@@ -21,7 +21,9 @@
    It also tells the page which drop-off times are taken: GET ?date=
    answers with the times of that day's confirmed bookings, times only
    (see heldTimes), and a booking for a time already taken is refused with
-   409. */
+   409. Neither is counted against a visitor, so both work from a few
+   seconds' memory of the database rather than reading it on every request
+   (see "A short memory"). */
 
 const crypto = require('node:crypto');
 const net = require('node:net');
@@ -121,6 +123,9 @@ const MAX_PHOTOS = 3;
 // and the page shows its usual "something went wrong ... call" message.
 const LIMITS = Object.freeze({ perClientHour: 3, perClientDay: 6, siteDay: 40 });
 const HOUR_MS = 60 * 60 * 1000;
+// What a visitor with no usable address is counted under (see admit). No
+// address looks like this, so it cannot collide with one.
+const NO_ADDRESS = 'no-address';
 
 // A booking takes its drop-off time once the shop has confirmed it (the
 // owner's choice, 16 Oct 2026): from then on /book/ shows that time as
@@ -132,6 +137,11 @@ const HOLDING_STATUSES = ['confirmed', 'responded', 'booked'];
 // Minutes between drop-off times when availability/settings does not say
 // (DEFAULT_AVAILABILITY in book/booking.js).
 const DEFAULT_SLOT_MINUTES = 15;
+
+// How long the settings and a day's taken times are remembered (see "A
+// short memory"), and the most days remembered at once.
+const MEMORY_MS = 10 * 1000;
+const MAX_REMEMBERED_DAYS = 200;
 
 // The shop's Gmail. The notice is sent through that same account, so it
 // goes to itself (a copy to hello@onlinefix.uk came back through hello@'s
@@ -227,7 +237,7 @@ async function submitBooking(req, res) {
 
         const reference = id.slice(-6);
         const client = clientAddress(req);
-        if (!client) console.warn('submitBooking: no usable client address; only the site-wide limit applies');
+        if (!client) console.warn('submitBooking: no usable client address; counted with every other visitor that has none');
 
         const verdict = await admit(id, client, now);
         if (verdict === 'exists') return reply(res, 200, { ok: true, reference });
@@ -367,11 +377,53 @@ function decodeJpeg(p) {
     return buf;
 }
 
+// ---- A short memory -----------------------------------------------------------
+// Anyone can ask which times are taken, or send a booking for a taken time,
+// as often as they like: neither is counted against the limits, because a
+// real customer who picked a taken time must not be held to them for trying
+// again. Each used to read the database every time: the settings, and every
+// booking with a drop-off time in the day or slot asked about, new and
+// removed ones included, which any visitor can add to. So a script could
+// make this function read the database without end, at the owner's cost.
+//
+// remembered() keeps what a read found for MEMORY_MS. However many requests
+// come in, each running instance then reads the settings, and each day's
+// bookings, at most once in that time. Requests that arrive while a read is
+// under way share it. A read that fails is forgotten at once, so the next
+// request tries again.
+//
+// The price: the booking page, and the 409 check, can be up to MEMORY_MS
+// behind the dashboard. A booking sent in the seconds after its time was
+// confirmed for someone else can get through as a new request; the
+// dashboard warns about the clash when it is confirmed (confirmedClash in
+// admin/index.html).
+function remembered(memory, key, read) {
+    const now = Date.now();
+    const kept = memory.get(key);
+    if (kept && kept.until > now) return kept.value;
+    if (memory.size >= MAX_REMEMBERED_DAYS) {
+        for (const [k, v] of memory) if (v.until <= now) memory.delete(k);
+        if (memory.size >= MAX_REMEMBERED_DAYS) memory.clear();
+    }
+    const value = read();
+    const entry = { until: now + MEMORY_MS, value };
+    memory.set(key, entry);
+    value.catch(() => { if (memory.get(key) === entry) memory.delete(key); });
+    return value;
+}
+
+const settingsMemory = new Map();   // 'settings' -> the settings
+const heldMemory = new Map();       // UK date -> that day's held bookings
+
 // The settings this function uses from availability/settings, which staff
 // edit on the dashboard: how many days ahead the page offers (60 when
 // unset), and the minutes between drop-off times. The latter is read the
 // way book/booking.js reads it (slotMinutes there).
-async function readSettings() {
+function readSettings() {
+    return remembered(settingsMemory, 'settings', loadSettings);
+}
+
+async function loadSettings() {
     const snap = await db.collection('availability').doc('settings').get();
     const v = snap.exists ? snap.get('maxFutureDays') : undefined;
     const slot = snap.exists ? snap.get('slotIntervalMinutes') : undefined;
@@ -394,28 +446,39 @@ function holdsTime(b) {
         && !!b.preferredAt && typeof b.preferredAt.toDate === 'function';
 }
 
-// Bookings with a drop-off time from `from` up to (not including) `to`.
+// The bookings that take a time on a UK date: each one's id and the moment
+// of its drop-off, in milliseconds. Remembered for a few seconds (see "A
+// short memory").
+//
 // Filtered on status here, not in the query: that would need a composite
-// index, and a day holds few bookings.
-async function bookingsBetween(from, to) {
+// index. Only the three fields the filter needs are fetched, so a
+// customer's details never reach this function on this path.
+function heldOn(date) {
+    return remembered(heldMemory, date, () => loadHeld(date));
+}
+
+async function loadHeld(date) {
+    const [y, m, d] = date.split('-').map(Number);
     const snap = await db.collection('bookings')
-        .where('preferredAt', '>=', Timestamp.fromDate(from))
-        .where('preferredAt', '<', Timestamp.fromDate(to))
+        .where('preferredAt', '>=', Timestamp.fromDate(ukTime(y, m, d, 0, 0)))
+        .where('preferredAt', '<', Timestamp.fromDate(ukTime(y, m, d + 1, 0, 0)))
+        .select('status', 'deleted', 'preferredAt')
         .get();
-    return snap.docs;
+    const held = [];
+    for (const doc of snap.docs) {
+        const b = doc.data();
+        if (holdsTime(b)) held.push({ id: doc.id, at: b.preferredAt.toDate().getTime() });
+    }
+    return held;
 }
 
 // The UK times ("18:00") of the bookings that take a time on a UK date,
 // sorted, each once. Nothing else about them leaves this function: the
 // answer goes to anyone who asks.
 async function heldTimes(date) {
-    const [y, m, d] = date.split('-').map(Number);
-    const docs = await bookingsBetween(ukTime(y, m, d, 0, 0), ukTime(y, m, d + 1, 0, 0));
     const times = new Set();
-    for (const doc of docs) {
-        const b = doc.data();
-        if (!holdsTime(b)) continue;
-        const p = ukParts(b.preferredAt.toDate(), { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
+    for (const b of await heldOn(date)) {
+        const p = ukParts(new Date(b.at), { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
         times.add(p.hour + ':' + p.minute);
     }
     return Array.from(times).sort();
@@ -424,13 +487,18 @@ async function heldTimes(date) {
 // Whether another booking takes the slot starting at this UK date and
 // time: any held time from its start until the next slot's. Same test as
 // the page's (slotTaken in book/booking.js), so a time the page offers is
-// one this accepts.
+// one this accepts. A slot that runs past midnight looks at both days.
 async function timeHeld(date, time, slotMinutes, ownId) {
     const [y, m, d] = date.split('-').map(Number);
     const [hh, mm] = time.split(':').map(Number);
-    const start = ukTime(y, m, d, hh, mm);
-    const docs = await bookingsBetween(start, new Date(start.getTime() + slotMinutes * 60 * 1000));
-    return docs.some(doc => doc.id !== ownId && holdsTime(doc.data()));
+    const start = ukTime(y, m, d, hh, mm).getTime();
+    const end = start + slotMinutes * 60 * 1000;
+    const days = new Set([ukIsoDate(0, new Date(start)), ukIsoDate(0, new Date(end - 1))]);
+    for (const day of days) {
+        const held = await heldOn(day);
+        if (held.some(b => b.id !== ownId && b.at >= start && b.at < end)) return true;
+    }
+    return false;
 }
 
 // ---- Who is asking --------------------------------------------------------
@@ -440,7 +508,8 @@ async function timeHeld(date, time, slotMinutes, ownId) {
 // /64s), so counting by /64 would let one person book past the per-visitor
 // limit just by changing address. Counting by /56 makes that 256 times
 // harder while two real customers in the same /56 on the same day stay
-// very unlikely. null when there is no address worth counting.
+// very unlikely. null when there is no address worth counting (admit()
+// then counts the visitor with every other that has none).
 //
 // X-Forwarded-For is read from the RIGHT. A client can send the header
 // itself and put anything in it, but Google's front end appends the address
@@ -519,6 +588,12 @@ function ipv6Groups(addr) {
 // included, two days on. No client can read or write this collection (the
 // rules' final deny-all).
 //
+// A visitor with no usable address (client is null) is counted under
+// NO_ADDRESS, together with every other such visitor, as one. Real
+// customers reach this function over the internet and always have an
+// address; a request from inside a data centre's private network may not,
+// and used to be held to the site-wide limit only.
+//
 // Returns 'exists' (this booking is already saved: a retry), 'busy' (over a
 // limit; nothing written) or 'ok' (counted).
 async function admit(id, client, now) {
@@ -538,20 +613,16 @@ async function admit(id, client, now) {
         const dayCount = daySnap.exists && Number.isInteger(daySnap.get('count')) ? daySnap.get('count') : 0;
         if (dayCount >= LIMITS.siteDay) return 'busy';
 
-        let clientRef = null;
-        let times = [];
-        if (client) {
-            const hash = crypto.createHmac('sha256', Buffer.from(salt, 'hex')).update(client).digest('hex').slice(0, 32);
-            clientRef = limits.doc(day + '_' + hash);
-            const clientSnap = await tx.get(clientRef);
-            const stored = clientSnap.exists ? clientSnap.get('times') : null;
-            times = Array.isArray(stored) ? stored.filter(t => typeof t === 'number') : [];
-            const lastHour = times.filter(t => t > nowMs - HOUR_MS).length;
-            if (times.length >= LIMITS.perClientDay || lastHour >= LIMITS.perClientHour) return 'busy';
-        }
+        const hash = crypto.createHmac('sha256', Buffer.from(salt, 'hex')).update(client || NO_ADDRESS).digest('hex').slice(0, 32);
+        const clientRef = limits.doc(day + '_' + hash);
+        const clientSnap = await tx.get(clientRef);
+        const stored = clientSnap.exists ? clientSnap.get('times') : null;
+        const times = Array.isArray(stored) ? stored.filter(t => typeof t === 'number') : [];
+        const lastHour = times.filter(t => t > nowMs - HOUR_MS).length;
+        if (times.length >= LIMITS.perClientDay || lastHour >= LIMITS.perClientHour) return 'busy';
 
         tx.set(dayRef, { day, salt, count: dayCount + 1, expireAt });
-        if (clientRef) tx.set(clientRef, { day, times: times.concat(nowMs), expireAt });
+        tx.set(clientRef, { day, times: times.concat(nowMs), expireAt });
         return 'ok';
     });
 }

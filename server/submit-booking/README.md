@@ -10,7 +10,9 @@ each booking here as JSON, photos included. The function:
 - limits accepted bookings to 3 an hour and 6 a UK day per visitor, and 40 a
   UK day for the whole site (`429` over any limit). Visitors are counted in
   `bookingLimits` under a salted hash of their address, never the address,
-  and old counts are deleted after about two days;
+  and old counts are deleted after about two days. A visitor with no usable
+  address (a request from inside a data centre's private network) is
+  counted together with every other such visitor, as one;
 - stores up to three JPEG photos at `bookings/<id>/photo-1.jpg` to
   `photo-3.jpg`, then writes `bookings/<id>` and the shop's email notice
   `mail/<id>` together with the admin SDK;
@@ -20,7 +22,11 @@ each booking here as JSON, photos included. The function:
   them. A booking for a time taken within one slot (`slotIntervalMinutes` in
   `availability/settings`) is refused with `409` before anything is counted
   or stored. A new request does not take its time; marking it as new again
-  or removing it on the dashboard frees the time.
+  or removing it on the dashboard frees the time. Neither of these is
+  counted against a visitor, so both work from a 10-second memory of the
+  database (`remembered` in `index.js`): a flood of them reads the settings
+  and each day's bookings at most once in 10 seconds per running instance,
+  and the booking page can be that far behind the dashboard.
 
 Visitors cannot write to Firestore or Storage directly any more:
 `firestore.rules` and `storage.rules` allow bookings, booking photos and mail
@@ -82,7 +88,7 @@ Check it after each deploy: open that URL in a browser. It answers
 `{"ok":true,"you":"<address>"}`. Open it on a phone on mobile data too: the
 two `you` values must differ (that is the address each visitor is counted
 under). If they are the same, or `null`, stop there and do not switch over:
-the per-visitor limit would count every visitor as one, or not at all.
+the per-visitor limit would count every visitor as one.
 
 Also worth setting once: a budget alert (Billing, Budgets & alerts), so a
 flood of refused requests, which each cost a few Firestore reads, shows up
