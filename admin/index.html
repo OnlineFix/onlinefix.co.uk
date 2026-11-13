@@ -4750,7 +4750,6 @@
             const notice = Number(a.minNoticeHours) || 0;
             const ahead = Number(a.maxFutureDays) || 60;
             const savedAt = settings && bookingDate(settings.updatedAt) ? formatBookingTime(settings.updatedAt) : '';
-            const savedBy = settings && settings.updatedAt ? String(settings.updatedBy || '') : '';
 
             const body = modal.querySelector('#hours-body');
             body.innerHTML = `
@@ -4793,7 +4792,7 @@
                 }).join('')}
                 <p class="hours-other">Customers can book up to ${ahead} days ahead.
                     This changes the booking page only: the opening hours written on the rest of the website, and on Google, stay as they are.</p>
-                ${savedAt ? `<p class="hours-other">Last saved ${escapeHTML(savedAt)}${savedBy ? ' by ' + escapeHTML(savedBy) : ''}.</p>` : ''}`;
+                ${savedAt ? `<p class="hours-other">Last saved ${escapeHTML(savedAt)}.</p>` : ''}`;
 
             const intervalSelect = body.querySelector('#hours-interval');
             const noticeSelect = body.querySelector('#hours-notice');
@@ -4856,12 +4855,16 @@
                 try {
                     const ref = db.collection('availability').doc('settings');
                     const snap = await ref.get();
+                    // Anyone can read this doc (the booking page does,
+                    // without signing in), so it must not say who saved it:
+                    // that is a staff sign-in address. Earlier saves stored
+                    // one as updatedBy; this removes it.
                     const payload = {
                         workingHours,
                         minNoticeHours,
                         slotIntervalMinutes,
                         updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                        updatedBy: currentUser ? currentUser.email : 'unknown'
+                        updatedBy: firebase.firestore.FieldValue.delete()
                     };
                     // A first save also stores the booking page's defaults
                     // for the settings not edited here, so they stay as
