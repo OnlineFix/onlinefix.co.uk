@@ -290,7 +290,13 @@
             try {
                 await auth.signInWithEmailAndPassword($('email').value, $('password').value);
             } catch (err) {
-                showStatus('Sign-in failed: ' + err.message, 'err');
+                // This page has no 6-digit code step. The dashboard does, and
+                // its sign-in carries over here.
+                if (err.code === 'auth/multi-factor-auth-required') {
+                    showStatus('This account asks for a 6-digit login code. Sign in on the dashboard (/admin/) first, then reload this page.', 'warn');
+                } else {
+                    showStatus('Sign-in failed: ' + err.message, 'err');
+                }
             } finally {
                 $('login-btn').disabled = false;
             }

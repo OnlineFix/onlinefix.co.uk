@@ -15,6 +15,8 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+    <script src="/admin/qrcode.js?v=20261127" defer></script>
+    <script src="/admin/staff-mfa.js?v=20261127" defer></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"
         integrity="sha512-fD9DI5bZwQxOi7MhYWnnNPlvXdp/2Pj3XSTRrFs5FQa4mizyGLnJcN6tuvUS6LbmgN1ut+XGSABKvjN0H6Aoow=="
@@ -3534,6 +3536,26 @@
                         Authenticate
                     </button>
                 </form>
+                <!-- Second step, shown when the account has a login code
+                     linked (see staff-mfa.js). -->
+                <form id="login-code-form" class="hidden" novalidate>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1rem;">
+                        Open Okta Verify on your phone and type the 6-digit code for OnlineFix.</p>
+                    <div class="form-group">
+                        <label class="form-label" for="login-code">6-digit code</label>
+                        <input type="text" class="form-input" id="login-code" inputmode="numeric"
+                            autocomplete="one-time-code" maxlength="7" placeholder="123456" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="login-code-submit"
+                        style="width: 100%; justify-content: center; margin-top: 1rem; padding: 1rem;">
+                        <i class="fas fa-shield-alt"></i>
+                        Verify
+                    </button>
+                    <button type="button" class="btn btn-secondary" id="login-code-back"
+                        style="width: 100%; justify-content: center; margin-top: 0.75rem;">
+                        Back
+                    </button>
+                </form>
                 <div id="login-error" class="alert alert-error hidden"
                     style="margin-top: 1.5rem; text-align: center; font-size: 0.9rem;"></div>
             </div>
@@ -3583,6 +3605,13 @@
                     <a href="#" class="nav-link" data-section="analytics">
                         <i class="fas fa-chart-bar"></i>
                         Analytics
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="#" class="nav-link" id="login-code-link">
+                        <i class="fas fa-key"></i>
+                        Login code
+                        <span class="overdue-nav-badge hidden" id="login-code-badge" title="No login code linked yet">Off</span>
                     </a>
                 </div>
                 <div class="nav-item">
@@ -4199,6 +4228,35 @@
             showAccessNote(access.state, read.refreshError);
         });
 
+        // Force ID token refresh so any newly-set custom claims
+        // (e.g. {admin: true} from set-admin-claim.mjs) are picked
+        // up immediately, instead of after a stale-token expiry.
+        async function refreshStaffClaims() {
+            if (auth.currentUser) {
+                try { await auth.currentUser.getIdToken(true); } catch (_) {}
+            }
+        }
+
+        // The sign-in waiting for its 6-digit code (a Firebase resolver).
+        let pendingCodeSignIn = null;
+
+        function showCodeStep(resolver) {
+            pendingCodeSignIn = resolver;
+            document.getElementById('login-error').classList.add('hidden');
+            document.getElementById('login-form').classList.add('hidden');
+            document.getElementById('login-code-form').classList.remove('hidden');
+            const input = document.getElementById('login-code');
+            input.value = '';
+            input.focus();
+        }
+
+        function showPasswordStep() {
+            pendingCodeSignIn = null;
+            document.getElementById('login-code-form').classList.add('hidden');
+            document.getElementById('login-form').classList.remove('hidden');
+            document.getElementById('login-password').value = '';
+        }
+
         // Login form submission
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -4207,15 +4265,42 @@
 
             try {
                 await auth.signInWithEmailAndPassword(email, password);
-                // Force ID token refresh so any newly-set custom claims
-                // (e.g. {admin: true} from set-admin-claim.mjs) are picked
-                // up immediately, instead of after a stale-token expiry.
-                if (auth.currentUser) {
-                    try { await auth.currentUser.getIdToken(true); } catch (_) {}
-                }
+                await refreshStaffClaims();
             } catch (error) {
+                if (window.StaffMfa && StaffMfa.needsCode(error)) {
+                    showCodeStep(error.resolver);
+                    return;
+                }
                 showLoginError(error.message);
             }
+        });
+
+        document.getElementById('login-code-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const input = document.getElementById('login-code');
+            const button = document.getElementById('login-code-submit');
+            const code = StaffMfa.cleanCode(input.value);
+            if (code.length !== 6) {
+                showLoginError('Type the 6-digit code from the app.');
+                return;
+            }
+            button.disabled = true;
+            try {
+                await StaffMfa.finishSignIn(pendingCodeSignIn, code);
+                showPasswordStep();
+                await refreshStaffClaims();
+            } catch (error) {
+                if (StaffMfa.isExpired(error)) showPasswordStep();
+                else input.select();
+                showLoginError(StaffMfa.describe(error) || error.message);
+            } finally {
+                button.disabled = false;
+            }
+        });
+
+        document.getElementById('login-code-back').addEventListener('click', () => {
+            document.getElementById('login-error').classList.add('hidden');
+            showPasswordStep();
         });
 
         // Navigation
