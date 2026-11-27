@@ -1,5 +1,16 @@
 /* Shared JavaScript - OnlineFix */
 
+// Deferred stylesheets. Pages load core/icons CSS as
+// <link media="print" data-async-css> so it never blocks first paint, and
+// this switches them on. It used to be onload="this.media='all'" on each
+// link, but inline handlers need 'unsafe-inline' in the Content-Security-
+// Policy, which is what lets an injected script run. Switching before the
+// file has finished loading is fine: the styles apply once it arrives, and
+// a deferred script runs too late to make the link block rendering.
+document.querySelectorAll('link[data-async-css]').forEach((link) => {
+    link.media = 'all';
+});
+
 // Mobile menu toggle
 const mobileToggle = document.getElementById('mobile-toggle');
 const navMenu = document.getElementById('nav-menu');
