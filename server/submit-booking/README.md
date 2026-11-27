@@ -32,15 +32,16 @@ Visitors cannot write to Firestore or Storage directly any more:
 `firestore.rules` and `storage.rules` allow bookings, booking photos and mail
 to staff only. The wording of the shop's notice lives in `index.js`.
 
-It is deployed separately, from Google Cloud Shell. (Cloudflare Pages
-publishes the whole repository, but `_redirects` at the repository root
-sends requests for this folder, `scripts/`, `docs/` and the rules files to
-the "page not found" page, so they cannot be read from the website. They
-hold no secrets either way.)
+It is deployed separately, from Google Cloud Shell. The website itself is
+published by GitHub Pages, which leaves this folder, `scripts/`, `docs/` and
+the rules files out (see `exclude` in `_config.yml`), so they cannot be
+read on onlinefix.co.uk. The Cloudflare Pages copy at
+onlinefix-co-uk.pages.dev publishes the whole repository instead, and
+`_redirects` sends the same paths to its "page not found" page. They hold no
+secrets either way.
 
-The GitHub repository is private. When `git clone` below asks for a
-password, give your GitHub username and a personal access token (GitHub,
-Settings, Developer settings, Personal access tokens), not your password.
+GitHub Pages only serves a public repository on GitHub's free plan: making
+the repository private takes onlinefix.co.uk offline.
 
 ## Deploy
 
