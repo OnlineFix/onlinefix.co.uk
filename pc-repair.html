@@ -424,9 +424,9 @@
         @media(max-width:768px){.header-cta-row{flex-direction:column}.header-cta-row .cta-button{width:100%;margin:0.25rem 0}}
     </style>
     <!-- Deferred stylesheets (non-render-blocking) -->
-    <link rel="stylesheet" href="/css/core.min.css?v=20261006" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="/css/core.min.css?v=20261006" media="print" data-async-css>
     <noscript><link rel="stylesheet" href="/css/core.min.css?v=20261006"></noscript>
-    <link rel="stylesheet" href="/css/icons.min.css?v=20260611" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="/css/icons.min.css?v=20260611" media="print" data-async-css>
     <noscript><link rel="stylesheet" href="/css/icons.min.css?v=20260611"></noscript>
     <style>
         html {
@@ -1733,7 +1733,7 @@
                         <li><a href="reviews.html">Reviews</a></li>
                         <li><a href="contact.html">Contact</a></li>
                         <li><a href="privacy.html">Privacy &amp; Cookies</a></li>
-                        <li><a href="#" onclick="cookieManage();return false;">Manage Cookies</a></li>
+                        <li><a href="#" data-cookie-action="manage">Manage Cookies</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
@@ -1761,8 +1761,8 @@
                 <a href="privacy.html">Privacy &amp; Cookie Policy</a>
             </p>
             <div class="cookie-banner-buttons">
-                <button class="cookie-btn cookie-btn-accept" onclick="cookieConsentAccept()">Accept All</button>
-                <button class="cookie-btn cookie-btn-reject" onclick="cookieConsentReject()">Reject Non-Essential</button>
+                <button class="cookie-btn cookie-btn-accept" data-cookie-action="accept">Accept All</button>
+                <button class="cookie-btn cookie-btn-reject" data-cookie-action="reject">Reject Non-Essential</button>
             </div>
         </div>
     </div>
@@ -1771,8 +1771,8 @@
 
     
     <script src="/js/webmcp.js?v=20261008" defer></script>
-    <script src="/js/core.js?v=20260712" defer></script>
-    <script src="/js/cookies.js?v=20260611" defer></script>
+    <script src="/js/core.js?v=20261127" defer></script>
+    <script src="/js/cookies.js?v=20261127" defer></script>
 </body>
 
 </html>

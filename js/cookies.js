@@ -112,7 +112,22 @@
         hideBanner();
     }
 
-    // Expose for the banner buttons and the "Manage Cookies" footer link
+    // The banner buttons and the "Manage Cookies" footer link carry
+    // data-cookie-action instead of onclick="", so the pages work under a
+    // Content-Security-Policy without 'unsafe-inline'.
+    document.addEventListener('click', function (e) {
+        var el = e.target.closest && e.target.closest('[data-cookie-action]');
+        if (!el) return;
+        var action = el.getAttribute('data-cookie-action');
+        if (action === 'accept') acceptAll();
+        else if (action === 'reject') rejectNonEssential();
+        else if (action === 'manage') {
+            e.preventDefault();
+            showBanner();
+        }
+    });
+
+    // Still exposed for any page cached from before data-cookie-action.
     window.cookieConsentAccept = acceptAll;
     window.cookieConsentReject = rejectNonEssential;
     window.cookieManage = function () { showBanner(); };

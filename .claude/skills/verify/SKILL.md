@@ -27,8 +27,13 @@ install `playwright-core` in the scratchpad, not the repo).
 
 ## Gotchas
 
-- Stylesheets load deferred (`media="print" onload="this.media='all'"`) —
-  wait ~1s after `load` before reading computed styles or screenshotting.
+- Stylesheets load deferred (`media="print" data-async-css`, switched on by
+  `js/core.js`) — wait ~1s after `load` before reading computed styles or
+  screenshotting.
+- The public pages run under a Content-Security-Policy with no
+  `'unsafe-inline'` scripts (see `_headers`): no `<script>` blocks with code
+  and no `onclick=""`-style attributes outside `/admin/` and `/new-repair/`.
+  Put code in a `.js` file and use `addEventListener`.
 - `.fade-in` content is invisible until scrolled into view (IntersectionObserver);
   `scrollIntoView` + ~800ms wait before screenshots.
 - On mobile widths the whole `.cta-section` is `display: none`
