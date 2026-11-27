@@ -33,8 +33,14 @@ Visitors cannot write to Firestore or Storage directly any more:
 to staff only. The wording of the shop's notice lives in `index.js`.
 
 It is deployed separately, from Google Cloud Shell. (Cloudflare Pages
-publishes the whole repository, so these files can also be fetched from the
-website; they hold no secrets.)
+publishes the whole repository, but `_redirects` at the repository root
+sends requests for this folder, `scripts/`, `docs/` and the rules files to
+the "page not found" page, so they cannot be read from the website. They
+hold no secrets either way.)
+
+The GitHub repository is private. When `git clone` below asks for a
+password, give your GitHub username and a personal access token (GitHub,
+Settings, Developer settings, Personal access tokens), not your password.
 
 ## Deploy
 

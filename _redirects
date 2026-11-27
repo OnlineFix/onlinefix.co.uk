@@ -1,0 +1,24 @@
+# Files that live in this repository but are not part of the website.
+#
+# Cloudflare Pages publishes the whole repository (there is no build step),
+# so without these lines anyone could open the booking server's code, the
+# setup notes and the admin scripts at their normal paths. None of them hold
+# secrets, but together they map out how the site works, which saves an
+# automated attack tool a lot of exploring.
+#
+# Pages follows a redirect even when a file exists at that path, so the file
+# itself is never sent. _redirects cannot return 404 directly (it only
+# supports 301, 302, 303, 307 and 308), so each request goes to the
+# "page not found" page instead. 302, not 301, so browsers do not remember
+# it and a rule can be removed cleanly later.
+#
+# Keep this list in step with any new non-website folder or file.
+
+/firestore.rules  /404  302
+/storage.rules    /404  302
+/.gitignore       /404  302
+/server/*         /404  302
+/scripts/*        /404  302
+/docs/*           /404  302
+/.github/*        /404  302
+/.claude/*        /404  302
