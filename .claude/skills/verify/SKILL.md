@@ -30,10 +30,12 @@ install `playwright-core` in the scratchpad, not the repo).
 - Stylesheets load deferred (`media="print" data-async-css`, switched on by
   `js/core.js`) — wait ~1s after `load` before reading computed styles or
   screenshotting.
-- The public pages run under a Content-Security-Policy with no
-  `'unsafe-inline'` scripts (see `_headers`): no `<script>` blocks with code
-  and no `onclick=""`-style attributes outside `/admin/` and `/new-repair/`.
-  Put code in a `.js` file and use `addEventListener`.
+- Every page, staff tools included, runs under a Content-Security-Policy with
+  no `'unsafe-inline'` scripts (see `_headers`): no `<script>` blocks with
+  code and no `onclick=""`-style attributes, in HTML or in HTML built by JS.
+  Put code in a `.js` file and use `addEventListener`. In the dashboard, give
+  the element `data-do-click="name"` and add `name` to `ACTIONS` in
+  `admin/dashboard.js`.
 - `.fade-in` content is invisible until scrolled into view (IntersectionObserver);
   `scrollIntoView` + ~800ms wait before screenshots.
 - On mobile widths the whole `.cta-section` is `display: none`

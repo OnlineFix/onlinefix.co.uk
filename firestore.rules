@@ -10,8 +10,18 @@ service cloud.firestore {
     // 2026. Until then an allow-listed, verified email address also counted;
     // that fallback is gone, so a new staff account needs the claim before
     // it can see anything. Keep this function identical in storage.rules.
+    //
+    // Staff must also have signed in with the 6-digit login code (Okta
+    // Verify) since 27 Nov 2026. sign_in_second_factor is only in the token
+    // when the sign-in used a second step, so a device that signed in before
+    // codes were switched on, or with a password alone, is refused until it
+    // signs in again with the code. Linking a code (dashboard menu, "Login
+    // code") needs no database access, so a new staff account can still set
+    // one up.
     function isAdmin() {
-      return request.auth != null && request.auth.token.admin == true;
+      return request.auth != null
+          && request.auth.token.admin == true
+          && request.auth.token.firebase.get('sign_in_second_factor', null) != null;
     }
 
     match /repairs/{repairDoc} {
