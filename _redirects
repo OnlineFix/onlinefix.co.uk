@@ -1,8 +1,11 @@
 # Files that live in this repository but are not part of the website.
 #
-# Cloudflare Pages publishes the whole repository (there is no build step),
-# so without these lines anyone could open the booking server's code, the
-# setup notes and the admin scripts at their normal paths. None of them hold
+# These rules apply to the Cloudflare Pages copy of the site
+# (onlinefix-co-uk.pages.dev), which publishes the whole repository (there
+# is no build step). onlinefix.co.uk itself is served by GitHub Pages, which
+# ignores this file: _config.yml leaves the same files out there. Without
+# them anyone could open the booking server's code, the setup notes and the
+# admin scripts at their normal paths. None of them hold
 # secrets, but together they map out how the site works, which saves an
 # automated attack tool a lot of exploring.
 #

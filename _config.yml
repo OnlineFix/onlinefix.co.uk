@@ -1,0 +1,31 @@
+# GitHub Pages settings for onlinefix.co.uk.
+#
+# The live site is built by GitHub Pages (Jekyll) from the main branch and
+# served through Cloudflare. GitHub Pages ignores _redirects and _headers,
+# so this file is what decides which files get published.
+#
+# exclude: folders and files that live in this repository but are not part
+#   of the website. Without this, anyone could open the booking server's
+#   code, the setup notes, the admin scripts and the rules files at their
+#   normal paths. None hold secrets, but together they map out how the site
+#   works, which saves an automated attack tool a lot of exploring.
+#   (Setting exclude replaces the default list GitHub Pages uses, so its
+#   usual entries, CNAME included, are repeated at the end.) Keep this list in step with any new
+#   non-website folder or file.
+#
+# include: Jekyll skips anything starting with a dot, which kept
+#   /.well-known/security.txt (how security researchers contact the shop)
+#   off the live site.
+exclude:
+  - server/
+  - scripts/
+  - docs/
+  - firestore.rules
+  - storage.rules
+  - CNAME
+  - Gemfile
+  - Gemfile.lock
+  - node_modules/
+  - vendor/
+include:
+  - .well-known
